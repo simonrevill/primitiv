@@ -45,11 +45,15 @@ function App() {
         style={{ backgroundColor: activeColor.bg, color: activeColor.fg }}
       >
         <p className="preview-text">Sample Text</p>
-        <div role="status" className="status-ratio">
-          Ratio: {contrast?.display_ratio ?? "Loading..."}
+        <div role="status" className="status-ratio" aria-labelledby="status-ratio">
+          <span id="status-ratio">
+            Ratio: {contrast?.display_ratio ?? "Loading..."}
+          </span>
         </div>
-        <div role="status" className="status-rating">
-          Rating: {contrast?.rating}
+        <div role="status" className="status-rating" aria-labelledby="status-rating">
+          <span id="status-rating">
+            Rating: {contrast?.rating}
+          </span>
         </div>
       </section>
 

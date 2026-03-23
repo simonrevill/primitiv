@@ -1,0 +1,37 @@
+# --- Dependencies ---
+node_modules/
+.pnpm-debug.log
+
+# --- Rust / Cargo ---
+# Ignore the massive build folder for all crates
+target/
+# Ignore the generated Wasm package (we build this in CI or locally)
+crates/*/pkg/
+
+# --- Next.js / React ---
+.next/
+dist/
+build/
+.turbo/
+
+# --- Environment & Secrets ---
+.env
+.env*.local
+.vercel
+*.pem
+
+# --- IDE & OS ---
+.vscode/
+.idea/
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# --- Testing ---
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/

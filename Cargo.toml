@@ -1,0 +1,3 @@
+[workspace]
+members = ["crates/primitiv-core", "crates/primitiv-wasm"]
+resolver = "2"

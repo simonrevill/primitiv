@@ -1,0 +1,8 @@
+[package]
+name = "primitiv-core"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+csscolorparser = "0.8.3"
+palette = "0.7.6"

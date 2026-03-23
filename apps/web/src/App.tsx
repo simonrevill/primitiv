@@ -1,46 +1,36 @@
-import { useState, useEffect, ChangeEvent, Fragment } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import init, { get_contrast_rating, ContrastData } from 'primitiv-wasm';
 import './App.scss';
 
-const BG_COLORS = {
-  0: '#000000',
-  1: '#FFFFFF',
-} as const
-
-const FG_COLORS = {
-  0: '#FFFFFF',
-  1: '#000000',
-} as const
-
-const COLOR_NAMES = {
-  0: 'Black',
-  1: 'White',
-} as const
+// 1. Single Source of Truth
+const COLORS = [
+  { id: 'black', name: 'Black', bg: '#000000', fg: '#FFFFFF' },
+  { id: 'white', name: 'White', bg: '#FFFFFF', fg: '#000000' },
+  { id: 'pink', name: 'Pink', bg: '#FFC0CB', fg: '#FFFFFF' }, // SHOULD FAIL
+] as const;
 
 function App() {
-  const [contrast, setContrast] = useState<ContrastData | null>(null);
-  const [step, setStep] = useState<number>(0);
   const [isReady, setIsReady] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [contrast, setContrast] = useState<ContrastData | null>(null);
 
-  const bgColor = BG_COLORS[step as keyof typeof BG_COLORS];
-  const fgColor = FG_COLORS[step as keyof typeof FG_COLORS];
+  // 2. Derive current color from index
+  const activeColor = COLORS[selectedIndex];
 
   useEffect(() => {
     init().then(() => {
       setIsReady(true);
-      setContrast(get_contrast_rating(bgColor, "#FFFFFF"));
+      // Initial calculation
+      const result = get_contrast_rating(COLORS[0].bg, COLORS[0].fg);
+      setContrast(result);
     });
   }, []);
 
-  const handleColorChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const newStep = parseInt(e.target.value) as keyof typeof BG_COLORS;
-    setStep(newStep);
-
+  const handleColorChange = (index: number) => {
+    setSelectedIndex(index);
     if (isReady) {
-      const newBackgroundColor = BG_COLORS[newStep];
-      const newForegroundColor = FG_COLORS[newStep];
-      const result = get_contrast_rating(newBackgroundColor, newForegroundColor);
-      console.log('result: ', result);
+      const { bg, fg } = COLORS[index];
+      const result = get_contrast_rating(bg, fg);
       setContrast(result);
     }
   };
@@ -52,30 +42,32 @@ function App() {
       <section
         className="preview-box"
         aria-label="Color Preview"
-        style={{ backgroundColor: bgColor, color: fgColor }}
+        style={{ backgroundColor: activeColor.bg, color: activeColor.fg }}
       >
         <p className="preview-text">Sample Text</p>
-        <div role="status" aria-label="status-ratio" className="status-rating">
-          Ratio: {contrast?.display_ratio}
+        <div role="status" className="status-ratio">
+          Ratio: {contrast?.display_ratio ?? "Loading..."}
         </div>
-        <div role="status" aria-label="status-rating" className="status-rating">
+        <div role="status" className="status-rating">
           Rating: {contrast?.rating}
         </div>
       </section>
-      {Object.keys(BG_COLORS).map((i) => parseInt(i)).map((colorIndex) => (
-        <Fragment key={colorIndex}>
-          <input
-            key={colorIndex}
-            id={BG_COLORS[colorIndex as keyof typeof BG_COLORS]}
-            name="color"
-            value={colorIndex}
-            className="slider"
-            type="radio"
-            onChange={handleColorChange}
-          />
-          <label htmlFor={BG_COLORS[colorIndex as keyof typeof BG_COLORS]}>{COLOR_NAMES[colorIndex as keyof typeof COLOR_NAMES]}</label>
-        </Fragment>
-      ))}
+
+      <div className="controls">
+        {COLORS.map((color, index) => (
+          <Fragment key={color.id}>
+            <input
+              id={color.id}
+              name="color-choice"
+              type="radio"
+              checked={selectedIndex === index}
+              onChange={() => handleColorChange(index)}
+              className="radio-input"
+            />
+            <label htmlFor={color.id}>{color.name}</label>
+          </Fragment>
+        ))}
+      </div>
     </main>
   );
 }

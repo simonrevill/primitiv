@@ -1,5 +1,5 @@
 import { useState, useEffect, Fragment } from 'react';
-import init, { get_contrast_rating, ContrastData } from 'primitiv-wasm';
+import init, { get_contrast_rating, ContrastData, get_greyscale_palette } from 'primitiv-wasm';
 import './App.scss';
 
 // 1. Single Source of Truth

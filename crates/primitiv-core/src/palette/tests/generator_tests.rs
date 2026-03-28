@@ -1,4 +1,3 @@
-// crates/primitiv-core/src/palette/generator_tests.rs
 use crate::palette::generator::*;
 
 #[test]

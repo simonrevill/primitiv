@@ -1,5 +1,5 @@
-pub mod contrast;
+pub mod audit;
 pub mod palette;
 
-pub use contrast::get_contrast_rating;
+pub use audit::audit::*;
 pub use palette::generator::*;

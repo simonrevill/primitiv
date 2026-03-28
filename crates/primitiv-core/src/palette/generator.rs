@@ -43,13 +43,19 @@ mod tests {
     }
 
     #[test]
-    fn test_generate_greyscale_oklch_first_step_returns_50_label() {
+    fn test_generate_greyscale_oklch_all_labels_are_correct() {
         // Arrange
         let result = generate_greyscale_oklch();
+        let expected_labels = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
 
         // Assert
-        let fifty_step = &result[0];
-        assert_eq!(fifty_step.label, 50);
+        for (i, step) in result.iter().enumerate() {
+            assert_eq!(
+                step.label, expected_labels[i],
+                "Step at index {} has incorrect label",
+                i
+            );
+        }
     }
 
     #[test]

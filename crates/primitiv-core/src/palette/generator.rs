@@ -61,4 +61,14 @@ mod tests {
         let fifty_step = &result[0];
         assert!(fifty_step.l > 0.9);
     }
+
+    #[test]
+    fn test_generate_greyscale_oklch_first_step_chroma_is_zero() {
+        // Arrange
+        let result = generate_greyscale_oklch();
+
+        // Assert
+        let fifty_step = &result[0];
+        assert_eq!(fifty_step.c, 0.0);
+    }
 }

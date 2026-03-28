@@ -1,6 +1,6 @@
 use wasm_bindgen::prelude::*;
 // Import the core logic
-use primitiv_core;
+use primitiv_core::{self, generate_greyscale_oklch, OklchStep};
 
 // 1. Define the JS-facing object
 #[wasm_bindgen]
@@ -36,4 +36,13 @@ pub fn get_contrast_rating(bg: &str, fg: &str) -> ContrastData {
         display_ratio: result.display_ratio,
         rating: result.rating,
     }
+}
+
+#[wasm_bindgen]
+pub fn get_greyscale_palette() -> JsValue {
+    let palette = generate_greyscale_oklch();
+
+    // This serializes the Vec<OklchStep> into a JS Array.
+    // Since OklchStep implements Tsify/Serialize, this is safe.
+    serde_wasm_bindgen::to_value(&palette).expect("Failed to serialize palette")
 }

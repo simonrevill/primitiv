@@ -70,12 +70,29 @@ mod tests {
 
     #[test]
     fn test_generate_greyscale_oklch_all_steps_have_zero_chroma() {
+        // Arrange
         let result = generate_greyscale_oklch();
 
+        // Assert
         for step in result {
             assert_eq!(
                 step.c, 0.0,
                 "Step {} should have 0.0 chroma (neutral grey)",
+                step.label
+            );
+        }
+    }
+
+    #[test]
+    fn test_generate_greyscale_oklch_all_steps_have_zero_hue() {
+        // Arrange
+        let result = generate_greyscale_oklch();
+
+        // Assert
+        for step in result {
+            assert_eq!(
+                step.h, 0.0,
+                "Step {} should have 0.0 hue (neutral grey)",
                 step.label
             );
         }

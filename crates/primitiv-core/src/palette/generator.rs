@@ -13,7 +13,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_generate_greyscale_oklch_returns_ten_steps() {
+    fn test_generate_greyscale_oklch_returns_length_of_ten() {
         // Arrange
         let result = generate_greyscale_oklch();
 

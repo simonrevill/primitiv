@@ -97,4 +97,22 @@ mod tests {
             );
         }
     }
+
+    #[test]
+    fn test_generate_greyscale_oklch_steps_are_perceptually_descending() {
+        // Arrange
+        let result = generate_greyscale_oklch();
+
+        // Assert
+        for i in 0..result.len() - 1 {
+            assert!(
+                result[i].l > result[i + 1].l,
+                "Step {} (L: {}) is not lighter that Step {} (L: {})",
+                result[i].label,
+                result[i].l,
+                result[i + 1].label,
+                result[i + 1].l,
+            );
+        }
+    }
 }

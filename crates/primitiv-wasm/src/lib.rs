@@ -1,6 +1,6 @@
 use wasm_bindgen::prelude::*;
 // Import the core logic
-use primitiv_core::{self, generate_greyscale_oklch, OklchStep};
+use primitiv_core::{self, generate_greyscale_oklch};
 
 // 1. Define the JS-facing object
 #[wasm_bindgen]
@@ -39,10 +39,19 @@ pub fn get_contrast_rating(bg: &str, fg: &str) -> ContrastData {
 }
 
 #[wasm_bindgen]
-pub fn get_greyscale_palette() -> JsValue {
-    let palette = generate_greyscale_oklch();
+extern "C" {
+    // This tells wasm-bindgen that a type called "OklchStep" exists in TS
+    #[wasm_bindgen(typescript_type = "OklchStep[]")]
+    pub type OklchStepArray;
+}
 
-    // This serializes the Vec<OklchStep> into a JS Array.
-    // Since OklchStep implements Tsify/Serialize, this is safe.
-    serde_wasm_bindgen::to_value(&palette).expect("Failed to serialize palette")
+#[wasm_bindgen]
+pub fn get_greyscale_palette() -> OklchStepArray {
+    let data = generate_greyscale_oklch();
+
+    // We still use serde to do the actual conversion,
+    // but we cast it to our "Fake" TS type
+    serde_wasm_bindgen::to_value(&data)
+        .unwrap()
+        .unchecked_into()
 }

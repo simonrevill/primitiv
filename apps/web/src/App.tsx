@@ -2,7 +2,7 @@ import { useState, useEffect, Fragment } from "react";
 import init, {
   get_contrast_rating,
   ContrastData,
-  get_greyscale_palette,
+  generate_greyscale_oklch,
 } from "primitiv-wasm";
 import "./App.scss";
 

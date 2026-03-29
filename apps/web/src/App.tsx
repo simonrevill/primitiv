@@ -1,12 +1,21 @@
-import { useState, useEffect, Fragment } from 'react';
-import init, { get_contrast_rating, ContrastData, get_greyscale_palette } from 'primitiv-wasm';
-import './App.scss';
+import { useState, useEffect, Fragment } from "react";
+import init, {
+  get_contrast_rating,
+  ContrastData,
+  get_greyscale_palette,
+} from "primitiv-wasm";
+import "./App.scss";
 
 // 1. Single Source of Truth
 const COLORS = [
-  { id: 'black', name: 'Black', bg: '#000000', fg: '#FFFFFF' },
-  { id: 'white', name: 'White', bg: '#FFFFFF', fg: '#000000' },
-  { id: 'pink', name: 'Pink', bg: '#FFC0CB', fg: '#FFFFFF' }, // SHOULD FAIL
+  { id: "black", name: "Black", bg: "oklch(0 0 0)", fg: "oklch(1 0 0)" },
+  { id: "white", name: "White", bg: "oklch(1 0 0)", fg: "oklch(0 0 0)" },
+  {
+    id: "pink",
+    name: "Pink",
+    bg: "oklch(0.8677 0.0735 7.09)",
+    fg: "oklch(1 0 0)",
+  }, // SHOULD FAIL
 ] as const;
 
 function App() {
@@ -45,15 +54,21 @@ function App() {
         style={{ backgroundColor: activeColor.bg, color: activeColor.fg }}
       >
         <p className="preview-text">Sample Text</p>
-        <div role="status" className="status-ratio" aria-labelledby="status-ratio">
+        <div
+          role="status"
+          className="status-ratio"
+          aria-labelledby="status-ratio"
+        >
           <span id="status-ratio">
             Ratio: {contrast?.display_ratio ?? "Loading..."}
           </span>
         </div>
-        <div role="status" className="status-rating" aria-labelledby="status-rating">
-          <span id="status-rating">
-            Rating: {contrast?.rating}
-          </span>
+        <div
+          role="status"
+          className="status-rating"
+          aria-labelledby="status-rating"
+        >
+          <span id="status-rating">Rating: {contrast?.rating}</span>
         </div>
       </section>
 

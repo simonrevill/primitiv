@@ -7,9 +7,9 @@ pub struct ContrastResult {
     pub rating: String,
 }
 
-pub fn get_contrast_rating(bg_hex: &str, fg_hex: &str) -> ContrastResult {
-    let bg_color = csscolorparser::parse(bg_hex).unwrap_or_default();
-    let fg_color = csscolorparser::parse(fg_hex).unwrap_or_default();
+pub fn get_contrast_rating(bg: &str, fg: &str) -> ContrastResult {
+    let bg_color = csscolorparser::parse(bg).unwrap_or_default();
+    let fg_color = csscolorparser::parse(fg).unwrap_or_default();
 
     let bg_lin = Srgb::new(bg_color.r as f32, bg_color.g as f32, bg_color.b as f32).into_linear();
     let fg_lin = Srgb::new(fg_color.r as f32, fg_color.g as f32, fg_color.b as f32).into_linear();

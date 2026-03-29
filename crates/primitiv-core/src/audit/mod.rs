@@ -1,3 +1,3 @@
 pub mod audit;
 #[cfg(test)]
-mod tests;
+mod audit_tests;

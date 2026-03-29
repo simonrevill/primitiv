@@ -1,4 +1,4 @@
-use super::super::audit::*;
+use super::audit::*;
 
 #[test]
 fn test_contrast_result_ratio_success() {

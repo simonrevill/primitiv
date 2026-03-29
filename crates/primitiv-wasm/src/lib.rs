@@ -1,6 +1,6 @@
 use wasm_bindgen::prelude::*;
 // Import the core logic
-use primitiv_core::{self, generate_greyscale_oklch};
+use primitiv_core;
 
 // 1. Define the JS-facing object
 #[wasm_bindgen]
@@ -46,8 +46,8 @@ extern "C" {
 }
 
 #[wasm_bindgen]
-pub fn get_greyscale_palette() -> OklchStepArray {
-    let data = generate_greyscale_oklch();
+pub fn generate_greyscale_oklch() -> OklchStepArray {
+    let data = primitiv_core::generate_greyscale_oklch();
 
     // We still use serde to do the actual conversion,
     // but we cast it to our "Fake" TS type

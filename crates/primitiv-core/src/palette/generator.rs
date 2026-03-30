@@ -2,7 +2,7 @@ use palette::Oklch;
 use serde::{Deserialize, Serialize};
 use tsify::Tsify;
 
-#[derive(Tsify, Debug, Clone, Serialize, Deserialize)]
+#[derive(Copy, PartialEq, Tsify, Debug, Clone, Serialize, Deserialize)]
 #[tsify(into_wasm_abi, from_wasm_abi)]
 pub struct OklchStep {
     pub l: f32,

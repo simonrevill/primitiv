@@ -1,4 +1,5 @@
 use crate::palette::generator::*;
+use crate::palette::generator::OklchLabel;
 
 #[test]
 fn test_generate_greyscale_oklch_returns_length_of_ten() {
@@ -12,7 +13,7 @@ fn test_generate_greyscale_oklch_all_labels_are_correct() {
     let expected_labels = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
 
     for (i, step) in result.iter().enumerate() {
-        assert_eq!(step.label, expected_labels[i]);
+        assert_eq!(step.label, OklchLabel::Number(expected_labels[i]));
     }
 }
 

@@ -2,13 +2,20 @@ use palette::Oklch;
 use serde::{Deserialize, Serialize};
 use tsify::Tsify;
 
-#[derive(Copy, PartialEq, Tsify, Debug, Clone, Serialize, Deserialize)]
+#[derive(Tsify, Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[tsify(into_wasm_abi, from_wasm_abi)]
+pub enum OklchLabel {
+    Number(u16),
+    Name(String),
+}
+
+#[derive(PartialEq, Tsify, Debug, Clone, Serialize, Deserialize)]
 #[tsify(into_wasm_abi, from_wasm_abi)]
 pub struct OklchStep {
     pub l: f32,
     pub c: f32,
     pub h: f32,
-    pub label: u16,
+    pub label: OklchLabel,
 }
 
 pub fn generate_greyscale_oklch() -> Vec<OklchStep> {
@@ -25,7 +32,7 @@ pub fn generate_greyscale_oklch() -> Vec<OklchStep> {
                 l: oklch_color.l,
                 c: oklch_color.chroma,
                 h: oklch_color.hue.into_degrees(),
-                label,
+                label: OklchLabel::Number(label),
             }
         })
         .collect();

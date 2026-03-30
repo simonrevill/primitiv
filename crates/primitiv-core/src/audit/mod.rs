@@ -1,3 +1,6 @@
-pub mod audit;
+pub mod contrast;
+pub mod foreground;
+
 #[cfg(test)]
-mod audit_tests;
+mod contrast_tests;
+mod foreground_tests;

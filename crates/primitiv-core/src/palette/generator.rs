@@ -9,6 +9,18 @@ pub enum OklchLabel {
     Name(String),
 }
 
+impl From<u16> for OklchLabel {
+    fn from(n: u16) -> Self {
+        OklchLabel::Number(n)
+    }
+}
+
+impl From<&str> for OklchLabel {
+    fn from(s: &str) -> Self {
+        OklchLabel::Name(s.to_string())
+    }
+}
+
 #[derive(PartialEq, Tsify, Debug, Clone, Serialize, Deserialize)]
 #[tsify(into_wasm_abi, from_wasm_abi)]
 pub struct OklchStep {
@@ -16,6 +28,12 @@ pub struct OklchStep {
     pub c: f32,
     pub h: f32,
     pub label: OklchLabel,
+}
+
+impl OklchStep {
+    pub fn from_label<T: Into<OklchLabel>>(l: f32, c: f32, h: f32, label: T) -> Self {
+        Self { l, c, h, label: label.into() }
+    }
 }
 
 pub fn generate_greyscale_oklch() -> Vec<OklchStep> {
@@ -28,12 +46,12 @@ pub fn generate_greyscale_oklch() -> Vec<OklchStep> {
 
             let oklch_color = Oklch::new(l, 0.0, 0.0);
 
-            OklchStep {
-                l: oklch_color.l,
-                c: oklch_color.chroma,
-                h: oklch_color.hue.into_degrees(),
-                label: OklchLabel::Number(label),
-            }
+            OklchStep::from_label(
+                oklch_color.l,
+                oklch_color.chroma,
+                oklch_color.hue.into_degrees(),
+                OklchLabel::Number(label)
+            )
         })
         .collect();
 

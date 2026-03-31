@@ -1,6 +1,8 @@
 use palette::Srgb;
 use palette::color_difference::Wcag21RelativeContrast;
+use serde::{Deserialize, Serialize};
 
+#[derive(PartialEq, Debug, Clone, Deserialize, Serialize)]
 pub struct ContrastResult {
     pub ratio: f32,
     pub display_ratio: String,

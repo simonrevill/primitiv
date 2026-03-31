@@ -3,6 +3,7 @@ import init, {
   get_contrast_rating,
   ContrastData,
   generate_greyscale_oklch,
+  OklchStepWithContrast,
 } from "primitiv-wasm";
 import "./App.scss";
 
@@ -22,16 +23,19 @@ function App() {
   const [isReady, setIsReady] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [contrast, setContrast] = useState<ContrastData | null>(null);
+  const [greyscalePalette, setGreyscalePalette] =
+    useState<OklchStepWithContrast[]>();
 
   // 2. Derive current color from index
   const activeColor = COLORS[selectedIndex];
 
   useEffect(() => {
     init().then(() => {
-      setIsReady(true);
       // Initial calculation
       const result = get_contrast_rating(COLORS[0].bg, COLORS[0].fg);
       setContrast(result);
+      setGreyscalePalette(generate_greyscale_oklch());
+      setIsReady(true);
     });
   }, []);
 
@@ -85,6 +89,30 @@ function App() {
             />
             <label htmlFor={color.id}>{color.name}</label>
           </Fragment>
+        ))}
+      </div>
+      <div style={{ display: "flex" }}>
+        {greyscalePalette?.map((step, index) => (
+          <div
+            key={
+              ("Number" in step.label
+                ? `number-${step.label.Number}`
+                : `name-${step.label.Name}`) + `-${index}`
+            }
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              minWidth: "80px",
+              height: "80px",
+              background: `oklch(${step.l} ${step.c} ${step.h})`,
+              color: `oklch(${step.best_foreground.l} ${step.best_foreground.c} ${step.best_foreground.h})`,
+            }}
+          >
+            {"Number" in step.best_foreground.label
+              ? step.best_foreground.label.Number
+              : step.best_foreground.label.Name}
+          </div>
         ))}
       </div>
     </main>

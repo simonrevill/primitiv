@@ -40,13 +40,13 @@ pub fn get_contrast_rating(bg: &str, fg: &str) -> ContrastData {
 
 #[wasm_bindgen]
 extern "C" {
-    // This tells wasm-bindgen that a type called "OklchStep" exists in TS
-    #[wasm_bindgen(typescript_type = "OklchStep[]")]
-    pub type OklchStepArray;
+    // This tells wasm-bindgen that a type called "OklchStepWithContrast" exists in TS
+    #[wasm_bindgen(typescript_type = "OklchStepWithContrast[]")]
+    pub type OklchStepWithContrastArray;
 }
 
 #[wasm_bindgen]
-pub fn generate_greyscale_oklch() -> OklchStepArray {
+pub fn generate_greyscale_oklch() -> OklchStepWithContrastArray {
     let data = primitiv_core::generate_greyscale_oklch();
 
     // We still use serde to do the actual conversion,

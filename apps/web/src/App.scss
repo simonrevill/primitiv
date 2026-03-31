@@ -1,46 +1,64 @@
 // Variables
 $border-color: #ccc;
-$border-radius: .5rem;
+$border-radius: 0.5rem;
 
 .container {
-    padding: 2rem;
-    max-width: 25rem;
-    margin: 0 auto;
+  padding: 2rem;
+  max-width: 25rem;
+  margin: 0 auto;
 
-    h1 {
-        margin-bottom: 1rem;
-    }
+  h1 {
+    margin-bottom: 1rem;
+  }
 }
 
 .preview-box {
-    padding: 2rem;
-    border-radius: $border-radius;
-    text-align: center;
-    margin-bottom: 1.5rem;
-    border: .0625rem solid $border-color;
-    transition: background-color 0.2s ease; // Smooth color transition
+  padding: 2rem;
+  border-radius: $border-radius;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  border: 0.0625rem solid $border-color;
+  transition: background-color 0.2s ease; // Smooth color transition
 
-    .preview-text {
-        font-size: 1.2rem;
-        margin-bottom: .5rem;
-    }
+  .preview-text {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+  }
 
-    .status-rating {
-        font-weight: bold;
-    }
+  .status-rating {
+    font-weight: bold;
+  }
 }
 
 .control-group {
-    display: flex;
-    flex-direction: column;
-    gap: .5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 
-    label {
-        font-weight: 500;
-    }
+  label {
+    font-weight: 500;
+  }
 
-    .slider {
-        width: 100%;
-        cursor: pointer;
-    }
+  .slider {
+    width: 100%;
+    cursor: pointer;
+  }
+}
+
+.swatch-container {
+  display: flex;
+}
+
+.swatch {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-width: 5rem;
+  height: 5rem;
+
+  p {
+    font-size: x-small;
+    margin: 0;
+  }
 }

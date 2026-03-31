@@ -91,7 +91,7 @@ function App() {
           </Fragment>
         ))}
       </div>
-      <div style={{ display: "flex" }}>
+      <div className="swatch-container">
         {greyscalePalette?.map((step, index) => (
           <div
             key={
@@ -99,19 +99,19 @@ function App() {
                 ? `number-${step.label.Number}`
                 : `name-${step.label.Name}`) + `-${index}`
             }
+            className="swatch"
             style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              minWidth: "80px",
-              height: "80px",
               background: `oklch(${step.l} ${step.c} ${step.h})`,
               color: `oklch(${step.best_foreground.l} ${step.best_foreground.c} ${step.best_foreground.h})`,
             }}
           >
-            {"Number" in step.best_foreground.label
-              ? step.best_foreground.label.Number
-              : step.best_foreground.label.Name}
+            <p>
+              {"Number" in step.best_foreground.label
+                ? step.best_foreground.label.Number
+                : step.best_foreground.label.Name}
+            </p>
+            <p>{step.contrast_result.display_ratio}</p>
+            <p>{step.contrast_result.rating}</p>
           </div>
         ))}
       </div>

@@ -86,12 +86,12 @@ pub fn generate_greyscale_oklch() -> Vec<OklchStepWithContrast> {
 
             let step_bg_oklch = format!("oklch({} {} {})", step.l, step.c, step.h);
 
-            let dark_anchor_oklch = format!(
+            let best_fg_oklch = format!(
                 "oklch({} {} {})",
-                dark_anchor.l, dark_anchor.c, dark_anchor.h
+                best_foreground.l, best_foreground.c, best_foreground.h
             );
 
-            let contrast_result = get_contrast_rating(&step_bg_oklch, &dark_anchor_oklch);
+            let contrast_result = get_contrast_rating(&step_bg_oklch, &best_fg_oklch);
 
             OklchStepWithContrast {
                 l: step.l,

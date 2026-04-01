@@ -2,8 +2,8 @@ use palette::Oklch;
 use serde::{Deserialize, Serialize};
 use tsify::Tsify;
 
-use crate::get_best_foreground;
-use crate::{ContrastResult, get_contrast_rating};
+use crate::{get_best_foreground, get_contrast_rating_for_step};
+use crate::{ContrastResult};
 
 #[derive(Tsify, Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[tsify(into_wasm_abi, from_wasm_abi)]
@@ -84,14 +84,7 @@ pub fn generate_greyscale_oklch() -> Vec<OklchStepWithContrast> {
         .map(|step| {
             let best_foreground = get_best_foreground(&step, &dark_anchor);
 
-            let step_bg_oklch = format!("oklch({} {} {})", step.l, step.c, step.h);
-
-            let best_fg_oklch = format!(
-                "oklch({} {} {})",
-                best_foreground.l, best_foreground.c, best_foreground.h
-            );
-
-            let contrast_result = get_contrast_rating(&step_bg_oklch, &best_fg_oklch);
+            let contrast_result = get_contrast_rating_for_step(&step, &best_foreground);
 
             OklchStepWithContrast {
                 l: step.l,

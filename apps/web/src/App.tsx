@@ -3,7 +3,8 @@ import init, {
   get_contrast_rating,
   ContrastResult,
   generate_greyscale_oklch,
-  OklchStepWithContrast,
+  // generate_palette,
+  Palette,
 } from "primitiv-wasm";
 import "./App.scss";
 
@@ -23,8 +24,7 @@ function App() {
   const [isReady, setIsReady] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [contrast, setContrast] = useState<ContrastResult | null>(null);
-  const [greyscalePalette, setGreyscalePalette] =
-    useState<OklchStepWithContrast[]>();
+  const [greyscalePalette, setGreyscalePalette] = useState<Palette[]>();
 
   // 2. Derive current color from index
   const activeColor = COLORS[selectedIndex];
@@ -35,6 +35,7 @@ function App() {
       const result = get_contrast_rating(COLORS[0].bg, COLORS[0].fg);
       setContrast(result);
       setGreyscalePalette(generate_greyscale_oklch());
+      // setGreyscalePalette(generate_palette("oklch(0.55 0.15 240)"));
       setIsReady(true);
     });
   }, []);

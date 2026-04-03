@@ -1,10 +1,12 @@
 use palette::{IntoColor, LinSrgb, Oklch, Srgb};
 use palette::color_difference::Wcag21RelativeContrast;
 use serde::{Deserialize, Serialize};
+use tsify::Tsify;
 
 use crate::OklchStep;
 
-#[derive(PartialEq, Debug, Clone, Deserialize, Serialize)]
+#[derive(PartialEq, Tsify, Debug, Clone, Deserialize, Serialize)]
+#[tsify(into_wasm_abi, from_wasm_abi)]
 pub struct ContrastResult {
     pub ratio: f32,
     pub display_ratio: String,

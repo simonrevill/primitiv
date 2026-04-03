@@ -1,41 +1,9 @@
 use wasm_bindgen::prelude::*;
-// Import the core logic
-use primitiv_core;
-
-// 1. Define the JS-facing object
-#[wasm_bindgen]
-pub struct ContrastData {
-    pub ratio: f32,
-    display_ratio: String,
-    rating: String,
-}
+use primitiv_core::ContrastResult;
 
 #[wasm_bindgen]
-impl ContrastData {
-    // This allows JS to access .display_ratio
-    #[wasm_bindgen(getter)]
-    pub fn display_ratio(&self) -> String {
-        self.display_ratio.clone()
-    }
-
-    // This allows JS to access .rating
-    #[wasm_bindgen(getter)]
-    pub fn rating(&self) -> String {
-        self.rating.clone()
-    }
-}
-
-// 2. The Exported Function
-#[wasm_bindgen]
-pub fn get_contrast_rating(bg: &str, fg: &str) -> ContrastData {
-    let result = primitiv_core::get_contrast_rating(bg, fg);
-
-    // Bridge the Core struct to the Wasm struct
-    ContrastData {
-        ratio: result.ratio,
-        display_ratio: result.display_ratio,
-        rating: result.rating,
-    }
+pub fn get_contrast_rating(bg: &str, fg: &str) -> ContrastResult {
+    primitiv_core::get_contrast_rating(bg, fg)
 }
 
 #[wasm_bindgen]

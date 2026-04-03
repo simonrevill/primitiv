@@ -1,7 +1,7 @@
 import { useState, useEffect, Fragment } from "react";
 import init, {
   get_contrast_rating,
-  ContrastData,
+  ContrastResult,
   generate_greyscale_oklch,
   OklchStepWithContrast,
 } from "primitiv-wasm";
@@ -22,7 +22,7 @@ const COLORS = [
 function App() {
   const [isReady, setIsReady] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [contrast, setContrast] = useState<ContrastData | null>(null);
+  const [contrast, setContrast] = useState<ContrastResult | null>(null);
   const [greyscalePalette, setGreyscalePalette] =
     useState<OklchStepWithContrast[]>();
 

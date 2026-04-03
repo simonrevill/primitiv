@@ -3,7 +3,22 @@ use crate::palette::generator::*;
 
 #[cfg(test)]
 mod generator_tests {
+    use palette::Oklch;
+
     use super::*;
+
+    #[test]
+    fn should_preserve_the_base_500_color_that_was_passed_in() {
+        // Arrange
+        let base_500 = Oklch::new(0.55, 0.15, 240.0);
+        let result = generate_palette(base_500);
+
+        // Assert
+        let base_500_step = &result[5];
+        assert_eq!(base_500.l, base_500_step.l);
+        assert_eq!(base_500.chroma, base_500_step.c);
+        assert_eq!(base_500.hue.into_degrees(), base_500_step.h);
+    }
 
     #[test]
     fn test_generate_greyscale_oklch_returns_length_of_ten() {
@@ -68,7 +83,7 @@ mod generator_tests {
             assert_eq!(
                 step_50.best_foreground,
                 OklchStep {
-                    l: 0.100000024,
+                    l: 0.1,
                     c: 0.0,
                     h: 0.0,
                     label: OklchLabel::Number(900),

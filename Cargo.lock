@@ -242,6 +242,7 @@ dependencies = [
 name = "primitiv-wasm"
 version = "0.1.0"
 dependencies = [
+ "palette",
  "primitiv-core",
  "serde",
  "serde-wasm-bindgen",

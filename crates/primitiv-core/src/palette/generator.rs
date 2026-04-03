@@ -74,7 +74,7 @@ pub fn generate_greyscale_oklch() -> Vec<OklchStepWithContrast> {
         })
         .collect();
 
-    let dark_anchor = steps
+    let dark_candidate = steps
         .iter()
         .find(|step| step.label == OklchLabel::Number(900))
         .expect("Palette must contain a 900 step to act as a dark anchor");
@@ -82,7 +82,7 @@ pub fn generate_greyscale_oklch() -> Vec<OklchStepWithContrast> {
     let steps_with_foreground_and_contrast: Vec<OklchStepWithContrast> = steps
         .iter()
         .map(|step| {
-            let best_foreground = get_best_foreground(&step, &dark_anchor);
+            let best_foreground = get_best_foreground(&step, &dark_candidate);
 
             let contrast_result = get_contrast_rating_for_step(&step, &best_foreground);
 

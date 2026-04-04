@@ -2,8 +2,8 @@ import { useState, useEffect, Fragment } from "react";
 import init, {
   get_contrast_rating,
   ContrastResult,
-  generate_greyscale_oklch,
-  // generate_palette,
+  // generate_greyscale_oklch,
+  generate_palette,
   Palette,
 } from "primitiv-wasm";
 import "./App.scss";
@@ -34,8 +34,8 @@ function App() {
       // Initial calculation
       const result = get_contrast_rating(COLORS[0].bg, COLORS[0].fg);
       setContrast(result);
-      setGreyscalePalette(generate_greyscale_oklch());
-      // setGreyscalePalette(generate_palette("oklch(0.55 0.15 240)"));
+      // setGreyscalePalette(generate_greyscale_oklch());
+      setGreyscalePalette(generate_palette("oklch(0.55 0.15 240)"));
       setIsReady(true);
     });
   }, []);

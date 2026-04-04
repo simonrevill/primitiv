@@ -62,19 +62,12 @@ const TARGET_LIGHTNESS: [f32; 10] = [
 ];
 
 pub fn chroma_scale_for_lightness(lightness: f32) -> f32 {
-    if lightness > 0.90 {
-        0.25
-    } else if lightness >= 0.85 {
-        0.40
-    } else if lightness > 0.80 {
-        0.65
-    } else if lightness < 0.25 {
-        0.35
-    } else if lightness < 0.35 {
-        0.60
-    } else {
-        1.0
-    }
+    if lightness >= 0.90 { 0.25 } 
+    else if lightness >= 0.85 { 0.40 } 
+    else if lightness > 0.80 { 0.65 }
+    else if lightness < 0.25 { 0.55 } 
+    else if lightness < 0.35 { 0.75 } 
+    else { 1.0 }
 }
 
 pub fn generate_palette_with_scale(base_500: Oklch, lightness_scale: &[f32]) -> Vec<Palette> {

@@ -2,7 +2,7 @@ import { useState, useEffect, Fragment, ChangeEvent } from "react";
 import init, {
   get_contrast_rating,
   ContrastResult,
-  // generate_greyscale_oklch,
+  generate_greyscale_oklch,
   generate_palette,
   Palette,
 } from "primitiv-wasm";
@@ -36,8 +36,7 @@ function App() {
       // Initial calculation
       const result = get_contrast_rating(COLORS[0].bg, COLORS[0].fg);
       setContrast(result);
-      // setGreyscalePalette(generate_greyscale_oklch());
-      setGreyscalePalette(generate_palette("oklch(0.55 0.15 240)"));
+      setGreyscalePalette(generate_greyscale_oklch());
 
       console.log(color);
       setCustomPalette(generate_palette(color));

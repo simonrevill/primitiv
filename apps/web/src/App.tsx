@@ -2,9 +2,52 @@ import { useState, useEffect, ChangeEvent } from "react";
 import init, {
   generate_greyscale_oklch,
   generate_palette,
-  Palette,
+  type Palette,
 } from "primitiv-wasm";
 import "./App.scss";
+
+type PaletteProps = {
+  palette?: Palette[];
+};
+
+function Palette({ palette }: PaletteProps) {
+  return (
+    <div className="swatch-container">
+      {palette?.map((step, index) => (
+        <div
+          key={
+            ("Number" in step.label
+              ? `number-${step.label.Number}`
+              : `name-${step.label.Name}`) + `-${index}`
+          }
+          className="swatch"
+        >
+          <div
+            key={
+              ("Number" in step.label
+                ? `number-${step.label.Number}`
+                : `name-${step.label.Name}`) + `-${index}`
+            }
+            className="swatch-inner"
+            style={{
+              background: `oklch(${step.l} ${step.c} ${step.h})`,
+              color: `oklch(${step.best_foreground.l} ${step.best_foreground.c} ${step.best_foreground.h})`,
+            }}
+          >
+            <p>
+              {"Number" in step.best_foreground.label
+                ? step.best_foreground.label.Number
+                : step.best_foreground.label.Name}
+            </p>
+            <p>{step.contrast_result.display_ratio}</p>
+            <p>{step.contrast_result.rating}</p>
+          </div>
+          <p className="swatch-step">{index === 0 ? 50 : index * 100}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 function App() {
   const [greyscalePalette, setGreyscalePalette] = useState<Palette[]>();
@@ -84,152 +127,20 @@ function App() {
       </div>
       <p style={{ color: "ocklch(0.55 0.200 90)" }}>Blue</p>
       <input type="color" onChange={handleBlueColorChange} value={blueColor} />
-      <div className="swatch-container">
-        {bluePalette?.map((step, index) => (
-          <div
-            key={
-              ("Number" in step.label
-                ? `number-${step.label.Number}`
-                : `name-${step.label.Name}`) + `-${index}`
-            }
-            className="swatch"
-          >
-            <div
-              key={
-                ("Number" in step.label
-                  ? `number-${step.label.Number}`
-                  : `name-${step.label.Name}`) + `-${index}`
-              }
-              className="swatch-inner"
-              style={{
-                background: `oklch(${step.l} ${step.c} ${step.h})`,
-                color: `oklch(${step.best_foreground.l} ${step.best_foreground.c} ${step.best_foreground.h})`,
-              }}
-            >
-              <p>
-                {"Number" in step.best_foreground.label
-                  ? step.best_foreground.label.Number
-                  : step.best_foreground.label.Name}
-              </p>
-              <p>{step.contrast_result.display_ratio}</p>
-              <p>{step.contrast_result.rating}</p>
-            </div>
-            <p className="swatch-step">{index === 0 ? 50 : index * 100}</p>
-          </div>
-        ))}
-      </div>
+      <Palette palette={bluePalette} />
       <p style={{ color: "ocklch(1.0 0 0)" }}>Yellow</p>
       <input
         type="color"
         onChange={handleYellowColorChange}
         value={yellowColor}
       />
-      <div className="swatch-container">
-        {yellowPalette?.map((step, index) => (
-          <div
-            key={
-              ("Number" in step.label
-                ? `number-${step.label.Number}`
-                : `name-${step.label.Name}`) + `-${index}`
-            }
-            className="swatch"
-          >
-            <div
-              key={
-                ("Number" in step.label
-                  ? `number-${step.label.Number}`
-                  : `name-${step.label.Name}`) + `-${index}`
-              }
-              className="swatch-inner"
-              style={{
-                background: `oklch(${step.l} ${step.c} ${step.h})`,
-                color: `oklch(${step.best_foreground.l} ${step.best_foreground.c} ${step.best_foreground.h})`,
-              }}
-            >
-              <p>
-                {"Number" in step.best_foreground.label
-                  ? step.best_foreground.label.Number
-                  : step.best_foreground.label.Name}
-              </p>
-              <p>{step.contrast_result.display_ratio}</p>
-              <p>{step.contrast_result.rating}</p>
-            </div>
-            <p className="swatch-step">{index === 0 ? 50 : index * 100}</p>
-          </div>
-        ))}
-      </div>
+      <Palette palette={yellowPalette} />
       <p style={{ color: "ocklch(0.55 0.178 130)" }}>Lime</p>
       <input type="color" onChange={handleLimeColorChange} value={limeColor} />
-      <div className="swatch-container">
-        {limePalette?.map((step, index) => (
-          <div
-            key={
-              ("Number" in step.label
-                ? `number-${step.label.Number}`
-                : `name-${step.label.Name}`) + `-${index}`
-            }
-            className="swatch"
-          >
-            <div
-              key={
-                ("Number" in step.label
-                  ? `number-${step.label.Number}`
-                  : `name-${step.label.Name}`) + `-${index}`
-              }
-              className="swatch-inner"
-              style={{
-                background: `oklch(${step.l} ${step.c} ${step.h})`,
-                color: `oklch(${step.best_foreground.l} ${step.best_foreground.c} ${step.best_foreground.h})`,
-              }}
-            >
-              <p>
-                {"Number" in step.best_foreground.label
-                  ? step.best_foreground.label.Number
-                  : step.best_foreground.label.Name}
-              </p>
-              <p>{step.contrast_result.display_ratio}</p>
-              <p>{step.contrast_result.rating}</p>
-            </div>
-            <p className="swatch-step">{index === 0 ? 50 : index * 100}</p>
-          </div>
-        ))}
-      </div>
+      <Palette palette={limePalette} />
       <p style={{ color: "ocklch(0.6034 0.2324 354.23)" }}>Pink</p>
       <input type="color" onChange={handlePinkColorChange} value={pinkColor} />
-      <div className="swatch-container">
-        {pinkPalette?.map((step, index) => (
-          <div
-            key={
-              ("Number" in step.label
-                ? `number-${step.label.Number}`
-                : `name-${step.label.Name}`) + `-${index}`
-            }
-            className="swatch"
-          >
-            <div
-              key={
-                ("Number" in step.label
-                  ? `number-${step.label.Number}`
-                  : `name-${step.label.Name}`) + `-${index}`
-              }
-              className="swatch-inner"
-              style={{
-                background: `oklch(${step.l} ${step.c} ${step.h})`,
-                color: `oklch(${step.best_foreground.l} ${step.best_foreground.c} ${step.best_foreground.h})`,
-              }}
-            >
-              <p>
-                {"Number" in step.best_foreground.label
-                  ? step.best_foreground.label.Number
-                  : step.best_foreground.label.Name}
-              </p>
-              <p>{step.contrast_result.display_ratio}</p>
-              <p>{step.contrast_result.rating}</p>
-            </div>
-            <p className="swatch-step">{index === 0 ? 50 : index * 100}</p>
-          </div>
-        ))}
-      </div>
+      <Palette palette={pinkPalette} />
     </main>
   );
 }

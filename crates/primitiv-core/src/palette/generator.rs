@@ -136,16 +136,17 @@ pub fn generate_palette_with_scale(base_500: Oklch, lightness_scale: &[f32]) -> 
         backgrounds
             .iter()
             .map(|background| {
-                let best_foreground = get_best_foreground(&background, &dark_candidate);
 
-                let contrast_result = get_contrast_rating_for_step(&background, &best_foreground);
+                let foreground_recommendation = get_best_foreground(background, dark_candidate);
+
+                let contrast_result = get_contrast_rating_for_step(&background, &foreground_recommendation.color);
 
                 Palette {
                     l: background.l,
                     c: background.c,
                     h: background.h,
                     label: background.label.clone(),
-                    best_foreground,
+                    best_foreground: foreground_recommendation.color,
                     contrast_result,
                 }
             })

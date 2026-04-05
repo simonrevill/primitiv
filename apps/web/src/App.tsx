@@ -6,6 +6,46 @@ import init, {
 } from "primitiv-wasm";
 import "./App.scss";
 
+type SwatchProps = {
+  step: Palette;
+  index: number;
+};
+
+function Swatch({ step, index }: SwatchProps) {
+  return (
+    <div
+      key={
+        ("Number" in step.label
+          ? `number-${step.label.Number}`
+          : `name-${step.label.Name}`) + `-${index}`
+      }
+      className="swatch"
+    >
+      <div
+        key={
+          ("Number" in step.label
+            ? `number-${step.label.Number}`
+            : `name-${step.label.Name}`) + `-${index}`
+        }
+        className="swatch-inner"
+        style={{
+          background: `oklch(${step.l} ${step.c} ${step.h})`,
+          color: `oklch(${step.best_foreground.l} ${step.best_foreground.c} ${step.best_foreground.h})`,
+        }}
+      >
+        <p>
+          {"Number" in step.best_foreground.label
+            ? step.best_foreground.label.Number
+            : step.best_foreground.label.Name}
+        </p>
+        <p>{step.contrast_result.display_ratio}</p>
+        <p>{step.contrast_result.rating}</p>
+      </div>
+      <p className="swatch-step">{index === 0 ? 50 : index * 100}</p>
+    </div>
+  );
+}
+
 type PaletteProps = {
   palette?: Palette[];
 };
@@ -14,36 +54,7 @@ function Palette({ palette }: PaletteProps) {
   return (
     <div className="swatch-container">
       {palette?.map((step, index) => (
-        <div
-          key={
-            ("Number" in step.label
-              ? `number-${step.label.Number}`
-              : `name-${step.label.Name}`) + `-${index}`
-          }
-          className="swatch"
-        >
-          <div
-            key={
-              ("Number" in step.label
-                ? `number-${step.label.Number}`
-                : `name-${step.label.Name}`) + `-${index}`
-            }
-            className="swatch-inner"
-            style={{
-              background: `oklch(${step.l} ${step.c} ${step.h})`,
-              color: `oklch(${step.best_foreground.l} ${step.best_foreground.c} ${step.best_foreground.h})`,
-            }}
-          >
-            <p>
-              {"Number" in step.best_foreground.label
-                ? step.best_foreground.label.Number
-                : step.best_foreground.label.Name}
-            </p>
-            <p>{step.contrast_result.display_ratio}</p>
-            <p>{step.contrast_result.rating}</p>
-          </div>
-          <p className="swatch-step">{index === 0 ? 50 : index * 100}</p>
-        </div>
+        <Swatch step={step} index={index} />
       ))}
     </div>
   );
@@ -96,35 +107,7 @@ function App() {
     <main className="container">
       <h1>Primitiv Engine</h1>
       <p style={{ color: "ocklch(1.0 0 0)" }}>Greyscale</p>
-      <div className="swatch-container">
-        {greyscalePalette?.map((step, index) => (
-          <div
-            key={
-              ("Number" in step.label
-                ? `number-${step.label.Number}`
-                : `name-${step.label.Name}`) + `-${index}`
-            }
-            className="swatch"
-          >
-            <div
-              className="swatch-inner"
-              style={{
-                background: `oklch(${step.l} ${step.c} ${step.h})`,
-                color: `oklch(${step.best_foreground.l} ${step.best_foreground.c} ${step.best_foreground.h})`,
-              }}
-            >
-              <p>
-                {"Number" in step.best_foreground.label
-                  ? step.best_foreground.label.Number
-                  : step.best_foreground.label.Name}
-              </p>
-              <p>{step.contrast_result.display_ratio}</p>
-              <p>{step.contrast_result.rating}</p>
-            </div>
-            <p className="swatch-step">{index === 0 ? 50 : index * 100}</p>
-          </div>
-        ))}
-      </div>
+      <Palette palette={greyscalePalette} />
       <p style={{ color: "ocklch(0.55 0.200 90)" }}>Blue</p>
       <input type="color" onChange={handleBlueColorChange} value={blueColor} />
       <Palette palette={bluePalette} />

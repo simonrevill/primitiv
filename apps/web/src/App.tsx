@@ -14,6 +14,8 @@ function App() {
   const [yellowPalette, setYellowPalette] = useState<Palette[]>();
   const [limeColor, setLimeColor] = useState("#9eb22e");
   const [limePalette, setLimePalette] = useState<Palette[]>();
+  const [pinkColor, setPinkColor] = useState("#e0218a");
+  const [pinkPalette, setPinkPalette] = useState<Palette[]>();
 
   useEffect(() => {
     init().then(() => {
@@ -21,8 +23,9 @@ function App() {
       setBluePalette(generate_palette(blueColor));
       setYellowPalette(generate_palette(yellowColor));
       setLimePalette(generate_palette(limeColor));
+      setPinkPalette(generate_palette(pinkColor));
     });
-  }, [blueColor, yellowColor, limeColor]);
+  }, [blueColor, yellowColor, limeColor, pinkColor]);
 
   useEffect(() => {}, [blueColor, setBluePalette]);
 
@@ -39,6 +42,11 @@ function App() {
   const handleLimeColorChange = (e: ChangeEvent<HTMLInputElement>) => {
     setLimeColor(e.target.value);
     setLimePalette(generate_palette(limeColor));
+  };
+
+  const handlePinkColorChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setPinkColor(e.target.value);
+    setPinkPalette(generate_palette(pinkColor));
   };
 
   return (
@@ -154,6 +162,42 @@ function App() {
       <input type="color" onChange={handleLimeColorChange} value={limeColor} />
       <div className="swatch-container">
         {limePalette?.map((step, index) => (
+          <div
+            key={
+              ("Number" in step.label
+                ? `number-${step.label.Number}`
+                : `name-${step.label.Name}`) + `-${index}`
+            }
+            className="swatch"
+          >
+            <div
+              key={
+                ("Number" in step.label
+                  ? `number-${step.label.Number}`
+                  : `name-${step.label.Name}`) + `-${index}`
+              }
+              className="swatch-inner"
+              style={{
+                background: `oklch(${step.l} ${step.c} ${step.h})`,
+                color: `oklch(${step.best_foreground.l} ${step.best_foreground.c} ${step.best_foreground.h})`,
+              }}
+            >
+              <p>
+                {"Number" in step.best_foreground.label
+                  ? step.best_foreground.label.Number
+                  : step.best_foreground.label.Name}
+              </p>
+              <p>{step.contrast_result.display_ratio}</p>
+              <p>{step.contrast_result.rating}</p>
+            </div>
+            <p className="swatch-step">{index === 0 ? 50 : index * 100}</p>
+          </div>
+        ))}
+      </div>
+      <p style={{ color: "ocklch(0.6034 0.2324 354.23)" }}>Pink</p>
+      <input type="color" onChange={handlePinkColorChange} value={pinkColor} />
+      <div className="swatch-container">
+        {pinkPalette?.map((step, index) => (
           <div
             key={
               ("Number" in step.label

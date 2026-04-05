@@ -1,6 +1,8 @@
+use std::str::FromStr;
+
 use wasm_bindgen::prelude::*;
 use primitiv_core::{ContrastResult};
-use palette::Oklch;
+use palette::{IntoColor, Oklch, Srgb};
 
 #[wasm_bindgen]
 pub fn get_contrast_rating(bg: &str, fg: &str) -> ContrastResult {
@@ -14,36 +16,18 @@ extern "C" {
     pub type PaletteArray;
 }
 
-fn parse_oklch(s: &str) -> Option<(f32, f32, f32)> {
-    let inner = s.trim()
-        .strip_prefix("oklch(")?
-        .strip_suffix(')')?;
-
-    let nums: Vec<f32> = inner
-        .split_whitespace()
-        .filter(|&p| p != "/")   // skip optional alpha separator
-        .take(3)
-        .map(|p| {
-            // lightness can be a percentage, e.g. "50%"
-            if let Some(pct) = p.strip_suffix('%') {
-                pct.parse::<f32>().ok().map(|v| v / 100.0)
-            } else {
-                p.parse::<f32>().ok()
-            }
-        })
-        .collect::<Option<Vec<_>>>()?;
-
-    if nums.len() == 3 { Some((nums[0], nums[1], nums[2])) } else { None }
-}
-
 #[wasm_bindgen]
-pub fn generate_palette(oklch: &str) -> Result<PaletteArray, JsError> {
-    let (l, c, h) = parse_oklch(oklch)
-        .ok_or_else(|| JsError::new(&format!("Invalid oklch string: {oklch}")))?;
+pub fn generate_palette(hex: &str) -> Result<PaletteArray, JsError> {
+    let hex_clean = hex.trim_start_matches('#');
 
-    let data = primitiv_core::generate_palette(Oklch::new(l, c, h));
+    let rgb = Srgb::from_str(hex_clean)
+        .map_err(|e| JsError::new(&format!("Invalid hex color: {}", e)))?;
 
-    serde_wasm_bindgen::to_value(&data)
+    let oklch: Oklch = rgb.into_format::<f32>().into_color();
+
+    let palette_data = primitiv_core::generate_palette(oklch);
+
+    serde_wasm_bindgen::to_value(&palette_data)
         .map(|v| v.unchecked_into())
         .map_err(|e| JsError::new(&e.to_string()))
 }

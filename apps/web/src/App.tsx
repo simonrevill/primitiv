@@ -1,4 +1,4 @@
-import { useState, useEffect, Fragment } from "react";
+import { useState, useEffect, Fragment, ChangeEvent } from "react";
 import init, {
   get_contrast_rating,
   ContrastResult,
@@ -25,6 +25,8 @@ function App() {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [contrast, setContrast] = useState<ContrastResult | null>(null);
   const [greyscalePalette, setGreyscalePalette] = useState<Palette[]>();
+  const [color, setColor] = useState("#3B82F6");
+  const [customPalette, setCustomPalette] = useState<Palette[]>();
 
   // 2. Derive current color from index
   const activeColor = COLORS[selectedIndex];
@@ -36,9 +38,14 @@ function App() {
       setContrast(result);
       // setGreyscalePalette(generate_greyscale_oklch());
       setGreyscalePalette(generate_palette("oklch(0.55 0.15 240)"));
+
+      console.log(color);
+      setCustomPalette(generate_palette(color));
       setIsReady(true);
     });
   }, []);
+
+  useEffect(() => {}, [color, setCustomPalette]);
 
   const handleColorChange = (index: number) => {
     setSelectedIndex(index);
@@ -47,6 +54,12 @@ function App() {
       const result = get_contrast_rating(bg, fg);
       setContrast(result);
     }
+  };
+
+  const handleCustomColorChange = (e: ChangeEvent<HTMLInputElement>) => {
+    console.log(e.target.value);
+    setColor(e.target.value);
+    setCustomPalette(generate_palette(color));
   };
 
   return (
@@ -94,6 +107,32 @@ function App() {
       </div>
       <div className="swatch-container">
         {greyscalePalette?.map((step, index) => (
+          <div
+            key={
+              ("Number" in step.label
+                ? `number-${step.label.Number}`
+                : `name-${step.label.Name}`) + `-${index}`
+            }
+            className="swatch"
+            style={{
+              background: `oklch(${step.l} ${step.c} ${step.h})`,
+              color: `oklch(${step.best_foreground.l} ${step.best_foreground.c} ${step.best_foreground.h})`,
+            }}
+          >
+            <p>
+              {"Number" in step.best_foreground.label
+                ? step.best_foreground.label.Number
+                : step.best_foreground.label.Name}
+            </p>
+            <p>{step.contrast_result.display_ratio}</p>
+            <p>{step.contrast_result.rating}</p>
+          </div>
+        ))}
+      </div>
+      <p style={{ color: "ocklch(1.0 0 0)" }}>{color}</p>
+      <input type="color" onChange={handleCustomColorChange} value={color} />
+      <div className="swatch-container">
+        {customPalette?.map((step, index) => (
           <div
             key={
               ("Number" in step.label

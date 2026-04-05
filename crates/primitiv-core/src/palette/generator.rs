@@ -70,6 +70,33 @@ pub fn chroma_scale_for_lightness(lightness: f32) -> f32 {
     else { 1.0 }
 }
 
+fn max_chroma_for_hue_and_lightness(hue: f32, lightness: f32) -> f32 {
+    let hue = (hue as i32).rem_euclid(360) as f32;
+
+    let base_max = match hue as i32 {
+        0..=30 | 330..=360 => 0.225,
+        31..=50 => 0.195,
+        51..=80 => 0.170,
+        81..=115 => 0.135,
+        116..=155 => 0.185,
+        156..=195 => 0.245,
+        196..=255 => 0.320,
+        256..=295 => 0.275,
+        296..=329 => 0.240,
+        _ => 0.22,
+    };
+
+    let lightness_factor = if lightness > 0.85 || lightness < 0.25 {
+        0.45
+    } else if lightness > 0.70 || lightness < 0.35 {
+        0.75
+    } else {
+        1.0
+    };
+
+    base_max * lightness_factor
+}
+
 pub fn generate_palette_with_scale(base_500: Oklch, lightness_scale: &[f32]) -> Vec<Palette> {
     let base_hue = base_500.hue.into_degrees();
     let base_chroma = base_500.chroma;
@@ -82,7 +109,10 @@ pub fn generate_palette_with_scale(base_500: Oklch, lightness_scale: &[f32]) -> 
                 (base_500.l, base_chroma)
             } else {
                 let scale = chroma_scale_for_lightness(target_lightness);
-                (target_lightness, base_chroma * scale)
+                let scaled = base_chroma * scale;
+
+                let max_chroma = max_chroma_for_hue_and_lightness(base_hue, target_lightness);
+                (target_lightness, scaled.min(max_chroma))
             };
 
             let oklch_color = Oklch::new(lightness, chroma, base_hue);

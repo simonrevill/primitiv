@@ -100,24 +100,31 @@ fn max_chroma_for_hue_and_lightness(hue: f32, lightness: f32) -> f32 {
 pub fn generate_palette_with_scale(base_500: Oklch, lightness_scale: &[f32]) -> Vec<Palette> {
     let base_hue = base_500.hue.into_degrees();
     let base_chroma = base_500.chroma;
+    let base_lightness = base_500.l;
 
     let backgrounds: Vec<OklchStep> = STEPS
         .iter()
         .zip(lightness_scale.iter())
-        .map(|(&background, &target_lightness)| {
-            let (lightness, chroma) = if background == 500 {
-                (base_500.l, base_chroma)
+        .map(|(&step, &reference_lightness)| {
+            let lightness = if step == 500 {
+                base_lightness
             } else {
-                let scale = chroma_scale_for_lightness(target_lightness);
+                let offset = reference_lightness - 0.55;
+                (base_lightness + offset).clamp(0.01, 0.99)
+            };
+            
+            let (final_lightness, final_chroma) = if step == 500 {
+                (lightness, base_chroma)
+            } else {
+                let scale = chroma_scale_for_lightness(lightness);
                 let scaled = base_chroma * scale;
-
-                let max_chroma = max_chroma_for_hue_and_lightness(base_hue, target_lightness);
-                (target_lightness, scaled.min(max_chroma))
+                let max_chroma = max_chroma_for_hue_and_lightness(base_hue, lightness);
+                (lightness, scaled.min(max_chroma))
             };
 
-            let oklch_color = Oklch::new(lightness, chroma, base_hue);
+            let oklch_color = Oklch::new(final_lightness, final_chroma, base_hue);
 
-            OklchStep::from_label(oklch_color.l, oklch_color.chroma, oklch_color.hue.into_degrees(), background)
+            OklchStep::from_label(oklch_color.l, oklch_color.chroma, oklch_color.hue.into_degrees(), step)
         })
         .collect();
 

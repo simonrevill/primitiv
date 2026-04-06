@@ -58,12 +58,12 @@ pub struct Palette {
 const STEPS: [u16; 10] = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
 
 const TARGET_LIGHTNESS: [f32; 10] = [
-    0.97, 0.92, 0.85, 0.78, 0.68, 0.55, 0.45, 0.32, 0.22, 0.15
+    0.985, 0.94, 0.87, 0.79, 0.69, 0.55, 0.45, 0.32, 0.22, 0.15
 ];
 
 pub fn chroma_scale_for_lightness(lightness: f32) -> f32 {
-    if lightness >= 0.90 { 0.25 } 
-    else if lightness >= 0.85 { 0.40 } 
+    if lightness >= 0.94 { 0.22 } 
+    else if lightness >= 0.88 { 0.38 } 
     else if lightness > 0.80 { 0.65 }
     else if lightness < 0.25 { 0.55 } 
     else if lightness < 0.35 { 0.75 } 
@@ -108,6 +108,8 @@ pub fn generate_palette_with_scale(base_500: Oklch, lightness_scale: &[f32]) -> 
         .map(|(&step, &reference_lightness)| {
             let lightness = if step == 500 {
                 base_lightness
+            } else if step == 900 {
+                (base_lightness - 0.42).max(0.08)
             } else {
                 let offset = reference_lightness - 0.55;
                 (base_lightness + offset).clamp(0.01, 0.99)

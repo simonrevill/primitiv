@@ -57,13 +57,22 @@ pub struct Palette {
 
 const STEPS: [u16; 10] = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
 
-const TARGET_LIGHTNESS: [f32; 10] = [
-    0.995, 0.96, 0.90, 0.82, 0.71, 0.55, 0.45, 0.32, 0.22, 0.15
+pub const TARGET_LIGHTNESS: [f32; 10] = [
+    0.99,
+    0.955,
+    0.895,
+    0.81,
+    0.71,
+    0.55,
+    0.45,
+    0.32,
+    0.22,
+    0.15
 ];
 
 pub fn chroma_scale_for_lightness(lightness: f32) -> f32 {
-    if lightness >= 0.96 { 0.16 } 
-    else if lightness >= 0.90 { 0.32 } 
+    if lightness >= 0.955 { 0.18 } 
+    else if lightness >= 0.895 { 0.34 } 
     else if lightness > 0.80 { 0.65 }
     else if lightness < 0.25 { 0.55 } 
     else if lightness < 0.35 { 0.75 } 
@@ -97,7 +106,7 @@ fn max_chroma_for_hue_and_lightness(hue: f32, lightness: f32) -> f32 {
     base_max * lightness_factor
 }
 
-pub fn generate_palette_with_scale(base_500: Oklch, lightness_scale: &[f32]) -> Vec<Palette> {
+pub fn generate_palette_with_scale(base_500: Oklch, lightness_scale: &[f32], light_padding: f32) -> Vec<Palette> {
     let base_hue = base_500.hue.into_degrees();
     let base_chroma = base_500.chroma;
     let base_lightness = base_500.l;
@@ -112,7 +121,13 @@ pub fn generate_palette_with_scale(base_500: Oklch, lightness_scale: &[f32]) -> 
                 (base_lightness - 0.42).max(0.08)
             } else {
                 let offset = reference_lightness - 0.55;
-                (base_lightness + offset).clamp(0.01, 0.99)
+                let mut l = base_lightness + offset;
+
+                if step <= 200 {
+                    l = (l + light_padding).clamp(0.1, 0.995);
+                }
+
+                l.clamp(0.01, 0.99)
             };
             
             let (final_lightness, final_chroma) = if step == 500 {
@@ -156,10 +171,10 @@ pub fn generate_palette_with_scale(base_500: Oklch, lightness_scale: &[f32]) -> 
 }
 
 pub fn generate_palette(base_500: Oklch) -> Vec<Palette> {
-    generate_palette_with_scale(base_500, &TARGET_LIGHTNESS)
+    generate_palette_with_scale(base_500, &TARGET_LIGHTNESS, 0.025)
 }
 
 pub fn generate_greyscale_oklch() -> Vec<Palette> {
     let lightness_scale: [f32; 10] = [0.95, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1];
-    generate_palette_with_scale(Oklch::new(0.5, 0.0, 0.0), &lightness_scale)
+    generate_palette_with_scale(Oklch::new(0.5, 0.0, 0.0), &lightness_scale, 0.0)
 }

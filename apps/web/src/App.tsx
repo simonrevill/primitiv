@@ -60,6 +60,8 @@ function Palette({ palette }: PaletteProps) {
   );
 }
 
+const LIGHT_PADDING = 0.025;
+
 function App() {
   const [greyscalePalette, setGreyscalePalette] = useState<Palette[]>();
   const [blueColor, setBlueColor] = useState("#3B82F6");
@@ -74,10 +76,10 @@ function App() {
   useEffect(() => {
     init().then(() => {
       setGreyscalePalette(generate_greyscale_oklch());
-      setBluePalette(generate_palette(blueColor));
-      setYellowPalette(generate_palette(yellowColor));
-      setLimePalette(generate_palette(limeColor));
-      setPinkPalette(generate_palette(pinkColor));
+      setBluePalette(generate_palette(blueColor, LIGHT_PADDING));
+      setYellowPalette(generate_palette(yellowColor, LIGHT_PADDING));
+      setLimePalette(generate_palette(limeColor, LIGHT_PADDING));
+      setPinkPalette(generate_palette(pinkColor, LIGHT_PADDING));
     });
   }, [blueColor, yellowColor, limeColor, pinkColor]);
 
@@ -85,22 +87,22 @@ function App() {
 
   const handleBlueColorChange = (e: ChangeEvent<HTMLInputElement>) => {
     setBlueColor(e.target.value);
-    setBluePalette(generate_palette(blueColor));
+    setBluePalette(generate_palette(blueColor, LIGHT_PADDING));
   };
 
   const handleYellowColorChange = (e: ChangeEvent<HTMLInputElement>) => {
     setYellowColor(e.target.value);
-    setYellowPalette(generate_palette(blueColor));
+    setYellowPalette(generate_palette(blueColor, LIGHT_PADDING));
   };
 
   const handleLimeColorChange = (e: ChangeEvent<HTMLInputElement>) => {
     setLimeColor(e.target.value);
-    setLimePalette(generate_palette(limeColor));
+    setLimePalette(generate_palette(limeColor, LIGHT_PADDING));
   };
 
   const handlePinkColorChange = (e: ChangeEvent<HTMLInputElement>) => {
     setPinkColor(e.target.value);
-    setPinkPalette(generate_palette(pinkColor));
+    setPinkPalette(generate_palette(pinkColor, LIGHT_PADDING));
   };
 
   return (

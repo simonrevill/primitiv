@@ -58,12 +58,12 @@ pub struct Palette {
 const STEPS: [u16; 10] = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
 
 const TARGET_LIGHTNESS: [f32; 10] = [
-    0.99, 0.945, 0.87, 0.79, 0.69, 0.55, 0.45, 0.32, 0.22, 0.15
+    0.995, 0.96, 0.90, 0.82, 0.71, 0.55, 0.45, 0.32, 0.22, 0.15
 ];
 
 pub fn chroma_scale_for_lightness(lightness: f32) -> f32 {
-    if lightness >= 0.945 { 0.18 } 
-    else if lightness >= 0.88 { 0.36 } 
+    if lightness >= 0.96 { 0.16 } 
+    else if lightness >= 0.90 { 0.32 } 
     else if lightness > 0.80 { 0.65 }
     else if lightness < 0.25 { 0.55 } 
     else if lightness < 0.35 { 0.75 } 

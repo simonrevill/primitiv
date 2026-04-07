@@ -45,9 +45,19 @@ $border-radius: 0.5rem;
   }
 }
 
+.palettes-grid {
+  display: grid;
+  row-gap: 1rem;
+}
+
 .palette-container {
   display: grid;
   grid-template-columns: repeat(10, 1fr);
+  row-gap: 0.25rem;
+
+  &--no-picker {
+    grid-template-columns: 1fr;
+  }
 }
 
 .palette-label {
@@ -79,10 +89,10 @@ $border-radius: 0.5rem;
   justify-content: center;
   align-items: center;
   min-width: 9rem;
-  height: 4.5rem;
+  height: 4rem;
 
   p {
-    font-size: small;
+    font-size: 0.75rem;
     margin: 0;
   }
 }

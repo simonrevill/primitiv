@@ -94,83 +94,91 @@ function App() {
   return (
     <main className="container">
       <h1>Primitiv Engine</h1>
-      <p className="palette-label">Greyscale</p>
-      <ColorPalette palette={greyscalePalette} />
+      <div className="palettes-grid">
+        <div className="palette-container palette-container--no-picker">
+          <p className="palette-label">Greyscale</p>
+          <ColorPalette palette={greyscalePalette} />
+        </div>
 
-      <div className="palette-container">
-        <p className="palette-label">Red</p>
-        <input type="color" onChange={handleRedColorChange} value={redColor} />
-        <ColorPalette palette={redPalette} />
-      </div>
+        <div className="palette-container">
+          <p className="palette-label">Red</p>
+          <input
+            type="color"
+            onChange={handleRedColorChange}
+            value={redColor}
+          />
+          <ColorPalette palette={redPalette} />
+        </div>
 
-      <div className="palette-container">
-        <p className="palette-label">Yellow</p>
-        <input
-          type="color"
-          onChange={handleYellowColorChange}
-          value={yellowColor}
-        />
-        <ColorPalette palette={yellowPalette} />
-      </div>
+        <div className="palette-container">
+          <p className="palette-label">Yellow</p>
+          <input
+            type="color"
+            onChange={handleYellowColorChange}
+            value={yellowColor}
+          />
+          <ColorPalette palette={yellowPalette} />
+        </div>
 
-      <div className="palette-container">
-        <p className="palette-label">Lime</p>
-        <input
-          type="color"
-          onChange={handleLimeColorChange}
-          value={limeColor}
-        />
-        <ColorPalette palette={limePalette} />
-      </div>
+        <div className="palette-container">
+          <p className="palette-label">Lime</p>
+          <input
+            type="color"
+            onChange={handleLimeColorChange}
+            value={limeColor}
+          />
+          <ColorPalette palette={limePalette} />
+        </div>
 
-      <div className="palette-container">
-        <p className="palette-label">Green</p>
-        <input
-          type="color"
-          onChange={handleGreenColorChange}
-          value={greenColor}
-        />
-        <ColorPalette palette={greenPalette} />
-      </div>
+        <div className="palette-container">
+          <p className="palette-label">Green</p>
+          <input
+            type="color"
+            onChange={handleGreenColorChange}
+            value={greenColor}
+          />
+          <ColorPalette palette={greenPalette} />
+        </div>
 
-      <div className="palette-container">
-        <p className="palette-label">Blue</p>
-        <input
-          type="color"
-          onChange={handleBlueColorChange}
-          value={blueColor}
-        />
-        <ColorPalette palette={bluePalette} />
-      </div>
+        <div className="palette-container">
+          <p className="palette-label">Blue</p>
+          <input
+            type="color"
+            onChange={handleBlueColorChange}
+            value={blueColor}
+          />
+          <ColorPalette palette={bluePalette} />
+        </div>
 
-      <div className="palette-container">
-        <p className="palette-label">Indigo</p>
-        <input
-          type="color"
-          onChange={handleIndigoColorChange}
-          value={indigoColor}
-        />
-        <ColorPalette palette={indigoPalette} />
-      </div>
+        <div className="palette-container">
+          <p className="palette-label">Indigo</p>
+          <input
+            type="color"
+            onChange={handleIndigoColorChange}
+            value={indigoColor}
+          />
+          <ColorPalette palette={indigoPalette} />
+        </div>
 
-      <div className="palette-container">
-        <p className="palette-label">Purple</p>
-        <input
-          type="color"
-          onChange={handlePurpleColorChange}
-          value={purpleColor}
-        />
-        <ColorPalette palette={purplePalette} />
-      </div>
+        <div className="palette-container">
+          <p className="palette-label">Purple</p>
+          <input
+            type="color"
+            onChange={handlePurpleColorChange}
+            value={purpleColor}
+          />
+          <ColorPalette palette={purplePalette} />
+        </div>
 
-      <div className="palette-container">
-        <p className="palette-label">Pink</p>
-        <input
-          type="color"
-          onChange={handlePinkColorChange}
-          value={pinkColor}
-        />
-        <ColorPalette palette={pinkPalette} />
+        <div className="palette-container">
+          <p className="palette-label">Pink</p>
+          <input
+            type="color"
+            onChange={handlePinkColorChange}
+            value={pinkColor}
+          />
+          <ColorPalette palette={pinkPalette} />
+        </div>
       </div>
     </main>
   );

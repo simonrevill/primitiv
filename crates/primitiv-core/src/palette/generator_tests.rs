@@ -110,8 +110,8 @@ mod generator_tests {
             assert_eq!(
                 step_50.contrast_result,
                 ContrastResult {
-                    ratio: 16.03,
-                    display_ratio: String::from("16.03:1"),
+                    ratio: 16.53,
+                    display_ratio: String::from("16.53:1"),
                     rating: String::from("AAA"),
                 }
             );

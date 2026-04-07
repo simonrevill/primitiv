@@ -58,11 +58,11 @@ pub struct Palette {
 const STEPS: [u16; 10] = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
 
 pub const TARGET_LIGHTNESS: [f32; 10] = [
-    0.97, 0.93, 0.87, 0.78, 0.68, 0.55, 0.45, 0.32, 0.22, 0.15
+    0.97, 0.91, 0.83, 0.76, 0.67, 0.55, 0.45, 0.32, 0.22, 0.15
 ];
 
 pub const TARGET_CHROMA_SCALE: [f32; 10] = [
-    0.10, 0.25, 0.50, 0.70, 0.90, 1.0, 0.90, 0.80, 0.65, 0.50
+    0.12, 0.35, 0.65, 0.80, 0.92, 1.0, 0.92, 0.80, 0.65, 0.50
 ];
 
 /// Binary search for the maximum chroma that stays within the sRGB gamut
@@ -161,6 +161,6 @@ pub fn generate_palette(base_500: Oklch) -> Vec<Palette> {
 }
 
 pub fn generate_greyscale_oklch() -> Vec<Palette> {
-    let lightness_scale: [f32; 10] = [0.96, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1];
+    let lightness_scale: [f32; 10] = [0.97, 0.93, 0.85, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1];
     generate_palette_with_scale(Oklch::new(0.5, 0.0, 0.0), &lightness_scale, &TARGET_CHROMA_SCALE)
 }

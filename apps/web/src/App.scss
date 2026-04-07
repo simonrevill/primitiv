@@ -45,6 +45,10 @@ $border-radius: 0.5rem;
   }
 }
 
+.palette-label {
+  color: oklch(1 0 0);
+}
+
 .swatch-container {
   display: flex;
 }

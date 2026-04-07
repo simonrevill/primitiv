@@ -106,22 +106,22 @@ function App() {
   return (
     <main className="container">
       <h1>Primitiv Engine</h1>
-      <p style={{ color: "ocklch(1.0 0 0)" }}>Greyscale</p>
+      <p className="palette-label">Greyscale</p>
       <Palette palette={greyscalePalette} />
-      <p style={{ color: "ocklch(0.55 0.200 90)" }}>Blue</p>
+      <p className="palette-label">Blue</p>
       <input type="color" onChange={handleBlueColorChange} value={blueColor} />
       <Palette palette={bluePalette} />
-      <p style={{ color: "ocklch(1.0 0 0)" }}>Yellow</p>
+      <p className="palette-label">Yellow</p>
       <input
         type="color"
         onChange={handleYellowColorChange}
         value={yellowColor}
       />
       <Palette palette={yellowPalette} />
-      <p style={{ color: "ocklch(0.55 0.178 130)" }}>Lime</p>
+      <p className="palette-label">Lime</p>
       <input type="color" onChange={handleLimeColorChange} value={limeColor} />
       <Palette palette={limePalette} />
-      <p style={{ color: "ocklch(0.6034 0.2324 354.23)" }}>Pink</p>
+      <p className="palette-label">Pink</p>
       <input type="color" onChange={handlePinkColorChange} value={pinkColor} />
       <Palette palette={pinkPalette} />
     </main>

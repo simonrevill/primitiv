@@ -90,7 +90,7 @@ mod generator_tests {
             assert_eq!(
                 step_50.best_foreground,
                 OklchStep {
-                    l: 0.1,
+                    l: 0.049999982,
                     c: 0.0,
                     h: 0.0,
                     label: OklchLabel::Number(900),
@@ -110,8 +110,8 @@ mod generator_tests {
             assert_eq!(
                 step_50.contrast_result,
                 ContrastResult {
-                    ratio: 17.79,
-                    display_ratio: String::from("17.79:1"),
+                    ratio: 16.03,
+                    display_ratio: String::from("16.03:1"),
                     rating: String::from("AAA"),
                 }
             );

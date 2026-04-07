@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use tsify::Tsify;
 
 use crate::{get_best_foreground, get_contrast_rating_for_step};
-use crate::{ContrastResult};
+use crate::ContrastResult;
 
 #[derive(Tsify, Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[tsify(into_wasm_abi, from_wasm_abi)]
@@ -58,26 +58,12 @@ pub struct Palette {
 const STEPS: [u16; 10] = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
 
 pub const TARGET_LIGHTNESS: [f32; 10] = [
-    0.99,
-    0.955,
-    0.895,
-    0.81,
-    0.71,
-    0.55,
-    0.45,
-    0.32,
-    0.22,
-    0.15
+    0.97, 0.93, 0.87, 0.78, 0.68, 0.55, 0.45, 0.32, 0.22, 0.15
 ];
 
-pub fn chroma_scale_for_lightness(lightness: f32) -> f32 {
-    if lightness >= 0.955 { 0.18 } 
-    else if lightness >= 0.895 { 0.34 } 
-    else if lightness > 0.80 { 0.65 }
-    else if lightness < 0.25 { 0.55 } 
-    else if lightness < 0.35 { 0.75 } 
-    else { 1.0 }
-}
+pub const TARGET_CHROMA_SCALE: [f32; 10] = [
+    0.10, 0.25, 0.50, 0.70, 0.90, 1.0, 0.90, 0.80, 0.65, 0.50
+];
 
 fn max_chroma_for_hue_and_lightness(hue: f32, lightness: f32) -> f32 {
     let hue = (hue as i32).rem_euclid(360) as f32;
@@ -106,7 +92,11 @@ fn max_chroma_for_hue_and_lightness(hue: f32, lightness: f32) -> f32 {
     base_max * lightness_factor
 }
 
-pub fn generate_palette_with_scale(base_500: Oklch, lightness_scale: &[f32], light_padding: f32) -> Vec<Palette> {
+pub fn generate_palette_with_scale(
+    base_500: Oklch,
+    lightness_scale: &[f32],
+    chroma_scale: &[f32],
+) -> Vec<Palette> {
     let base_hue = base_500.hue.into_degrees();
     let base_chroma = base_500.chroma;
     let base_lightness = base_500.l;
@@ -114,67 +104,57 @@ pub fn generate_palette_with_scale(base_500: Oklch, lightness_scale: &[f32], lig
     let backgrounds: Vec<OklchStep> = STEPS
         .iter()
         .zip(lightness_scale.iter())
-        .map(|(&step, &reference_lightness)| {
-            let lightness = if step == 500 {
-                base_lightness
-            } else if step == 900 {
-                (base_lightness - 0.42).max(0.08)
+        .zip(chroma_scale.iter())
+        .map(|((&step, &reference_lightness), &chroma_factor)| {
+            let (final_lightness, final_chroma) = if step == 500 {
+                (base_lightness, base_chroma)
             } else {
                 let offset = reference_lightness - 0.55;
-                let mut l = base_lightness + offset;
-
-                if step <= 200 {
-                    l = (l + light_padding).clamp(0.1, 0.995);
-                }
-
-                l.clamp(0.01, 0.99)
-            };
-            
-            let (final_lightness, final_chroma) = if step == 500 {
-                (lightness, base_chroma)
-            } else {
-                let scale = chroma_scale_for_lightness(lightness);
-                let scaled = base_chroma * scale;
-                let max_chroma = max_chroma_for_hue_and_lightness(base_hue, lightness);
-                (lightness, scaled.min(max_chroma))
+                let l = (base_lightness + offset).clamp(0.01, 0.99);
+                let scaled = base_chroma * chroma_factor;
+                let max_c = max_chroma_for_hue_and_lightness(base_hue, l);
+                (l, scaled.min(max_c))
             };
 
             let oklch_color = Oklch::new(final_lightness, final_chroma, base_hue);
 
-            OklchStep::from_label(oklch_color.l, oklch_color.chroma, oklch_color.hue.into_degrees(), step)
+            OklchStep::from_label(
+                oklch_color.l,
+                oklch_color.chroma,
+                oklch_color.hue.into_degrees(),
+                step,
+            )
         })
         .collect();
 
-        let dark_candidate = backgrounds
+    let dark_candidate = backgrounds
         .iter()
         .find(|background| background.label == OklchLabel::Number(900))
         .expect("Palette must contain a 900 step to act as a dark candidate");
 
-        backgrounds
-            .iter()
-            .map(|background| {
+    backgrounds
+        .iter()
+        .map(|background| {
+            let recommendation = get_best_foreground(background, dark_candidate);
+            let contrast_result = get_contrast_rating_for_step(background, &recommendation.color);
 
-                let foreground_recommendation = get_best_foreground(background, dark_candidate);
-
-                let contrast_result = get_contrast_rating_for_step(&background, &foreground_recommendation.color);
-
-                Palette {
-                    l: background.l,
-                    c: background.c,
-                    h: background.h,
-                    label: background.label.clone(),
-                    best_foreground: foreground_recommendation.color,
-                    contrast_result,
-                }
-            })
-            .collect()
+            Palette {
+                l: background.l,
+                c: background.c,
+                h: background.h,
+                label: background.label.clone(),
+                best_foreground: recommendation.color,
+                contrast_result,
+            }
+        })
+        .collect()
 }
 
 pub fn generate_palette(base_500: Oklch) -> Vec<Palette> {
-    generate_palette_with_scale(base_500, &TARGET_LIGHTNESS, 0.025)
+    generate_palette_with_scale(base_500, &TARGET_LIGHTNESS, &TARGET_CHROMA_SCALE)
 }
 
 pub fn generate_greyscale_oklch() -> Vec<Palette> {
-    let lightness_scale: [f32; 10] = [0.95, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1];
-    generate_palette_with_scale(Oklch::new(0.5, 0.0, 0.0), &lightness_scale, 0.0)
+    let lightness_scale: [f32; 10] = [0.96, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1];
+    generate_palette_with_scale(Oklch::new(0.5, 0.0, 0.0), &lightness_scale, &TARGET_CHROMA_SCALE)
 }

@@ -67,28 +67,8 @@ pub fn get_best_foreground(background: &OklchStep, dark_candidate: &OklchStep) -
         };
     }
 
-    // 3. Both white and black fail AA → pick the one with the highest ratio anyway
-    if ratio_white >= ratio_black {
-        ForegroundRecommendation {
-            color: OklchStep {
-                l: 1.0,
-                c: 0.0,
-                h: 0.0,
-                label: OklchLabel::Name(String::from("White")),
-            },
-            contrast_ratio: ratio_white,
-            is_harmonious: false,
-        }
-    } else {
-        ForegroundRecommendation {
-            color: OklchStep {
-                l: 0.01,
-                c: 0.0,
-                h: 0.0,
-                label: OklchLabel::Name(String::from("Black")),
-            },
-            contrast_ratio: ratio_black,
-            is_harmonious: false,
-        }
-    }
+    // For any sRGB-representable background, at least one of white or black
+    // will always achieve a contrast ratio >= 4.5 against it.
+    // This is mathematically guaranteed by the WCAG relative luminance formula.
+    unreachable!("Both white and black failed AA — this should never happen for valid sRGB colors");
 }

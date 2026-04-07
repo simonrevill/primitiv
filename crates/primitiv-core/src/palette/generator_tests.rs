@@ -117,4 +117,47 @@ mod generator_tests {
             );
         }
     }
+
+    mod oklch_label {
+        use super::*;
+
+        #[test]
+        fn should_create_label_from_str() {
+            let label: OklchLabel = "White".into();
+            assert_eq!(label, OklchLabel::Name(String::from("White")));
+        }
+    }
+
+    mod max_chroma_hue_coverage {
+        use super::*;
+
+        #[test]
+        fn should_generate_palette_for_purple_hue() {
+            // Hue 280 covers the 256..=295 range
+            let base = Oklch::new(0.55, 0.15, 280.0);
+            let result = generate_palette(base);
+            assert_eq!(result.len(), 10);
+        }
+
+        #[test]
+        fn should_generate_palette_for_magenta_hue() {
+            // Hue 310 covers the 296..=329 range
+            let base = Oklch::new(0.55, 0.15, 310.0);
+            let result = generate_palette(base);
+            assert_eq!(result.len(), 10);
+        }
+
+        #[test]
+        fn should_generate_palette_for_edge_case_hue() {
+            // Hue 361+ wraps via rem_euclid — after % 360 it becomes 1,
+            // which lands in 0..=30. Use a negative hue to exercise the
+            // _ fallback (unreachable in practice due to rem_euclid 0..=360,
+            // but we can test with hue 360 exactly which matches 0..=30|330..=360).
+            // Actually the _ arm is unreachable since hue ranges 0..=360 are
+            // fully covered. Let's just verify wrapping works.
+            let base = Oklch::new(0.55, 0.15, 720.0);
+            let result = generate_palette(base);
+            assert_eq!(result.len(), 10);
+        }
+    }
 }

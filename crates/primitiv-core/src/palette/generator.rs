@@ -1,4 +1,4 @@
-use palette::Oklch;
+use palette::{IntoColor, LinSrgb, Oklch};
 use serde::{Deserialize, Serialize};
 use tsify::Tsify;
 
@@ -65,31 +65,27 @@ pub const TARGET_CHROMA_SCALE: [f32; 10] = [
     0.10, 0.25, 0.50, 0.70, 0.90, 1.0, 0.90, 0.80, 0.65, 0.50
 ];
 
-fn max_chroma_for_hue_and_lightness(hue: f32, lightness: f32) -> f32 {
-    let hue = (hue as i32).rem_euclid(360) as f32;
+/// Binary search for the maximum chroma that stays within the sRGB gamut
+/// for a given OkLCH lightness and hue.
+pub fn max_in_gamut_chroma(lightness: f32, hue: f32) -> f32 {
+    let mut lo: f32 = 0.0;
+    let mut hi: f32 = 0.4;
 
-    let base_max = match hue as i32 {
-        0..=30 | 330..=360 => 0.225,
-        31..=50 => 0.195,
-        51..=80 => 0.170,
-        81..=115 => 0.135,
-        116..=155 => 0.185,
-        156..=195 => 0.245,
-        196..=255 => 0.320,
-        256..=295 => 0.275,
-        296..=329 => 0.240,
-        _ => 0.22,
-    };
+    for _ in 0..20 {
+        let mid = (lo + hi) / 2.0;
+        let srgb: LinSrgb = Oklch::new(lightness, mid, hue).into_color();
 
-    let lightness_factor = if lightness > 0.85 || lightness < 0.25 {
-        0.45
-    } else if lightness > 0.70 || lightness < 0.35 {
-        0.75
-    } else {
-        1.0
-    };
+        if srgb.red >= -0.001 && srgb.red <= 1.001
+            && srgb.green >= -0.001 && srgb.green <= 1.001
+            && srgb.blue >= -0.001 && srgb.blue <= 1.001
+        {
+            lo = mid;
+        } else {
+            hi = mid;
+        }
+    }
 
-    base_max * lightness_factor
+    lo
 }
 
 pub fn generate_palette_with_scale(
@@ -101,6 +97,15 @@ pub fn generate_palette_with_scale(
     let base_chroma = base_500.chroma;
     let base_lightness = base_500.l;
 
+    // Express the base chroma as a fraction of its gamut maximum,
+    // so we can apply the same proportional saturation at every step.
+    let base_gamut_max = max_in_gamut_chroma(base_lightness, base_hue);
+    let base_ratio = if base_gamut_max > 0.001 {
+        (base_chroma / base_gamut_max).min(1.0)
+    } else {
+        0.0
+    };
+
     let backgrounds: Vec<OklchStep> = STEPS
         .iter()
         .zip(lightness_scale.iter())
@@ -111,9 +116,10 @@ pub fn generate_palette_with_scale(
             } else {
                 let offset = reference_lightness - 0.55;
                 let l = (base_lightness + offset).clamp(0.01, 0.99);
-                let scaled = base_chroma * chroma_factor;
-                let max_c = max_chroma_for_hue_and_lightness(base_hue, l);
-                (l, scaled.min(max_c))
+                let step_gamut_max = max_in_gamut_chroma(l, base_hue);
+                // Use 95% of gamut max as a safety margin to avoid edge clipping
+                let chroma = step_gamut_max * 0.95 * base_ratio * chroma_factor;
+                (l, chroma)
             };
 
             let oklch_color = Oklch::new(final_lightness, final_chroma, base_hue);

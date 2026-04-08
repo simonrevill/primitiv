@@ -168,13 +168,46 @@ mod generator_tests {
         fn should_make_light_end_of_scale_lighter_with_positive_light_padding() {
             // Arrange
             let base_500 = Oklch::new(0.55, 0.0, 0.0);
+            let positive_light_padding = 0.06;
             let palette_with_no_padding = generate_palette_with_scale(base_500, &TARGET_LIGHTNESS, &TARGET_CHROMA_SCALE, 0.0);
             let step_50_no_padding_lightness = palette_with_no_padding.iter().find(|step| step.label == OklchLabel::Number(50)).unwrap().l;
-            let palette_with_padding = generate_palette_with_scale(base_500, &TARGET_LIGHTNESS, &TARGET_CHROMA_SCALE, 0.06);
+            let step_100_no_padding_lightness = palette_with_no_padding.iter().find(|step| step.label == OklchLabel::Number(100)).unwrap().l;
+            let step_200_no_padding_lightness = palette_with_no_padding.iter().find(|step| step.label == OklchLabel::Number(200)).unwrap().l;
+            let step_300_no_padding_lightness = palette_with_no_padding.iter().find(|step| step.label == OklchLabel::Number(300)).unwrap().l;
+            let palette_with_padding = generate_palette_with_scale(base_500, &TARGET_LIGHTNESS, &TARGET_CHROMA_SCALE, positive_light_padding);
             let step_50_with_padding_lightness = palette_with_padding.iter().find(|step| step.label == OklchLabel::Number(50)).unwrap().l;
+            let step_100_with_padding_lightness = palette_with_padding.iter().find(|step| step.label == OklchLabel::Number(100)).unwrap().l;
+            let step_200_with_padding_lightness = palette_with_padding.iter().find(|step| step.label == OklchLabel::Number(200)).unwrap().l;
+            let step_300_with_padding_lightness = palette_with_padding.iter().find(|step| step.label == OklchLabel::Number(300)).unwrap().l;
 
             // Assert
             assert!(step_50_with_padding_lightness > step_50_no_padding_lightness);
+            assert!(step_100_with_padding_lightness > step_100_no_padding_lightness);
+            assert!(step_200_with_padding_lightness > step_200_no_padding_lightness);
+            assert!(step_300_with_padding_lightness > step_300_no_padding_lightness);
+        }
+        
+        #[test]
+        fn should_make_light_end_of_scale_darker_with_negative_light_padding() {
+            // Arrange
+            let base_500 = Oklch::new(0.55, 0.0, 0.0);
+            let negative_light_padding = -0.06;
+            let palette_with_no_padding = generate_palette_with_scale(base_500, &TARGET_LIGHTNESS, &TARGET_CHROMA_SCALE, 0.0);
+            let step_50_no_padding_lightness = palette_with_no_padding.iter().find(|step| step.label == OklchLabel::Number(50)).unwrap().l;
+            let step_100_no_padding_lightness = palette_with_no_padding.iter().find(|step| step.label == OklchLabel::Number(100)).unwrap().l;
+            let step_200_no_padding_lightness = palette_with_no_padding.iter().find(|step| step.label == OklchLabel::Number(200)).unwrap().l;
+            let step_300_no_padding_lightness = palette_with_no_padding.iter().find(|step| step.label == OklchLabel::Number(300)).unwrap().l;
+            let palette_with_padding = generate_palette_with_scale(base_500, &TARGET_LIGHTNESS, &TARGET_CHROMA_SCALE, negative_light_padding);
+            let step_50_with_padding_lightness = palette_with_padding.iter().find(|step| step.label == OklchLabel::Number(50)).unwrap().l;
+            let step_100_with_padding_lightness = palette_with_padding.iter().find(|step| step.label == OklchLabel::Number(100)).unwrap().l;
+            let step_200_with_padding_lightness = palette_with_padding.iter().find(|step| step.label == OklchLabel::Number(200)).unwrap().l;
+            let step_300_with_padding_lightness = palette_with_padding.iter().find(|step| step.label == OklchLabel::Number(300)).unwrap().l;
+
+            // Assert
+            assert!(step_50_with_padding_lightness < step_50_no_padding_lightness);
+            assert!(step_100_with_padding_lightness < step_100_no_padding_lightness);
+            assert!(step_200_with_padding_lightness < step_200_no_padding_lightness);
+            assert!(step_300_with_padding_lightness < step_300_no_padding_lightness);
         }
     }
 }

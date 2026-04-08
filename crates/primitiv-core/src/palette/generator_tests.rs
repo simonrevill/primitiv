@@ -160,4 +160,21 @@ mod generator_tests {
             assert_eq!(result.len(), 10);
         }
     }
+
+    mod light_padding {
+        use super::*;
+
+        #[test]
+        fn should_make_light_end_of_scale_lighter_with_positive_light_padding() {
+            // Arrange
+            let base_500 = Oklch::new(0.55, 0.0, 0.0);
+            let palette_with_no_padding = generate_palette_with_scale(base_500, &TARGET_LIGHTNESS, &TARGET_CHROMA_SCALE, 0.0);
+            let step_50_no_padding_lightness = palette_with_no_padding.iter().find(|step| step.label == OklchLabel::Number(50)).unwrap().l;
+            let palette_with_padding = generate_palette_with_scale(base_500, &TARGET_LIGHTNESS, &TARGET_CHROMA_SCALE, 0.06);
+            let step_50_with_padding_lightness = palette_with_padding.iter().find(|step| step.label == OklchLabel::Number(50)).unwrap().l;
+
+            // Assert
+            assert!(step_50_with_padding_lightness > step_50_no_padding_lightness);
+        }
+    }
 }

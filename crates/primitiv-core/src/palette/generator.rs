@@ -180,8 +180,8 @@ pub fn generate_palette_with_scale(
         .collect()
 }
 
-pub fn generate_palette(base_500: Oklch) -> Vec<Palette> {
-    generate_palette_with_scale(base_500, &TARGET_LIGHTNESS, &TARGET_CHROMA_SCALE, 0.0, 0.0)
+pub fn generate_palette(base_500: Oklch, light_padding: f32, dark_padding: f32) -> Vec<Palette> {
+    generate_palette_with_scale(base_500, &TARGET_LIGHTNESS, &TARGET_CHROMA_SCALE, light_padding, dark_padding)
 }
 
 pub fn generate_palette_with_light_padding(base_500: Oklch, light_padding: f32) -> Vec<Palette> {

@@ -17,7 +17,7 @@ extern "C" {
 }
 
 #[wasm_bindgen]
-pub fn generate_palette(hex: &str) -> Result<PaletteArray, JsError> {
+pub fn generate_palette(hex: &str, light_padding: f32, dark_padding: f32) -> Result<PaletteArray, JsError> {
     let hex_clean = hex.trim_start_matches('#');
 
     let rgb = Srgb::from_str(hex_clean)
@@ -25,7 +25,7 @@ pub fn generate_palette(hex: &str) -> Result<PaletteArray, JsError> {
 
     let oklch: Oklch = rgb.into_format::<f32>().into_color();
 
-    let palette_data = primitiv_core::generate_palette(oklch);
+    let palette_data = primitiv_core::generate_palette(oklch, light_padding, dark_padding);
 
     serde_wasm_bindgen::to_value(&palette_data)
         .map(|v| v.unchecked_into())

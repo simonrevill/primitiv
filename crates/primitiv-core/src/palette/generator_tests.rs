@@ -13,7 +13,7 @@ mod generator_tests {
         fn should_preserve_the_base_500_color_that_was_passed_in() {
             // Arrange
             let base_500 = Oklch::new(0.55, 0.15, 240.0);
-            let result = generate_palette(base_500);
+            let result = generate_palette(base_500, 0.0, 0.0);
 
             // Assert
             let base_500_step = &result[5];
@@ -135,7 +135,7 @@ mod generator_tests {
         fn should_generate_palette_for_purple_hue() {
             // Hue 280 covers the 256..=295 range
             let base = Oklch::new(0.55, 0.15, 280.0);
-            let result = generate_palette(base);
+            let result = generate_palette(base, 0.0, 0.0);
             assert_eq!(result.len(), 10);
         }
 
@@ -143,7 +143,7 @@ mod generator_tests {
         fn should_generate_palette_for_magenta_hue() {
             // Hue 310 covers the 296..=329 range
             let base = Oklch::new(0.55, 0.15, 310.0);
-            let result = generate_palette(base);
+            let result = generate_palette(base, 0.0, 0.0);
             assert_eq!(result.len(), 10);
         }
 
@@ -156,7 +156,7 @@ mod generator_tests {
             // Actually the _ arm is unreachable since hue ranges 0..=360 are
             // fully covered. Let's just verify wrapping works.
             let base = Oklch::new(0.55, 0.15, 720.0);
-            let result = generate_palette(base);
+            let result = generate_palette(base, 0.0, 0.0);
             assert_eq!(result.len(), 10);
         }
     }

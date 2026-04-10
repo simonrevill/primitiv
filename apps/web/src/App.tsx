@@ -1,7 +1,7 @@
 import { useState, useEffect, ChangeEvent } from "react";
 import init, {
   generate_greyscale_oklch,
-  generate_palette_with_light_padding,
+  generate_palette,
   type Palette,
 } from "primitiv-wasm";
 import "./App.scss";
@@ -26,27 +26,33 @@ function App() {
   const [pinkColor, setPinkColor] = useState("#e0218a");
   const [pinkPalette, setPinkPalette] = useState<Palette[]>();
 
-  const TARGET_LIGHTNESS = [
-    0.97, 0.91, 0.83, 0.76, 0.67, 0.55, 0.45, 0.32, 0.22, 0.15,
-  ];
-  const safeNegative = Math.min(...TARGET_LIGHTNESS) - 0.01; // ~0.14
-  const maxPaddingPercent = Math.round(safeNegative * 100); // e.g. 14
+  // const TARGET_LIGHTNESS = [
+  //   0.97, 0.91, 0.83, 0.76, 0.67, 0.55, 0.45, 0.32, 0.22, 0.15,
+  // ];
+  // const safeNegative = Math.min(...TARGET_LIGHTNESS) - 0.01; // ~0.14
+  const maxPaddingPercent = 25;
 
-  const [redPaddingPercent, setRedPaddingPercent] = useState<number>(0);
+  const [redLightPaddingPercent, setRedLightPaddingPercent] =
+    useState<number>(0);
+  const [redDarkPaddingPercent, setRedDarkPaddingPercent] = useState<number>(0);
 
   useEffect(() => {
     init().then(() => {
       setGreyscalePalette(generate_greyscale_oklch());
       setRedPalette(
-        generate_palette_with_light_padding(redColor, -redPaddingPercent / 100),
+        generate_palette(
+          redColor,
+          redLightPaddingPercent / 100, // ← positive = brighter
+          redDarkPaddingPercent / 100, // ← positive = darker
+        ),
       );
-      setYellowPalette(generate_palette_with_light_padding(yellowColor, 0));
-      setLimePalette(generate_palette_with_light_padding(limeColor, 0));
-      setGreenPalette(generate_palette_with_light_padding(greenColor, 0));
-      setBluePalette(generate_palette_with_light_padding(blueColor, 0));
-      setIndigoPalette(generate_palette_with_light_padding(indigoColor, 0));
-      setPurplePalette(generate_palette_with_light_padding(purpleColor, 0));
-      setPinkPalette(generate_palette_with_light_padding(pinkColor, 0));
+      setYellowPalette(generate_palette(yellowColor, 0, 0));
+      setLimePalette(generate_palette(limeColor, 0, 0));
+      setGreenPalette(generate_palette(greenColor, 0, 0));
+      setBluePalette(generate_palette(blueColor, 0, 0));
+      setIndigoPalette(generate_palette(indigoColor, 0, 0));
+      setPurplePalette(generate_palette(purpleColor, 0, 0));
+      setPinkPalette(generate_palette(pinkColor, 0, 0));
     });
   }, [
     blueColor,
@@ -57,56 +63,84 @@ function App() {
     greenColor,
     indigoColor,
     purpleColor,
-    redPaddingPercent,
+    redLightPaddingPercent,
+    redDarkPaddingPercent,
   ]);
-
-  const handleRedColorChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const v = e.target.value;
-    setRedColor(v);
-    const lightPadding = -redPaddingPercent / 100; // Supa: positive slider -> darken -> negative padding
-    setRedPalette(generate_palette_with_light_padding(v, lightPadding));
-  };
 
   const handleYellowColorChange = (e: ChangeEvent<HTMLInputElement>) => {
     setYellowColor(e.target.value);
-    setYellowPalette(generate_palette_with_light_padding(blueColor, 0));
+    setYellowPalette(generate_palette(blueColor, 0, 0));
   };
 
   const handleLimeColorChange = (e: ChangeEvent<HTMLInputElement>) => {
     setLimeColor(e.target.value);
-    setLimePalette(generate_palette_with_light_padding(limeColor, 0));
+    setLimePalette(generate_palette(limeColor, 0, 0));
   };
 
   const handleGreenColorChange = (e: ChangeEvent<HTMLInputElement>) => {
     setGreenColor(e.target.value);
-    setGreenPalette(generate_palette_with_light_padding(greenColor, 0));
+    setGreenPalette(generate_palette(greenColor, 0, 0));
   };
 
   const handleBlueColorChange = (e: ChangeEvent<HTMLInputElement>) => {
     setBlueColor(e.target.value);
-    setBluePalette(generate_palette_with_light_padding(blueColor, 0));
+    setBluePalette(generate_palette(blueColor, 0, 0));
   };
 
   const handleIndigoColorChange = (e: ChangeEvent<HTMLInputElement>) => {
     setIndigoColor(e.target.value);
-    setIndigoPalette(generate_palette_with_light_padding(indigoColor, 0));
+    setIndigoPalette(generate_palette(indigoColor, 0, 0));
   };
 
   const handlePurpleColorChange = (e: ChangeEvent<HTMLInputElement>) => {
     setPurpleColor(e.target.value);
-    setPurplePalette(generate_palette_with_light_padding(purpleColor, 0));
+    setPurplePalette(generate_palette(purpleColor, 0, 0));
   };
 
   const handlePinkColorChange = (e: ChangeEvent<HTMLInputElement>) => {
     setPinkColor(e.target.value);
-    setPinkPalette(generate_palette_with_light_padding(pinkColor, 0));
+    setPinkPalette(generate_palette(pinkColor, 0, 0));
   };
 
-  const handleRedPaddingChange = (e: ChangeEvent<HTMLInputElement>) => {
+  // Color change handler
+  const handleRedColorChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const v = e.target.value;
+    setRedColor(v);
+    setRedPalette(
+      generate_palette(
+        v,
+        redLightPaddingPercent / 100,
+        redDarkPaddingPercent / 100,
+      ),
+    );
+  };
+
+  // Handler for light padding
+  const handleRedLightPaddingChange = (e: ChangeEvent<HTMLInputElement>) => {
     const p = parseFloat(e.target.value);
-    setRedPaddingPercent(p);
-    const lightPadding = -p / 100; // invert: slider up darkens (negative padding)
-    setRedPalette(generate_palette_with_light_padding(redColor, lightPadding));
+    setRedLightPaddingPercent(p);
+
+    setRedPalette(
+      generate_palette(
+        redColor,
+        p / 100, // positive = brighter light end
+        redDarkPaddingPercent / 100,
+      ),
+    );
+  };
+
+  // Handler for dark padding
+  const handleRedDarkPaddingChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const p = parseFloat(e.target.value);
+    setRedDarkPaddingPercent(p);
+
+    setRedPalette(
+      generate_palette(
+        redColor,
+        redLightPaddingPercent / 100,
+        p / 100, // positive = darker dark end
+      ),
+    );
   };
 
   return (
@@ -132,10 +166,19 @@ function App() {
               min={0}
               max={maxPaddingPercent}
               step={1}
-              value={redPaddingPercent}
-              onChange={handleRedPaddingChange}
+              value={redLightPaddingPercent}
+              onChange={handleRedLightPaddingChange}
             />
-            <span className="slider-label">{redPaddingPercent}%</span>
+            <span className="slider-label">{redLightPaddingPercent}%</span>
+            <input
+              type="range"
+              min={0}
+              max={maxPaddingPercent}
+              step={1}
+              value={redDarkPaddingPercent}
+              onChange={handleRedDarkPaddingChange}
+            />
+            <span className="slider-label">{redDarkPaddingPercent}%</span>
           </div>
         </div>
 

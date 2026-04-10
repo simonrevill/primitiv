@@ -1,21 +1,24 @@
 use crate::OklchStep;
 use crate::palette::generator::OklchLabel;
-use palette::{IntoColor, LinSrgb, Oklch};
 use palette::color_difference::Wcag21RelativeContrast;
+use palette::{IntoColor, LinSrgb, Oklch};
 
 // New return type — rich information for the UI and strict AA guarantee
 #[derive(Debug, Clone, PartialEq)]
 pub struct ForegroundRecommendation {
     pub color: OklchStep,
     pub contrast_ratio: f32,
-    pub is_harmonious: bool,        // true = used palette's own 900
+    pub is_harmonious: bool, // true = used palette's own 900
 }
 
-pub fn get_best_foreground(background: &OklchStep, dark_candidate: &OklchStep) -> ForegroundRecommendation {
+pub fn get_best_foreground(
+    background: &OklchStep,
+    dark_candidate: &OklchStep,
+) -> ForegroundRecommendation {
     let bg_color = Oklch::new(background.l, background.c, background.h);
     let dark_color = Oklch::new(dark_candidate.l, dark_candidate.c, dark_candidate.h);
     let white_color = Oklch::new(1.0, 0.0, 0.0);
-    let black_color = Oklch::new(0.01, 0.0, 0.0);   // near-black (better than pure 0.0)
+    let black_color = Oklch::new(0.01, 0.0, 0.0); // near-black (better than pure 0.0)
 
     let bg_lin: LinSrgb = bg_color.into_color();
     let dark_lin: LinSrgb = dark_color.into_color();
@@ -29,7 +32,7 @@ pub fn get_best_foreground(background: &OklchStep, dark_candidate: &OklchStep) -
 
     let ratio_white = (white_lum + 0.05) / (bg_lum + 0.05);
     let ratio_black = (bg_lum + 0.05) / (black_lum + 0.05);
-    let ratio_dark  = (bg_lum + 0.05) / (dark_lum + 0.05);
+    let ratio_dark = (bg_lum + 0.05) / (dark_lum + 0.05);
 
     // 1. Prefer harmonious dark_candidate (palette's 900) if it meets AA
     if ratio_dark >= 4.5 {

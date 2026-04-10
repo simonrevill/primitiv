@@ -2,8 +2,8 @@ use palette::{IntoColor, LinSrgb, Oklch};
 use serde::{Deserialize, Serialize};
 use tsify::Tsify;
 
-use crate::{get_best_foreground, get_contrast_rating_for_step};
 use crate::ContrastResult;
+use crate::{get_best_foreground, get_contrast_rating_for_step};
 
 #[derive(Tsify, Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[tsify(into_wasm_abi, from_wasm_abi)]
@@ -57,13 +57,11 @@ pub struct Palette {
 
 const STEPS: [u16; 10] = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
 
-pub const TARGET_LIGHTNESS: [f32; 10] = [
-    0.97, 0.91, 0.83, 0.76, 0.67, 0.55, 0.45, 0.32, 0.22, 0.15
-];
+pub const TARGET_LIGHTNESS: [f32; 10] =
+    [0.97, 0.91, 0.83, 0.76, 0.67, 0.55, 0.45, 0.32, 0.22, 0.15];
 
-pub const TARGET_CHROMA_SCALE: [f32; 10] = [
-    0.12, 0.35, 0.65, 0.80, 0.92, 1.0, 0.92, 0.80, 0.65, 0.50
-];
+pub const TARGET_CHROMA_SCALE: [f32; 10] =
+    [0.12, 0.35, 0.65, 0.80, 0.92, 1.0, 0.92, 0.80, 0.65, 0.50];
 
 /// Binary search for the maximum chroma that stays within the sRGB gamut
 /// for a given OkLCH lightness and hue.
@@ -75,9 +73,12 @@ pub fn max_in_gamut_chroma(lightness: f32, hue: f32) -> f32 {
         let mid = (lo + hi) / 2.0;
         let srgb: LinSrgb = Oklch::new(lightness, mid, hue).into_color();
 
-        if srgb.red >= -0.001 && srgb.red <= 1.001
-            && srgb.green >= -0.001 && srgb.green <= 1.001
-            && srgb.blue >= -0.001 && srgb.blue <= 1.001
+        if srgb.red >= -0.001
+            && srgb.red <= 1.001
+            && srgb.green >= -0.001
+            && srgb.green <= 1.001
+            && srgb.blue >= -0.001
+            && srgb.blue <= 1.001
         {
             lo = mid;
         } else {
@@ -88,14 +89,19 @@ pub fn max_in_gamut_chroma(lightness: f32, hue: f32) -> f32 {
     lo
 }
 
-fn apply_padding_to_lightness(lightness_scale: &[f32], light_padding: f32) -> Vec<f32>{
+fn apply_padding_to_lightness(
+    lightness_scale: &[f32],
+    light_padding: f32,
+    dark_padding: f32,
+) -> Vec<f32> {
     lightness_scale
         .iter()
         .enumerate()
         .map(|(i, &l)| {
             let n = i as f32 / (lightness_scale.len() as f32 - 1.0);
             let light_influence = (1.0 - n).powi(2);
-            let delta = light_padding * light_influence;
+            let dark_influence = n.powi(2);
+            let delta = light_padding * light_influence - dark_padding * dark_influence;
 
             (l + delta).clamp(0.01, 0.99)
         })
@@ -107,11 +113,13 @@ pub fn generate_palette_with_scale(
     lightness_scale: &[f32],
     chroma_scale: &[f32],
     light_padding: f32,
+    dark_padding: f32,
 ) -> Vec<Palette> {
     let base_hue = base_500.hue.into_degrees();
     let base_chroma = base_500.chroma;
     let base_lightness = base_500.l;
-    let adjusted_lightness = apply_padding_to_lightness(lightness_scale, light_padding);
+    let adjusted_lightness =
+        apply_padding_to_lightness(lightness_scale, light_padding, dark_padding);
 
     // Express the base chroma as a fraction of its gamut maximum,
     // so we can apply the same proportional saturation at every step.
@@ -173,14 +181,36 @@ pub fn generate_palette_with_scale(
 }
 
 pub fn generate_palette(base_500: Oklch) -> Vec<Palette> {
-    generate_palette_with_scale(base_500, &TARGET_LIGHTNESS, &TARGET_CHROMA_SCALE, 0.0)
+    generate_palette_with_scale(base_500, &TARGET_LIGHTNESS, &TARGET_CHROMA_SCALE, 0.0, 0.0)
 }
 
 pub fn generate_palette_with_light_padding(base_500: Oklch, light_padding: f32) -> Vec<Palette> {
-    generate_palette_with_scale(base_500, &TARGET_LIGHTNESS, &TARGET_CHROMA_SCALE, light_padding)
+    generate_palette_with_scale(
+        base_500,
+        &TARGET_LIGHTNESS,
+        &TARGET_CHROMA_SCALE,
+        light_padding,
+        0.0,
+    )
+}
+
+pub fn generate_palette_with_dark_padding(base_500: Oklch, dark_padding: f32) -> Vec<Palette> {
+    generate_palette_with_scale(
+        base_500,
+        &TARGET_LIGHTNESS,
+        &TARGET_CHROMA_SCALE,
+        0.0,
+        dark_padding,
+    )
 }
 
 pub fn generate_greyscale_oklch() -> Vec<Palette> {
     let lightness_scale: [f32; 10] = [0.97, 0.93, 0.85, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1];
-    generate_palette_with_scale(Oklch::new(0.5, 0.0, 0.0), &lightness_scale, &TARGET_CHROMA_SCALE, 0.0)
+    generate_palette_with_scale(
+        Oklch::new(0.5, 0.0, 0.0),
+        &lightness_scale,
+        &TARGET_CHROMA_SCALE,
+        0.0,
+        0.0,
+    )
 }

@@ -1,5 +1,5 @@
-use palette::{IntoColor, LinSrgb, Oklch, Srgb};
 use palette::color_difference::Wcag21RelativeContrast;
+use palette::{IntoColor, LinSrgb, Oklch, Srgb};
 use serde::{Deserialize, Serialize};
 use tsify::Tsify;
 

@@ -14,7 +14,7 @@ mod generator_tests {
             // Arrange
             let base_500 = Oklch::new(0.55, 0.15, 240.0);
             let result = generate_palette(base_500);
-    
+
             // Assert
             let base_500_step = &result[5];
             assert_eq!(base_500.l, base_500_step.l);
@@ -31,23 +31,23 @@ mod generator_tests {
             let result = generate_greyscale_oklch();
             assert_eq!(result.len(), 10);
         }
-    
+
         #[test]
         fn test_generate_greyscale_oklch_all_labels_are_correct() {
             let result = generate_greyscale_oklch();
             let expected_labels = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
-    
+
             for (i, step) in result.iter().enumerate() {
                 assert_eq!(step.label, OklchLabel::Number(expected_labels[i]));
             }
         }
-    
+
         #[test]
         fn test_generate_greyscale_oklch_first_step_lightness_is_very_bright() {
             let result = generate_greyscale_oklch();
             assert!(result[0].l > 0.9);
         }
-    
+
         #[test]
         fn test_generate_greyscale_oklch_all_steps_have_zero_chroma() {
             let result = generate_greyscale_oklch();
@@ -55,7 +55,7 @@ mod generator_tests {
                 assert_eq!(step.c, 0.0);
             }
         }
-    
+
         #[test]
         fn test_generate_greyscale_oklch_all_steps_have_zero_hue() {
             let result = generate_greyscale_oklch();
@@ -63,7 +63,7 @@ mod generator_tests {
                 assert_eq!(step.h, 0.0);
             }
         }
-    
+
         #[test]
         fn test_generate_greyscale_oklch_steps_are_perceptually_descending() {
             let result = generate_greyscale_oklch();
@@ -169,16 +169,60 @@ mod generator_tests {
             // Arrange
             let base_500 = Oklch::new(0.55, 0.0, 0.0);
             let positive_light_padding = 0.06;
-            let palette_with_no_padding = generate_palette_with_scale(base_500, &TARGET_LIGHTNESS, &TARGET_CHROMA_SCALE, 0.0);
-            let step_50_no_padding_lightness = palette_with_no_padding.iter().find(|step| step.label == OklchLabel::Number(50)).unwrap().l;
-            let step_100_no_padding_lightness = palette_with_no_padding.iter().find(|step| step.label == OklchLabel::Number(100)).unwrap().l;
-            let step_200_no_padding_lightness = palette_with_no_padding.iter().find(|step| step.label == OklchLabel::Number(200)).unwrap().l;
-            let step_300_no_padding_lightness = palette_with_no_padding.iter().find(|step| step.label == OklchLabel::Number(300)).unwrap().l;
-            let palette_with_padding = generate_palette_with_scale(base_500, &TARGET_LIGHTNESS, &TARGET_CHROMA_SCALE, positive_light_padding);
-            let step_50_with_padding_lightness = palette_with_padding.iter().find(|step| step.label == OklchLabel::Number(50)).unwrap().l;
-            let step_100_with_padding_lightness = palette_with_padding.iter().find(|step| step.label == OklchLabel::Number(100)).unwrap().l;
-            let step_200_with_padding_lightness = palette_with_padding.iter().find(|step| step.label == OklchLabel::Number(200)).unwrap().l;
-            let step_300_with_padding_lightness = palette_with_padding.iter().find(|step| step.label == OklchLabel::Number(300)).unwrap().l;
+            let palette_with_no_padding = generate_palette_with_scale(
+                base_500,
+                &TARGET_LIGHTNESS,
+                &TARGET_CHROMA_SCALE,
+                0.0,
+                0.0,
+            );
+            let step_50_no_padding_lightness = palette_with_no_padding
+                .iter()
+                .find(|step| step.label == OklchLabel::Number(50))
+                .unwrap()
+                .l;
+            let step_100_no_padding_lightness = palette_with_no_padding
+                .iter()
+                .find(|step| step.label == OklchLabel::Number(100))
+                .unwrap()
+                .l;
+            let step_200_no_padding_lightness = palette_with_no_padding
+                .iter()
+                .find(|step| step.label == OklchLabel::Number(200))
+                .unwrap()
+                .l;
+            let step_300_no_padding_lightness = palette_with_no_padding
+                .iter()
+                .find(|step| step.label == OklchLabel::Number(300))
+                .unwrap()
+                .l;
+            let palette_with_padding = generate_palette_with_scale(
+                base_500,
+                &TARGET_LIGHTNESS,
+                &TARGET_CHROMA_SCALE,
+                positive_light_padding,
+                0.0,
+            );
+            let step_50_with_padding_lightness = palette_with_padding
+                .iter()
+                .find(|step| step.label == OklchLabel::Number(50))
+                .unwrap()
+                .l;
+            let step_100_with_padding_lightness = palette_with_padding
+                .iter()
+                .find(|step| step.label == OklchLabel::Number(100))
+                .unwrap()
+                .l;
+            let step_200_with_padding_lightness = palette_with_padding
+                .iter()
+                .find(|step| step.label == OklchLabel::Number(200))
+                .unwrap()
+                .l;
+            let step_300_with_padding_lightness = palette_with_padding
+                .iter()
+                .find(|step| step.label == OklchLabel::Number(300))
+                .unwrap()
+                .l;
 
             // Assert
             assert!(step_50_with_padding_lightness > step_50_no_padding_lightness);
@@ -186,28 +230,166 @@ mod generator_tests {
             assert!(step_200_with_padding_lightness > step_200_no_padding_lightness);
             assert!(step_300_with_padding_lightness > step_300_no_padding_lightness);
         }
-        
+
         #[test]
         fn should_make_light_end_of_scale_darker_with_negative_light_padding() {
             // Arrange
             let base_500 = Oklch::new(0.55, 0.0, 0.0);
             let negative_light_padding = -0.06;
-            let palette_with_no_padding = generate_palette_with_scale(base_500, &TARGET_LIGHTNESS, &TARGET_CHROMA_SCALE, 0.0);
-            let step_50_no_padding_lightness = palette_with_no_padding.iter().find(|step| step.label == OklchLabel::Number(50)).unwrap().l;
-            let step_100_no_padding_lightness = palette_with_no_padding.iter().find(|step| step.label == OklchLabel::Number(100)).unwrap().l;
-            let step_200_no_padding_lightness = palette_with_no_padding.iter().find(|step| step.label == OklchLabel::Number(200)).unwrap().l;
-            let step_300_no_padding_lightness = palette_with_no_padding.iter().find(|step| step.label == OklchLabel::Number(300)).unwrap().l;
-            let palette_with_padding = generate_palette_with_scale(base_500, &TARGET_LIGHTNESS, &TARGET_CHROMA_SCALE, negative_light_padding);
-            let step_50_with_padding_lightness = palette_with_padding.iter().find(|step| step.label == OklchLabel::Number(50)).unwrap().l;
-            let step_100_with_padding_lightness = palette_with_padding.iter().find(|step| step.label == OklchLabel::Number(100)).unwrap().l;
-            let step_200_with_padding_lightness = palette_with_padding.iter().find(|step| step.label == OklchLabel::Number(200)).unwrap().l;
-            let step_300_with_padding_lightness = palette_with_padding.iter().find(|step| step.label == OklchLabel::Number(300)).unwrap().l;
+            let palette_with_no_padding = generate_palette_with_scale(
+                base_500,
+                &TARGET_LIGHTNESS,
+                &TARGET_CHROMA_SCALE,
+                0.0,
+                0.0,
+            );
+            let step_50_no_padding_lightness = palette_with_no_padding
+                .iter()
+                .find(|step| step.label == OklchLabel::Number(50))
+                .unwrap()
+                .l;
+            let step_100_no_padding_lightness = palette_with_no_padding
+                .iter()
+                .find(|step| step.label == OklchLabel::Number(100))
+                .unwrap()
+                .l;
+            let step_200_no_padding_lightness = palette_with_no_padding
+                .iter()
+                .find(|step| step.label == OklchLabel::Number(200))
+                .unwrap()
+                .l;
+            let step_300_no_padding_lightness = palette_with_no_padding
+                .iter()
+                .find(|step| step.label == OklchLabel::Number(300))
+                .unwrap()
+                .l;
+            let palette_with_padding = generate_palette_with_scale(
+                base_500,
+                &TARGET_LIGHTNESS,
+                &TARGET_CHROMA_SCALE,
+                negative_light_padding,
+                0.0,
+            );
+            let step_50_with_padding_lightness = palette_with_padding
+                .iter()
+                .find(|step| step.label == OklchLabel::Number(50))
+                .unwrap()
+                .l;
+            let step_100_with_padding_lightness = palette_with_padding
+                .iter()
+                .find(|step| step.label == OklchLabel::Number(100))
+                .unwrap()
+                .l;
+            let step_200_with_padding_lightness = palette_with_padding
+                .iter()
+                .find(|step| step.label == OklchLabel::Number(200))
+                .unwrap()
+                .l;
+            let step_300_with_padding_lightness = palette_with_padding
+                .iter()
+                .find(|step| step.label == OklchLabel::Number(300))
+                .unwrap()
+                .l;
 
             // Assert
             assert!(step_50_with_padding_lightness < step_50_no_padding_lightness);
             assert!(step_100_with_padding_lightness < step_100_no_padding_lightness);
             assert!(step_200_with_padding_lightness < step_200_no_padding_lightness);
             assert!(step_300_with_padding_lightness < step_300_no_padding_lightness);
+        }
+    }
+
+    mod dark_padding {
+        use super::*;
+
+        #[test]
+        fn should_make_dark_end_of_scale_darker_with_positive_dark_padding() {
+            let base_500 = Oklch::new(0.55, 0.0, 0.0);
+            let positive_dark_padding = 0.06;
+
+            let no_padding = generate_palette_with_scale(
+                base_500,
+                &TARGET_LIGHTNESS,
+                &TARGET_CHROMA_SCALE,
+                0.0,
+                0.0,
+            );
+            let step_800_no = no_padding
+                .iter()
+                .find(|s| s.label == OklchLabel::Number(800))
+                .unwrap()
+                .l;
+            let step_900_no = no_padding
+                .iter()
+                .find(|s| s.label == OklchLabel::Number(900))
+                .unwrap()
+                .l;
+
+            let with_padding = generate_palette_with_scale(
+                base_500,
+                &TARGET_LIGHTNESS,
+                &TARGET_CHROMA_SCALE,
+                0.0,
+                positive_dark_padding,
+            );
+            let step_800_with = with_padding
+                .iter()
+                .find(|s| s.label == OklchLabel::Number(800))
+                .unwrap()
+                .l;
+            let step_900_with = with_padding
+                .iter()
+                .find(|s| s.label == OklchLabel::Number(900))
+                .unwrap()
+                .l;
+
+            assert!(step_800_with < step_800_no);
+            assert!(step_900_with < step_900_no);
+        }
+
+        #[test]
+        fn should_make_dark_end_of_scale_lighter_with_negative_dark_padding() {
+            let base_500 = Oklch::new(0.55, 0.0, 0.0);
+            let negative_dark_padding = -0.06;
+
+            let no_padding = generate_palette_with_scale(
+                base_500,
+                &TARGET_LIGHTNESS,
+                &TARGET_CHROMA_SCALE,
+                0.0,
+                0.0,
+            );
+            let step_800_no = no_padding
+                .iter()
+                .find(|s| s.label == OklchLabel::Number(800))
+                .unwrap()
+                .l;
+            let step_900_no = no_padding
+                .iter()
+                .find(|s| s.label == OklchLabel::Number(900))
+                .unwrap()
+                .l;
+
+            let with_padding = generate_palette_with_scale(
+                base_500,
+                &TARGET_LIGHTNESS,
+                &TARGET_CHROMA_SCALE,
+                0.0,
+                negative_dark_padding,
+            );
+            let step_800_with = with_padding
+                .iter()
+                .find(|s| s.label == OklchLabel::Number(800))
+                .unwrap()
+                .l;
+            let step_900_with = with_padding
+                .iter()
+                .find(|s| s.label == OklchLabel::Number(900))
+                .unwrap()
+                .l;
+
+            assert!(step_800_with > step_800_no);
+            assert!(step_900_with > step_900_no);
         }
     }
 }

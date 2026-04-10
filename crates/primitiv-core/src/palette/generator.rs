@@ -111,7 +111,7 @@ pub fn generate_palette_with_scale(
     let base_hue = base_500.hue.into_degrees();
     let base_chroma = base_500.chroma;
     let base_lightness = base_500.l;
-    let adjusted_lightess = apply_padding_to_lightness(lightness_scale, light_padding);
+    let adjusted_lightness = apply_padding_to_lightness(lightness_scale, light_padding);
 
     // Express the base chroma as a fraction of its gamut maximum,
     // so we can apply the same proportional saturation at every step.
@@ -124,7 +124,7 @@ pub fn generate_palette_with_scale(
 
     let backgrounds: Vec<OklchStep> = STEPS
         .iter()
-        .zip(adjusted_lightess.iter())
+        .zip(adjusted_lightness.iter())
         .zip(chroma_scale.iter())
         .map(|((&step, &reference_lightness), &chroma_factor)| {
             let (final_lightness, final_chroma) = if step == 500 {

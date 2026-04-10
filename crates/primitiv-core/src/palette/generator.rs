@@ -176,6 +176,10 @@ pub fn generate_palette(base_500: Oklch) -> Vec<Palette> {
     generate_palette_with_scale(base_500, &TARGET_LIGHTNESS, &TARGET_CHROMA_SCALE, 0.0)
 }
 
+pub fn generate_palette_with_light_padding(base_500: Oklch, light_padding: f32) -> Vec<Palette> {
+    generate_palette_with_scale(base_500, &TARGET_LIGHTNESS, &TARGET_CHROMA_SCALE, light_padding)
+}
+
 pub fn generate_greyscale_oklch() -> Vec<Palette> {
     let lightness_scale: [f32; 10] = [0.97, 0.93, 0.85, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1];
     generate_palette_with_scale(Oklch::new(0.5, 0.0, 0.0), &lightness_scale, &TARGET_CHROMA_SCALE, 0.0)

@@ -100,7 +100,7 @@ fn apply_padding_to_lightness(
         .map(|(i, &l)| {
             let n = i as f32 / (lightness_scale.len() as f32 - 1.0);
             let light_influence = (1.0 - n).powi(2);
-            let dark_influence = n.powi(2);
+            let dark_influence = n.powi(3);
             let delta = light_padding * light_influence - dark_padding * dark_influence;
 
             (l + delta).clamp(0.01, 0.99)

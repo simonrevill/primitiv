@@ -1,4 +1,4 @@
-// Curated public API for primitiv-core.
+// Curated public API for harmoni-core.
 //
 // Adapters (web, Figma plugin, CLI, etc.) should call into this
 // module rather than the lower-level palette::generator functions.
@@ -11,7 +11,7 @@ pub mod generate;
 pub use audit::audit_contrast;
 pub use generate::{generate, generate_with_options, GenerateOptions};
 
-// Thin re-export so adapters only ever need to know about primitiv_core::api.
+// Thin re-export so adapters only ever need to know about harmoni_core::api.
 pub use crate::palette::generator::generate_greyscale_oklch as generate_greyscale;
 
 #[cfg(test)]

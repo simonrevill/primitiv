@@ -73,6 +73,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "harmoni-core"
+version = "0.1.0"
+dependencies = [
+ "csscolorparser",
+ "palette",
+ "serde",
+]
+
+[[package]]
+name = "harmoni-wasm"
+version = "0.1.0"
+dependencies = [
+ "harmoni-core",
+ "palette",
+ "serde",
+ "serde-wasm-bindgen",
+ "tsify",
+ "wasm-bindgen",
+]
+
+[[package]]
 name = "itoa"
 version = "1.0.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -225,27 +246,6 @@ checksum = "e57fef6bc5981e38c2ce2d63bfa546861309f875b8a75f092d1d54ae2d64f266"
 dependencies = [
  "siphasher",
  "uncased",
-]
-
-[[package]]
-name = "primitiv-core"
-version = "0.1.0"
-dependencies = [
- "csscolorparser",
- "palette",
- "serde",
-]
-
-[[package]]
-name = "primitiv-wasm"
-version = "0.1.0"
-dependencies = [
- "palette",
- "primitiv-core",
- "serde",
- "serde-wasm-bindgen",
- "tsify",
- "wasm-bindgen",
 ]
 
 [[package]]

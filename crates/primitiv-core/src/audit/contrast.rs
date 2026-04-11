@@ -3,7 +3,7 @@ use palette::{IntoColor, LinSrgb, Oklch};
 use serde::{Deserialize, Serialize};
 use tsify::Tsify;
 
-use crate::{ColorInput, OklchStep};
+use crate::OklchStep;
 
 #[derive(PartialEq, Tsify, Debug, Clone, Deserialize, Serialize)]
 #[tsify(into_wasm_abi, from_wasm_abi)]
@@ -52,17 +52,4 @@ pub fn get_contrast_rating_for_step(bg: &OklchStep, fg: &OklchStep) -> ContrastR
     let fg_raw = Oklch::new(fg.l, fg.c, fg.h);
 
     calculate_contrast_low_level(&bg_raw, &fg_raw)
-}
-
-pub fn parse_oklch_string(color_css: &str) -> Oklch {
-    ColorInput::Css(color_css.to_string())
-        .to_oklch()
-        .unwrap_or_else(|_| Oklch::new(0.0, 0.0, 0.0))
-}
-
-pub fn get_contrast_rating(bg_css: &str, fg_css: &str) -> ContrastResult {
-    let bg_oklch = parse_oklch_string(bg_css);
-    let fg_oklch = parse_oklch_string(fg_css);
-
-    calculate_contrast_low_level(&bg_oklch, &fg_oklch)
 }

@@ -5,7 +5,10 @@
 // Everything here accepts ColorInput so callers never need to know
 // about palette::Oklch directly.
 
+pub mod audit;
 pub mod generate;
 
+#[cfg(test)]
+mod audit_tests;
 #[cfg(test)]
 mod generate_tests;

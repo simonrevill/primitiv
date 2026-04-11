@@ -1,4 +1,4 @@
-use super::input::ColorInput;
+use super::input::{ColorInput, ColorInputError};
 use palette::Oklch;
 
 // Ground-truth OkLCH values for well-known sRGB colors come from the
@@ -8,6 +8,10 @@ use palette::Oklch;
 
 const L_C_EPSILON: f32 = 0.01;
 const HUE_EPSILON_DEG: f32 = 0.2;
+
+fn ok(result: Result<Oklch, ColorInputError>) -> Oklch {
+    result.expect("color input should parse successfully")
+}
 
 fn assert_oklch_approx_eq(actual: Oklch, expected_l: f32, expected_c: f32, expected_h: f32) {
     let actual_hue = actual.hue.into_degrees();
@@ -35,7 +39,7 @@ fn assert_oklch_approx_eq(actual: Oklch, expected_l: f32, expected_c: f32, expec
 fn hex_with_hash_prefix_converts_pure_red_to_oklch() {
     let input = ColorInput::Hex("#ff0000".to_string());
 
-    let result = input.to_oklch();
+    let result = ok(input.to_oklch());
 
     // sRGB #ff0000 ≈ oklch(0.6279 0.2577 29.23°)
     assert_oklch_approx_eq(result, 0.6279, 0.2577, 29.23);
@@ -43,13 +47,25 @@ fn hex_with_hash_prefix_converts_pure_red_to_oklch() {
 
 #[test]
 fn hex_without_hash_prefix_converts_pure_red_to_oklch() {
-    let with_hash = ColorInput::Hex("#ff0000".to_string()).to_oklch();
-    let without_hash = ColorInput::Hex("ff0000".to_string()).to_oklch();
+    let with_hash = ok(ColorInput::Hex("#ff0000".to_string()).to_oklch());
+    let without_hash = ok(ColorInput::Hex("ff0000".to_string()).to_oklch());
 
     assert_oklch_approx_eq(
         without_hash,
         with_hash.l,
         with_hash.chroma,
         with_hash.hue.into_degrees(),
+    );
+}
+
+#[test]
+fn invalid_hex_returns_invalid_hex_error() {
+    let input = ColorInput::Hex("not-a-color".to_string());
+
+    let result = input.to_oklch();
+
+    assert_eq!(
+        result,
+        Err(ColorInputError::InvalidHex("not-a-color".to_string()))
     );
 }

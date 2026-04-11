@@ -9,14 +9,21 @@ pub enum ColorInput {
     Hex(String),
 }
 
+#[derive(Debug, Clone, PartialEq)]
+pub enum ColorInputError {
+    InvalidHex(String),
+}
+
 impl ColorInput {
-    pub fn to_oklch(&self) -> Oklch {
+    pub fn to_oklch(&self) -> Result<Oklch, ColorInputError> {
         match self {
-            ColorInput::Hex(s) => {
-                let color = csscolorparser::parse(s).unwrap_or_default();
-                let srgb = Srgb::new(color.r as f32, color.g as f32, color.b as f32);
-                srgb.into_color()
-            }
+            ColorInput::Hex(s) => parse_hex(s),
         }
     }
+}
+
+fn parse_hex(s: &str) -> Result<Oklch, ColorInputError> {
+    let color = csscolorparser::parse(s).map_err(|_| ColorInputError::InvalidHex(s.to_string()))?;
+    let srgb = Srgb::new(color.r as f32, color.g as f32, color.b as f32);
+    Ok(srgb.into_color())
 }

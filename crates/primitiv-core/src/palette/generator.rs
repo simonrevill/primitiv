@@ -1,13 +1,11 @@
 use palette::{IntoColor, LinSrgb, Oklch};
 use serde::{Deserialize, Serialize};
-use tsify::Tsify;
 
 use crate::audit::contrast::get_contrast_rating_for_step;
 use crate::audit::foreground::get_best_foreground;
 use crate::ContrastResult;
 
-#[derive(Tsify, Debug, Clone, Serialize, Deserialize, PartialEq)]
-#[tsify(into_wasm_abi, from_wasm_abi)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum OklchLabel {
     Number(u16),
     Name(String),
@@ -25,8 +23,7 @@ impl From<&str> for OklchLabel {
     }
 }
 
-#[derive(PartialEq, Tsify, Debug, Clone, Serialize, Deserialize)]
-#[tsify(into_wasm_abi, from_wasm_abi)]
+#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub struct OklchStep {
     pub l: f32,
     pub c: f32,
@@ -45,8 +42,7 @@ impl OklchStep {
     }
 }
 
-#[derive(PartialEq, Tsify, Debug, Clone, Serialize, Deserialize)]
-#[tsify(into_wasm_abi, from_wasm_abi)]
+#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub struct Palette {
     pub l: f32,
     pub c: f32,

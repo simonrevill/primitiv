@@ -3,16 +3,17 @@ mod types;
 use wasm_bindgen::prelude::*;
 
 use primitiv_core::api::{self, GenerateOptions};
-use primitiv_core::{ColorInput, ContrastResult};
+use primitiv_core::ColorInput;
 
 fn to_js_error(e: impl std::fmt::Debug) -> JsError {
     JsError::new(&format!("Invalid color input: {:?}", e))
 }
 
 fn palette_to_js(
-    palette_data: &[primitiv_core::Palette],
+    palette_data: Vec<primitiv_core::Palette>,
 ) -> Result<PaletteArray, JsError> {
-    serde_wasm_bindgen::to_value(palette_data)
+    let wrapped: Vec<types::Palette> = palette_data.into_iter().map(Into::into).collect();
+    serde_wasm_bindgen::to_value(&wrapped)
         .map(|v| v.unchecked_into())
         .map_err(|e| JsError::new(&e.to_string()))
 }
@@ -25,11 +26,12 @@ extern "C" {
 }
 
 #[wasm_bindgen]
-pub fn get_contrast_rating(bg: &str, fg: &str) -> Result<ContrastResult, JsError> {
+pub fn get_contrast_rating(bg: &str, fg: &str) -> Result<types::ContrastResult, JsError> {
     api::audit_contrast(
         ColorInput::Css(bg.to_string()),
         ColorInput::Css(fg.to_string()),
     )
+    .map(Into::into)
     .map_err(to_js_error)
 }
 
@@ -48,7 +50,7 @@ pub fn generate_palette(
     )
     .map_err(to_js_error)?;
 
-    palette_to_js(&palette_data)
+    palette_to_js(palette_data)
 }
 
 #[wasm_bindgen]
@@ -65,13 +67,14 @@ pub fn generate_palette_with_light_padding(
     )
     .map_err(to_js_error)?;
 
-    palette_to_js(&palette_data)
+    palette_to_js(palette_data)
 }
 
 #[wasm_bindgen]
 pub fn generate_greyscale_oklch() -> PaletteArray {
     let data = api::generate_greyscale();
-    serde_wasm_bindgen::to_value(&data)
+    let wrapped: Vec<types::Palette> = data.into_iter().map(Into::into).collect();
+    serde_wasm_bindgen::to_value(&wrapped)
         .expect("serializing greyscale palette should never fail")
         .unchecked_into()
 }

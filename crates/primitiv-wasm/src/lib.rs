@@ -1,12 +1,21 @@
-use std::str::FromStr;
+mod types;
 
 use wasm_bindgen::prelude::*;
-use primitiv_core::ContrastResult;
-use palette::{IntoColor, Oklch, Srgb};
 
-#[wasm_bindgen]
-pub fn get_contrast_rating(bg: &str, fg: &str) -> ContrastResult {
-    primitiv_core::get_contrast_rating(bg, fg)
+use primitiv_core::api::{self, GenerateOptions};
+use primitiv_core::ColorInput;
+
+fn to_js_error(e: impl std::fmt::Debug) -> JsError {
+    JsError::new(&format!("Invalid color input: {:?}", e))
+}
+
+fn palette_to_js(
+    palette_data: Vec<primitiv_core::Palette>,
+) -> Result<PaletteArray, JsError> {
+    let wrapped: Vec<types::Palette> = palette_data.into_iter().map(Into::into).collect();
+    serde_wasm_bindgen::to_value(&wrapped)
+        .map(|v| v.unchecked_into())
+        .map_err(|e| JsError::new(&e.to_string()))
 }
 
 #[wasm_bindgen]
@@ -17,46 +26,55 @@ extern "C" {
 }
 
 #[wasm_bindgen]
-pub fn generate_palette(hex: &str, light_padding: f32, dark_padding: f32) -> Result<PaletteArray, JsError> {
-    let hex_clean = hex.trim_start_matches('#');
-
-    let rgb = Srgb::from_str(hex_clean)
-        .map_err(|e| JsError::new(&format!("Invalid hex color: {}", e)))?;
-
-    let oklch: Oklch = rgb.into_format::<f32>().into_color();
-
-    let palette_data = primitiv_core::generate_palette(oklch, light_padding, dark_padding);
-
-    serde_wasm_bindgen::to_value(&palette_data)
-        .map(|v| v.unchecked_into())
-        .map_err(|e| JsError::new(&e.to_string()))
+pub fn get_contrast_rating(bg: &str, fg: &str) -> Result<types::ContrastResult, JsError> {
+    api::audit_contrast(
+        ColorInput::Css(bg.to_string()),
+        ColorInput::Css(fg.to_string()),
+    )
+    .map(Into::into)
+    .map_err(to_js_error)
 }
 
 #[wasm_bindgen]
-pub fn generate_palette_with_light_padding(hex: &str, light_padding: f32) -> Result<PaletteArray, JsError> {
-    let hex_clean = hex.trim_start_matches('#');
+pub fn generate_palette(
+    hex: &str,
+    light_padding: f32,
+    dark_padding: f32,
+) -> Result<PaletteArray, JsError> {
+    let palette_data = api::generate_with_options(
+        ColorInput::Css(hex.to_string()),
+        GenerateOptions {
+            light_padding,
+            dark_padding,
+        },
+    )
+    .map_err(to_js_error)?;
 
-    let rgb = Srgb::from_str(hex_clean)
-        .map_err(|e| JsError::new(&format!("Invalid hex color: {}", e)))?;
-
-    let oklch: Oklch = rgb.into_format::<f32>().into_color();
-
-    let palette_data = primitiv_core::generate_palette_with_light_padding(oklch, light_padding);
-
-    serde_wasm_bindgen::to_value(&palette_data)
-        .map(|v| v.unchecked_into())
-        .map_err(|e| JsError::new(&e.to_string()))
+    palette_to_js(palette_data)
 }
 
+#[wasm_bindgen]
+pub fn generate_palette_with_light_padding(
+    hex: &str,
+    light_padding: f32,
+) -> Result<PaletteArray, JsError> {
+    let palette_data = api::generate_with_options(
+        ColorInput::Css(hex.to_string()),
+        GenerateOptions {
+            light_padding,
+            dark_padding: 0.0,
+        },
+    )
+    .map_err(to_js_error)?;
 
+    palette_to_js(palette_data)
+}
 
 #[wasm_bindgen]
 pub fn generate_greyscale_oklch() -> PaletteArray {
-    let data = primitiv_core::generate_greyscale_oklch();
-
-    // We still use serde to do the actual conversion,
-    // but we cast it to our "Fake" TS type
-    serde_wasm_bindgen::to_value(&data)
-        .unwrap()
+    let data = api::generate_greyscale();
+    let wrapped: Vec<types::Palette> = data.into_iter().map(Into::into).collect();
+    serde_wasm_bindgen::to_value(&wrapped)
+        .expect("serializing greyscale palette should never fail")
         .unchecked_into()
 }

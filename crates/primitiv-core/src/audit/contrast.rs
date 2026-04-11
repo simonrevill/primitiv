@@ -1,12 +1,10 @@
 use palette::color_difference::Wcag21RelativeContrast;
-use palette::{IntoColor, LinSrgb, Oklch, Srgb};
+use palette::{IntoColor, LinSrgb, Oklch};
 use serde::{Deserialize, Serialize};
-use tsify::Tsify;
 
 use crate::OklchStep;
 
-#[derive(PartialEq, Tsify, Debug, Clone, Deserialize, Serialize)]
-#[tsify(into_wasm_abi, from_wasm_abi)]
+#[derive(PartialEq, Debug, Clone, Deserialize, Serialize)]
 pub struct ContrastResult {
     pub ratio: f32,
     pub display_ratio: String,
@@ -52,18 +50,4 @@ pub fn get_contrast_rating_for_step(bg: &OklchStep, fg: &OklchStep) -> ContrastR
     let fg_raw = Oklch::new(fg.l, fg.c, fg.h);
 
     calculate_contrast_low_level(&bg_raw, &fg_raw)
-}
-
-pub fn parse_oklch_string(color_css: &str) -> Oklch {
-    let color = csscolorparser::parse(color_css).unwrap_or_default();
-    let srgb = Srgb::new(color.r as f32, color.g as f32, color.b as f32);
-
-    srgb.into_color()
-}
-
-pub fn get_contrast_rating(bg_css: &str, fg_css: &str) -> ContrastResult {
-    let bg_oklch = parse_oklch_string(bg_css);
-    let fg_oklch = parse_oklch_string(fg_css);
-
-    calculate_contrast_low_level(&bg_oklch, &fg_oklch)
 }

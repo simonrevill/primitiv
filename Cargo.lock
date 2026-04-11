@@ -234,8 +234,6 @@ dependencies = [
  "csscolorparser",
  "palette",
  "serde",
- "tsify",
- "wasm-bindgen",
 ]
 
 [[package]]
@@ -246,6 +244,7 @@ dependencies = [
  "primitiv-core",
  "serde",
  "serde-wasm-bindgen",
+ "tsify",
  "wasm-bindgen",
 ]
 

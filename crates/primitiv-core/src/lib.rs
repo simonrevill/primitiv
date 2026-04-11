@@ -1,3 +1,4 @@
+pub mod api;
 pub mod audit;
 pub mod color;
 pub mod palette;

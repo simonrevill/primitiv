@@ -2,8 +2,9 @@ use palette::{IntoColor, LinSrgb, Oklch};
 use serde::{Deserialize, Serialize};
 use tsify::Tsify;
 
+use crate::audit::contrast::get_contrast_rating_for_step;
+use crate::audit::foreground::get_best_foreground;
 use crate::ContrastResult;
-use crate::{get_best_foreground, get_contrast_rating_for_step};
 
 #[derive(Tsify, Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[tsify(into_wasm_abi, from_wasm_abi)]

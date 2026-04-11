@@ -3,7 +3,7 @@ import init, {
   generate_greyscale_oklch,
   generate_palette,
   type Palette,
-} from "primitiv-wasm";
+} from "harmoni-wasm";
 import "./App.scss";
 import { Palette as ColorPalette } from "./Palette";
 

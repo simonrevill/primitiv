@@ -1,4 +1,4 @@
-import { type Palette } from "primitiv-wasm";
+import { type Palette } from "harmoni-wasm";
 
 export type SwatchProps = {
   step: Palette;

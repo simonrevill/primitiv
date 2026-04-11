@@ -1,8 +1,5 @@
-use std::str::FromStr;
-
 use wasm_bindgen::prelude::*;
-use primitiv_core::ContrastResult;
-use palette::{IntoColor, Oklch, Srgb};
+use primitiv_core::{ColorInput, ContrastResult};
 
 #[wasm_bindgen]
 pub fn get_contrast_rating(bg: &str, fg: &str) -> ContrastResult {
@@ -16,14 +13,15 @@ extern "C" {
     pub type PaletteArray;
 }
 
+fn parse_hex_input(hex: &str) -> Result<palette::Oklch, JsError> {
+    ColorInput::Css(hex.to_string())
+        .to_oklch()
+        .map_err(|e| JsError::new(&format!("Invalid hex color: {:?}", e)))
+}
+
 #[wasm_bindgen]
 pub fn generate_palette(hex: &str, light_padding: f32, dark_padding: f32) -> Result<PaletteArray, JsError> {
-    let hex_clean = hex.trim_start_matches('#');
-
-    let rgb = Srgb::from_str(hex_clean)
-        .map_err(|e| JsError::new(&format!("Invalid hex color: {}", e)))?;
-
-    let oklch: Oklch = rgb.into_format::<f32>().into_color();
+    let oklch = parse_hex_input(hex)?;
 
     let palette_data = primitiv_core::generate_palette(oklch, light_padding, dark_padding);
 
@@ -34,12 +32,7 @@ pub fn generate_palette(hex: &str, light_padding: f32, dark_padding: f32) -> Res
 
 #[wasm_bindgen]
 pub fn generate_palette_with_light_padding(hex: &str, light_padding: f32) -> Result<PaletteArray, JsError> {
-    let hex_clean = hex.trim_start_matches('#');
-
-    let rgb = Srgb::from_str(hex_clean)
-        .map_err(|e| JsError::new(&format!("Invalid hex color: {}", e)))?;
-
-    let oklch: Oklch = rgb.into_format::<f32>().into_color();
+    let oklch = parse_hex_input(hex)?;
 
     let palette_data = primitiv_core::generate_palette_with_light_padding(oklch, light_padding);
 

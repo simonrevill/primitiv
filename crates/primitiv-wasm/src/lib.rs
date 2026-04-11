@@ -3,18 +3,6 @@ use wasm_bindgen::prelude::*;
 use primitiv_core::api::{self, GenerateOptions};
 use primitiv_core::{ColorInput, ContrastResult};
 
-#[wasm_bindgen]
-pub fn get_contrast_rating(bg: &str, fg: &str) -> ContrastResult {
-    primitiv_core::get_contrast_rating(bg, fg)
-}
-
-#[wasm_bindgen]
-extern "C" {
-    // This tells wasm-bindgen that a type called "Palette" exists in TS
-    #[wasm_bindgen(typescript_type = "Palette[]")]
-    pub type PaletteArray;
-}
-
 fn to_js_error(e: impl std::fmt::Debug) -> JsError {
     JsError::new(&format!("Invalid color input: {:?}", e))
 }
@@ -25,6 +13,22 @@ fn palette_to_js(
     serde_wasm_bindgen::to_value(palette_data)
         .map(|v| v.unchecked_into())
         .map_err(|e| JsError::new(&e.to_string()))
+}
+
+#[wasm_bindgen]
+extern "C" {
+    // This tells wasm-bindgen that a type called "Palette" exists in TS
+    #[wasm_bindgen(typescript_type = "Palette[]")]
+    pub type PaletteArray;
+}
+
+#[wasm_bindgen]
+pub fn get_contrast_rating(bg: &str, fg: &str) -> Result<ContrastResult, JsError> {
+    api::audit_contrast(
+        ColorInput::Css(bg.to_string()),
+        ColorInput::Css(fg.to_string()),
+    )
+    .map_err(to_js_error)
 }
 
 #[wasm_bindgen]
@@ -64,11 +68,8 @@ pub fn generate_palette_with_light_padding(
 
 #[wasm_bindgen]
 pub fn generate_greyscale_oklch() -> PaletteArray {
-    let data = primitiv_core::generate_greyscale_oklch();
-
-    // We still use serde to do the actual conversion,
-    // but we cast it to our "Fake" TS type
+    let data = api::generate_greyscale();
     serde_wasm_bindgen::to_value(&data)
-        .unwrap()
+        .expect("serializing greyscale palette should never fail")
         .unchecked_into()
 }

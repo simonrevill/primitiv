@@ -40,3 +40,16 @@ fn hex_with_hash_prefix_converts_pure_red_to_oklch() {
     // sRGB #ff0000 ≈ oklch(0.6279 0.2577 29.23°)
     assert_oklch_approx_eq(result, 0.6279, 0.2577, 29.23);
 }
+
+#[test]
+fn hex_without_hash_prefix_converts_pure_red_to_oklch() {
+    let with_hash = ColorInput::Hex("#ff0000".to_string()).to_oklch();
+    let without_hash = ColorInput::Hex("ff0000".to_string()).to_oklch();
+
+    assert_oklch_approx_eq(
+        without_hash,
+        with_hash.l,
+        with_hash.chroma,
+        with_hash.hue.into_degrees(),
+    );
+}

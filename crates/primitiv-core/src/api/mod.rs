@@ -8,6 +8,9 @@
 pub mod audit;
 pub mod generate;
 
+pub use audit::audit_contrast;
+pub use generate::{generate, generate_with_options, GenerateOptions};
+
 #[cfg(test)]
 mod audit_tests;
 #[cfg(test)]

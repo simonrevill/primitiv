@@ -1,3 +1,5 @@
+mod types;
+
 use wasm_bindgen::prelude::*;
 
 use primitiv_core::api::{self, GenerateOptions};

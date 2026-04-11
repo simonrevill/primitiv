@@ -69,3 +69,26 @@ fn invalid_hex_returns_invalid_hex_error() {
         Err(ColorInputError::InvalidHex("not-a-color".to_string()))
     );
 }
+
+#[test]
+fn rgb_pure_red_matches_hex_pure_red() {
+    let from_hex = ok(ColorInput::Hex("#ff0000".to_string()).to_oklch());
+    let from_rgb = ok(ColorInput::Rgb { r: 255, g: 0, b: 0 }.to_oklch());
+
+    assert_oklch_approx_eq(
+        from_rgb,
+        from_hex.l,
+        from_hex.chroma,
+        from_hex.hue.into_degrees(),
+    );
+}
+
+#[test]
+fn rgb_pure_green_converts_to_oklch() {
+    let input = ColorInput::Rgb { r: 0, g: 255, b: 0 };
+
+    let result = ok(input.to_oklch());
+
+    // sRGB #00ff00 ≈ oklch(0.8664 0.2948 142.50°)
+    assert_oklch_approx_eq(result, 0.8664, 0.2948, 142.50);
+}

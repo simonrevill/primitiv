@@ -92,3 +92,19 @@ fn rgb_pure_green_converts_to_oklch() {
     // sRGB #00ff00 ≈ oklch(0.8664 0.2948 142.50°)
     assert_oklch_approx_eq(result, 0.8664, 0.2948, 142.50);
 }
+
+#[test]
+fn oklch_variant_is_passthrough() {
+    let input = ColorInput::Oklch {
+        l: 0.55,
+        c: 0.18,
+        h: 27.3,
+    };
+
+    let result = ok(input.to_oklch());
+
+    // Tolerance zero — this is a literal pass-through, no conversion.
+    assert_eq!(result.l, 0.55);
+    assert_eq!(result.chroma, 0.18);
+    assert_eq!(result.hue.into_degrees(), 27.3);
+}

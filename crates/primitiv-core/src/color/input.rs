@@ -8,6 +8,7 @@ use palette::{IntoColor, Oklch, Srgb};
 pub enum ColorInput {
     Hex(String),
     Rgb { r: u8, g: u8, b: u8 },
+    Oklch { l: f32, c: f32, h: f32 },
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -20,6 +21,7 @@ impl ColorInput {
         match self {
             ColorInput::Hex(s) => parse_hex(s),
             ColorInput::Rgb { r, g, b } => Ok(rgb_to_oklch(*r, *g, *b)),
+            ColorInput::Oklch { l, c, h } => Ok(Oklch::new(*l, *c, *h)),
         }
     }
 }

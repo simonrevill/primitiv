@@ -37,7 +37,7 @@ fn assert_oklch_approx_eq(actual: Oklch, expected_l: f32, expected_c: f32, expec
 
 #[test]
 fn hex_with_hash_prefix_converts_pure_red_to_oklch() {
-    let input = ColorInput::Hex("#ff0000".to_string());
+    let input = ColorInput::Css("#ff0000".to_string());
 
     let result = ok(input.to_oklch());
 
@@ -47,8 +47,8 @@ fn hex_with_hash_prefix_converts_pure_red_to_oklch() {
 
 #[test]
 fn hex_without_hash_prefix_converts_pure_red_to_oklch() {
-    let with_hash = ok(ColorInput::Hex("#ff0000".to_string()).to_oklch());
-    let without_hash = ok(ColorInput::Hex("ff0000".to_string()).to_oklch());
+    let with_hash = ok(ColorInput::Css("#ff0000".to_string()).to_oklch());
+    let without_hash = ok(ColorInput::Css("ff0000".to_string()).to_oklch());
 
     assert_oklch_approx_eq(
         without_hash,
@@ -59,20 +59,20 @@ fn hex_without_hash_prefix_converts_pure_red_to_oklch() {
 }
 
 #[test]
-fn invalid_hex_returns_invalid_hex_error() {
-    let input = ColorInput::Hex("not-a-color".to_string());
+fn invalid_css_string_returns_invalid_css_error() {
+    let input = ColorInput::Css("not-a-color".to_string());
 
     let result = input.to_oklch();
 
     assert_eq!(
         result,
-        Err(ColorInputError::InvalidHex("not-a-color".to_string()))
+        Err(ColorInputError::InvalidCss("not-a-color".to_string()))
     );
 }
 
 #[test]
 fn rgb_pure_red_matches_hex_pure_red() {
-    let from_hex = ok(ColorInput::Hex("#ff0000".to_string()).to_oklch());
+    let from_hex = ok(ColorInput::Css("#ff0000".to_string()).to_oklch());
     let from_rgb = ok(ColorInput::Rgb { r: 255, g: 0, b: 0 }.to_oklch());
 
     assert_oklch_approx_eq(
@@ -95,7 +95,7 @@ fn rgb_pure_green_converts_to_oklch() {
 
 #[test]
 fn hsl_pure_red_matches_hex_pure_red() {
-    let from_hex = ok(ColorInput::Hex("#ff0000".to_string()).to_oklch());
+    let from_hex = ok(ColorInput::Css("#ff0000".to_string()).to_oklch());
     let from_hsl = ok(ColorInput::Hsl {
         h: 0.0,
         s: 1.0,

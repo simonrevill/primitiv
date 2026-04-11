@@ -6,7 +6,9 @@ use palette::{encoding, Hsl, IntoColor, Oklch, Srgb};
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum ColorInput {
-    Hex(String),
+    /// Any CSS-parseable color string: hex (`#ff0000`), `rgb(...)`,
+    /// `hsl(...)`, `oklch(...)`, named colors, etc.
+    Css(String),
     Rgb { r: u8, g: u8, b: u8 },
     Hsl { h: f32, s: f32, l: f32 },
     Oklch { l: f32, c: f32, h: f32 },
@@ -14,13 +16,13 @@ pub enum ColorInput {
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum ColorInputError {
-    InvalidHex(String),
+    InvalidCss(String),
 }
 
 impl ColorInput {
     pub fn to_oklch(&self) -> Result<Oklch, ColorInputError> {
         match self {
-            ColorInput::Hex(s) => parse_hex(s),
+            ColorInput::Css(s) => parse_css(s),
             ColorInput::Rgb { r, g, b } => Ok(rgb_to_oklch(*r, *g, *b)),
             ColorInput::Hsl { h, s, l } => Ok(hsl_to_oklch(*h, *s, *l)),
             ColorInput::Oklch { l, c, h } => Ok(Oklch::new(*l, *c, *h)),
@@ -28,8 +30,8 @@ impl ColorInput {
     }
 }
 
-fn parse_hex(s: &str) -> Result<Oklch, ColorInputError> {
-    let color = csscolorparser::parse(s).map_err(|_| ColorInputError::InvalidHex(s.to_string()))?;
+fn parse_css(s: &str) -> Result<Oklch, ColorInputError> {
+    let color = csscolorparser::parse(s).map_err(|_| ColorInputError::InvalidCss(s.to_string()))?;
     let srgb = Srgb::new(color.r as f32, color.g as f32, color.b as f32);
     Ok(srgb.into_color())
 }

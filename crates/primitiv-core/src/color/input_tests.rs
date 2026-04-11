@@ -94,6 +94,24 @@ fn rgb_pure_green_converts_to_oklch() {
 }
 
 #[test]
+fn hsl_pure_red_matches_hex_pure_red() {
+    let from_hex = ok(ColorInput::Hex("#ff0000".to_string()).to_oklch());
+    let from_hsl = ok(ColorInput::Hsl {
+        h: 0.0,
+        s: 1.0,
+        l: 0.5,
+    }
+    .to_oklch());
+
+    assert_oklch_approx_eq(
+        from_hsl,
+        from_hex.l,
+        from_hex.chroma,
+        from_hex.hue.into_degrees(),
+    );
+}
+
+#[test]
 fn oklch_variant_is_passthrough() {
     let input = ColorInput::Oklch {
         l: 0.55,

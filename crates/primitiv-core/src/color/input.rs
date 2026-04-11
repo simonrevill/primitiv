@@ -2,12 +2,13 @@
 // normalizes to OkLCH, which is the single internal representation
 // used throughout primitiv-core.
 
-use palette::{IntoColor, Oklch, Srgb};
+use palette::{encoding, Hsl, IntoColor, Oklch, Srgb};
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum ColorInput {
     Hex(String),
     Rgb { r: u8, g: u8, b: u8 },
+    Hsl { h: f32, s: f32, l: f32 },
     Oklch { l: f32, c: f32, h: f32 },
 }
 
@@ -21,6 +22,7 @@ impl ColorInput {
         match self {
             ColorInput::Hex(s) => parse_hex(s),
             ColorInput::Rgb { r, g, b } => Ok(rgb_to_oklch(*r, *g, *b)),
+            ColorInput::Hsl { h, s, l } => Ok(hsl_to_oklch(*h, *s, *l)),
             ColorInput::Oklch { l, c, h } => Ok(Oklch::new(*l, *c, *h)),
         }
     }
@@ -39,4 +41,9 @@ fn rgb_to_oklch(r: u8, g: u8, b: u8) -> Oklch {
         f32::from(b) / 255.0,
     );
     srgb.into_color()
+}
+
+fn hsl_to_oklch(h: f32, s: f32, l: f32) -> Oklch {
+    let hsl: Hsl<encoding::Srgb, f32> = Hsl::new(h, s, l);
+    hsl.into_color()
 }

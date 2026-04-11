@@ -1,6 +1,6 @@
 // Color input abstraction — accepts colors in multiple formats and
 // normalizes to OkLCH, which is the single internal representation
-// used throughout primitiv-core.
+// used throughout harmoni-core.
 
 use palette::{encoding, Hsl, IntoColor, Oklch, Srgb};
 

@@ -2,15 +2,15 @@ mod types;
 
 use wasm_bindgen::prelude::*;
 
-use primitiv_core::api::{self, GenerateOptions};
-use primitiv_core::ColorInput;
+use harmoni_core::api::{self, GenerateOptions};
+use harmoni_core::ColorInput;
 
 fn to_js_error(e: impl std::fmt::Debug) -> JsError {
     JsError::new(&format!("Invalid color input: {:?}", e))
 }
 
 fn palette_to_js(
-    palette_data: Vec<primitiv_core::Palette>,
+    palette_data: Vec<harmoni_core::Palette>,
 ) -> Result<PaletteArray, JsError> {
     let wrapped: Vec<types::Palette> = palette_data.into_iter().map(Into::into).collect();
     serde_wasm_bindgen::to_value(&wrapped)

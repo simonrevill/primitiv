@@ -1,12 +1,12 @@
 // Mirror types that hold the Tsify derives for the wasm boundary.
 //
-// primitiv-core is a pure Rust library and must not depend on wasm-bindgen
+// harmoni-core is a pure Rust library and must not depend on wasm-bindgen
 // or tsify. These structs shadow the core types field-for-field, add the
 // Tsify derives needed for TypeScript generation + the wasm ABI, and
 // expose `From<core::..>` impls so wasm entry points can convert at the
 // boundary.
 
-use primitiv_core as core;
+use harmoni_core as core;
 use serde::{Deserialize, Serialize};
 use tsify::Tsify;
 

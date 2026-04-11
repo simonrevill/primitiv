@@ -14,9 +14,9 @@ importers:
 
   apps/web:
     dependencies:
-      primitiv-wasm:
+      harmoni-wasm:
         specifier: workspace:*
-        version: link:../../crates/primitiv-wasm/pkg
+        version: link:../../crates/harmoni-wasm/pkg
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -73,7 +73,7 @@ importers:
         specifier: ^3.6.0
         version: 3.6.0(vite@5.4.21(@types/node@25.5.0)(sass@1.98.0))
 
-  crates/primitiv-wasm/pkg: {}
+  crates/harmoni-wasm/pkg: {}
 
 packages:
 

@@ -1,4 +1,4 @@
-import { type Palette } from "primitiv-wasm";
+import { type Palette } from "harmoni-wasm";
 import { Swatch } from "./Swatch";
 
 export type PaletteProps = {

@@ -2,9 +2,9 @@
   "name": "primitiv",
   "private": true,
   "scripts": {
-    "build:wasm": "pnpm --filter primitiv-wasm exec wasm-pack build --target web",
-    "build:core": "pnpm --filter primitiv-core exec cargo build",
-    "test:rust": "pnpm --filter \"primitiv-*\" exec cargo test",
+    "build:wasm": "pnpm --filter harmoni-wasm exec wasm-pack build --target web",
+    "build:core": "pnpm --filter harmoni-core exec cargo build",
+    "test:rust": "pnpm --filter \"harmoni-*\" exec cargo test",
     "test:e2e": "pnpm --filter web exec playwright test",
     "test:full": "pnpm test:rust && pnpm build:wasm && pnpm test:e2e",
     "dev": "pnpm --filter web dev",

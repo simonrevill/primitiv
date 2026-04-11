@@ -30,7 +30,10 @@ function App() {
   //   0.97, 0.91, 0.83, 0.76, 0.67, 0.55, 0.45, 0.32, 0.22, 0.15,
   // ];
   // const safeNegative = Math.min(...TARGET_LIGHTNESS) - 0.01; // ~0.14
-  const maxPaddingPercent = 25;
+
+  // Better padding limits
+  const MAX_LIGHT_PADDING_PERCENT = 32; // up to +0.30 on light end (quite bright)
+  const MAX_DARK_PADDING_PERCENT = 20; // much more conservative on dark end
 
   const [redLightPaddingPercent, setRedLightPaddingPercent] =
     useState<number>(0);
@@ -39,13 +42,13 @@ function App() {
   useEffect(() => {
     init().then(() => {
       setGreyscalePalette(generate_greyscale_oklch());
-      setRedPalette(
-        generate_palette(
-          redColor,
-          redLightPaddingPercent / 100, // ← positive = brighter
-          redDarkPaddingPercent / 100, // ← positive = darker
-        ),
+      const result = generate_palette(
+        redColor,
+        redLightPaddingPercent / 100, // ← positive = brighter
+        redDarkPaddingPercent / 100, // ← positive = darker
       );
+      console.log("RESULT: ", result);
+      setRedPalette(result);
       setYellowPalette(generate_palette(yellowColor, 0, 0));
       setLimePalette(generate_palette(limeColor, 0, 0));
       setGreenPalette(generate_palette(greenColor, 0, 0));
@@ -164,7 +167,7 @@ function App() {
             <input
               type="range"
               min={0}
-              max={maxPaddingPercent}
+              max={MAX_LIGHT_PADDING_PERCENT}
               step={1}
               value={redLightPaddingPercent}
               onChange={handleRedLightPaddingChange}
@@ -173,7 +176,7 @@ function App() {
             <input
               type="range"
               min={0}
-              max={maxPaddingPercent}
+              max={MAX_DARK_PADDING_PERCENT}
               step={1}
               value={redDarkPaddingPercent}
               onChange={handleRedDarkPaddingChange}

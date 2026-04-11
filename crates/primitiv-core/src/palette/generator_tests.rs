@@ -392,4 +392,44 @@ mod generator_tests {
             assert!(step_900_with > step_900_no);
         }
     }
+
+    mod metadata_tests {
+    use super::*;
+
+    #[test]
+    fn every_palette_swatch_contains_metadata() {
+        let base = Oklch::new(0.55, 0.18, 260.0); // blue-ish
+
+        let palette = generate_palette_with_scale(
+            base,
+            &TARGET_LIGHTNESS,
+            &TARGET_CHROMA_SCALE,
+            0.0,
+            0.0,
+        );
+
+        assert!(!palette.is_empty());
+
+        let first = &palette[0];
+        assert!(first.max_recommended_light_padding > 0.0);
+        assert!(first.max_recommended_dark_padding > 0.0);
+    }
+
+    #[test]
+    fn metadata_limits_vary_by_hue() {
+        let yellow = Oklch::new(0.55, 0.18, 80.0);   // yellow – more constrained
+        let blue   = Oklch::new(0.55, 0.18, 260.0);  // blue   – more headroom
+
+        let yellow_palette = generate_palette_with_scale(yellow, &TARGET_LIGHTNESS, &TARGET_CHROMA_SCALE, 0.0, 0.0);
+        let blue_palette   = generate_palette_with_scale(blue,   &TARGET_LIGHTNESS, &TARGET_CHROMA_SCALE, 0.0, 0.0);
+
+        let yellow_meta = &yellow_palette[0];
+        let blue_meta   = &blue_palette[0];
+
+        assert!(
+            yellow_meta.max_recommended_light_padding < blue_meta.max_recommended_light_padding,
+            "Yellow should have tighter light padding limit than blue"
+        );
+    }
+}
 }

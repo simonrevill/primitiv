@@ -53,6 +53,9 @@ pub struct Palette {
     pub label: OklchLabel,
     pub best_foreground: OklchStep,
     pub contrast_result: ContrastResult,
+    pub max_recommended_light_padding: f32,
+    pub max_recommended_dark_padding: f32,
+    pub note: String,
 }
 
 const STEPS: [u16; 10] = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
@@ -106,6 +109,23 @@ fn apply_padding_to_lightness(
             (l + delta).clamp(0.01, 0.99)
         })
         .collect()
+}
+
+fn get_max_recommended_light_padding(hue: f32) -> f32 {
+    // Yellow/orange hues have less headroom
+    if hue > 40.0 && hue < 100.0 {
+        0.24
+    } else {
+        0.32
+    }
+}
+
+fn get_max_recommended_dark_padding(hue: f32) -> f32 {
+    if hue > 30.0 && hue < 90.0 {
+        0.14
+    } else {
+        0.20
+    }
 }
 
 pub fn generate_palette_with_scale(
@@ -175,6 +195,11 @@ pub fn generate_palette_with_scale(
                 label: background.label.clone(),
                 best_foreground: recommendation.color,
                 contrast_result,
+
+                // Dynamic metadata based on hue
+                max_recommended_light_padding: get_max_recommended_light_padding(base_hue),
+                max_recommended_dark_padding: get_max_recommended_dark_padding(base_hue),
+                note: "".to_string(),
             }
         })
         .collect()

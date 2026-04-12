@@ -431,5 +431,32 @@ mod generator_tests {
             "Yellow should have tighter light padding limit than blue"
         );
     }
+
+    mod palette_struct_tests {
+        use super::*;
+
+        #[test]
+        fn palette_struct_exposes_metadata_fields() {
+            // Arrange
+            let base_500 = Oklch::new(0.55, 0.15, 240.0);
+            let palette = generate_palette(base_500, 0.0, 0.0);
+
+            // Assert: Palette should have metadata fields accessible directly
+            assert!(palette.max_recommended_light_padding > 0.0);
+            assert!(palette.max_recommended_dark_padding > 0.0);
+            assert_eq!(palette.note, "");
+        }
+
+        #[test]
+        fn palette_struct_contains_swatches() {
+            // Arrange
+            let base_500 = Oklch::new(0.55, 0.15, 240.0);
+            let palette = generate_palette(base_500, 0.0, 0.0);
+
+            // Assert: Palette should have a swatches field with 10 items
+            assert_eq!(palette.swatches.len(), 10);
+            assert_eq!(palette.swatches[5].label, SwatchLabel::Number(500));
+        }
+    }
 }
 }

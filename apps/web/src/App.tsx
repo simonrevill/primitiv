@@ -18,13 +18,13 @@ function App() {
     <main className="container">
       <h1>Primitiv Engine</h1>
       <div className="palettes-grid">
-        <div className="palette-container palette-container--no-picker">
-          <p className="palette-label">Greyscale</p>
+        <div className="palette palette--no-picker">
+          <p className="palette__label">Greyscale</p>
           <ColorPalette palette={greyscalePalette} />
         </div>
 
-        <div className="palette-container">
-          <p className="palette-label">Red</p>
+        <div className="palette">
+          <p className="palette__label">Red</p>
           <input
             type="color"
             onChange={handleColorChange("red")}
@@ -57,8 +57,8 @@ function App() {
           </div>
         </div>
         {STANDARD_KEYS.map((key) => (
-          <div key={key} className="palette-container">
-            <p className="palette-label">
+          <div key={key} className="palette">
+            <p className="palette__label">
               {key.charAt(0).toUpperCase() + key.slice(1)}
             </p>
             <input

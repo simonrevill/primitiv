@@ -73,9 +73,6 @@ pub struct Swatch {
     pub label: SwatchLabel,
     pub best_foreground: SwatchStep,
     pub contrast_result: ContrastResult,
-    pub max_recommended_light_padding: f32,
-    pub max_recommended_dark_padding: f32,
-    pub note: String,
 }
 
 impl From<core::Swatch> for Swatch {
@@ -87,9 +84,6 @@ impl From<core::Swatch> for Swatch {
             label: value.label.into(),
             best_foreground: value.best_foreground.into(),
             contrast_result: value.contrast_result.into(),
-            max_recommended_light_padding: value.max_recommended_light_padding,
-            max_recommended_dark_padding: value.max_recommended_dark_padding,
-            note: value.note,
         }
     }
 }

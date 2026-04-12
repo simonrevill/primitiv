@@ -50,9 +50,6 @@ pub struct Swatch {
     pub label: SwatchLabel,
     pub best_foreground: SwatchStep,
     pub contrast_result: ContrastResult,
-    pub max_recommended_light_padding: f32,
-    pub max_recommended_dark_padding: f32,
-    pub note: String,
 }
 
 /// A generated palette is a sequence of `Swatch`es — the items on a
@@ -203,11 +200,6 @@ pub fn generate_palette_with_scale(
                 label: background.label.clone(),
                 best_foreground: recommendation.color,
                 contrast_result,
-
-                // Dynamic metadata based on hue
-                max_recommended_light_padding: get_max_recommended_light_padding(base_hue),
-                max_recommended_dark_padding: get_max_recommended_dark_padding(base_hue),
-                note: "".to_string(),
             }
         })
         .collect();

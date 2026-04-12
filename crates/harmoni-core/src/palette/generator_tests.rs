@@ -16,7 +16,7 @@ mod generator_tests {
             let result = generate_palette(base_500, 0.0, 0.0);
 
             // Assert
-            let base_500_step = &result[5];
+            let base_500_step = &result.swatches[5];
             assert_eq!(base_500.l, base_500_step.l);
             assert_eq!(base_500.chroma, base_500_step.c);
             assert_eq!(base_500.hue.into_degrees(), base_500_step.h);
@@ -29,7 +29,7 @@ mod generator_tests {
         #[test]
         fn test_generate_greyscale_oklch_returns_length_of_ten() {
             let result = generate_greyscale_oklch();
-            assert_eq!(result.len(), 10);
+            assert_eq!(result.swatches.len(), 10);
         }
 
         #[test]
@@ -37,7 +37,7 @@ mod generator_tests {
             let result = generate_greyscale_oklch();
             let expected_labels = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
 
-            for (i, step) in result.iter().enumerate() {
+            for (i, step) in result.swatches.iter().enumerate() {
                 assert_eq!(step.label, SwatchLabel::Number(expected_labels[i]));
             }
         }
@@ -45,13 +45,13 @@ mod generator_tests {
         #[test]
         fn test_generate_greyscale_oklch_first_step_lightness_is_very_bright() {
             let result = generate_greyscale_oklch();
-            assert!(result[0].l > 0.9);
+            assert!(result.swatches[0].l > 0.9);
         }
 
         #[test]
         fn test_generate_greyscale_oklch_all_steps_have_zero_chroma() {
             let result = generate_greyscale_oklch();
-            for step in result {
+            for step in result.swatches {
                 assert_eq!(step.c, 0.0);
             }
         }
@@ -59,7 +59,7 @@ mod generator_tests {
         #[test]
         fn test_generate_greyscale_oklch_all_steps_have_zero_hue() {
             let result = generate_greyscale_oklch();
-            for step in result {
+            for step in result.swatches {
                 assert_eq!(step.h, 0.0);
             }
         }
@@ -67,8 +67,8 @@ mod generator_tests {
         #[test]
         fn test_generate_greyscale_oklch_steps_are_perceptually_descending() {
             let result = generate_greyscale_oklch();
-            for i in 0..result.len() - 1 {
-                assert!(result[i].l > result[i + 1].l);
+            for i in 0..result.swatches.len() - 1 {
+                assert!(result.swatches[i].l > result.swatches[i + 1].l);
             }
         }
     }
@@ -83,7 +83,7 @@ mod generator_tests {
             let result = generate_greyscale_oklch();
 
             let step_50 = result
-                .iter()
+                .swatches.iter()
                 .find(|step| step.label == SwatchLabel::Number(50))
                 .expect("Should have a 50 step");
 
@@ -103,7 +103,7 @@ mod generator_tests {
             let result = generate_greyscale_oklch();
 
             let step_50 = result
-                .iter()
+                .swatches.iter()
                 .find(|step| step.label == SwatchLabel::Number(50))
                 .expect("Should have a 50 step");
 
@@ -136,7 +136,7 @@ mod generator_tests {
             // Hue 280 covers the 256..=295 range
             let base = Oklch::new(0.55, 0.15, 280.0);
             let result = generate_palette(base, 0.0, 0.0);
-            assert_eq!(result.len(), 10);
+            assert_eq!(result.swatches.len(), 10);
         }
 
         #[test]
@@ -144,7 +144,7 @@ mod generator_tests {
             // Hue 310 covers the 296..=329 range
             let base = Oklch::new(0.55, 0.15, 310.0);
             let result = generate_palette(base, 0.0, 0.0);
-            assert_eq!(result.len(), 10);
+            assert_eq!(result.swatches.len(), 10);
         }
 
         #[test]
@@ -157,7 +157,7 @@ mod generator_tests {
             // fully covered. Let's just verify wrapping works.
             let base = Oklch::new(0.55, 0.15, 720.0);
             let result = generate_palette(base, 0.0, 0.0);
-            assert_eq!(result.len(), 10);
+            assert_eq!(result.swatches.len(), 10);
         }
     }
 
@@ -177,22 +177,22 @@ mod generator_tests {
                 0.0,
             );
             let step_50_no_padding_lightness = palette_with_no_padding
-                .iter()
+                .swatches.iter()
                 .find(|step| step.label == SwatchLabel::Number(50))
                 .unwrap()
                 .l;
             let step_100_no_padding_lightness = palette_with_no_padding
-                .iter()
+                .swatches.iter()
                 .find(|step| step.label == SwatchLabel::Number(100))
                 .unwrap()
                 .l;
             let step_200_no_padding_lightness = palette_with_no_padding
-                .iter()
+                .swatches.iter()
                 .find(|step| step.label == SwatchLabel::Number(200))
                 .unwrap()
                 .l;
             let step_300_no_padding_lightness = palette_with_no_padding
-                .iter()
+                .swatches.iter()
                 .find(|step| step.label == SwatchLabel::Number(300))
                 .unwrap()
                 .l;
@@ -204,22 +204,22 @@ mod generator_tests {
                 0.0,
             );
             let step_50_with_padding_lightness = palette_with_padding
-                .iter()
+                .swatches.iter()
                 .find(|step| step.label == SwatchLabel::Number(50))
                 .unwrap()
                 .l;
             let step_100_with_padding_lightness = palette_with_padding
-                .iter()
+                .swatches.iter()
                 .find(|step| step.label == SwatchLabel::Number(100))
                 .unwrap()
                 .l;
             let step_200_with_padding_lightness = palette_with_padding
-                .iter()
+                .swatches.iter()
                 .find(|step| step.label == SwatchLabel::Number(200))
                 .unwrap()
                 .l;
             let step_300_with_padding_lightness = palette_with_padding
-                .iter()
+                .swatches.iter()
                 .find(|step| step.label == SwatchLabel::Number(300))
                 .unwrap()
                 .l;
@@ -244,22 +244,22 @@ mod generator_tests {
                 0.0,
             );
             let step_50_no_padding_lightness = palette_with_no_padding
-                .iter()
+                .swatches.iter()
                 .find(|step| step.label == SwatchLabel::Number(50))
                 .unwrap()
                 .l;
             let step_100_no_padding_lightness = palette_with_no_padding
-                .iter()
+                .swatches.iter()
                 .find(|step| step.label == SwatchLabel::Number(100))
                 .unwrap()
                 .l;
             let step_200_no_padding_lightness = palette_with_no_padding
-                .iter()
+                .swatches.iter()
                 .find(|step| step.label == SwatchLabel::Number(200))
                 .unwrap()
                 .l;
             let step_300_no_padding_lightness = palette_with_no_padding
-                .iter()
+                .swatches.iter()
                 .find(|step| step.label == SwatchLabel::Number(300))
                 .unwrap()
                 .l;
@@ -271,22 +271,22 @@ mod generator_tests {
                 0.0,
             );
             let step_50_with_padding_lightness = palette_with_padding
-                .iter()
+                .swatches.iter()
                 .find(|step| step.label == SwatchLabel::Number(50))
                 .unwrap()
                 .l;
             let step_100_with_padding_lightness = palette_with_padding
-                .iter()
+                .swatches.iter()
                 .find(|step| step.label == SwatchLabel::Number(100))
                 .unwrap()
                 .l;
             let step_200_with_padding_lightness = palette_with_padding
-                .iter()
+                .swatches.iter()
                 .find(|step| step.label == SwatchLabel::Number(200))
                 .unwrap()
                 .l;
             let step_300_with_padding_lightness = palette_with_padding
-                .iter()
+                .swatches.iter()
                 .find(|step| step.label == SwatchLabel::Number(300))
                 .unwrap()
                 .l;
@@ -315,12 +315,12 @@ mod generator_tests {
                 0.0,
             );
             let step_800_no = no_padding
-                .iter()
+                .swatches.iter()
                 .find(|s| s.label == SwatchLabel::Number(800))
                 .unwrap()
                 .l;
             let step_900_no = no_padding
-                .iter()
+                .swatches.iter()
                 .find(|s| s.label == SwatchLabel::Number(900))
                 .unwrap()
                 .l;
@@ -333,12 +333,12 @@ mod generator_tests {
                 positive_dark_padding,
             );
             let step_800_with = with_padding
-                .iter()
+                .swatches.iter()
                 .find(|s| s.label == SwatchLabel::Number(800))
                 .unwrap()
                 .l;
             let step_900_with = with_padding
-                .iter()
+                .swatches.iter()
                 .find(|s| s.label == SwatchLabel::Number(900))
                 .unwrap()
                 .l;
@@ -360,12 +360,12 @@ mod generator_tests {
                 0.0,
             );
             let step_800_no = no_padding
-                .iter()
+                .swatches.iter()
                 .find(|s| s.label == SwatchLabel::Number(800))
                 .unwrap()
                 .l;
             let step_900_no = no_padding
-                .iter()
+                .swatches.iter()
                 .find(|s| s.label == SwatchLabel::Number(900))
                 .unwrap()
                 .l;
@@ -378,12 +378,12 @@ mod generator_tests {
                 negative_dark_padding,
             );
             let step_800_with = with_padding
-                .iter()
+                .swatches.iter()
                 .find(|s| s.label == SwatchLabel::Number(800))
                 .unwrap()
                 .l;
             let step_900_with = with_padding
-                .iter()
+                .swatches.iter()
                 .find(|s| s.label == SwatchLabel::Number(900))
                 .unwrap()
                 .l;
@@ -408,11 +408,10 @@ mod generator_tests {
             0.0,
         );
 
-        assert!(!palette.is_empty());
+        assert!(!palette.swatches.is_empty());
 
-        let first = &palette[0];
-        assert!(first.max_recommended_light_padding > 0.0);
-        assert!(first.max_recommended_dark_padding > 0.0);
+        assert!(palette.max_recommended_light_padding > 0.0);
+        assert!(palette.max_recommended_dark_padding > 0.0);
     }
 
     #[test]
@@ -423,11 +422,8 @@ mod generator_tests {
         let yellow_palette = generate_palette_with_scale(yellow, &TARGET_LIGHTNESS, &TARGET_CHROMA_SCALE, 0.0, 0.0);
         let blue_palette   = generate_palette_with_scale(blue,   &TARGET_LIGHTNESS, &TARGET_CHROMA_SCALE, 0.0, 0.0);
 
-        let yellow_meta = &yellow_palette[0];
-        let blue_meta   = &blue_palette[0];
-
         assert!(
-            yellow_meta.max_recommended_light_padding < blue_meta.max_recommended_light_padding,
+            yellow_palette.max_recommended_light_padding < blue_palette.max_recommended_light_padding,
             "Yellow should have tighter light padding limit than blue"
         );
     }

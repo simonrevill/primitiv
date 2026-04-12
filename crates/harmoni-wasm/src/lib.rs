@@ -10,7 +10,7 @@ fn to_js_error(e: impl std::fmt::Debug) -> JsError {
 }
 
 fn palette_to_js(palette_data: harmoni_core::Palette) -> Result<Palette, JsError> {
-    let wrapped: Vec<types::Swatch> = palette_data.into_iter().map(Into::into).collect();
+    let wrapped: Vec<types::Swatch> = palette_data.swatches.into_iter().map(Into::into).collect();
     serde_wasm_bindgen::to_value(&wrapped)
         .map(|v| v.unchecked_into())
         .map_err(|e| JsError::new(&e.to_string()))
@@ -81,7 +81,7 @@ pub fn generate_palette_with_light_padding(
 #[wasm_bindgen]
 pub fn generate_greyscale_oklch() -> Palette {
     let data = api::generate_greyscale();
-    let wrapped: Vec<types::Swatch> = data.into_iter().map(Into::into).collect();
+    let wrapped: Vec<types::Swatch> = data.swatches.into_iter().map(Into::into).collect();
     serde_wasm_bindgen::to_value(&wrapped)
         .expect("serializing greyscale palette should never fail")
         .unchecked_into()

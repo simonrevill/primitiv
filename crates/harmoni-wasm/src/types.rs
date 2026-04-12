@@ -88,6 +88,26 @@ impl From<core::Swatch> for Swatch {
     }
 }
 
+#[derive(Tsify, Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[tsify(into_wasm_abi, from_wasm_abi)]
+pub struct Palette {
+    pub swatches: Vec<Swatch>,
+    pub max_recommended_light_padding: f32,
+    pub max_recommended_dark_padding: f32,
+    pub note: String,
+}
+
+impl From<core::Palette> for Palette {
+    fn from(value: core::Palette) -> Self {
+        Palette {
+            swatches: value.swatches.into_iter().map(Into::into).collect(),
+            max_recommended_light_padding: value.max_recommended_light_padding,
+            max_recommended_dark_padding: value.max_recommended_dark_padding,
+            note: value.note,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

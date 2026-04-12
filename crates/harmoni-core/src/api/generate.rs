@@ -9,14 +9,14 @@ pub struct GenerateOptions {
     pub dark_padding: f32,
 }
 
-pub fn generate(input: ColorInput) -> Result<Vec<Palette>, ColorInputError> {
+pub fn generate(input: ColorInput) -> Result<Palette, ColorInputError> {
     generate_with_options(input, GenerateOptions::default())
 }
 
 pub fn generate_with_options(
     input: ColorInput,
     options: GenerateOptions,
-) -> Result<Vec<Palette>, ColorInputError> {
+) -> Result<Palette, ColorInputError> {
     let oklch = input.to_oklch()?;
     Ok(generate_palette(
         oklch,

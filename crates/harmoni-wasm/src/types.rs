@@ -66,7 +66,7 @@ impl From<core::ContrastResult> for ContrastResult {
 
 #[derive(Tsify, PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[tsify(into_wasm_abi, from_wasm_abi)]
-pub struct Palette {
+pub struct Swatch {
     pub l: f32,
     pub c: f32,
     pub h: f32,
@@ -78,9 +78,9 @@ pub struct Palette {
     pub note: String,
 }
 
-impl From<core::Palette> for Palette {
-    fn from(value: core::Palette) -> Self {
-        Palette {
+impl From<core::Swatch> for Swatch {
+    fn from(value: core::Swatch) -> Self {
+        Swatch {
             l: value.l,
             c: value.c,
             h: value.h,

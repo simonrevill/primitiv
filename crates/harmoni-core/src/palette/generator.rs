@@ -43,7 +43,7 @@ impl SwatchStep {
 }
 
 #[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
-pub struct Palette {
+pub struct Swatch {
     pub l: f32,
     pub c: f32,
     pub h: f32,
@@ -54,6 +54,11 @@ pub struct Palette {
     pub max_recommended_dark_padding: f32,
     pub note: String,
 }
+
+/// A generated palette is a sequence of `Swatch`es — the items on a
+/// lightness scale for a single hue. Exposed as a type alias so it
+/// serializes as a plain array at every boundary (JSON, JS, Figma).
+pub type Palette = Vec<Swatch>;
 
 const STEPS: [u16; 10] = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
 
@@ -131,7 +136,7 @@ pub fn generate_palette_with_scale(
     chroma_scale: &[f32],
     light_padding: f32,
     dark_padding: f32,
-) -> Vec<Palette> {
+) -> Palette {
     let base_hue = base_500.hue.into_degrees();
     let base_chroma = base_500.chroma;
     let base_lightness = base_500.l;
@@ -185,7 +190,7 @@ pub fn generate_palette_with_scale(
             let recommendation = get_best_foreground(background, dark_candidate);
             let contrast_result = get_contrast_rating_for_step(background, &recommendation.color);
 
-            Palette {
+            Swatch {
                 l: background.l,
                 c: background.c,
                 h: background.h,
@@ -202,11 +207,11 @@ pub fn generate_palette_with_scale(
         .collect()
 }
 
-pub fn generate_palette(base_500: Oklch, light_padding: f32, dark_padding: f32) -> Vec<Palette> {
+pub fn generate_palette(base_500: Oklch, light_padding: f32, dark_padding: f32) -> Palette {
     generate_palette_with_scale(base_500, &TARGET_LIGHTNESS, &TARGET_CHROMA_SCALE, light_padding, dark_padding)
 }
 
-pub fn generate_palette_with_light_padding(base_500: Oklch, light_padding: f32) -> Vec<Palette> {
+pub fn generate_palette_with_light_padding(base_500: Oklch, light_padding: f32) -> Palette {
     generate_palette_with_scale(
         base_500,
         &TARGET_LIGHTNESS,
@@ -216,7 +221,7 @@ pub fn generate_palette_with_light_padding(base_500: Oklch, light_padding: f32) 
     )
 }
 
-pub fn generate_palette_with_dark_padding(base_500: Oklch, dark_padding: f32) -> Vec<Palette> {
+pub fn generate_palette_with_dark_padding(base_500: Oklch, dark_padding: f32) -> Palette {
     generate_palette_with_scale(
         base_500,
         &TARGET_LIGHTNESS,
@@ -226,7 +231,7 @@ pub fn generate_palette_with_dark_padding(base_500: Oklch, dark_padding: f32) ->
     )
 }
 
-pub fn generate_greyscale_oklch() -> Vec<Palette> {
+pub fn generate_greyscale_oklch() -> Palette {
     let lightness_scale: [f32; 10] = [0.97, 0.93, 0.85, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1];
     generate_palette_with_scale(
         Oklch::new(0.5, 0.0, 0.0),

@@ -41,11 +41,11 @@ Adapters should program against `harmoni_core::api`, never the
 lower-level modules. The curated surface is small by design:
 
 ```rust
-// Palette generation
-api::generate(ColorInput) -> Result<Vec<Palette>, ColorInputError>
+// Palette generation (Palette = Vec<Swatch>)
+api::generate(ColorInput) -> Result<Palette, ColorInputError>
 api::generate_with_options(ColorInput, GenerateOptions)
-    -> Result<Vec<Palette>, ColorInputError>
-api::generate_greyscale() -> Vec<Palette>
+    -> Result<Palette, ColorInputError>
+api::generate_greyscale() -> Palette
 
 // Contrast audit
 api::audit_contrast(ColorInput, ColorInput)

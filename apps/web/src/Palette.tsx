@@ -8,7 +8,7 @@ export type PaletteProps = {
 export function Palette({ palette }: PaletteProps) {
   return (
     <div className="palette__steps">
-      {palette?.map((step, index) => (
+      {palette?.swatches?.map((step, index) => (
         <Swatch
           key={
             ("Number" in step.label

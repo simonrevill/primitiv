@@ -13,7 +13,7 @@ fn sample_input() -> ColorInput {
 fn generate_returns_ten_step_palette_for_valid_oklch_input() {
     let result = generate(sample_input()).expect("valid input should produce a palette");
 
-    assert_eq!(result.len(), 10);
+    assert_eq!(result.swatches.len(), 10);
 }
 
 #[test]
@@ -30,9 +30,9 @@ fn generate_with_options_light_padding_brightens_the_lightest_step() {
 
     // Step 50 (index 0) should be lighter with positive light_padding.
     assert!(
-        padded_result[0].l > default_result[0].l,
+        padded_result.swatches[0].l > default_result.swatches[0].l,
         "expected padded 50 step ({}) to be lighter than default ({})",
-        padded_result[0].l,
-        default_result[0].l
+        padded_result.swatches[0].l,
+        default_result.swatches[0].l
     );
 }

@@ -50,15 +50,18 @@ pub struct Swatch {
     pub label: SwatchLabel,
     pub best_foreground: SwatchStep,
     pub contrast_result: ContrastResult,
+}
+
+/// A generated palette is a sequence of `Swatch`es — the items on a
+/// lightness scale for a single hue. Includes metadata computed once
+/// for the entire palette (based on hue) rather than per-swatch.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct Palette {
+    pub swatches: Vec<Swatch>,
     pub max_recommended_light_padding: f32,
     pub max_recommended_dark_padding: f32,
     pub note: String,
 }
-
-/// A generated palette is a sequence of `Swatch`es — the items on a
-/// lightness scale for a single hue. Exposed as a type alias so it
-/// serializes as a plain array at every boundary (JSON, JS, Figma).
-pub type Palette = Vec<Swatch>;
 
 const STEPS: [u16; 10] = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
 
@@ -184,7 +187,7 @@ pub fn generate_palette_with_scale(
         .find(|background| background.label == SwatchLabel::Number(900))
         .expect("Palette must contain a 900 step to act as a dark candidate");
 
-    backgrounds
+    let swatches: Vec<Swatch> = backgrounds
         .iter()
         .map(|background| {
             let recommendation = get_best_foreground(background, dark_candidate);
@@ -197,14 +200,16 @@ pub fn generate_palette_with_scale(
                 label: background.label.clone(),
                 best_foreground: recommendation.color,
                 contrast_result,
-
-                // Dynamic metadata based on hue
-                max_recommended_light_padding: get_max_recommended_light_padding(base_hue),
-                max_recommended_dark_padding: get_max_recommended_dark_padding(base_hue),
-                note: "".to_string(),
             }
         })
-        .collect()
+        .collect();
+
+    Palette {
+        swatches,
+        max_recommended_light_padding: get_max_recommended_light_padding(base_hue),
+        max_recommended_dark_padding: get_max_recommended_dark_padding(base_hue),
+        note: "".to_string(),
+    }
 }
 
 pub fn generate_palette(base_500: Oklch, light_padding: f32, dark_padding: f32) -> Palette {

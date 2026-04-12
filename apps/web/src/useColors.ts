@@ -35,7 +35,7 @@ const DEFAULT_COLORS: Record<ColorKey, ColorConfig> = {
 
 export function useColors() {
   const [wasmReady, setWasmReady] = useState(false);
-  const [greyscalePalette, setGreyscalePalette] = useState<Palette>();
+  const [greyscalePalette, setGreyscalePalette] = useState<Palette>([]);
   const [colors, setColors] =
     useState<Record<ColorKey, ColorConfig>>(DEFAULT_COLORS);
 

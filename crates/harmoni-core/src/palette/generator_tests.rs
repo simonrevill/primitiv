@@ -1,4 +1,4 @@
-use crate::palette::generator::OklchLabel;
+use crate::palette::generator::SwatchLabel;
 use crate::palette::generator::*;
 use palette::Oklch;
 
@@ -38,7 +38,7 @@ mod generator_tests {
             let expected_labels = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
 
             for (i, step) in result.iter().enumerate() {
-                assert_eq!(step.label, OklchLabel::Number(expected_labels[i]));
+                assert_eq!(step.label, SwatchLabel::Number(expected_labels[i]));
             }
         }
 
@@ -84,16 +84,16 @@ mod generator_tests {
 
             let step_50 = result
                 .iter()
-                .find(|step| step.label == OklchLabel::Number(50))
+                .find(|step| step.label == SwatchLabel::Number(50))
                 .expect("Should have a 50 step");
 
             assert_eq!(
                 step_50.best_foreground,
-                OklchStep {
+                SwatchStep {
                     l: 0.049999982,
                     c: 0.0,
                     h: 0.0,
-                    label: OklchLabel::Number(900),
+                    label: SwatchLabel::Number(900),
                 }
             );
         }
@@ -104,7 +104,7 @@ mod generator_tests {
 
             let step_50 = result
                 .iter()
-                .find(|step| step.label == OklchLabel::Number(50))
+                .find(|step| step.label == SwatchLabel::Number(50))
                 .expect("Should have a 50 step");
 
             assert_eq!(
@@ -118,13 +118,13 @@ mod generator_tests {
         }
     }
 
-    mod oklch_label {
+    mod swatch_label {
         use super::*;
 
         #[test]
         fn should_create_label_from_str() {
-            let label: OklchLabel = "White".into();
-            assert_eq!(label, OklchLabel::Name(String::from("White")));
+            let label: SwatchLabel = "White".into();
+            assert_eq!(label, SwatchLabel::Name(String::from("White")));
         }
     }
 
@@ -178,22 +178,22 @@ mod generator_tests {
             );
             let step_50_no_padding_lightness = palette_with_no_padding
                 .iter()
-                .find(|step| step.label == OklchLabel::Number(50))
+                .find(|step| step.label == SwatchLabel::Number(50))
                 .unwrap()
                 .l;
             let step_100_no_padding_lightness = palette_with_no_padding
                 .iter()
-                .find(|step| step.label == OklchLabel::Number(100))
+                .find(|step| step.label == SwatchLabel::Number(100))
                 .unwrap()
                 .l;
             let step_200_no_padding_lightness = palette_with_no_padding
                 .iter()
-                .find(|step| step.label == OklchLabel::Number(200))
+                .find(|step| step.label == SwatchLabel::Number(200))
                 .unwrap()
                 .l;
             let step_300_no_padding_lightness = palette_with_no_padding
                 .iter()
-                .find(|step| step.label == OklchLabel::Number(300))
+                .find(|step| step.label == SwatchLabel::Number(300))
                 .unwrap()
                 .l;
             let palette_with_padding = generate_palette_with_scale(
@@ -205,22 +205,22 @@ mod generator_tests {
             );
             let step_50_with_padding_lightness = palette_with_padding
                 .iter()
-                .find(|step| step.label == OklchLabel::Number(50))
+                .find(|step| step.label == SwatchLabel::Number(50))
                 .unwrap()
                 .l;
             let step_100_with_padding_lightness = palette_with_padding
                 .iter()
-                .find(|step| step.label == OklchLabel::Number(100))
+                .find(|step| step.label == SwatchLabel::Number(100))
                 .unwrap()
                 .l;
             let step_200_with_padding_lightness = palette_with_padding
                 .iter()
-                .find(|step| step.label == OklchLabel::Number(200))
+                .find(|step| step.label == SwatchLabel::Number(200))
                 .unwrap()
                 .l;
             let step_300_with_padding_lightness = palette_with_padding
                 .iter()
-                .find(|step| step.label == OklchLabel::Number(300))
+                .find(|step| step.label == SwatchLabel::Number(300))
                 .unwrap()
                 .l;
 
@@ -245,22 +245,22 @@ mod generator_tests {
             );
             let step_50_no_padding_lightness = palette_with_no_padding
                 .iter()
-                .find(|step| step.label == OklchLabel::Number(50))
+                .find(|step| step.label == SwatchLabel::Number(50))
                 .unwrap()
                 .l;
             let step_100_no_padding_lightness = palette_with_no_padding
                 .iter()
-                .find(|step| step.label == OklchLabel::Number(100))
+                .find(|step| step.label == SwatchLabel::Number(100))
                 .unwrap()
                 .l;
             let step_200_no_padding_lightness = palette_with_no_padding
                 .iter()
-                .find(|step| step.label == OklchLabel::Number(200))
+                .find(|step| step.label == SwatchLabel::Number(200))
                 .unwrap()
                 .l;
             let step_300_no_padding_lightness = palette_with_no_padding
                 .iter()
-                .find(|step| step.label == OklchLabel::Number(300))
+                .find(|step| step.label == SwatchLabel::Number(300))
                 .unwrap()
                 .l;
             let palette_with_padding = generate_palette_with_scale(
@@ -272,22 +272,22 @@ mod generator_tests {
             );
             let step_50_with_padding_lightness = palette_with_padding
                 .iter()
-                .find(|step| step.label == OklchLabel::Number(50))
+                .find(|step| step.label == SwatchLabel::Number(50))
                 .unwrap()
                 .l;
             let step_100_with_padding_lightness = palette_with_padding
                 .iter()
-                .find(|step| step.label == OklchLabel::Number(100))
+                .find(|step| step.label == SwatchLabel::Number(100))
                 .unwrap()
                 .l;
             let step_200_with_padding_lightness = palette_with_padding
                 .iter()
-                .find(|step| step.label == OklchLabel::Number(200))
+                .find(|step| step.label == SwatchLabel::Number(200))
                 .unwrap()
                 .l;
             let step_300_with_padding_lightness = palette_with_padding
                 .iter()
-                .find(|step| step.label == OklchLabel::Number(300))
+                .find(|step| step.label == SwatchLabel::Number(300))
                 .unwrap()
                 .l;
 
@@ -316,12 +316,12 @@ mod generator_tests {
             );
             let step_800_no = no_padding
                 .iter()
-                .find(|s| s.label == OklchLabel::Number(800))
+                .find(|s| s.label == SwatchLabel::Number(800))
                 .unwrap()
                 .l;
             let step_900_no = no_padding
                 .iter()
-                .find(|s| s.label == OklchLabel::Number(900))
+                .find(|s| s.label == SwatchLabel::Number(900))
                 .unwrap()
                 .l;
 
@@ -334,12 +334,12 @@ mod generator_tests {
             );
             let step_800_with = with_padding
                 .iter()
-                .find(|s| s.label == OklchLabel::Number(800))
+                .find(|s| s.label == SwatchLabel::Number(800))
                 .unwrap()
                 .l;
             let step_900_with = with_padding
                 .iter()
-                .find(|s| s.label == OklchLabel::Number(900))
+                .find(|s| s.label == SwatchLabel::Number(900))
                 .unwrap()
                 .l;
 
@@ -361,12 +361,12 @@ mod generator_tests {
             );
             let step_800_no = no_padding
                 .iter()
-                .find(|s| s.label == OklchLabel::Number(800))
+                .find(|s| s.label == SwatchLabel::Number(800))
                 .unwrap()
                 .l;
             let step_900_no = no_padding
                 .iter()
-                .find(|s| s.label == OklchLabel::Number(900))
+                .find(|s| s.label == SwatchLabel::Number(900))
                 .unwrap()
                 .l;
 
@@ -379,12 +379,12 @@ mod generator_tests {
             );
             let step_800_with = with_padding
                 .iter()
-                .find(|s| s.label == OklchLabel::Number(800))
+                .find(|s| s.label == SwatchLabel::Number(800))
                 .unwrap()
                 .l;
             let step_900_with = with_padding
                 .iter()
-                .find(|s| s.label == OklchLabel::Number(900))
+                .find(|s| s.label == SwatchLabel::Number(900))
                 .unwrap()
                 .l;
 

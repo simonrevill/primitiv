@@ -1,10 +1,10 @@
 use crate::audit::foreground::get_best_foreground;
-use crate::palette::generator::{OklchLabel, OklchStep};
+use crate::palette::generator::{SwatchLabel, SwatchStep};
 
 #[test]
 fn should_return_dark_candidate_foreground_when_background_is_very_light() {
-    let example_background = OklchStep::from_label(0.9, 0.0, 0.0, OklchLabel::Number(100));
-    let example_dark_candidate = OklchStep::from_label(0.1, 0.0, 0.0, OklchLabel::Number(900));
+    let example_background = SwatchStep::from_label(0.9, 0.0, 0.0, SwatchLabel::Number(100));
+    let example_dark_candidate = SwatchStep::from_label(0.1, 0.0, 0.0, SwatchLabel::Number(900));
     let result = get_best_foreground(&example_background, &example_dark_candidate);
 
     assert_eq!(result.color, example_dark_candidate);
@@ -14,10 +14,10 @@ fn should_return_dark_candidate_foreground_when_background_is_very_light() {
 
 #[test]
 fn should_return_white_foreground_when_background_is_very_dark() {
-    let example_background = OklchStep::from_label(0.1, 0.0, 0.0, OklchLabel::Number(900));
-    let example_dark_candidate = OklchStep::from_label(0.1, 0.0, 0.0, OklchLabel::Number(900));
+    let example_background = SwatchStep::from_label(0.1, 0.0, 0.0, SwatchLabel::Number(900));
+    let example_dark_candidate = SwatchStep::from_label(0.1, 0.0, 0.0, SwatchLabel::Number(900));
     let expected_white_foreground =
-        OklchStep::from_label(1.0, 0.0, 0.0, OklchLabel::Name(String::from("White")));
+        SwatchStep::from_label(1.0, 0.0, 0.0, SwatchLabel::Name(String::from("White")));
     let result = get_best_foreground(&example_background, &example_dark_candidate);
 
     assert_eq!(result.color, expected_white_foreground);
@@ -26,10 +26,10 @@ fn should_return_white_foreground_when_background_is_very_dark() {
 
 #[test]
 fn should_select_white_as_clarity_winner_when_both_pass_as_double_a() {
-    let example_background = OklchStep::from_label(0.5, 0.0, 0.0, OklchLabel::Number(600));
-    let example_dark_candidate = OklchStep::from_label(0.1, 0.0, 0.0, OklchLabel::Number(900));
+    let example_background = SwatchStep::from_label(0.5, 0.0, 0.0, SwatchLabel::Number(600));
+    let example_dark_candidate = SwatchStep::from_label(0.1, 0.0, 0.0, SwatchLabel::Number(900));
     let expected_white_foreground =
-        OklchStep::from_label(1.0, 0.0, 0.0, OklchLabel::Name(String::from("White")));
+        SwatchStep::from_label(1.0, 0.0, 0.0, SwatchLabel::Name(String::from("White")));
     let result = get_best_foreground(&example_background, &example_dark_candidate);
 
     assert_eq!(result.color, expected_white_foreground);
@@ -40,10 +40,10 @@ fn should_select_white_as_clarity_winner_when_both_pass_as_double_a() {
 fn should_return_black_when_dark_candidate_fails_and_black_beats_white() {
     // Light background: white has low contrast, black has high contrast
     // Dark candidate is also light, so it fails AA
-    let light_background = OklchStep::from_label(0.85, 0.0, 0.0, OklchLabel::Number(200));
-    let light_dark_candidate = OklchStep::from_label(0.75, 0.0, 0.0, OklchLabel::Number(900));
+    let light_background = SwatchStep::from_label(0.85, 0.0, 0.0, SwatchLabel::Number(200));
+    let light_dark_candidate = SwatchStep::from_label(0.75, 0.0, 0.0, SwatchLabel::Number(900));
     let expected_black =
-        OklchStep::from_label(0.01, 0.0, 0.0, OklchLabel::Name(String::from("Black")));
+        SwatchStep::from_label(0.01, 0.0, 0.0, SwatchLabel::Name(String::from("Black")));
 
     let result = get_best_foreground(&light_background, &light_dark_candidate);
 
@@ -58,8 +58,8 @@ fn should_pick_white_in_fallback_when_neither_passes_aa() {
     // and both white and black fall below 4.5.
     // With near-black at L=0.01, this is hard to hit naturally,
     // so we use a background just above the crossover point.
-    let mid_background = OklchStep::from_label(0.62, 0.0, 0.0, OklchLabel::Number(500));
-    let bad_dark_candidate = OklchStep::from_label(0.60, 0.0, 0.0, OklchLabel::Number(900));
+    let mid_background = SwatchStep::from_label(0.62, 0.0, 0.0, SwatchLabel::Number(500));
+    let bad_dark_candidate = SwatchStep::from_label(0.60, 0.0, 0.0, SwatchLabel::Number(900));
 
     let result = get_best_foreground(&mid_background, &bad_dark_candidate);
 
@@ -74,14 +74,14 @@ fn should_pick_white_in_fallback_when_neither_passes_aa() {
 fn should_pick_black_in_fallback_when_black_has_higher_ratio() {
     // Very light background with a similarly light dark candidate
     // At very high lightness, black always wins over white
-    let very_light_bg = OklchStep::from_label(0.95, 0.0, 0.0, OklchLabel::Number(50));
-    let bad_dark_candidate = OklchStep::from_label(0.93, 0.0, 0.0, OklchLabel::Number(900));
+    let very_light_bg = SwatchStep::from_label(0.95, 0.0, 0.0, SwatchLabel::Number(50));
+    let bad_dark_candidate = SwatchStep::from_label(0.93, 0.0, 0.0, SwatchLabel::Number(900));
 
     let result = get_best_foreground(&very_light_bg, &bad_dark_candidate);
 
     assert!(!result.is_harmonious);
     // Black should have higher contrast against very light background
     let expected_black =
-        OklchStep::from_label(0.01, 0.0, 0.0, OklchLabel::Name(String::from("Black")));
+        SwatchStep::from_label(0.01, 0.0, 0.0, SwatchLabel::Name(String::from("Black")));
     assert_eq!(result.color, expected_black);
 }

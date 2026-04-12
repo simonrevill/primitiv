@@ -12,32 +12,32 @@ use tsify::Tsify;
 
 #[derive(Tsify, Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[tsify(into_wasm_abi, from_wasm_abi)]
-pub enum OklchLabel {
+pub enum SwatchLabel {
     Number(u16),
     Name(String),
 }
 
-impl From<core::OklchLabel> for OklchLabel {
-    fn from(value: core::OklchLabel) -> Self {
+impl From<core::SwatchLabel> for SwatchLabel {
+    fn from(value: core::SwatchLabel) -> Self {
         match value {
-            core::OklchLabel::Number(n) => OklchLabel::Number(n),
-            core::OklchLabel::Name(s) => OklchLabel::Name(s),
+            core::SwatchLabel::Number(n) => SwatchLabel::Number(n),
+            core::SwatchLabel::Name(s) => SwatchLabel::Name(s),
         }
     }
 }
 
 #[derive(Tsify, PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[tsify(into_wasm_abi, from_wasm_abi)]
-pub struct OklchStep {
+pub struct SwatchStep {
     pub l: f32,
     pub c: f32,
     pub h: f32,
-    pub label: OklchLabel,
+    pub label: SwatchLabel,
 }
 
-impl From<core::OklchStep> for OklchStep {
-    fn from(value: core::OklchStep) -> Self {
-        OklchStep {
+impl From<core::SwatchStep> for SwatchStep {
+    fn from(value: core::SwatchStep) -> Self {
+        SwatchStep {
             l: value.l,
             c: value.c,
             h: value.h,
@@ -70,8 +70,8 @@ pub struct Palette {
     pub l: f32,
     pub c: f32,
     pub h: f32,
-    pub label: OklchLabel,
-    pub best_foreground: OklchStep,
+    pub label: SwatchLabel,
+    pub best_foreground: SwatchStep,
     pub contrast_result: ContrastResult,
     pub max_recommended_light_padding: f32,
     pub max_recommended_dark_padding: f32,
@@ -99,30 +99,30 @@ mod tests {
     use super::*;
 
     #[test]
-    fn oklch_label_number_converts_from_core() {
-        let core_label = core::OklchLabel::Number(500);
-        let wasm_label: OklchLabel = core_label.into();
-        assert_eq!(wasm_label, OklchLabel::Number(500));
+    fn swatch_label_number_converts_from_core() {
+        let core_label = core::SwatchLabel::Number(500);
+        let wasm_label: SwatchLabel = core_label.into();
+        assert_eq!(wasm_label, SwatchLabel::Number(500));
     }
 
     #[test]
-    fn oklch_label_name_converts_from_core() {
-        let core_label = core::OklchLabel::Name("White".to_string());
-        let wasm_label: OklchLabel = core_label.into();
-        assert_eq!(wasm_label, OklchLabel::Name("White".to_string()));
+    fn swatch_label_name_converts_from_core() {
+        let core_label = core::SwatchLabel::Name("White".to_string());
+        let wasm_label: SwatchLabel = core_label.into();
+        assert_eq!(wasm_label, SwatchLabel::Name("White".to_string()));
     }
 
     #[test]
-    fn oklch_step_converts_from_core_preserving_all_fields() {
-        let core_step = core::OklchStep::from_label(0.55, 0.12, 30.0, 500u16);
-        let wasm_step: OklchStep = core_step.into();
+    fn swatch_step_converts_from_core_preserving_all_fields() {
+        let core_step = core::SwatchStep::from_label(0.55, 0.12, 30.0, 500u16);
+        let wasm_step: SwatchStep = core_step.into();
         assert_eq!(
             wasm_step,
-            OklchStep {
+            SwatchStep {
                 l: 0.55,
                 c: 0.12,
                 h: 30.0,
-                label: OklchLabel::Number(500),
+                label: SwatchLabel::Number(500),
             }
         );
     }

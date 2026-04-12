@@ -2,7 +2,7 @@ use palette::color_difference::Wcag21RelativeContrast;
 use palette::{IntoColor, LinSrgb, Oklch};
 use serde::{Deserialize, Serialize};
 
-use crate::OklchStep;
+use crate::SwatchStep;
 
 #[derive(PartialEq, Debug, Clone, Deserialize, Serialize)]
 pub struct ContrastResult {
@@ -45,7 +45,7 @@ pub fn calculate_contrast_low_level(bg: &Oklch, fg: &Oklch) -> ContrastResult {
     get_contrast_result(ratio)
 }
 
-pub fn get_contrast_rating_for_step(bg: &OklchStep, fg: &OklchStep) -> ContrastResult {
+pub fn get_contrast_rating_for_step(bg: &SwatchStep, fg: &SwatchStep) -> ContrastResult {
     let bg_raw = Oklch::new(bg.l, bg.c, bg.h);
     let fg_raw = Oklch::new(fg.l, fg.c, fg.h);
 

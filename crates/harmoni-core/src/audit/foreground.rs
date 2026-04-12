@@ -1,19 +1,19 @@
-use crate::OklchStep;
-use crate::palette::generator::OklchLabel;
+use crate::SwatchStep;
+use crate::palette::generator::SwatchLabel;
 use palette::color_difference::Wcag21RelativeContrast;
 use palette::{IntoColor, LinSrgb, Oklch};
 
 // New return type — rich information for the UI and strict AA guarantee
 #[derive(Debug, Clone, PartialEq)]
 pub struct ForegroundRecommendation {
-    pub color: OklchStep,
+    pub color: SwatchStep,
     pub contrast_ratio: f32,
     pub is_harmonious: bool, // true = used palette's own 900
 }
 
 pub fn get_best_foreground(
-    background: &OklchStep,
-    dark_candidate: &OklchStep,
+    background: &SwatchStep,
+    dark_candidate: &SwatchStep,
 ) -> ForegroundRecommendation {
     let bg_color = Oklch::new(background.l, background.c, background.h);
     let dark_color = Oklch::new(dark_candidate.l, dark_candidate.c, dark_candidate.h);
@@ -46,11 +46,11 @@ pub fn get_best_foreground(
     // 2. Otherwise choose the better of white or black
     if ratio_white >= 4.5 && ratio_white >= ratio_black {
         return ForegroundRecommendation {
-            color: OklchStep {
+            color: SwatchStep {
                 l: 1.0,
                 c: 0.0,
                 h: 0.0,
-                label: OklchLabel::Name(String::from("White")),
+                label: SwatchLabel::Name(String::from("White")),
             },
             contrast_ratio: ratio_white,
             is_harmonious: false,
@@ -59,11 +59,11 @@ pub fn get_best_foreground(
 
     if ratio_black >= 4.5 {
         return ForegroundRecommendation {
-            color: OklchStep {
+            color: SwatchStep {
                 l: 0.01,
                 c: 0.0,
                 h: 0.0,
-                label: OklchLabel::Name(String::from("Black")),
+                label: SwatchLabel::Name(String::from("Black")),
             },
             contrast_ratio: ratio_black,
             is_harmonious: false,

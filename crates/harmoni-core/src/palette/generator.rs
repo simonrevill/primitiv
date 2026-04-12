@@ -6,33 +6,33 @@ use crate::audit::foreground::get_best_foreground;
 use crate::ContrastResult;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-pub enum OklchLabel {
+pub enum SwatchLabel {
     Number(u16),
     Name(String),
 }
 
-impl From<u16> for OklchLabel {
+impl From<u16> for SwatchLabel {
     fn from(n: u16) -> Self {
-        OklchLabel::Number(n)
+        SwatchLabel::Number(n)
     }
 }
 
-impl From<&str> for OklchLabel {
+impl From<&str> for SwatchLabel {
     fn from(s: &str) -> Self {
-        OklchLabel::Name(s.to_string())
+        SwatchLabel::Name(s.to_string())
     }
 }
 
 #[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
-pub struct OklchStep {
+pub struct SwatchStep {
     pub l: f32,
     pub c: f32,
     pub h: f32,
-    pub label: OklchLabel,
+    pub label: SwatchLabel,
 }
 
-impl OklchStep {
-    pub fn from_label<T: Into<OklchLabel>>(l: f32, c: f32, h: f32, label: T) -> Self {
+impl SwatchStep {
+    pub fn from_label<T: Into<SwatchLabel>>(l: f32, c: f32, h: f32, label: T) -> Self {
         Self {
             l,
             c,
@@ -47,8 +47,8 @@ pub struct Palette {
     pub l: f32,
     pub c: f32,
     pub h: f32,
-    pub label: OklchLabel,
-    pub best_foreground: OklchStep,
+    pub label: SwatchLabel,
+    pub best_foreground: SwatchStep,
     pub contrast_result: ContrastResult,
     pub max_recommended_light_padding: f32,
     pub max_recommended_dark_padding: f32,
@@ -147,7 +147,7 @@ pub fn generate_palette_with_scale(
         0.0
     };
 
-    let backgrounds: Vec<OklchStep> = STEPS
+    let backgrounds: Vec<SwatchStep> = STEPS
         .iter()
         .zip(adjusted_lightness.iter())
         .zip(chroma_scale.iter())
@@ -165,7 +165,7 @@ pub fn generate_palette_with_scale(
 
             let oklch_color = Oklch::new(final_lightness, final_chroma, base_hue);
 
-            OklchStep::from_label(
+            SwatchStep::from_label(
                 oklch_color.l,
                 oklch_color.chroma,
                 oklch_color.hue.into_degrees(),
@@ -176,7 +176,7 @@ pub fn generate_palette_with_scale(
 
     let dark_candidate = backgrounds
         .iter()
-        .find(|background| background.label == OklchLabel::Number(900))
+        .find(|background| background.label == SwatchLabel::Number(900))
         .expect("Palette must contain a 900 step to act as a dark candidate");
 
     backgrounds

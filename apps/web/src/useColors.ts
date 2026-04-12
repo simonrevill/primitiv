@@ -17,20 +17,20 @@ type ColorKey =
 
 type ColorConfig = {
   hex: string;
-  palette: Palette | undefined;
+  palette?: Palette;
   lightPadding?: number;
   darkPadding?: number;
 };
 
 const DEFAULT_COLORS: Record<ColorKey, ColorConfig> = {
-  red: { hex: "#EF4444", palette: undefined },
-  yellow: { hex: "#F59E0B", palette: undefined },
-  lime: { hex: "#9eb22e", palette: undefined },
-  green: { hex: "#10B981", palette: undefined },
-  blue: { hex: "#3B82F6", palette: undefined },
-  indigo: { hex: "#6366F1", palette: undefined },
-  purple: { hex: "#8B5CF6", palette: undefined },
-  pink: { hex: "#e0218a", palette: undefined },
+  red: { hex: "#EF4444" },
+  yellow: { hex: "#F59E0B" },
+  lime: { hex: "#9eb22e" },
+  green: { hex: "#10B981" },
+  blue: { hex: "#3B82F6" },
+  indigo: { hex: "#6366F1" },
+  purple: { hex: "#8B5CF6" },
+  pink: { hex: "#e0218a" },
 };
 
 export function useColors() {

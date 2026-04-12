@@ -34,6 +34,7 @@ function App() {
           <div className="slider-row">
             <input
               type="range"
+              role="slider"
               min={0}
               max={MAX_LIGHT_PADDING_PERCENT}
               step={1}
@@ -45,6 +46,7 @@ function App() {
             </span>
             <input
               type="range"
+              role="slider"
               min={0}
               max={MAX_DARK_PADDING_PERCENT}
               step={1}

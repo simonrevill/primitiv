@@ -128,7 +128,7 @@ pub use crate::palette::generator::generate_greyscale_oklch as generate_greyscal
 
 The Tsify/wasm-abi work moved to `crates/harmoni-wasm/src/types.rs`,
 which holds mirror types that shadow the core structs field-for-field
-(`OklchLabel`, `OklchStep`, `ContrastResult`, `Palette`) and derive
+(`SwatchLabel`, `SwatchStep`, `ContrastResult`, `Swatch`) and derive
 `Tsify`. Each has `From<harmoni_core::*>` so wasm entry points convert
 at the boundary:
 
@@ -138,22 +138,28 @@ api::audit_contrast(...)
     .map_err(to_js_error)
 ```
 
-The opaque `PaletteArray` extern type pattern is kept because
-`Vec<T>` isn't a first-class wasm-abi return type:
+An opaque `Palette` extern type is used because `Vec<T>` isn't a
+first-class wasm-abi return type. A `typescript_custom_section`
+emits `export type Palette = Swatch[]` so the TS side gets a named
+type alias matching the engine's vocabulary:
 
 ```rust
+#[wasm_bindgen(typescript_custom_section)]
+const TS_PALETTE: &'static str = r#"
+export type Palette = Swatch[];
+"#;
+
 #[wasm_bindgen]
 extern "C" {
-    #[wasm_bindgen(typescript_type = "Palette[]")]
-    pub type PaletteArray;
+    #[wasm_bindgen(typescript_type = "Palette")]
+    pub type Palette;
 }
 ```
 
-The TypeScript type `Palette` in the generated `.d.ts` comes from
-Tsify's `typescript_custom_section` emission on `types::Palette`
-— which is why the mirror type keeps the same struct name as the
-core type. The web app's `import { type Palette } from "harmoni-wasm"`
-still resolves because the emitted type name is identical.
+The TypeScript type `Swatch` in the generated `.d.ts` comes from
+Tsify's `typescript_custom_section` emission on `types::Swatch`.
+The web app's `import { type Palette } from "harmoni-wasm"` still
+resolves because the emitted type name is identical.
 
 ### Step B — rename
 
@@ -196,15 +202,37 @@ four product-name references listed above.
   `App.tsx`. The `test:e2e` script remains in root `package.json`
   and would fail with "no tests found" if run. Not yet replaced.
 
-## Current state (as of the Step B PR)
+## Vocabulary rename (post-Step B)
 
-- Step C, D, A, B are done and landed (PR #1 merged; PR #2 open
-  at time of writing).
+The user renamed the domain types to align with design-system
+language:
+
+- `OklchStep` → `SwatchStep` — a single colour point with l/c/h
+  and a label.
+- `OklchLabel` → `SwatchLabel` — the discriminated label on a
+  step (either a numeric scale position like `500` or a name like
+  `"White"`).
+- The struct formerly called `Palette` → `Swatch` — one item on a
+  lightness scale, carrying its foreground recommendation and
+  contrast metadata.
+- `pub type Palette = Vec<Swatch>` — a type alias so the whole
+  scale has a name. Generator return types simplify from
+  `Vec<Palette>` to `Palette`.
+
+The wasm mirror types (`types.rs`) and the web app's TypeScript
+were updated mechanically. `Swatch.tsx` aliases the import as
+`SwatchData` to avoid colliding with the React component name.
+
+## Current state (post vocabulary rename)
+
+- Steps C, D, A, B are done and landed (PRs #1, #2, #3 merged).
+- Vocabulary rename (`OklchStep`/`OklchLabel`/`Palette` →
+  `SwatchStep`/`SwatchLabel`/`Swatch` + `Palette` alias) is
+  complete across all Rust, wasm, TS, and documentation.
 - 47 core tests + 4 wasm conversion tests, all green.
 - `harmoni-core` has 3 direct deps (`csscolorparser`, `palette`,
   `serde`), 0 wasm/JS/TS concerns.
 - `harmoni-wasm` holds all Tsify/wasm-bindgen code.
-- No open architectural debt from the four-step refactor arc.
 
 ## Natural next moves (nothing here is committed to)
 
@@ -218,12 +246,12 @@ not instructions.
 - **Replace the stale Playwright test** with one that matches the
   current `App.tsx`. The workbench is useful to verify visually
   but there's nothing automated around it.
-- **Reconsider `OklchStep`.** The user mused early on: "I'm
-  wondering whether I even need the `OklchStep` anyway". Worth
-  revisiting now that the api surface is narrower and the
-  internal vs external types are cleanly separated. If it goes,
-  it'll cascade through `Palette`, `ForegroundRecommendation`,
-  and the mirror types.
+- **Lift per-swatch metadata to Palette level.** Fields like
+  `max_recommended_light_padding`, `max_recommended_dark_padding`,
+  and `note` are currently duplicated on every `Swatch`. They
+  logically belong on the palette (they're the same for every
+  swatch in a given palette). If/when `Palette` becomes a struct
+  instead of a type alias, these could move there.
 - **Fix the broken `build:core` pnpm script** — see Things that
   caught me out.
 - **Add a real LICENSE** — README currently says `TBD`.

@@ -8,23 +8,23 @@ import "./App.scss";
 import { Palette as ColorPalette } from "./Palette";
 
 function App() {
-  const [greyscalePalette, setGreyscalePalette] = useState<Palette[]>();
+  const [greyscalePalette, setGreyscalePalette] = useState<Palette>();
   const [redColor, setRedColor] = useState("#EF4444");
-  const [redPalette, setRedPalette] = useState<Palette[]>();
+  const [redPalette, setRedPalette] = useState<Palette>();
   const [yellowColor, setYellowColor] = useState("#F59E0B");
-  const [yellowPalette, setYellowPalette] = useState<Palette[]>();
+  const [yellowPalette, setYellowPalette] = useState<Palette>();
   const [limeColor, setLimeColor] = useState("#9eb22e");
-  const [limePalette, setLimePalette] = useState<Palette[]>();
+  const [limePalette, setLimePalette] = useState<Palette>();
   const [greenColor, setGreenColor] = useState("#10B981");
-  const [greenPalette, setGreenPalette] = useState<Palette[]>();
+  const [greenPalette, setGreenPalette] = useState<Palette>();
   const [blueColor, setBlueColor] = useState("#3B82F6");
-  const [bluePalette, setBluePalette] = useState<Palette[]>();
+  const [bluePalette, setBluePalette] = useState<Palette>();
   const [indigoColor, setIndigoColor] = useState("#6366F1");
-  const [indigoPalette, setIndigoPalette] = useState<Palette[]>();
+  const [indigoPalette, setIndigoPalette] = useState<Palette>();
   const [purpleColor, setPurpleColor] = useState("#8B5CF6");
-  const [purplePalette, setPurplePalette] = useState<Palette[]>();
+  const [purplePalette, setPurplePalette] = useState<Palette>();
   const [pinkColor, setPinkColor] = useState("#e0218a");
-  const [pinkPalette, setPinkPalette] = useState<Palette[]>();
+  const [pinkPalette, setPinkPalette] = useState<Palette>();
 
   // const TARGET_LIGHTNESS = [
   //   0.97, 0.91, 0.83, 0.76, 0.67, 0.55, 0.45, 0.32, 0.22, 0.15,

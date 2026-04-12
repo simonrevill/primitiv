@@ -1,7 +1,7 @@
-import { type Palette } from "harmoni-wasm";
+import { type Swatch as SwatchData } from "harmoni-wasm";
 
 export type SwatchProps = {
-  step: Palette;
+  step: SwatchData;
   index: number;
 };
 

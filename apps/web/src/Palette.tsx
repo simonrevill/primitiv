@@ -2,7 +2,7 @@ import { type Palette } from "harmoni-wasm";
 import { Swatch } from "./Swatch";
 
 export type PaletteProps = {
-  palette?: Palette[];
+  palette?: Palette;
 };
 
 export function Palette({ palette }: PaletteProps) {

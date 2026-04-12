@@ -5,4 +5,4 @@ pub mod palette;
 
 pub use audit::contrast::ContrastResult;
 pub use color::input::{ColorInput, ColorInputError};
-pub use palette::generator::{OklchLabel, OklchStep, Palette};
+pub use palette::generator::{Palette, Swatch, SwatchLabel, SwatchStep};

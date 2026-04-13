@@ -112,12 +112,36 @@ export function useColors() {
       });
     };
 
+  const handleLightnessCurveChange =
+    (key: ColorKey, index: number) => (e: ChangeEvent<HTMLInputElement>) => {
+      const value = parseFloat(e.target.value);
+
+      setColors((prev) => {
+        const prevLightness = prev[key].lightnessArray ?? DEFAULT_LIGHTNESS;
+        const lightnessArray = prevLightness.map((v, i) => (i === index ? value : v));
+        return {
+          ...prev,
+          [key]: {
+            ...prev[key],
+            lightnessArray,
+            palette: generate_palette_with_lightness(
+              prev[key].hex,
+              lightnessArray,
+              prev[key].lightPadding ?? 0,
+              prev[key].darkPadding ?? 0,
+            ),
+          },
+        };
+      });
+    };
+
   return {
     greyscalePalette,
     handleColorChange,
     colors,
     handleLightPaddingChange,
     handleDarkPaddingChange,
+    handleLightnessCurveChange,
     STANDARD_KEYS,
   };
 }

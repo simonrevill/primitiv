@@ -9,6 +9,7 @@ function App() {
     colors,
     handleLightPaddingChange,
     handleDarkPaddingChange,
+    handleLightnessCurveChange,
     STANDARD_KEYS,
   } = useColors();
 
@@ -49,9 +50,9 @@ function App() {
                   </span>
                 </div>
                 <div className="palette__slider-container palette__slider-container--curve-editor">
-                  {palette?.lightness_curve.map((node) => (
+                  {palette?.lightness_curve.map((node, index) => (
                     <input
-                      key={node}
+                      key={index}
                       className="palette__slider palette__slider--curve"
                       type="range"
                       role="slider"
@@ -59,6 +60,7 @@ function App() {
                       max={1}
                       step={0.01}
                       value={node}
+                      onChange={handleLightnessCurveChange(key, index)}
                     />
                   ))}
                 </div>

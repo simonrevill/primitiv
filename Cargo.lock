@@ -86,6 +86,7 @@ name = "harmoni-wasm"
 version = "0.1.0"
 dependencies = [
  "harmoni-core",
+ "js-sys",
  "palette",
  "serde",
  "serde-wasm-bindgen",

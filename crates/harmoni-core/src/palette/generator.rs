@@ -54,10 +54,12 @@ pub struct Swatch {
 
 /// A generated palette is a sequence of `Swatch`es — the items on a
 /// lightness scale for a single hue. Includes metadata computed once
-/// for the entire palette (based on hue) rather than per-swatch.
+/// for the entire palette (based on hue) rather than per-swatch, and the
+/// lightness curve used to generate the palette.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct Palette {
     pub swatches: Vec<Swatch>,
+    pub lightness_curve: [f32; 10],
     pub max_recommended_light_padding: f32,
     pub max_recommended_dark_padding: f32,
     pub note: String,
@@ -135,7 +137,7 @@ fn get_max_recommended_dark_padding(hue: f32) -> f32 {
 
 pub fn generate_palette_with_scale(
     base_500: Oklch,
-    lightness_scale: &[f32],
+    lightness_scale: &[f32; 10],
     chroma_scale: &[f32],
     light_padding: f32,
     dark_padding: f32,
@@ -206,6 +208,7 @@ pub fn generate_palette_with_scale(
 
     Palette {
         swatches,
+        lightness_curve: *lightness_scale,
         max_recommended_light_padding: get_max_recommended_light_padding(base_hue),
         max_recommended_dark_padding: get_max_recommended_dark_padding(base_hue),
         note: "".to_string(),

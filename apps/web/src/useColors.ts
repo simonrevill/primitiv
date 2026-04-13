@@ -43,9 +43,6 @@ export function useColors() {
     });
   }, [wasmReady]);
 
-  const MAX_LIGHT_PADDING_PERCENT = 32;
-  const MAX_DARK_PADDING_PERCENT = 20;
-
   const handleColorChange =
     (key: ColorKey) => (e: ChangeEvent<HTMLInputElement>) => {
       const hex = e.target.value;

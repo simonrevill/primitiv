@@ -14,7 +14,7 @@ function App() {
 
   return (
     <main className="container">
-      <h1>Primitiv Engine</h1>
+      <h1>Harmoni Color Engine</h1>
       <div className="palettes-grid">
         <div className="palette palette--no-picker">
           <p className="palette__label">Greyscale</p>

@@ -1,12 +1,34 @@
 mod types;
 
 use wasm_bindgen::prelude::*;
+use js_sys::Array;
 
 use harmoni_core::api::{self, GenerateOptions};
 use harmoni_core::ColorInput;
 
 fn to_js_error(e: impl std::fmt::Debug) -> JsError {
     JsError::new(&format!("Invalid color input: {:?}", e))
+}
+
+fn array_to_lightness(js_array: Array) -> Result<[f32; 10], JsError> {
+    if js_array.length() != 10 {
+        return Err(JsError::new(&format!(
+            "Lightness array must have exactly 10 values, got {}",
+            js_array.length()
+        )));
+    }
+
+    let mut lightness = [0.0f32; 10];
+    for i in 0..10 {
+        let value = js_array.get(i as u32);
+        let f = value
+            .as_f64()
+            .ok_or_else(|| JsError::new(&format!("Lightness at index {} is not a number", i)))?
+            as f32;
+        lightness[i] = f;
+    }
+
+    Ok(lightness)
 }
 
 fn palette_to_js(palette_data: harmoni_core::Palette) -> Result<Palette, JsError> {
@@ -47,6 +69,28 @@ pub fn generate_palette(
 ) -> Result<Palette, JsError> {
     let palette_data = api::generate_with_options(
         ColorInput::Css(hex.to_string()),
+        GenerateOptions {
+            light_padding,
+            dark_padding,
+        },
+    )
+    .map_err(to_js_error)?;
+
+    palette_to_js(palette_data)
+}
+
+#[wasm_bindgen]
+pub fn generate_palette_with_lightness(
+    hex: &str,
+    lightness: Array,
+    light_padding: f32,
+    dark_padding: f32,
+) -> Result<Palette, JsError> {
+    let lightness_curve = array_to_lightness(lightness)?;
+
+    let palette_data = api::generate_with_lightness(
+        ColorInput::Css(hex.to_string()),
+        lightness_curve,
         GenerateOptions {
             light_padding,
             dark_padding,

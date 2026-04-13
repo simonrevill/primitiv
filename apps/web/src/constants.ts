@@ -1,5 +1,7 @@
 import type { ColorMap, ColorKey } from "./types";
 
+export const DEFAULT_LIGHTNESS: number[] = [0.97, 0.91, 0.83, 0.76, 0.67, 0.55, 0.45, 0.32, 0.22, 0.15];
+
 export const DEFAULT_COLORS: ColorMap = {
   red: { hex: "#EF4444" },
   yellow: { hex: "#F59E0B" },

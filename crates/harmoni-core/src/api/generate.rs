@@ -1,7 +1,7 @@
 // Palette generation entry points for adapters.
 
 use crate::color::input::{ColorInput, ColorInputError};
-use crate::palette::generator::{generate_palette, generate_palette_with_scale, Palette, TARGET_LIGHTNESS, TARGET_CHROMA_SCALE, validate_lightness_curve};
+use crate::palette::generator::{generate_palette, generate_palette_with_scale, Palette, TARGET_CHROMA_SCALE, validate_lightness_curve};
 
 #[derive(Debug, Clone, Default, PartialEq)]
 pub struct GenerateOptions {

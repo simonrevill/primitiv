@@ -484,6 +484,58 @@ mod generator_tests {
             // Assert: Default palette should use TARGET_LIGHTNESS
             assert_eq!(palette.lightness_curve, TARGET_LIGHTNESS);
         }
+
+        #[test]
+        fn validate_accepts_arbitrary_valid_lightness_array() {
+            // Test with non-monotonic array - this should be valid
+            let arbitrary = [0.50, 0.95, 0.40, 0.80, 0.30, 0.70, 0.20, 0.60, 0.10, 0.99];
+            assert!(validate_lightness_curve(arbitrary).is_ok());
+        }
+
+        #[test]
+        fn validate_accepts_all_same_values() {
+            // All values the same should be valid (0.5, 0.5, 0.5, ...)
+            let all_same = [0.50; 10];
+            assert!(validate_lightness_curve(all_same).is_ok());
+        }
+
+        #[test]
+        fn validate_rejects_value_below_zero() {
+            // Array with a negative value should fail
+            let invalid = [0.97, 0.91, 0.83, 0.76, 0.67, 0.55, 0.45, 0.32, 0.22, -0.05];
+            let result = validate_lightness_curve(invalid);
+            assert!(result.is_err());
+            assert!(result.unwrap_err().contains("out of range"));
+        }
+
+        #[test]
+        fn validate_rejects_value_above_one() {
+            // Array with a value > 1.0 should fail
+            let invalid = [1.05, 0.91, 0.83, 0.76, 0.67, 0.55, 0.45, 0.32, 0.22, 0.15];
+            let result = validate_lightness_curve(invalid);
+            assert!(result.is_err());
+            assert!(result.unwrap_err().contains("out of range"));
+        }
+
+        #[test]
+        fn validate_rejects_multiple_out_of_range_values() {
+            // First error should be reported
+            let invalid = [1.1, 0.91, 0.83, 0.76, 0.67, 0.55, 0.45, 0.32, 0.22, -0.1];
+            let result = validate_lightness_curve(invalid);
+            assert!(result.is_err());
+            assert!(result.unwrap_err().contains("index 0"));
+        }
+
+        #[test]
+        fn validate_reports_error_at_correct_index() {
+            // Value at index 5 is out of range
+            let invalid = [0.97, 0.91, 0.83, 0.76, 0.67, 1.5, 0.45, 0.32, 0.22, 0.15];
+            let result = validate_lightness_curve(invalid);
+            assert!(result.is_err());
+            let err = result.unwrap_err();
+            assert!(err.contains("index 5"));
+            assert!(err.contains("1.5"));
+        }
     }
 }
 }

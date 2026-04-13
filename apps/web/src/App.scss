@@ -33,7 +33,10 @@ $border-radius: 0.5rem;
   }
 
   &__steps {
-    display: flex;
+    // display: flex;
+    // grid-column: 1 / 11;
+    display: grid;
+    grid-template-columns: subgrid;
     grid-column: 1 / 11;
   }
 

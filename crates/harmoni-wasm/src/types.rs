@@ -92,6 +92,7 @@ impl From<core::Swatch> for Swatch {
 #[tsify(into_wasm_abi, from_wasm_abi)]
 pub struct Palette {
     pub swatches: Vec<Swatch>,
+    pub lightness_curve: [f32; 10],
     pub max_recommended_light_padding: f32,
     pub max_recommended_dark_padding: f32,
     pub note: String,
@@ -101,6 +102,7 @@ impl From<core::Palette> for Palette {
     fn from(value: core::Palette) -> Self {
         Palette {
             swatches: value.swatches.into_iter().map(Into::into).collect(),
+            lightness_curve: value.lightness_curve,
             max_recommended_light_padding: value.max_recommended_light_padding,
             max_recommended_dark_padding: value.max_recommended_dark_padding,
             note: value.note,

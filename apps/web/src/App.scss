@@ -3,8 +3,10 @@ $border-color: #ccc;
 $border-radius: 0.5rem;
 
 .container {
+  display: grid;
   padding: 2rem;
-  max-width: 90rem;
+  grid-template-columns: 1fr;
+  max-width: 62rem;
   margin: 0 auto;
 
   h1 {
@@ -20,12 +22,12 @@ $border-radius: 0.5rem;
 .palette {
   display: grid;
   grid-template-columns: repeat(10, 1fr);
-  grid-template-rows: repeat(2, auto) 5rem;
-  row-gap: 0.25rem;
-
-  &--no-picker {
-    grid-template-columns: 1fr;
-  }
+  grid-template-rows: 1fr 8rem;
+  row-gap: 1rem;
+  min-width: 0;
+  padding-block-end: 1rem;
+  margin-block-end: 1rem;
+  border: 0.0625rem solid #4f4f4f;
 
   &__label {
     color: oklch(1 0 0);
@@ -58,8 +60,8 @@ $border-radius: 0.5rem;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    min-width: 9rem;
-    height: 4rem;
+    width: 100%;
+    height: 6rem;
 
     p {
       font-size: 0.75rem;
@@ -71,35 +73,35 @@ $border-radius: 0.5rem;
     display: grid;
     grid-template-columns: subgrid;
     grid-column: 1 / -1;
+    grid-row: 2 / 3;
   }
 
-  &__slider-container {
-    &--light-padding {
-      grid-column: 1;
-    }
-
-    &--curve-editor {
-      grid-column: 2 / 10;
-      display: grid;
-      grid-template-columns: repeat(10, 1fr);
-      // display: flex;
-      // justify-content: flex-start;
-
-      .palette__slider {
-        width: 5rem;
-      }
-    }
-
-    &--dark-padding {
-      grid-column: -1;
-    }
+  &__curve-editor {
+    grid-column: 1 / 11;
+    grid-row: 2 / 3;
+    display: grid;
+    grid-template-columns: subgrid;
+    // display: flex;
+    // justify-content: flex-start;
   }
+}
 
-  &__slider {
-    &--curve {
-      background: red;
-      transform-origin: center center;
-      transform: rotate(90deg);
-    }
+input[type="range"][role="slider"].palette__slider {
+  width: 100%;
+  height: 100%;
+  line-height: 1;
+  margin: 0;
+
+  &--curve {
+    -webkit-appearance: slider-vertical;
+    background: red;
+    transform-origin: center center;
+    transform: rotate(180deg);
   }
+}
+
+.palette-padding {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }

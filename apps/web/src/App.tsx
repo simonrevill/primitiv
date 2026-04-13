@@ -17,69 +17,77 @@ function App() {
     <main className="container">
       <h1>Harmoni Color Engine</h1>
       <div className="palettes-grid">
-        <div className="palette palette--no-picker">
-          <p className="palette__label">Greyscale</p>
-          <ColorPalette palette={greyscalePalette} />
+        <div className="palette-container">
+          <div className="palette">
+            <p className="palette__label">Greyscale</p>
+            <ColorPalette palette={greyscalePalette} />
+          </div>
         </div>
 
         {STANDARD_KEYS.map((key) => {
           const { hex, palette, lightPadding, darkPadding } = colors[key];
 
           return (
-            <div key={key} className="palette">
+            <>
               <p className="palette__label">Red</p>
               <input
                 type="color"
                 onChange={handleColorChange(key)}
                 value={hex}
               />
-              <ColorPalette palette={palette} />
-              <div className="palette__editor">
-                <div className="palette__slider-container palette__slider-container--light-padding">
-                  <input
-                    type="range"
-                    role="slider"
-                    min={0}
-                    max={(palette?.max_recommended_light_padding ?? 0) * 100}
-                    step={1}
-                    value={(lightPadding ?? 0) * 100}
-                    onChange={handleLightPaddingChange(key)}
-                  />
-                  <span className="slider-label">
-                    {((lightPadding ?? 0) * 100).toFixed(0)}%
-                  </span>
+              <div key={key} className="palette-container">
+                <div key={key} className="palette">
+                  <ColorPalette palette={palette} />
+                  {/* <div className="palette__editor"> */}
+                  <div className="palette__curve-editor">
+                    {palette?.lightness_curve.map((node, index) => (
+                      <input
+                        key={index}
+                        className="palette__slider palette__slider--curve"
+                        type="range"
+                        role="slider"
+                        min={0}
+                        max={1}
+                        step={0.01}
+                        value={node}
+                        onChange={handleLightnessCurveChange(key, index)}
+                      />
+                    ))}
+                  </div>
+                  {/* </div> */}
                 </div>
-                <div className="palette__slider-container palette__slider-container--curve-editor">
-                  {palette?.lightness_curve.map((node, index) => (
+                <div className="palette-padding">
+                  <div className="palette__slider-container palette__slider-container--light-padding">
                     <input
-                      key={index}
-                      className="palette__slider palette__slider--curve"
                       type="range"
                       role="slider"
                       min={0}
-                      max={1}
-                      step={0.01}
-                      value={node}
-                      onChange={handleLightnessCurveChange(key, index)}
+                      max={(palette?.max_recommended_light_padding ?? 0) * 100}
+                      step={1}
+                      value={(lightPadding ?? 0) * 100}
+                      onChange={handleLightPaddingChange(key)}
                     />
-                  ))}
-                </div>
-                <div className="palette__slider-container palette__slider-container--dark-padding">
-                  <input
-                    type="range"
-                    role="slider"
-                    min={0}
-                    max={(palette?.max_recommended_dark_padding ?? 0) * 100}
-                    step={1}
-                    value={(darkPadding ?? 0) * 100}
-                    onChange={handleDarkPaddingChange(key)}
-                  />
-                  <span className="slider-label">
-                    {((darkPadding ?? 0) * 100).toFixed(0)}%
-                  </span>
+                    <span className="slider-label">
+                      {((lightPadding ?? 0) * 100).toFixed(0)}%
+                    </span>
+                  </div>
+                  <div className="palette__slider-container palette__slider-container--dark-padding">
+                    <input
+                      type="range"
+                      role="slider"
+                      min={0}
+                      max={(palette?.max_recommended_dark_padding ?? 0) * 100}
+                      step={1}
+                      value={(darkPadding ?? 0) * 100}
+                      onChange={handleDarkPaddingChange(key)}
+                    />
+                    <span className="slider-label">
+                      {((darkPadding ?? 0) * 100).toFixed(0)}%
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
+            </>
           );
         })}
       </div>

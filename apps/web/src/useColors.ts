@@ -1,7 +1,7 @@
 import init, {
   type Palette,
   generate_greyscale_oklch,
-  generate_palette,
+  generate_palette_with_lightness,
 } from "harmoni-wasm";
 import { useState, useEffect, ChangeEvent } from "react";
 
@@ -18,9 +18,12 @@ type ColorKey =
 type ColorConfig = {
   hex: string;
   palette?: Palette;
+  lightnessArray?: number[];
   lightPadding?: number;
   darkPadding?: number;
 };
+
+const DEFAULT_LIGHTNESS: number[] = [0.97, 0.91, 0.83, 0.76, 0.67, 0.55, 0.45, 0.32, 0.22, 0.15];
 
 const DEFAULT_COLORS: Record<ColorKey, ColorConfig> = {
   red: { hex: "#EF4444" },
@@ -53,9 +56,16 @@ export function useColors() {
 
       for (const key of Object.keys(next) as ColorKey[]) {
         const { hex, lightPadding = 0, darkPadding = 0 } = next[key];
+        const lightnessArray = next[key].lightnessArray ?? DEFAULT_LIGHTNESS;
         next[key] = {
           ...next[key],
-          palette: generate_palette(hex, lightPadding, darkPadding),
+          lightnessArray,
+          palette: generate_palette_with_lightness(
+            hex,
+            lightnessArray,
+            lightPadding,
+            darkPadding,
+          ),
         };
       }
 
@@ -80,52 +90,67 @@ export function useColors() {
     (key: ColorKey) => (e: ChangeEvent<HTMLInputElement>) => {
       const hex = e.target.value;
 
-      setColors((prev) => ({
-        ...prev,
-        [key]: {
-          ...prev[key],
-          hex,
-          palette: generate_palette(
+      setColors((prev) => {
+        const lightnessArray = prev[key].lightnessArray ?? DEFAULT_LIGHTNESS;
+        return {
+          ...prev,
+          [key]: {
+            ...prev[key],
             hex,
-            prev[key].lightPadding ?? 0,
-            prev[key].darkPadding ?? 0,
-          ),
-        },
-      }));
+            lightnessArray,
+            palette: generate_palette_with_lightness(
+              hex,
+              lightnessArray,
+              prev[key].lightPadding ?? 0,
+              prev[key].darkPadding ?? 0,
+            ),
+          },
+        };
+      });
     };
 
   const handleLightPaddingChange = (e: ChangeEvent<HTMLInputElement>) => {
     const lightPadding = parseFloat(e.target.value) / 100;
 
-    setColors((prev) => ({
-      ...prev,
-      red: {
-        ...prev.red,
-        lightPadding,
-        palette: generate_palette(
-          prev.red.hex,
+    setColors((prev) => {
+      const lightnessArray = prev.red.lightnessArray ?? DEFAULT_LIGHTNESS;
+      return {
+        ...prev,
+        red: {
+          ...prev.red,
           lightPadding,
-          prev.red.darkPadding ?? 0,
-        ),
-      },
-    }));
+          lightnessArray,
+          palette: generate_palette_with_lightness(
+            prev.red.hex,
+            lightnessArray,
+            lightPadding,
+            prev.red.darkPadding ?? 0,
+          ),
+        },
+      };
+    });
   };
 
   const handleDarkPaddingChange = (e: ChangeEvent<HTMLInputElement>) => {
     const darkPadding = parseFloat(e.target.value) / 100;
 
-    setColors((prev) => ({
-      ...prev,
-      red: {
-        ...prev.red,
-        darkPadding,
-        palette: generate_palette(
-          prev.red.hex,
-          prev.red.lightPadding ?? 0,
+    setColors((prev) => {
+      const lightnessArray = prev.red.lightnessArray ?? DEFAULT_LIGHTNESS;
+      return {
+        ...prev,
+        red: {
+          ...prev.red,
           darkPadding,
-        ),
-      },
-    }));
+          lightnessArray,
+          palette: generate_palette_with_lightness(
+            prev.red.hex,
+            lightnessArray,
+            prev.red.lightPadding ?? 0,
+            darkPadding,
+          ),
+        },
+      };
+    });
   };
 
   return {

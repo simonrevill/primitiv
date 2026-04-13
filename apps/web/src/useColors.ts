@@ -119,8 +119,6 @@ export function useColors() {
     greyscalePalette,
     handleColorChange,
     colors,
-    MAX_LIGHT_PADDING_PERCENT,
-    MAX_DARK_PADDING_PERCENT,
     handleLightPaddingChange,
     handleDarkPaddingChange,
     STANDARD_KEYS,

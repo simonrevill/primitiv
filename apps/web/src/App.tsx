@@ -7,8 +7,6 @@ function App() {
     greyscalePalette,
     handleColorChange,
     colors,
-    MAX_LIGHT_PADDING_PERCENT,
-    MAX_DARK_PADDING_PERCENT,
     handleLightPaddingChange,
     handleDarkPaddingChange,
     STANDARD_KEYS,
@@ -23,50 +21,46 @@ function App() {
           <ColorPalette palette={greyscalePalette} />
         </div>
 
-        <div className="palette">
-          <p className="palette__label">Red</p>
-          <input
-            type="color"
-            onChange={handleColorChange("red")}
-            value={colors.red.hex}
-          />
-          <ColorPalette palette={colors.red.palette} />
-          <div className="slider-row">
-            <input
-              type="range"
-              min={0}
-              max={MAX_LIGHT_PADDING_PERCENT}
-              step={1}
-              value={(colors.red.lightPadding ?? 0) * 100}
-              onChange={handleLightPaddingChange}
-            />
-            <span className="slider-label">
-              {((colors.red.lightPadding ?? 0) * 100).toFixed(0)}%
-            </span>
-            <input
-              type="range"
-              min={0}
-              max={MAX_DARK_PADDING_PERCENT}
-              step={1}
-              value={(colors.red.darkPadding ?? 0) * 100}
-              onChange={handleDarkPaddingChange}
-            />
-            <span className="slider-label">
-              {((colors.red.darkPadding ?? 0) * 100).toFixed(0)}%
-            </span>
-          </div>
-        </div>
         {STANDARD_KEYS.map((key) => (
           <div key={key} className="palette">
-            <p className="palette__label">
-              {key.charAt(0).toUpperCase() + key.slice(1)}
-            </p>
+            <p className="palette__label">Red</p>
             <input
               type="color"
-              onChange={handleColorChange(key)}
+              onChange={handleColorChange("red")}
               value={colors[key].hex}
             />
             <ColorPalette palette={colors[key].palette} />
+            <div className="slider-row">
+              <input
+                type="range"
+                role="slider"
+                min={0}
+                max={
+                  (colors[key].palette?.max_recommended_light_padding ?? 0) *
+                  100
+                }
+                step={1}
+                value={(colors[key].lightPadding ?? 0) * 100}
+                onChange={handleLightPaddingChange(key)}
+              />
+              <span className="slider-label">
+                {((colors[key].lightPadding ?? 0) * 100).toFixed(0)}%
+              </span>
+              <input
+                type="range"
+                role="slider"
+                min={0}
+                max={
+                  (colors[key].palette?.max_recommended_dark_padding ?? 0) * 100
+                }
+                step={1}
+                value={(colors[key].darkPadding ?? 0) * 100}
+                onChange={handleDarkPaddingChange(key)}
+              />
+              <span className="slider-label">
+                {((colors[key].darkPadding ?? 0) * 100).toFixed(0)}%
+              </span>
+            </div>
           </div>
         ))}
       </div>

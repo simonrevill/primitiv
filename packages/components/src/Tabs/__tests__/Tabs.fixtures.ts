@@ -2,8 +2,10 @@ import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 export const arrowKeyCases = [
+  // LTR horizontal
   {
-    description: 'Horizontal: Right Arrow moves to next tab',
+    description: 'LTR Horizontal: Right Arrow moves to next tab',
+    dir: 'ltr',
     orientation: 'horizontal',
     defaultValue: 'tab1',
     key: '{ArrowRight}',
@@ -11,7 +13,8 @@ export const arrowKeyCases = [
     expectedDeselected: ['Tab 1', 'Tab 3'],
   },
   {
-    description: 'Horizontal: Left Arrow moves to previous tab',
+    description: 'LTR Horizontal: Left Arrow moves to previous tab',
+    dir: 'ltr',
     orientation: 'horizontal',
     defaultValue: 'tab2',
     key: '{ArrowLeft}',
@@ -19,7 +22,8 @@ export const arrowKeyCases = [
     expectedDeselected: ['Tab 2', 'Tab 3'],
   },
   {
-    description: 'Horizontal: Left Arrow wraps to last tab from first',
+    description: 'LTR Horizontal: Left Arrow wraps to last tab from first',
+    dir: 'ltr',
     orientation: 'horizontal',
     defaultValue: 'tab1',
     key: '{ArrowLeft}',
@@ -27,15 +31,55 @@ export const arrowKeyCases = [
     expectedDeselected: ['Tab 1', 'Tab 2'],
   },
   {
-    description: 'Horizontal: Right Arrow wraps to first tab from last',
+    description: 'LTR Horizontal: Right Arrow wraps to first tab from last',
+    dir: 'ltr',
     orientation: 'horizontal',
     defaultValue: 'tab3',
     key: '{ArrowRight}',
     expectedTab: 'Tab 1',
     expectedDeselected: ['Tab 2', 'Tab 3'],
   },
+  // RTL horizontal — ArrowLeft is "forward" (next), ArrowRight is "backward" (previous)
+  {
+    description: 'RTL Horizontal: Left Arrow moves to next tab',
+    dir: 'rtl',
+    orientation: 'horizontal',
+    defaultValue: 'tab1',
+    key: '{ArrowLeft}',
+    expectedTab: 'Tab 2',
+    expectedDeselected: ['Tab 1', 'Tab 3'],
+  },
+  {
+    description: 'RTL Horizontal: Right Arrow moves to previous tab',
+    dir: 'rtl',
+    orientation: 'horizontal',
+    defaultValue: 'tab2',
+    key: '{ArrowRight}',
+    expectedTab: 'Tab 1',
+    expectedDeselected: ['Tab 2', 'Tab 3'],
+  },
+  {
+    description: 'RTL Horizontal: Right Arrow wraps to last tab from first',
+    dir: 'rtl',
+    orientation: 'horizontal',
+    defaultValue: 'tab1',
+    key: '{ArrowRight}',
+    expectedTab: 'Tab 3',
+    expectedDeselected: ['Tab 1', 'Tab 2'],
+  },
+  {
+    description: 'RTL Horizontal: Left Arrow wraps to first tab from last',
+    dir: 'rtl',
+    orientation: 'horizontal',
+    defaultValue: 'tab3',
+    key: '{ArrowLeft}',
+    expectedTab: 'Tab 1',
+    expectedDeselected: ['Tab 2', 'Tab 3'],
+  },
+  // Vertical — unaffected by reading direction
   {
     description: 'Vertical: Down Arrow moves to next tab',
+    dir: 'ltr',
     orientation: 'vertical',
     defaultValue: 'tab1',
     key: '{ArrowDown}',
@@ -44,6 +88,7 @@ export const arrowKeyCases = [
   },
   {
     description: 'Vertical: Up Arrow moves to previous tab',
+    dir: 'ltr',
     orientation: 'vertical',
     defaultValue: 'tab2',
     key: '{ArrowUp}',
@@ -52,6 +97,7 @@ export const arrowKeyCases = [
   },
   {
     description: 'Vertical: Up Arrow wraps to last tab from first',
+    dir: 'ltr',
     orientation: 'vertical',
     defaultValue: 'tab1',
     key: '{ArrowUp}',
@@ -60,6 +106,7 @@ export const arrowKeyCases = [
   },
   {
     description: 'Vertical: Down Arrow wraps to first tab from last',
+    dir: 'ltr',
     orientation: 'vertical',
     defaultValue: 'tab3',
     key: '{ArrowDown}',

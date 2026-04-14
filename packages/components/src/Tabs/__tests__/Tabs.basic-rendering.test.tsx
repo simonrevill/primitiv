@@ -171,8 +171,11 @@ describe("Tabs basic rendering tests", () => {
       (orientation) => {
         // Arrange
         render(
-          <Tabs.Root orientation={orientation}>
-            <Tabs.List label="test label" />
+          <Tabs.Root defaultValue="tab1" orientation={orientation}>
+            <Tabs.List label="test label">
+              <Tabs.Trigger value="tab1" />
+            </Tabs.List>
+            <Tabs.Content value="tab1" />
           </Tabs.Root>,
         );
         const tabList = screen.getByRole("tablist");
@@ -330,11 +333,11 @@ describe("Tabs basic rendering tests", () => {
     it("should render the Tabs.Content component", () => {
       // Arrange
       render(
-        <Tabs.Root>
+        <Tabs.Root defaultValue="tab1">
           <Tabs.List label="test label">
             <Tabs.Trigger value="tab1" />
           </Tabs.List>
-          <Tabs.Content />
+          <Tabs.Content value="tab1" />
         </Tabs.Root>,
       );
       const tabContent = screen.getByRole("tabpanel");
@@ -346,11 +349,11 @@ describe("Tabs basic rendering tests", () => {
       // Arrange
       const testClass = "test-class";
       render(
-        <Tabs.Root>
+        <Tabs.Root defaultValue="tab1">
           <Tabs.List label="test label">
             <Tabs.Trigger value="tab1" />
           </Tabs.List>
-          <Tabs.Content className={testClass} />
+          <Tabs.Content value="tab1" className={testClass} />
         </Tabs.Root>,
       );
       const tabContent = screen.getByRole("tabpanel");
@@ -361,11 +364,11 @@ describe("Tabs basic rendering tests", () => {
     it("should apply a className of empty string by default when not specified", () => {
       // Arrange
       render(
-        <Tabs.Root>
+        <Tabs.Root defaultValue="tab1">
           <Tabs.List label="test label">
             <Tabs.Trigger value="tab1" />
           </Tabs.List>
-          <Tabs.Content />
+          <Tabs.Content value="tab1" />
         </Tabs.Root>,
       );
       const tabContent = screen.getByRole("tabpanel");
@@ -376,11 +379,11 @@ describe("Tabs basic rendering tests", () => {
     it("should render children correctly", () => {
       // Arrange
       render(
-        <Tabs.Root>
+        <Tabs.Root defaultValue="tab1">
           <Tabs.List label="test label">
             <Tabs.Trigger value="tab1" />
           </Tabs.List>
-          <Tabs.Content>
+          <Tabs.Content value="tab1">
             <p>Test Content</p>
           </Tabs.Content>
         </Tabs.Root>,
@@ -429,11 +432,11 @@ describe("Tabs basic rendering tests", () => {
     it('should render a data-orientation attribute of "horizontal" by default when not specified', () => {
       // Arrange
       render(
-        <Tabs.Root>
+        <Tabs.Root defaultValue="tab1">
           <Tabs.List label="test label">
             <Tabs.Trigger value="tab1" />
           </Tabs.List>
-          <Tabs.Content />
+          <Tabs.Content value="tab1" />
         </Tabs.Root>,
       );
       const tabContent = screen.getByRole("tabpanel");
@@ -447,11 +450,11 @@ describe("Tabs basic rendering tests", () => {
       (orientation) => {
         // Arrange
         render(
-          <Tabs.Root orientation={orientation}>
+          <Tabs.Root defaultValue="tab1" orientation={orientation}>
             <Tabs.List label="test label">
               <Tabs.Trigger value="tab1" />
             </Tabs.List>
-            <Tabs.Content />
+            <Tabs.Content value="tab1" />
           </Tabs.Root>,
         );
         const tabContent = screen.getByRole("tabpanel");
@@ -466,10 +469,10 @@ describe("Tabs basic rendering tests", () => {
     it.each([
       ["Tabs.List", () => <Tabs.List label="test label" />],
       ["Tabs.Trigger", () => <Tabs.Trigger value="tab1" />],
-      ["Tabs.Content", () => <Tabs.Content />],
+      ["Tabs.Content", () => <Tabs.Content value="tab1" />],
     ] as const)(
       "should throw an error when %s is used outside Tabs.Root",
-      (componentName, ComponentRenderer) => {
+      (_, ComponentRenderer) => {
         // Arrange & Act & Assert
         expect(() => {
           render(ComponentRenderer());

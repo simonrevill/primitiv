@@ -55,7 +55,7 @@ export type TabsTriggerProps = ComponentProps<"button"> & {
 };
 
 export type TabsContentProps = ComponentProps<"div"> & {
-  value?: string;
+  value: string;
 };
 
 export type TabsKeyActionsKey =

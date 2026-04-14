@@ -17,9 +17,9 @@ function App() {
     <main className="container">
       <h1>Harmoni Color Engine</h1>
       <div className="palettes-grid">
+        <p className="palette__label">Greyscale</p>
         <div className="palette-container">
           <div className="palette">
-            <p className="palette__label">Greyscale</p>
             <ColorPalette palette={greyscalePalette} />
           </div>
         </div>
@@ -38,9 +38,8 @@ function App() {
               <div key={key} className="palette-container">
                 <div key={key} className="palette">
                   <ColorPalette palette={palette} />
-                  {/* <div className="palette__editor"> */}
                   <div className="palette__curve-editor">
-                    {palette?.lightness_curve.map((node, index) => (
+                    {palette?.lightness_curve.map((lightnessValue, index) => (
                       <input
                         key={index}
                         className="palette__slider palette__slider--curve"
@@ -49,12 +48,11 @@ function App() {
                         min={0}
                         max={1}
                         step={0.01}
-                        value={node}
+                        value={lightnessValue}
                         onChange={handleLightnessCurveChange(key, index)}
                       />
                     ))}
                   </div>
-                  {/* </div> */}
                 </div>
                 <div className="palette-padding">
                   <div className="palette__slider-container palette__slider-container--light-padding">

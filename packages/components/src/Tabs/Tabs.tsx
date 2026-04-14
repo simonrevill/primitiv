@@ -149,6 +149,7 @@ export function TabsList({
   children,
   className = "",
   label,
+  ariaLabelledBy,
   ...rest
 }: TabsListProps) {
   const { orientation } = useTabsContext();
@@ -158,7 +159,12 @@ export function TabsList({
       role="tablist"
       className={className}
       aria-orientation={orientation}
-      aria-label={label}
+      {...(label && {
+        "aria-label": label,
+      })}
+      {...(ariaLabelledBy && {
+        "aria-labelledby": ariaLabelledBy,
+      })}
       data-orientation={orientation}
       {...rest}
     >

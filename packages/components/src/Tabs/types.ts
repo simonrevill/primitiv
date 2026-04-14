@@ -41,8 +41,14 @@ export type TabsContextValue = {
   triggersRef: RefObject<Map<string, HTMLButtonElement>>;
 };
 
-export type TabsListProps = ComponentProps<"div"> & { label: string };
+type Without<T, K> = { [P in Exclude<keyof T, K>]?: never };
+type XOR<T, U> = (T & Without<U, keyof T>) | (U & Without<T, keyof U>);
 
+export type TabsListProps = Omit<
+  ComponentProps<"div">,
+  "label" | "aria-labelledby"
+> &
+  XOR<{ label: string }, { ariaLabelledBy: string }>;
 export type TabsTriggerProps = ComponentProps<"button"> & {
   disabled?: boolean;
   value: string;

@@ -67,7 +67,7 @@ describe("Tabs basic rendering tests", () => {
       expect(tabList).toBeVisible();
     });
 
-    it("should require a label prop", () => {
+    it("should require a label prop when aria-labelledby is not provided", () => {
       // Arrange
       const testLabel = "test label";
       render(
@@ -78,6 +78,24 @@ describe("Tabs basic rendering tests", () => {
       const tabList = screen.getByLabelText(testLabel);
 
       expect(tabList).toBeVisible();
+    });
+
+    it("should require an aria-labelledby prop when label is not provided", () => {
+      // Arrange
+      const testLabel = "test label";
+      const testLabelId = "#test-label";
+      render(
+        <>
+          <h2 id={testLabelId}>{testLabel}</h2>
+          <Tabs.Root>
+            <Tabs.List ariaLabelledBy={testLabelId} />
+          </Tabs.Root>
+          ,
+        </>,
+      );
+      const tabList = screen.getByLabelText(testLabel);
+
+      expect(tabList).toHaveAttribute("aria-labelledby", "#test-label");
     });
 
     it("should accept a className prop", () => {

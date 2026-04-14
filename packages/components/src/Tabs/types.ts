@@ -44,6 +44,7 @@ export type TabsContextValue = {
 export type TabsListProps = ComponentProps<"div"> & { label: string };
 
 export type TabsTriggerProps = ComponentProps<"button"> & {
+  disabled?: boolean;
   value: string;
 };
 

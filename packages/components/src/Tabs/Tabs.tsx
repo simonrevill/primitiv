@@ -213,6 +213,7 @@ export function TabsTrigger({
   className = "",
   value,
   onClick,
+  disabled = false,
   ...rest
 }: TabsTriggerProps) {
   const {

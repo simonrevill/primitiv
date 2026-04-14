@@ -237,6 +237,7 @@ export function TabsTrigger({
       id={triggerId}
       aria-controls={panelId}
       aria-selected={isActive}
+      aria-disabled={disabled}
       data-orientation={orientation}
       data-state={state}
       tabIndex={tabIndex}

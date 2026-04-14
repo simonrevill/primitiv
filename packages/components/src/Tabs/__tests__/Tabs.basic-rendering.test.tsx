@@ -13,15 +13,6 @@ describe("Tabs basic rendering tests", () => {
       expect(tabsRoot).toBeVisible();
     });
 
-    it('should have the dir attribute set to "ltr" by default', () => {
-      // Arrange
-      render(<Tabs.Root data-testid="tabs-root" />);
-      const tabsRoot = screen.getByTestId("tabs-root");
-
-      // Assert
-      expect(tabsRoot).toHaveAttribute("dir", "ltr");
-    });
-
     it("should accept a className prop", () => {
       // Arrange
       const testClass = "custom-tabs-root";

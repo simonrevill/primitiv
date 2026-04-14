@@ -2,6 +2,8 @@ import { ComponentProps, Dispatch, RefObject, SetStateAction } from "react";
 
 export type TabsOrientation = "horizontal" | "vertical";
 
+export type TabsReadingDirection = "ltr" | "rtl";
+
 export type TabMetadata = { index: number; name: string };
 
 export type BaseTabsRootProps = {
@@ -22,6 +24,7 @@ type ControlledTabsRootProps = {
 
 export type TabsRootProps = Omit<ComponentProps<"div">, "onChange"> & {
   orientation?: TabsOrientation;
+  dir?: TabsReadingDirection;
 } & BaseTabsRootProps &
   (UncontrolledTabsRootProps | ControlledTabsRootProps);
 

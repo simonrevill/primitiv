@@ -92,6 +92,7 @@ const TabsRoot = forwardRef<TabsImperativeApi, TabsRootProps>(function TabsRoot(
   {
     className = "",
     orientation = "horizontal",
+    dir = "ltr",
     defaultValue,
     value,
     onValueChange,
@@ -114,7 +115,7 @@ const TabsRoot = forwardRef<TabsImperativeApi, TabsRootProps>(function TabsRoot(
   return (
     <TabsProvider value={contextValue}>
       <div
-        dir="ltr"
+        dir={dir}
         className={className}
         data-orientation={contextValue.orientation}
         {...rest}

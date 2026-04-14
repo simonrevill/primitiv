@@ -1,19 +1,15 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import wasm from "vite-plugin-wasm"
-import topLevelAwait from "vite-plugin-top-level-await"
 
 export default defineConfig({
   plugins: [
     react(),
-    wasm(),
-    topLevelAwait()
+    wasm()
   ],
-  css: {
-    preprocessorOptions: {
-      scss: {
-        api: 'modern-compiler'
-      }
-    }
+  build: {
+    // Required by vite-plugin-wasm so top-level-await isn't downlevelled.
+    // Drops the need for vite-plugin-top-level-await on Vite >= 8.
+    target: 'esnext'
   }
 })

@@ -4,7 +4,10 @@ import {
   KeyToActionMapper,
 } from "./types";
 
-export function getTriggerAndPanelIds(tabsId: string, value?: string) {
+export function getTriggerAndPanelIds(
+  tabsId: string,
+  value: string | undefined,
+) {
   const triggerId = `${tabsId}-trigger-${value}`;
   const panelId = `${tabsId}-panel-${value}`;
 

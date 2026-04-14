@@ -1,6 +1,7 @@
-import "./App.scss";
+import { Tabs } from "@primitiv/components";
 import { Palette as ColorPalette } from "./Palette";
 import { useColors } from "./useColors";
+import "./App.scss";
 
 function App() {
   const {
@@ -84,6 +85,14 @@ function App() {
                     </span>
                   </div>
                 </div>
+                <Tabs.Root defaultValue="a">
+                  <Tabs.List label="Demo tabs">
+                    <Tabs.Trigger value="a">First</Tabs.Trigger>
+                    <Tabs.Trigger value="b">Second</Tabs.Trigger>
+                  </Tabs.List>
+                  <Tabs.Content value="a">First panel</Tabs.Content>
+                  <Tabs.Content value="b">Second panel</Tabs.Content>
+                </Tabs.Root>
               </div>
             </>
           );

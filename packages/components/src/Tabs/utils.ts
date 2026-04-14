@@ -1,8 +1,12 @@
-import { TabsOrientation, TabsReadingDirection, KeyToActionMapper } from "./types";
+import {
+  TabsOrientation,
+  TabsReadingDirection,
+  KeyToActionMapper,
+} from "./types";
 
 export function getTriggerAndPanelIds(
   tabsId: string,
-  value: string | number | readonly string[] | undefined,
+  value: string | undefined,
 ) {
   const triggerId = `${tabsId}-trigger-${value}`;
   const panelId = `${tabsId}-panel-${value}`;

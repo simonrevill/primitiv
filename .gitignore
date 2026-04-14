@@ -41,3 +41,4 @@ playwright/.cache/
 /target/llvm-cov/
 htmlcov/
 lcov.info
+coverage/

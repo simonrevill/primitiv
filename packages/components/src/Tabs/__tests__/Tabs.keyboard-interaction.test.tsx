@@ -35,11 +35,11 @@ describe('Tabs keyboard navigation', () => {
   describe('Arrow key navigation', () => {
     it.each(arrowKeyCases)(
       '$description',
-      async ({ orientation, defaultValue, key, expectedTab, expectedDeselected }) => {
+      async ({ dir, orientation, defaultValue, key, expectedTab, expectedDeselected }) => {
         // Arrange
         const user = userEvent.setup();
         render(
-          <Tabs.Root orientation={orientation} defaultValue={defaultValue}>
+          <Tabs.Root dir={dir} orientation={orientation} defaultValue={defaultValue}>
             <Tabs.List label="Test tabs">
               <Tabs.Trigger value="tab1">Tab 1</Tabs.Trigger>
               <Tabs.Trigger value="tab2">Tab 2</Tabs.Trigger>
@@ -130,7 +130,7 @@ describe('Tabs keyboard navigation', () => {
       // Arrange
       const user = userEvent.setup();
       render(
-        <Tabs.Root defaultValue="tab2">
+        <Tabs.Root dir="ltr" defaultValue="tab2">
           <Tabs.List label="Test tabs">
             <Tabs.Trigger value="tab1">Tab 1</Tabs.Trigger>
             <Tabs.Trigger value="tab2">Tab 2</Tabs.Trigger>
@@ -161,7 +161,7 @@ describe('Tabs keyboard navigation', () => {
       // Arrange
       const user = userEvent.setup();
       render(
-        <Tabs.Root orientation="vertical" defaultValue="tab2">
+        <Tabs.Root dir="ltr" orientation="vertical" defaultValue="tab2">
           <Tabs.List label="Test tabs">
             <Tabs.Trigger value="tab1">Tab 1</Tabs.Trigger>
             <Tabs.Trigger value="tab2">Tab 2</Tabs.Trigger>

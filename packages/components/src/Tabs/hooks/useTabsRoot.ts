@@ -14,6 +14,7 @@ import type { TabsRootProps, TabsImperativeApi } from "../types";
 export function useTabsRoot(
   {
     orientation = "horizontal",
+    dir = "ltr",
     defaultValue,
     value,
     onValueChange,
@@ -76,6 +77,7 @@ export function useTabsRoot(
   const contextValue = useMemo(
     () => ({
       orientation,
+      dir,
       tabsId,
       activeValue,
       isControlled,
@@ -87,6 +89,7 @@ export function useTabsRoot(
     }),
     [
       orientation,
+      dir,
       tabsId,
       activeValue,
       isControlled,

@@ -30,6 +30,7 @@ export type TabsRootProps = Omit<ComponentProps<"div">, "onChange"> & {
 
 export type TabsContextValue = {
   orientation: TabsOrientation;
+  dir: TabsReadingDirection;
   activeValue: string | undefined;
   isControlled: boolean;
   setActiveValue: Dispatch<SetStateAction<string | undefined>>;

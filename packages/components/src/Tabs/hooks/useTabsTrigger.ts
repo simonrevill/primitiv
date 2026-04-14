@@ -17,6 +17,7 @@ export function useTabsTrigger({
 }: Pick<TabsTriggerProps, "value" | "onClick">) {
   const {
     orientation,
+    dir,
     activeValue,
     isControlled,
     setActiveValue,
@@ -62,7 +63,7 @@ export function useTabsTrigger({
     const triggerValues = Array.from(triggersRef.current.keys());
     const currentIndex = triggerValues.indexOf(value);
     const totalTabs = triggerValues.length;
-    const keyToAction = getKeyToAction(orientation);
+    const keyToAction = getKeyToAction(orientation, dir);
     const action = keyToAction[e.key as TabsKeyActionsKey];
 
     const actions: TabsKeyActions = {

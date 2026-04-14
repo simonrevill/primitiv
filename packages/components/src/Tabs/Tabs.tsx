@@ -104,6 +104,7 @@ const TabsRoot = forwardRef<TabsImperativeApi, TabsRootProps>(function TabsRoot(
   const { contextValue } = useTabsRoot(
     {
       orientation,
+      dir,
       defaultValue,
       value,
       onValueChange,

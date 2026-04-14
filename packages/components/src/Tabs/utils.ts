@@ -1,4 +1,4 @@
-import { TabsOrientation, KeyToActionMapper } from "./types";
+import { TabsOrientation, TabsReadingDirection, KeyToActionMapper } from "./types";
 
 export function getTriggerAndPanelIds(
   tabsId: string,
@@ -13,14 +13,18 @@ export function getTriggerAndPanelIds(
 // Utility function for key-to-action mapping
 export function getKeyToAction(
   orientation: TabsOrientation,
+  dir: TabsReadingDirection,
 ): KeyToActionMapper {
   const keyToActionMap: KeyToActionMapper = {
     Home: "home",
     End: "end",
   };
   if (orientation === "horizontal") {
-    keyToActionMap.ArrowRight = "moveForward";
-    keyToActionMap.ArrowLeft = "moveBackward";
+    // In RTL the arrow directions are inverted relative to DOM order
+    const forward = dir === "rtl" ? "ArrowLeft" : "ArrowRight";
+    const backward = dir === "rtl" ? "ArrowRight" : "ArrowLeft";
+    keyToActionMap[forward] = "moveForward";
+    keyToActionMap[backward] = "moveBackward";
   }
   if (orientation === "vertical") {
     keyToActionMap.ArrowDown = "moveForward";

@@ -232,7 +232,7 @@ export function TabsTrigger({
     tabIndex,
     handleClick,
     handleKeyDown,
-  } = useTabsTrigger({ value, onClick });
+  } = useTabsTrigger({ value, onClick, disabled });
 
   return (
     <button

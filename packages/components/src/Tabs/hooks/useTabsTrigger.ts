@@ -14,7 +14,8 @@ import { useTabsContext } from "./useTabsContext";
 export function useTabsTrigger({
   value,
   onClick,
-}: Pick<TabsTriggerProps, "value" | "onClick">) {
+  disabled,
+}: Pick<TabsTriggerProps, "value" | "onClick" | "disabled">) {
   const {
     orientation,
     dir,
@@ -55,11 +56,15 @@ export function useTabsTrigger({
 
   function handleClick(e: MouseEvent<HTMLButtonElement>) {
     const index = Array.from(triggersRef.current.keys()).indexOf(value);
-    activateTab(value, index);
+    if (!disabled) {
+      activateTab(value, index);
+    }
     onClick?.(e);
   }
 
   function handleKeyDown(e: KeyboardEvent<HTMLButtonElement>) {
+    if (disabled) return;
+
     const triggerValues = Array.from(triggersRef.current.keys());
     const currentIndex = triggerValues.indexOf(value);
     const totalTabs = triggerValues.length;

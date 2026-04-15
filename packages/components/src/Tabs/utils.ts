@@ -23,6 +23,7 @@ export function getKeyToAction(
     Home: "home",
     End: "end",
     Space: "space",
+    Enter: "enter",
   };
   if (orientation === "horizontal") {
     // In RTL the arrow directions are inverted relative to DOM order

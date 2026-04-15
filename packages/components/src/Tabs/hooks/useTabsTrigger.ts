@@ -81,7 +81,9 @@ export function useTabsTrigger({
       if (
         !isDisabled &&
         (activationMode === "automatic" ||
-          (activationMode === "manual" && key && key === "space"))
+          (activationMode === "manual" &&
+            key &&
+            (key === "space" || key === "enter")))
       ) {
         activateTab(targetValue, targetIndex);
       }
@@ -95,6 +97,7 @@ export function useTabsTrigger({
       home: () => activateIfEnabled(0),
       end: () => activateIfEnabled(totalTabs - 1),
       space: () => activateIfEnabled(currentIndex, "space"),
+      enter: () => activateIfEnabled(currentIndex, "enter"),
     };
 
     if (action && actions[action]) {

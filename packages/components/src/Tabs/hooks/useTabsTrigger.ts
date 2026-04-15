@@ -69,42 +69,21 @@ export function useTabsTrigger({
     const keyToAction = getKeyToAction(orientation, dir);
     const action = keyToAction[e.key as TabsKeyActionsKey];
 
+    function activateIfEnabled(targetIndex: number) {
+      const targetValue = triggerValues[targetIndex];
+      const targetElement = triggersRef.current.get(targetValue);
+      if (!(targetElement?.getAttribute("aria-disabled") === "true")) {
+        activateTab(targetValue, targetIndex);
+      }
+      targetElement?.focus();
+    }
+
     const actions: TabsKeyActions = {
-      moveForward: () => {
-        const nextIndex = (currentIndex + 1) % totalTabs;
-        const nextValue = triggerValues[nextIndex];
-        const nextElement = triggersRef.current.get(nextValue);
-        console.log(nextElement);
-        if (!(nextElement?.getAttribute("aria-disabled") === "true")) {
-          activateTab(nextValue, nextIndex);
-        }
-        nextElement?.focus();
-      },
-      moveBackward: () => {
-        const prevIndex = (currentIndex - 1 + totalTabs) % totalTabs;
-        const prevValue = triggerValues[prevIndex];
-        const prevElement = triggersRef.current.get(prevValue);
-        if (!(prevElement?.getAttribute("aria-disabled") === "true")) {
-          activateTab(prevValue, prevIndex);
-        }
-        prevElement?.focus();
-      },
-      home: () => {
-        const firstValue = triggerValues[0];
-        const firstElement = triggersRef.current.get(firstValue);
-        if (!(firstElement?.getAttribute("aria-disabled") === "true")) {
-          activateTab(firstValue, 0);
-        }
-        firstElement?.focus();
-      },
-      end: () => {
-        const lastValue = triggerValues[totalTabs - 1];
-        const lastElement = triggersRef.current.get(lastValue);
-        if (!(lastElement?.getAttribute("aria-disabled") === "true")) {
-          activateTab(lastValue, totalTabs - 1);
-        }
-        lastElement?.focus();
-      },
+      moveForward: () => activateIfEnabled((currentIndex + 1) % totalTabs),
+      moveBackward: () =>
+        activateIfEnabled((currentIndex - 1 + totalTabs) % totalTabs),
+      home: () => activateIfEnabled(0),
+      end: () => activateIfEnabled(totalTabs - 1),
     };
 
     if (action && actions[action]) {

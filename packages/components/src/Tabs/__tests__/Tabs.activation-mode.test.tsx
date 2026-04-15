@@ -27,4 +27,27 @@ describe("Activation mode tests", () => {
     });
     expect(secondTabPanel).not.toHaveAttribute("hidden");
   });
+
+  it("should not activate the second tab when focusing its tab in manual mode", async () => {
+    // Arrange
+    const user = userEvent.setup();
+    const { container } = render(
+      <Tabs.Root defaultValue="tab1" activationMode="manual">
+        <Tabs.List label="Test tabs">
+          <Tabs.Trigger value="tab1">Tab 1</Tabs.Trigger>
+          <Tabs.Trigger value="tab2">Tab 2</Tabs.Trigger>
+        </Tabs.List>
+        <Tabs.Content value="tab1">Content 1</Tabs.Content>
+        <Tabs.Content value="tab2">Content 2</Tabs.Content>
+      </Tabs.Root>,
+    );
+
+    // Act
+    await user.tab();
+    await user.keyboard("{ArrowRight}");
+
+    // Assert
+    const secondTabPanel = container.querySelectorAll('[role="tabpanel"]')[1];
+    expect(secondTabPanel).not.toBeVisible();
+  });
 });

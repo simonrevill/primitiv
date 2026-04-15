@@ -19,6 +19,7 @@ export function useTabsTrigger({
   const {
     orientation,
     dir,
+    activationMode,
     activeValue,
     isControlled,
     setActiveValue,
@@ -72,7 +73,9 @@ export function useTabsTrigger({
     function activateIfEnabled(targetIndex: number) {
       const targetValue = triggerValues[targetIndex];
       const targetElement = triggersRef.current.get(targetValue);
-      if (!(targetElement?.getAttribute("aria-disabled") === "true")) {
+      const isDisabled =
+        targetElement?.getAttribute("aria-disabled") === "true";
+      if (!isDisabled && activationMode === "automatic") {
         activateTab(targetValue, targetIndex);
       }
       targetElement?.focus();

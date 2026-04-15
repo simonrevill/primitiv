@@ -93,6 +93,7 @@ const TabsRoot = forwardRef<TabsImperativeApi, TabsRootProps>(function TabsRoot(
     className = "",
     orientation = "horizontal",
     dir = "ltr",
+    activationMode = "automatic",
     defaultValue,
     value,
     onValueChange,
@@ -105,6 +106,7 @@ const TabsRoot = forwardRef<TabsImperativeApi, TabsRootProps>(function TabsRoot(
     {
       orientation,
       dir,
+      activationMode,
       defaultValue,
       value,
       onValueChange,

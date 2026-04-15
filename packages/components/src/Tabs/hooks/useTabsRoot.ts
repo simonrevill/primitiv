@@ -15,6 +15,7 @@ export function useTabsRoot(
   {
     orientation = "horizontal",
     dir = "ltr",
+    activationMode = "automatic",
     defaultValue,
     value,
     onValueChange,
@@ -78,6 +79,7 @@ export function useTabsRoot(
     () => ({
       orientation,
       dir,
+      activationMode,
       tabsId,
       activeValue,
       isControlled,
@@ -90,6 +92,7 @@ export function useTabsRoot(
     [
       orientation,
       dir,
+      activationMode,
       tabsId,
       activeValue,
       isControlled,

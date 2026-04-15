@@ -4,6 +4,8 @@ export type TabsOrientation = "horizontal" | "vertical";
 
 export type TabsReadingDirection = "ltr" | "rtl";
 
+export type TabsActivationMode = "automatic" | "manual";
+
 export type TabMetadata = { index: number; name: string };
 
 export type BaseTabsRootProps = {
@@ -25,12 +27,14 @@ type ControlledTabsRootProps = {
 export type TabsRootProps = Omit<ComponentProps<"div">, "onChange"> & {
   orientation?: TabsOrientation;
   dir?: TabsReadingDirection;
+  activationMode?: TabsActivationMode;
 } & BaseTabsRootProps &
   (UncontrolledTabsRootProps | ControlledTabsRootProps);
 
 export type TabsContextValue = {
   orientation: TabsOrientation;
   dir: TabsReadingDirection;
+  activationMode: TabsActivationMode;
   activeValue: string | undefined;
   isControlled: boolean;
   setActiveValue: Dispatch<SetStateAction<string | undefined>>;

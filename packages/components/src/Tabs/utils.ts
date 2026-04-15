@@ -22,7 +22,7 @@ export function getKeyToAction(
   const keyToActionMap: KeyToActionMapper = {
     Home: "home",
     End: "end",
-    Space: "space",
+    " ": "enter", // Space maps to same action as Enter
     Enter: "enter",
   };
   if (orientation === "horizontal") {

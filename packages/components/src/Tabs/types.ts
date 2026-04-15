@@ -69,7 +69,7 @@ export type TabsKeyActionsKey =
   | "ArrowUp"
   | "Home"
   | "End"
-  | "Space"
+  | " "
   | "Enter";
 
 export type TabsKeyActions = {
@@ -77,14 +77,13 @@ export type TabsKeyActions = {
   moveBackward: () => void;
   home: () => void;
   end: () => void;
-  space: () => void;
   enter: () => void;
 };
 
 export type KeyToActionMapper = Partial<
   Record<
     TabsKeyActionsKey,
-    "moveForward" | "moveBackward" | "home" | "end" | "space" | "enter"
+    "moveForward" | "moveBackward" | "home" | "end" | "enter"
   >
 >;
 

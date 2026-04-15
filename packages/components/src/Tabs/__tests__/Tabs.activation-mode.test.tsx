@@ -56,14 +56,14 @@ describe("Activation mode tests", () => {
       defaultValue: "tab1",
       direction: "next",
       directionKeys: ["{ArrowRight}"],
-      key: "{Space}",
+      key: " ",
       expectedSelectedTab: "Tab 2",
     },
     {
       defaultValue: "tab2",
       direction: "previous",
       directionKeys: ["{ArrowLeft}"],
-      key: "{Space}",
+      key: " ",
       expectedSelectedTab: "Tab 1",
     },
     {

@@ -51,13 +51,42 @@ describe("Activation mode tests", () => {
     expect(secondTabPanel).not.toBeVisible();
   });
 
-  it.each(["Space", "Enter"])(
-    "should activate the next tab when focusing it in manual mode and pressing the %s key",
-    async (key) => {
+  it.each([
+    {
+      defaultValue: "tab1",
+      direction: "next",
+      directionKeys: ["{ArrowRight}"],
+      key: "{Space}",
+      expectedSelectedTab: "Tab 2",
+    },
+    {
+      defaultValue: "tab2",
+      direction: "previous",
+      directionKeys: ["{ArrowLeft}"],
+      key: "{Space}",
+      expectedSelectedTab: "Tab 1",
+    },
+    {
+      defaultValue: "tab1",
+      direction: "next",
+      directionKeys: ["{ArrowRight}"],
+      key: "{Enter}",
+      expectedSelectedTab: "Tab 2",
+    },
+    {
+      defaultValue: "tab2",
+      direction: "previous",
+      directionKeys: ["{ArrowLeft}"],
+      key: "{Enter}",
+      expectedSelectedTab: "Tab 1",
+    },
+  ])(
+    "should activate the $direction tab when focusing it in manual mode and pressing the $key key",
+    async ({ defaultValue, directionKeys, key, expectedSelectedTab }) => {
       // Arrange
       const user = userEvent.setup();
       render(
-        <Tabs.Root defaultValue="tab1" activationMode="manual">
+        <Tabs.Root defaultValue={defaultValue} activationMode="manual">
           <Tabs.List label="Test tabs">
             <Tabs.Trigger value="tab1">Tab 1</Tabs.Trigger>
             <Tabs.Trigger value="tab2">Tab 2</Tabs.Trigger>
@@ -69,15 +98,17 @@ describe("Activation mode tests", () => {
 
       // Act
       await user.tab();
-      await user.keyboard("{ArrowRight}");
-      await user.keyboard(`{${key}}`);
+      for (const directionKey of directionKeys) {
+        await user.keyboard(directionKey);
+      }
+      await user.keyboard(key);
 
       // Assert
-      const secondTab = screen.getByRole("tab", {
-        name: "Tab 2",
+      const tab = screen.getByRole("tab", {
+        name: expectedSelectedTab,
       });
-      expect(secondTab).toHaveFocus();
-      expect(secondTab).toHaveAttribute("aria-selected", "true");
+      expect(tab).toHaveFocus();
+      expect(tab).toHaveAttribute("aria-selected", "true");
     },
   );
 });

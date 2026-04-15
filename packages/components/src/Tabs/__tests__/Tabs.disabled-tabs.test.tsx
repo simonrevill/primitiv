@@ -193,6 +193,7 @@ describe("Tabs disabled tabs tests", () => {
 
       // Act
       await user.tab();
+      expect(screen.getByRole("tab", { name: focusTab })).toHaveFocus();
       await user.keyboard(keyboard);
 
       // Assert

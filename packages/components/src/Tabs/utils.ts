@@ -22,6 +22,7 @@ export function getKeyToAction(
   const keyToActionMap: KeyToActionMapper = {
     Home: "home",
     End: "end",
+    Space: "space",
   };
   if (orientation === "horizontal") {
     // In RTL the arrow directions are inverted relative to DOM order

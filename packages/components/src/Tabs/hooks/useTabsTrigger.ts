@@ -70,12 +70,19 @@ export function useTabsTrigger({
     const keyToAction = getKeyToAction(orientation, dir);
     const action = keyToAction[e.key as TabsKeyActionsKey];
 
-    function activateIfEnabled(targetIndex: number) {
+    function activateIfEnabled(
+      targetIndex: number,
+      key?: keyof TabsKeyActions,
+    ) {
       const targetValue = triggerValues[targetIndex];
       const targetElement = triggersRef.current.get(targetValue);
       const isDisabled =
         targetElement?.getAttribute("aria-disabled") === "true";
-      if (!isDisabled && activationMode === "automatic") {
+      if (
+        !isDisabled &&
+        (activationMode === "automatic" ||
+          (activationMode === "manual" && key && key === "space"))
+      ) {
         activateTab(targetValue, targetIndex);
       }
       targetElement?.focus();
@@ -87,6 +94,7 @@ export function useTabsTrigger({
         activateIfEnabled((currentIndex - 1 + totalTabs) % totalTabs),
       home: () => activateIfEnabled(0),
       end: () => activateIfEnabled(totalTabs - 1),
+      space: () => activateIfEnabled(currentIndex, "space"),
     };
 
     if (action && actions[action]) {

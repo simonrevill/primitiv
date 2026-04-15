@@ -123,4 +123,29 @@ describe("Tabs disabled tabs tests", () => {
     // Assert
     expect(currentActivePanel).not.toHaveAttribute("hidden");
   });
+
+  it("should not change the currently active panel when moving to the next focused disabled tab via arrow key", async () => {
+    // Arrange
+    const user = userEvent.setup();
+    render(
+      <Tabs.Root defaultValue="tab1">
+        <Tabs.List label="Test tabs">
+          <Tabs.Trigger value="tab1">Tab 1</Tabs.Trigger>
+          <Tabs.Trigger value="tab2" disabled>
+            Tab 2
+          </Tabs.Trigger>
+        </Tabs.List>
+        <Tabs.Content value="tab1">Content 1</Tabs.Content>
+        <Tabs.Content value="tab2">Content 2</Tabs.Content>
+      </Tabs.Root>,
+    );
+    const currentActivePanel = screen.getByRole("tabpanel", { name: "Tab 1" });
+
+    // Act
+    await user.tab();
+    await user.keyboard("{ArrowRight}");
+
+    // Assert
+    expect(currentActivePanel).not.toHaveAttribute("hidden");
+  });
 });

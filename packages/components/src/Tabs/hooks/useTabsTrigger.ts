@@ -63,8 +63,6 @@ export function useTabsTrigger({
   }
 
   function handleKeyDown(e: KeyboardEvent<HTMLButtonElement>) {
-    if (disabled) return;
-
     const triggerValues = Array.from(triggersRef.current.keys());
     const currentIndex = triggerValues.indexOf(value);
     const totalTabs = triggerValues.length;
@@ -76,26 +74,35 @@ export function useTabsTrigger({
         const nextIndex = (currentIndex + 1) % totalTabs;
         const nextValue = triggerValues[nextIndex];
         const nextElement = triggersRef.current.get(nextValue);
-        activateTab(nextValue, nextIndex);
+        console.log(nextElement);
+        if (!(nextElement?.getAttribute("aria-disabled") === "true")) {
+          activateTab(nextValue, nextIndex);
+        }
         nextElement?.focus();
       },
       moveBackward: () => {
         const prevIndex = (currentIndex - 1 + totalTabs) % totalTabs;
         const prevValue = triggerValues[prevIndex];
         const prevElement = triggersRef.current.get(prevValue);
-        activateTab(prevValue, prevIndex);
+        if (!(prevElement?.getAttribute("aria-disabled") === "true")) {
+          activateTab(prevValue, prevIndex);
+        }
         prevElement?.focus();
       },
       home: () => {
         const firstValue = triggerValues[0];
         const firstElement = triggersRef.current.get(firstValue);
-        activateTab(firstValue, 0);
+        if (!(firstElement?.getAttribute("aria-disabled") === "true")) {
+          activateTab(firstValue, 0);
+        }
         firstElement?.focus();
       },
       end: () => {
         const lastValue = triggerValues[totalTabs - 1];
         const lastElement = triggersRef.current.get(lastValue);
-        activateTab(lastValue, totalTabs - 1);
+        if (!(lastElement?.getAttribute("aria-disabled") === "true")) {
+          activateTab(lastValue, totalTabs - 1);
+        }
         lastElement?.focus();
       },
     };

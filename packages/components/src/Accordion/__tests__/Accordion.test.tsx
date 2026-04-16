@@ -1009,6 +1009,50 @@ describe("accordion tests", () => {
       expect(accordionItemTrigger3).toHaveFocus();
     });
 
+    it("should wrap to first item when pressing ArrowDown from last item", async () => {
+      // Arrange
+      const user = userEvent.setup();
+      const title1 = "Accordion Trigger 1";
+      const title2 = "Accordion Trigger 2";
+      const title3 = "Accordion Trigger 3";
+      render(
+        <Accordion.Root>
+          <Accordion.Item>
+            <Accordion.Header>
+              <Accordion.Trigger>{title1}</Accordion.Trigger>
+            </Accordion.Header>
+          </Accordion.Item>
+          <Accordion.Item>
+            <Accordion.Header>
+              <Accordion.Trigger>{title2}</Accordion.Trigger>
+            </Accordion.Header>
+          </Accordion.Item>
+          <Accordion.Item>
+            <Accordion.Header>
+              <Accordion.Trigger>{title3}</Accordion.Trigger>
+            </Accordion.Header>
+          </Accordion.Item>
+        </Accordion.Root>,
+      );
+      const accordionItemTrigger1 = screen.getByRole("button", {
+        name: title1,
+      });
+      const accordionItemTrigger3 = screen.getByRole("button", {
+        name: title3,
+      });
+
+      // Act - Tab to last trigger, then press ArrowDown to wrap to first
+      await user.tab();
+      await user.tab();
+      await user.tab();
+      expect(accordionItemTrigger3).toHaveFocus();
+
+      await user.keyboard("[ArrowDown]");
+
+      // Assert - Should wrap around to the last item
+      expect(accordionItemTrigger1).toHaveFocus();
+    });
+
     it('should move focus to the first accordion trigger when focus is on an accordion trigger and the "Home" key is pressed', async () => {
       // Arrange
       const user = userEvent.setup();

@@ -94,27 +94,27 @@ import { Tabs } from "@primitiv/components";
   </Tabs.List>
   <Tabs.Content value="overview">Dashboard…</Tabs.Content>
   <Tabs.Content value="settings">Preferences…</Tabs.Content>
-</Tabs.Root>
+</Tabs.Root>;
 ```
 
 **Sub-components**
 
-| Export           | Role         | Notes                                                    |
-| ---------------- | ------------ | -------------------------------------------------------- |
-| `Tabs.Root`      | State owner  | Uncontrolled (`defaultValue`) or controlled (`value` + `onValueChange`) |
-| `Tabs.List`      | `tablist`    | Requires `label` or `ariaLabelledBy` for accessibility  |
-| `Tabs.Trigger`   | `tab`        | Supports `asChild` to render any element with tab semantics |
-| `Tabs.Content`   | `tabpanel`   | Stays mounted when inactive; use conditional rendering for unmount semantics |
+| Export         | Role        | Notes                                                                        |
+| -------------- | ----------- | ---------------------------------------------------------------------------- |
+| `Tabs.Root`    | State owner | Uncontrolled (`defaultValue`) or controlled (`value` + `onValueChange`)      |
+| `Tabs.List`    | `tablist`   | Requires `label` or `ariaLabelledBy` for accessibility                       |
+| `Tabs.Trigger` | `tab`       | Supports `asChild` to render any element with tab semantics                  |
+| `Tabs.Content` | `tabpanel`  | Stays mounted when inactive; use conditional rendering for unmount semantics |
 
 **Keyboard interaction**
 
-| Key                        | Behaviour                                           |
-| -------------------------- | --------------------------------------------------- |
-| `ArrowRight` / `ArrowLeft` | Move between triggers (horizontal tabs)             |
-| `ArrowDown`  / `ArrowUp`   | Move between triggers (vertical tabs)               |
-| `Home` / `End`             | Jump to first / last trigger                        |
-| `Enter` / `Space`          | Activate focused trigger (manual activation mode)   |
-| `Tab`                      | Move from tablist into the active panel             |
+| Key                        | Behaviour                                         |
+| -------------------------- | ------------------------------------------------- |
+| `ArrowRight` / `ArrowLeft` | Move between triggers (horizontal tabs)           |
+| `ArrowDown` / `ArrowUp`    | Move between triggers (vertical tabs)             |
+| `Home` / `End`             | Jump to first / last trigger                      |
+| `Enter` / `Space`          | Activate focused trigger (manual activation mode) |
+| `Tab`                      | Move from tablist into the active panel           |
 
 **State modes**
 
@@ -130,7 +130,9 @@ import { Tabs } from "@primitiv/components";
 
 ```tsx
 const ref = useRef<TabsImperativeApi>(null);
-<Tabs.Root ref={ref} defaultValue="a">…</Tabs.Root>
+<Tabs.Root ref={ref} defaultValue="a">
+  …
+</Tabs.Root>;
 ref.current?.setActiveTab("b");
 ```
 
@@ -138,7 +140,7 @@ ref.current?.setActiveTab("b");
 
 `Tabs.Trigger` accepts an `asChild` prop to render any child element with
 full tab semantics. All ARIA attributes, event handlers, and the roving
-`tabIndex` are merged onto the child following the Radix UI composition
+`tabIndex` are merged onto the child following the asChild composition
 pattern (child handler runs first, then the trigger's):
 
 ```tsx
@@ -150,8 +152,12 @@ pattern (child handler runs first, then the trigger's):
 **Styling hooks**
 
 ```css
-[role="tab"][data-state="active"]    { border-bottom: 2px solid currentColor; }
-[role="tabpanel"][data-state="active"] { display: block; }
+[role="tab"][data-state="active"] {
+  border-bottom: 2px solid currentColor;
+}
+[role="tabpanel"][data-state="active"] {
+  display: block;
+}
 ```
 
 Both `data-state` (`"active"` | `"inactive"`) and

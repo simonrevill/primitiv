@@ -209,7 +209,7 @@ TabsList.displayName = "TabsList";
  * **`asChild` prop.** Pass `asChild` to render an arbitrary child element
  * instead of the default `<button>`. All tab ARIA attributes, event handlers,
  * and the roving `tabIndex` are merged onto the child element following the
- * Radix UI composition pattern:
+ * Composition pattern:
  * - Event handlers compose — the child's handler runs first, then the trigger's.
  * - `style` is shallow-merged (child wins on collisions).
  * - `className` strings are concatenated.

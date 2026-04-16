@@ -14,6 +14,7 @@ that caught me out so a fresh session can pick up without retracing.
   `primitiv-wasm`.
 
 A useful heuristic when deciding whether to rename a string:
+
 - Is this the engine crate / Rust code / wasm adapter? → `harmoni`
 - Is this the product, the app title, the repo name, the README
   heading, the `<h1>` in the web app? → leave it as `Primitiv`
@@ -68,27 +69,31 @@ Which model to use depends on task type. Default is Sonnet; escalate to Opus
 for architectural decisions; use Haiku for syntax lookups.
 
 **Quick decision tree:**
+
 - "What should we do?" → Opus (design, trade-offs, architecture)
 - "How do we implement this?" → Sonnet (implementation, TDD, refactoring)
 - "What's the syntax?" → Haiku (lookups, clarifications, boilerplate)
 
 **Task-type routing:**
 
-*Opus 4.6 (design & architecture)*
+_Opus 4.6 (design & architecture)_
+
 - Exploring multiple approaches to a new system
 - Comparing trade-offs (performance vs. maintainability, type safety vs. flexibility)
 - Long-horizon refactoring strategy or system restructuring
 - Complex TDD decisions ("what should we test?" not "how?")
 - Cost: ~8–15k tokens (high reasoning, infrequent)
 
-*Sonnet 4.6 (implementation & features)*
+_Sonnet 4.6 (implementation & features)_
+
 - Writing code once the design is clear
 - TDD cycles (test → red → green → refactor)
 - Feature implementation following an established pattern
 - Code review and refactoring within a known approach
 - Cost: ~5–12k tokens per iteration (faster, frequent)
 
-*Haiku 4.5 (quick fixes & syntax)*
+_Haiku 4.5 (quick fixes & syntax)_
+
 - Syntax questions in any language
 - Quick clarifications or API lookups
 - High-volume boilerplate tasks
@@ -166,7 +171,7 @@ pub use crate::palette::generator::generate_greyscale_oklch as generate_greyscal
 ```
 
 - `generate_with_options` takes `GenerateOptions { light_padding,
-  dark_padding }`. `generate` is a thin wrapper with defaults.
+dark_padding }`. `generate` is a thin wrapper with defaults.
 - `audit_contrast` is fallible because it accepts arbitrary CSS.
 - `generate_greyscale` is intentionally infallible — it takes no
   user input, so there's nothing to validate. The web app calls it
@@ -249,7 +254,7 @@ four product-name references listed above.
   `.d.ts` to verify that the Tsify relocation in Step A produced
   the same TypeScript types the web app expects. The structs are
   field-for-field identical and named identically, so the output
-  *should* be byte-equivalent, but the user is going to verify
+  _should_ be byte-equivalent, but the user is going to verify
   manually. Flag this as pending.
 - **`cargo test` is fine but `pnpm test:e2e` will fail.** The
   Playwright e2e test was deleted early in this work because it
@@ -311,6 +316,7 @@ needed surface is small and we want zero style baggage.
 
 `Slot` clones its single child element and merges the Slot's own props
 onto it following these rules (same as Radix):
+
 - Event handlers **compose** — child's handler runs first, then Slot's.
 - `style` is **shallow-merged** — child wins on collisions.
 - `className` strings are **concatenated**.
@@ -325,6 +331,7 @@ or any other element while keeping full tab semantics.
 trigger values as React state (`triggerValues: string[]`), not just as a
 ref. This makes trigger registration cause re-renders, which is required
 for two things that depend on trigger order:
+
 1. Roving tabindex — the first registered trigger must have `tabIndex=0`
    as the keyboard home base when no active value is set.
 2. Dynamic validation — the `useEffect` that throws on an invalid

@@ -1,5 +1,5 @@
 /**
- * Slot — a React composition utility following the Radix UI asChild pattern.
+ * Slot — a React composition utility following the asChild pattern.
  *
  * When a component renders `<Slot {...ownProps}>{child}</Slot>`, the child
  * element is cloned with ownProps merged in:
@@ -56,7 +56,7 @@ export function composeRefs<T>(...refs: PossibleRef<T>[]) {
 }
 
 // ---------------------------------------------------------------------------
-// mergeProps — follows Radix's composition rules exactly
+// mergeProps — follows the asChild composition pattern rules exactly
 // ---------------------------------------------------------------------------
 
 function getRef(element: React.ReactElement): PossibleRef<unknown> {

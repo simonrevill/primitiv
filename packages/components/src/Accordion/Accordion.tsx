@@ -441,25 +441,38 @@ export function AccordionContent({
 AccordionContent.displayName = "AccordionContent";
 
 /**
- * A thin wrapper that injects `aria-hidden="true"` and a
- * `data-state="open" | "closed"` attribute onto its single icon child,
- * keeping decorative icons out of the accessibility tree and providing a
- * styling hook for rotation or swap animations.
+ * A wrapper that hides its icon child from the accessibility tree and
+ * provides a `data-state` hook for open/close animations. Accepts any
+ * renderable React content as a child — an inline `<svg>`, a component
+ * from a third-party icon library (lucide-react, react-icons, etc.), or
+ * any custom icon component.
  *
- * Uses the `Slot` composition pattern — the child element receives the
- * injected props directly, so it must be a single DOM element (e.g. `<svg>`),
- * not a React component wrapper.
+ * Renders a `<span>` with `aria-hidden="true"` around the child so the
+ * icon is hidden from assistive technology regardless of whether the child
+ * component forwards unknown props.
  *
  * **Styling hooks.**
- * - `data-state="open" | "closed"` on the child element.
- * - `aria-hidden="true"` on the child element (removes it from AT).
+ * - `data-state="open" | "closed"` on the rendered `<span>`.
+ * - `aria-hidden="true"` on the rendered `<span>`.
  *
- * @example
+ * @example Inline SVG
  * ```tsx
  * <Accordion.Trigger>
  *   Shipping policy
  *   <Accordion.TriggerIcon>
- *     <ChevronDownIcon />
+ *     <svg …><path d="…" /></svg>
+ *   </Accordion.TriggerIcon>
+ * </Accordion.Trigger>
+ * ```
+ *
+ * @example Third-party icon component
+ * ```tsx
+ * import { ChevronDown } from "lucide-react";
+ *
+ * <Accordion.Trigger>
+ *   Shipping policy
+ *   <Accordion.TriggerIcon>
+ *     <ChevronDown />
  *   </Accordion.TriggerIcon>
  * </Accordion.Trigger>
  * ```
@@ -467,9 +480,9 @@ AccordionContent.displayName = "AccordionContent";
 export function AccordionTriggerIcon({ children }: AccordionTriggerIconProps) {
   const { isExpanded } = useAccordionItemContext();
   return (
-    <Slot aria-hidden="true" data-state={isExpanded ? "open" : "closed"}>
+    <span aria-hidden="true" data-state={isExpanded ? "open" : "closed"}>
       {children}
-    </Slot>
+    </span>
   );
 }
 

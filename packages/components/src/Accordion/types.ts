@@ -1,4 +1,4 @@
-import { ComponentProps, ReactNode, ReactElement } from "react";
+import { ComponentProps, ReactNode } from "react";
 import { HeadingLevel } from "../types";
 
 type AccordionRootBaseProps = ComponentProps<"div"> & {
@@ -47,7 +47,7 @@ export type AccordionContentProps = ComponentProps<"div"> & {
 };
 
 export type AccordionTriggerIconProps = {
-  children: ReactElement;
+  children: ReactNode;
 };
 
 export type AccordionContextValue = {

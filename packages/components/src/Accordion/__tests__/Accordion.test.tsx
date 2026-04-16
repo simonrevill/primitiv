@@ -1149,6 +1149,297 @@ describe("accordion tests", () => {
       // Assert
       expect(accordionItemTrigger3).toHaveFocus();
     });
+
+    it('should move focus from the second to the third trigger when "ArrowDown" is pressed', async () => {
+      // Arrange
+      const user = userEvent.setup();
+      const title1 = "Accordion Trigger 1";
+      const title2 = "Accordion Trigger 2";
+      const title3 = "Accordion Trigger 3";
+      render(
+        <Accordion.Root>
+          <Accordion.Item>
+            <Accordion.Header>
+              <Accordion.Trigger>{title1}</Accordion.Trigger>
+            </Accordion.Header>
+          </Accordion.Item>
+          <Accordion.Item>
+            <Accordion.Header>
+              <Accordion.Trigger>{title2}</Accordion.Trigger>
+            </Accordion.Header>
+          </Accordion.Item>
+          <Accordion.Item>
+            <Accordion.Header>
+              <Accordion.Trigger>{title3}</Accordion.Trigger>
+            </Accordion.Header>
+          </Accordion.Item>
+        </Accordion.Root>,
+      );
+      const accordionItemTrigger3 = screen.getByRole("button", {
+        name: title3,
+      });
+
+      // Act - Tab to second trigger, then press ArrowDown
+      await user.tab();
+      await user.tab();
+      await user.keyboard("[ArrowDown]");
+
+      // Assert
+      expect(accordionItemTrigger3).toHaveFocus();
+    });
+
+    it('should move focus from the third to the second trigger when "ArrowUp" is pressed', async () => {
+      // Arrange
+      const user = userEvent.setup();
+      const title1 = "Accordion Trigger 1";
+      const title2 = "Accordion Trigger 2";
+      const title3 = "Accordion Trigger 3";
+      render(
+        <Accordion.Root>
+          <Accordion.Item>
+            <Accordion.Header>
+              <Accordion.Trigger>{title1}</Accordion.Trigger>
+            </Accordion.Header>
+          </Accordion.Item>
+          <Accordion.Item>
+            <Accordion.Header>
+              <Accordion.Trigger>{title2}</Accordion.Trigger>
+            </Accordion.Header>
+          </Accordion.Item>
+          <Accordion.Item>
+            <Accordion.Header>
+              <Accordion.Trigger>{title3}</Accordion.Trigger>
+            </Accordion.Header>
+          </Accordion.Item>
+        </Accordion.Root>,
+      );
+      const accordionItemTrigger2 = screen.getByRole("button", {
+        name: title2,
+      });
+
+      // Act - Tab to third trigger, then press ArrowUp
+      await user.tab();
+      await user.tab();
+      await user.tab();
+      await user.keyboard("[ArrowUp]");
+
+      // Assert
+      expect(accordionItemTrigger2).toHaveFocus();
+    });
+
+    it('should move focus to the next trigger using "ArrowRight" when orientation="horizontal"', async () => {
+      // Arrange
+      const user = userEvent.setup();
+      const title1 = "Accordion Trigger 1";
+      const title2 = "Accordion Trigger 2";
+      const title3 = "Accordion Trigger 3";
+      render(
+        <Accordion.Root orientation="horizontal">
+          <Accordion.Item>
+            <Accordion.Header>
+              <Accordion.Trigger>{title1}</Accordion.Trigger>
+            </Accordion.Header>
+          </Accordion.Item>
+          <Accordion.Item>
+            <Accordion.Header>
+              <Accordion.Trigger>{title2}</Accordion.Trigger>
+            </Accordion.Header>
+          </Accordion.Item>
+          <Accordion.Item>
+            <Accordion.Header>
+              <Accordion.Trigger>{title3}</Accordion.Trigger>
+            </Accordion.Header>
+          </Accordion.Item>
+        </Accordion.Root>,
+      );
+      const accordionItemTrigger2 = screen.getByRole("button", {
+        name: title2,
+      });
+
+      // Act
+      await user.tab();
+      await user.keyboard("[ArrowRight]");
+
+      // Assert
+      expect(accordionItemTrigger2).toHaveFocus();
+    });
+
+    it('should move focus to the previous trigger using "ArrowLeft" when orientation="horizontal"', async () => {
+      // Arrange
+      const user = userEvent.setup();
+      const title1 = "Accordion Trigger 1";
+      const title2 = "Accordion Trigger 2";
+      const title3 = "Accordion Trigger 3";
+      render(
+        <Accordion.Root orientation="horizontal">
+          <Accordion.Item>
+            <Accordion.Header>
+              <Accordion.Trigger>{title1}</Accordion.Trigger>
+            </Accordion.Header>
+          </Accordion.Item>
+          <Accordion.Item>
+            <Accordion.Header>
+              <Accordion.Trigger>{title2}</Accordion.Trigger>
+            </Accordion.Header>
+          </Accordion.Item>
+          <Accordion.Item>
+            <Accordion.Header>
+              <Accordion.Trigger>{title3}</Accordion.Trigger>
+            </Accordion.Header>
+          </Accordion.Item>
+        </Accordion.Root>,
+      );
+      const accordionItemTrigger1 = screen.getByRole("button", {
+        name: title1,
+      });
+
+      // Act - Tab to second trigger, then press ArrowLeft
+      await user.tab();
+      await user.tab();
+      await user.keyboard("[ArrowLeft]");
+
+      // Assert
+      expect(accordionItemTrigger1).toHaveFocus();
+    });
+
+    it('should wrap to the first trigger using "ArrowRight" from the last trigger when orientation="horizontal"', async () => {
+      // Arrange
+      const user = userEvent.setup();
+      const title1 = "Accordion Trigger 1";
+      const title2 = "Accordion Trigger 2";
+      const title3 = "Accordion Trigger 3";
+      render(
+        <Accordion.Root orientation="horizontal">
+          <Accordion.Item>
+            <Accordion.Header>
+              <Accordion.Trigger>{title1}</Accordion.Trigger>
+            </Accordion.Header>
+          </Accordion.Item>
+          <Accordion.Item>
+            <Accordion.Header>
+              <Accordion.Trigger>{title2}</Accordion.Trigger>
+            </Accordion.Header>
+          </Accordion.Item>
+          <Accordion.Item>
+            <Accordion.Header>
+              <Accordion.Trigger>{title3}</Accordion.Trigger>
+            </Accordion.Header>
+          </Accordion.Item>
+        </Accordion.Root>,
+      );
+      const accordionItemTrigger1 = screen.getByRole("button", {
+        name: title1,
+      });
+
+      // Act - Tab to last trigger, then press ArrowRight to wrap
+      await user.tab();
+      await user.tab();
+      await user.tab();
+      await user.keyboard("[ArrowRight]");
+
+      // Assert
+      expect(accordionItemTrigger1).toHaveFocus();
+    });
+
+    it('should wrap to the last trigger using "ArrowLeft" from the first trigger when orientation="horizontal"', async () => {
+      // Arrange
+      const user = userEvent.setup();
+      const title1 = "Accordion Trigger 1";
+      const title2 = "Accordion Trigger 2";
+      const title3 = "Accordion Trigger 3";
+      render(
+        <Accordion.Root orientation="horizontal">
+          <Accordion.Item>
+            <Accordion.Header>
+              <Accordion.Trigger>{title1}</Accordion.Trigger>
+            </Accordion.Header>
+          </Accordion.Item>
+          <Accordion.Item>
+            <Accordion.Header>
+              <Accordion.Trigger>{title2}</Accordion.Trigger>
+            </Accordion.Header>
+          </Accordion.Item>
+          <Accordion.Item>
+            <Accordion.Header>
+              <Accordion.Trigger>{title3}</Accordion.Trigger>
+            </Accordion.Header>
+          </Accordion.Item>
+        </Accordion.Root>,
+      );
+      const accordionItemTrigger3 = screen.getByRole("button", {
+        name: title3,
+      });
+
+      // Act - Tab to first trigger, then press ArrowLeft to wrap
+      await user.tab();
+      await user.keyboard("[ArrowLeft]");
+
+      // Assert
+      expect(accordionItemTrigger3).toHaveFocus();
+    });
+
+    it('should NOT move focus when pressing "ArrowDown" while orientation="horizontal"', async () => {
+      // Arrange
+      const user = userEvent.setup();
+      const title1 = "Accordion Trigger 1";
+      const title2 = "Accordion Trigger 2";
+      render(
+        <Accordion.Root orientation="horizontal">
+          <Accordion.Item>
+            <Accordion.Header>
+              <Accordion.Trigger>{title1}</Accordion.Trigger>
+            </Accordion.Header>
+          </Accordion.Item>
+          <Accordion.Item>
+            <Accordion.Header>
+              <Accordion.Trigger>{title2}</Accordion.Trigger>
+            </Accordion.Header>
+          </Accordion.Item>
+        </Accordion.Root>,
+      );
+      const accordionItemTrigger1 = screen.getByRole("button", {
+        name: title1,
+      });
+
+      // Act
+      await user.tab();
+      await user.keyboard("[ArrowDown]");
+
+      // Assert - focus should remain on trigger 1
+      expect(accordionItemTrigger1).toHaveFocus();
+    });
+
+    it('should NOT move focus when pressing "ArrowUp" while orientation="horizontal"', async () => {
+      // Arrange
+      const user = userEvent.setup();
+      const title1 = "Accordion Trigger 1";
+      const title2 = "Accordion Trigger 2";
+      render(
+        <Accordion.Root orientation="horizontal">
+          <Accordion.Item>
+            <Accordion.Header>
+              <Accordion.Trigger>{title1}</Accordion.Trigger>
+            </Accordion.Header>
+          </Accordion.Item>
+          <Accordion.Item>
+            <Accordion.Header>
+              <Accordion.Trigger>{title2}</Accordion.Trigger>
+            </Accordion.Header>
+          </Accordion.Item>
+        </Accordion.Root>,
+      );
+      const accordionItemTrigger2 = screen.getByRole("button", {
+        name: title2,
+      });
+
+      // Act - Tab to second trigger, then press ArrowUp (should be ignored in horizontal)
+      await user.tab();
+      await user.tab();
+      await user.keyboard("[ArrowUp]");
+
+      // Assert - focus should remain on trigger 2
+      expect(accordionItemTrigger2).toHaveFocus();
+    });
   });
 
   describe("multiple mode", () => {

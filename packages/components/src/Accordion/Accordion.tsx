@@ -85,11 +85,12 @@ export function AccordionRoot({
     () => ({
       accordionId,
       expandedItems,
+      orientation,
       toggleItem,
       registerTrigger,
       getTriggers,
     }),
-    [accordionId, expandedItems, toggleItem, registerTrigger, getTriggers],
+    [accordionId, expandedItems, orientation, toggleItem, registerTrigger, getTriggers],
   );
 
   return (
@@ -148,7 +149,8 @@ export function AccordionTrigger({
   ...rest
 }: AccordionTriggerProps) {
   const { buttonId, panelId, itemId, isExpanded } = useAccordionItemContext();
-  const { toggleItem, registerTrigger, getTriggers } = useAccordionContext();
+  const { toggleItem, registerTrigger, getTriggers, orientation } =
+    useAccordionContext();
   const triggerRef = useRef<HTMLButtonElement>(null);
 
   // Register/unregister this trigger with the context
@@ -163,36 +165,38 @@ export function AccordionTrigger({
   }
 
   function handleKeyDown(e: KeyboardEvent<HTMLButtonElement>) {
+    const moveNext = (triggers: HTMLButtonElement[]) => {
+      if (triggerRef.current) {
+        const currentIndex = triggers.indexOf(triggerRef.current);
+        const nextIndex = (currentIndex + 1) % triggers.length;
+        triggers[nextIndex]?.focus();
+      }
+    };
+
+    const movePrev = (triggers: HTMLButtonElement[]) => {
+      if (triggerRef.current) {
+        const currentIndex = triggers.indexOf(triggerRef.current);
+        const prevIndex = (currentIndex - 1 + triggers.length) % triggers.length;
+        triggers[prevIndex]?.focus();
+      }
+    };
+
+    const orientationKeys =
+      orientation === "horizontal"
+        ? { ArrowRight: moveNext, ArrowLeft: movePrev }
+        : { ArrowDown: moveNext, ArrowUp: movePrev };
+
     const keyHandlers: Record<string, (triggers: HTMLButtonElement[]) => void> =
       {
-        ArrowDown: (triggers) => {
-          if (triggerRef.current) {
-            const currentIndex = triggers.indexOf(triggerRef.current);
-            const nextIndex = (currentIndex + 1) % triggers.length;
-            triggers[nextIndex]?.focus();
-          }
-        },
-        ArrowUp: (triggers) => {
-          if (triggerRef.current) {
-            const currentIndex = triggers.indexOf(triggerRef.current);
-            const prevIndex =
-              (currentIndex - 1 + triggers.length) % triggers.length;
-            triggers[prevIndex]?.focus();
-          }
-        },
-        Home: (triggers) => {
-          triggers[0]?.focus();
-        },
-        End: (triggers) => {
-          triggers[triggers.length - 1]?.focus();
-        },
+        ...orientationKeys,
+        Home: (triggers) => triggers[0]?.focus(),
+        End: (triggers) => triggers[triggers.length - 1]?.focus(),
       };
 
     const handler = keyHandlers[e.key];
     if (handler) {
       e.preventDefault();
-      const allTriggers = getTriggers();
-      handler(allTriggers);
+      handler(getTriggers());
     }
   }
 

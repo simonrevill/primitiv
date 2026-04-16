@@ -32,6 +32,7 @@ export type AccordionTriggerIconProps = {
 export type AccordionContextValue = {
   accordionId: string;
   expandedItems: Set<string>;
+  orientation: "vertical" | "horizontal";
   toggleItem: (itemId: string) => void;
   registerTrigger: (itemId: string, element: HTMLButtonElement | null) => void;
   getTriggers: () => HTMLButtonElement[];

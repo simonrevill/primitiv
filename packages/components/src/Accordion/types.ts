@@ -40,6 +40,7 @@ export type AccordionHeaderProps = ComponentProps<"h3"> & {
 
 export type AccordionContentProps = ComponentProps<"div"> & {
   children: ReactNode;
+  forceMount?: boolean;
 };
 
 export type AccordionTriggerIconProps = {

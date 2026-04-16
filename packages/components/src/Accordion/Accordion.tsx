@@ -255,7 +255,11 @@ export function AccordionTrigger({
 
 AccordionTrigger.displayName = "AccordionTrigger";
 
-export function AccordionContent({ children, ...rest }: AccordionContentProps) {
+export function AccordionContent({
+  children,
+  forceMount = false,
+  ...rest
+}: AccordionContentProps) {
   const { panelId, buttonId, isExpanded } = useAccordionItemContext();
 
   return (
@@ -263,7 +267,7 @@ export function AccordionContent({ children, ...rest }: AccordionContentProps) {
       id={panelId}
       aria-labelledby={buttonId}
       role="region"
-      hidden={!isExpanded}
+      hidden={forceMount ? undefined : !isExpanded}
       data-state={isExpanded ? "open" : "closed"}
       {...rest}
     >

@@ -30,6 +30,7 @@ describe('Tabs keyboard navigation', () => {
       const tab2 = screen.getByRole('tab', { name: 'Tab 2' });
       expect(tab2).toHaveFocus();
     });
+
   });
 
   describe('Arrow key navigation', () => {

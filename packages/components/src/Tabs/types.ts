@@ -66,6 +66,10 @@ export type TabsListProps = Omit<
 export type TabsTriggerProps = ComponentProps<"button"> & {
   disabled?: boolean;
   value: string;
+  /** Render the child element instead of the default `<button>`. All tab
+   * ARIA attributes and event handlers are merged onto the child. The child
+   * must accept a `ref`. Useful for routing links that need tab semantics. */
+  asChild?: boolean;
 };
 
 export type TabsContentProps = ComponentProps<"div"> & {

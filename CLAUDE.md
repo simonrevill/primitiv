@@ -278,7 +278,7 @@ The wasm mirror types (`types.rs`) and the web app's TypeScript
 were updated mechanically. `Swatch.tsx` aliases the import as
 `SwatchData` to avoid colliding with the React component name.
 
-## Current state (post vocabulary rename)
+## Current state (post components package)
 
 - Steps C, D, A, B are done and landed (PRs #1, #2, #3 merged).
 - Vocabulary rename (`OklchStep`/`OklchLabel`/`Palette` →
@@ -288,6 +288,86 @@ were updated mechanically. `Swatch.tsx` aliases the import as
 - `harmoni-core` has 3 direct deps (`csscolorparser`, `palette`,
   `serde`), 0 wasm/JS/TS concerns.
 - `harmoni-wasm` holds all Tsify/wasm-bindgen code.
+- `packages/components` — headless React component library,
+  119 tests green. See below.
+
+## Components package — `packages/components`
+
+A pnpm workspace package (`@primitiv/components`) that exports headless,
+accessible React components built on WAI-ARIA patterns. Zero styles ship
+with it.
+
+### Current exports
+
+- **`Tabs`** — compound component implementing the WAI-ARIA Tabs pattern.
+  Sub-components: `Tabs.Root`, `Tabs.List`, `Tabs.Trigger`, `Tabs.Content`.
+
+### Key architectural decisions
+
+**Slot / asChild pattern.** `packages/components/src/Slot.tsx` is a
+self-contained implementation of the Radix UI `asChild` composition
+utility. It's intentionally not pulled from Radix as a dep — the entire
+needed surface is small and we want zero style baggage.
+
+`Slot` clones its single child element and merges the Slot's own props
+onto it following these rules (same as Radix):
+- Event handlers **compose** — child's handler runs first, then Slot's.
+- `style` is **shallow-merged** — child wins on collisions.
+- `className` strings are **concatenated**.
+- All other props default to the child's value; Slot provides the fallback.
+- Refs from both sides are composed via `composeRefs`.
+
+`Tabs.Trigger` exposes an `asChild` prop. When set, it renders a `<Slot>`
+instead of the default `<button>`, so consumers can swap in router links
+or any other element while keeping full tab semantics.
+
+**Trigger registration as state.** `useTabsRoot` tracks registered
+trigger values as React state (`triggerValues: string[]`), not just as a
+ref. This makes trigger registration cause re-renders, which is required
+for two things that depend on trigger order:
+1. Roving tabindex — the first registered trigger must have `tabIndex=0`
+   as the keyboard home base when no active value is set.
+2. Dynamic validation — the `useEffect` that throws on an invalid
+   `value`/`defaultValue` now actually re-runs when triggers mount or
+   unmount, because it depends on `triggerValues` state.
+
+**Manual activation mode.** `activationMode="manual"` means arrow keys
+move focus without switching panels; `Enter` or `Space` confirms. The
+`" "` key (literal space, `e.key === " "`) is in the keymap. Tests use
+`user.keyboard(" ")` (a literal space string), not `user.keyboard("{Space}")`,
+because userEvent v14's `{Space}` generates `e.key === "Space"` which
+does not match what real browsers produce.
+
+**React 19 ref-as-prop.** `Tabs.Trigger` destructures `ref` directly
+from its props (React 19 feature) — no `forwardRef` wrapper needed.
+
+### Test layout
+
+```
+packages/components/src/Tabs/__tests__/
+├── Tabs.activation-mode.test.tsx    # automatic vs manual, Space/Enter
+├── Tabs.asChild.test.tsx            # asChild composition, ref forwarding
+├── Tabs.basic-rendering.test.tsx    # ARIA roles, attributes, data-* hooks
+├── Tabs.change-event-callbacks.test.tsx
+├── Tabs.controlled-state.test.tsx
+├── Tabs.disabled-tabs.test.tsx
+├── Tabs.error-handling.test.tsx     # invalid value, dynamic removal
+├── Tabs.fixtures.ts
+├── Tabs.imperative-api.test.tsx
+├── Tabs.keyboard-interaction.test.tsx
+├── Tabs.mouse-interaction.test.tsx
+├── Tabs.reading-direction.test.tsx  # RTL arrow key inversion
+└── Tabs.uncontrolled-state.test.tsx # incl. no-defaultValue tabIndex
+```
+
+### Running component tests
+
+```sh
+cd packages/components
+npx vitest run          # run once
+npx vitest              # watch mode
+npx vitest run --coverage
+```
 
 ## Natural next moves (nothing here is committed to)
 
@@ -316,6 +396,9 @@ not instructions.
 ```sh
 # Run all Rust tests
 cargo test --workspace
+
+# Run React component tests (from packages/components)
+cd packages/components && npx vitest run
 
 # Build the wasm package for the web app
 pnpm run build:wasm

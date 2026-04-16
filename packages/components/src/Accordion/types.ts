@@ -30,6 +30,7 @@ export type AccordionItemProps = ComponentProps<"div"> & {
 export type AccordionTriggerProps = Omit<ComponentProps<"button">, "disabled"> & {
   children: ReactNode;
   disabled?: boolean;
+  asChild?: boolean;
 };
 
 export type AccordionHeaderProps = ComponentProps<"h3"> & {

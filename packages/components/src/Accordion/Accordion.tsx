@@ -9,7 +9,10 @@ import {
   HTMLAttributes,
   MouseEvent,
   KeyboardEvent,
+  Ref,
 } from "react";
+
+import { Slot, composeRefs } from "../Slot";
 
 import type {
   AccordionRootProps,
@@ -159,15 +162,20 @@ export function AccordionHeader({
 AccordionHeader.displayName = "AccordionHeader";
 
 export function AccordionTrigger({
+  ref: externalRef,
   children,
   onClick,
   disabled = false,
+  asChild = false,
   ...rest
-}: AccordionTriggerProps) {
+}: AccordionTriggerProps & { ref?: Ref<HTMLButtonElement> }) {
   const { buttonId, panelId, itemId, isExpanded } = useAccordionItemContext();
   const { toggleItem, registerTrigger, getTriggers, orientation } =
     useAccordionContext();
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const composedRef = externalRef
+    ? composeRefs(triggerRef, externalRef)
+    : triggerRef;
 
   // Register/unregister this trigger with the context
   useEffect(() => {
@@ -221,20 +229,25 @@ export function AccordionTrigger({
     }
   }
 
+  const triggerProps = {
+    ref: composedRef,
+    "aria-expanded": isExpanded,
+    id: buttonId,
+    "aria-controls": panelId,
+    "aria-disabled": disabled,
+    "data-disabled": disabled,
+    onClick: handleClick,
+    onKeyDown: handleKeyDown,
+    "data-state": isExpanded ? "open" : "closed",
+    ...rest,
+  };
+
+  if (asChild) {
+    return <Slot {...triggerProps}>{children}</Slot>;
+  }
+
   return (
-    <button
-      ref={triggerRef}
-      type="button"
-      aria-expanded={isExpanded}
-      id={buttonId}
-      aria-controls={panelId}
-      aria-disabled={disabled}
-      data-disabled={disabled}
-      onClick={handleClick}
-      onKeyDown={handleKeyDown}
-      data-state={isExpanded ? "open" : "closed"}
-      {...rest}
-    >
+    <button type="button" {...triggerProps}>
       {children}
     </button>
   );

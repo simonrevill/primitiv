@@ -19,18 +19,14 @@ import {
   isValidElement,
   cloneElement,
   Children,
-  Ref,
-  HTMLAttributes,
-  ReactNode,
   RefObject,
 } from "react";
 import { SlotProps } from "./types";
+import { AnyProps, PossibleRef } from "../types";
 
 // ---------------------------------------------------------------------------
 // composeRefs
 // ---------------------------------------------------------------------------
-
-type PossibleRef<T> = Ref<T> | undefined;
 
 function setRef<T>(ref: PossibleRef<T>, value: T) {
   if (typeof ref === "function") {
@@ -47,8 +43,6 @@ export function composeRefs<T>(...refs: PossibleRef<T>[]) {
 // ---------------------------------------------------------------------------
 // mergeProps — follows Radix's composition rules exactly
 // ---------------------------------------------------------------------------
-
-type AnyProps = Record<string, unknown>;
 
 function getRef(element: React.ReactElement): PossibleRef<unknown> {
   // React 19 exposes ref via props; React ≤18 via element.ref

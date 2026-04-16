@@ -129,6 +129,8 @@ const TabsRoot = forwardRef<TabsImperativeApi, TabsRootProps>(function TabsRoot(
   );
 });
 
+TabsRoot.displayName = "TabsRoot";
+
 /**
  * The tablist — an accessible container for `Tabs.Trigger` elements.
  *
@@ -176,6 +178,8 @@ export function TabsList({
     </div>
   );
 }
+
+TabsList.displayName = "TabsList";
 
 /**
  * An individual tab button. Renders `<button role="tab">` with full ARIA
@@ -293,6 +297,8 @@ export function TabsTrigger({
   );
 }
 
+TabsTrigger.displayName = "TabsTrigger";
+
 /**
  * A panel associated with a `Tabs.Trigger` of the same
  * {@link TabsContentProps.value | `value`}.
@@ -341,6 +347,8 @@ export function TabsContent({
     </div>
   );
 }
+
+TabsContent.displayName = "TabsContent";
 
 type TTabsCompound = typeof TabsRoot & {
   Root: typeof TabsRoot;
@@ -402,5 +410,7 @@ const TabsCompound: TTabsCompound = Object.assign(TabsRoot, {
   Trigger: TabsTrigger,
   Content: TabsContent,
 });
+
+TabsCompound.displayName = "Tabs";
 
 export { TabsCompound as Tabs };

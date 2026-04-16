@@ -22,7 +22,7 @@ import {
   Ref,
   HTMLAttributes,
   ReactNode,
-  MutableRefObject,
+  RefObject,
 } from "react";
 
 // ---------------------------------------------------------------------------
@@ -35,7 +35,7 @@ function setRef<T>(ref: PossibleRef<T>, value: T) {
   if (typeof ref === "function") {
     ref(value);
   } else if (ref !== null && ref !== undefined) {
-    (ref as MutableRefObject<T>).current = value;
+    (ref as RefObject<T>).current = value;
   }
 }
 
@@ -55,7 +55,7 @@ function getRef(element: React.ReactElement): PossibleRef<unknown> {
     ref?: PossibleRef<unknown>;
   };
   return (props as AnyProps).ref !== undefined
-    ? (props as AnyProps).ref as PossibleRef<unknown>
+    ? ((props as AnyProps).ref as PossibleRef<unknown>)
     : ref;
 }
 

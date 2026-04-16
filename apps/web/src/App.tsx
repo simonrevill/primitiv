@@ -40,19 +40,30 @@ function App() {
                 <div key={key} className="palette">
                   <ColorPalette palette={palette} />
                   <div className="palette__curve-editor">
-                    {palette?.lightness_curve.map((lightnessValue, index) => (
-                      <input
-                        key={index}
-                        className="palette__slider palette__slider--curve"
-                        type="range"
-                        role="slider"
-                        min={0}
-                        max={1}
-                        step={0.01}
-                        value={lightnessValue}
-                        onChange={handleLightnessCurveChange(key, index)}
-                      />
-                    ))}
+                    <Tabs.Root defaultValue="a">
+                      <Tabs.List label="Demo tabs">
+                        <Tabs.Trigger value="a">Sliders</Tabs.Trigger>
+                        <Tabs.Trigger value="b">Curve</Tabs.Trigger>
+                      </Tabs.List>
+                      <Tabs.Content value="a">
+                        {palette?.lightness_curve.map(
+                          (lightnessValue, index) => (
+                            <input
+                              key={index}
+                              className="palette__slider palette__slider--curve"
+                              type="range"
+                              role="slider"
+                              min={0}
+                              max={1}
+                              step={0.01}
+                              value={lightnessValue}
+                              onChange={handleLightnessCurveChange(key, index)}
+                            />
+                          ),
+                        )}
+                      </Tabs.Content>
+                      <Tabs.Content value="b">Second panel</Tabs.Content>
+                    </Tabs.Root>
                   </div>
                 </div>
                 <div className="palette-padding">
@@ -85,14 +96,6 @@ function App() {
                     </span>
                   </div>
                 </div>
-                <Tabs.Root defaultValue="a">
-                  <Tabs.List label="Demo tabs">
-                    <Tabs.Trigger value="a">First</Tabs.Trigger>
-                    <Tabs.Trigger value="b">Second</Tabs.Trigger>
-                  </Tabs.List>
-                  <Tabs.Content value="a">First panel</Tabs.Content>
-                  <Tabs.Content value="b">Second panel</Tabs.Content>
-                </Tabs.Root>
               </div>
             </>
           );

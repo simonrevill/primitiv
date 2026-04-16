@@ -24,6 +24,7 @@ import {
   ReactNode,
   RefObject,
 } from "react";
+import { SlotProps } from "./types";
 
 // ---------------------------------------------------------------------------
 // composeRefs
@@ -92,10 +93,6 @@ function mergeProps(slotProps: AnyProps, childProps: AnyProps): AnyProps {
 // ---------------------------------------------------------------------------
 // Slot component
 // ---------------------------------------------------------------------------
-
-interface SlotProps extends HTMLAttributes<HTMLElement> {
-  children?: ReactNode;
-}
 
 export const Slot = forwardRef<HTMLElement, SlotProps>(
   ({ children, ...slotProps }, forwardedRef) => {

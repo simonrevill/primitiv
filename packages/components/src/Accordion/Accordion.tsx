@@ -39,6 +39,7 @@ export function AccordionRoot({
   value: controlledValue,
   onValueChange,
   orientation = "vertical",
+  dir = "ltr",
   ...rest
 }: AccordionRootProps) {
   const accordionId = useId();
@@ -104,16 +105,17 @@ export function AccordionRoot({
       accordionId,
       expandedItems,
       orientation,
+      dir,
       toggleItem,
       registerTrigger,
       getTriggers,
     }),
-    [accordionId, expandedItems, orientation, toggleItem, registerTrigger, getTriggers],
+    [accordionId, expandedItems, orientation, dir, toggleItem, registerTrigger, getTriggers],
   );
 
   return (
     <AccordionContext.Provider value={contextValue}>
-      <div data-orientation={orientation} {...rest}>
+      <div data-orientation={orientation} dir={dir} {...rest}>
         {children}
       </div>
     </AccordionContext.Provider>
@@ -170,7 +172,7 @@ export function AccordionTrigger({
   ...rest
 }: AccordionTriggerProps & { ref?: Ref<HTMLButtonElement> }) {
   const { buttonId, panelId, itemId, isExpanded } = useAccordionItemContext();
-  const { toggleItem, registerTrigger, getTriggers, orientation } =
+  const { toggleItem, registerTrigger, getTriggers, orientation, dir } =
     useAccordionContext();
   const triggerRef = useRef<HTMLButtonElement>(null);
   const composedRef = externalRef
@@ -210,9 +212,13 @@ export function AccordionTrigger({
       }
     };
 
+    const isRtl = orientation === "horizontal" && dir === "rtl";
     const orientationKeys =
       orientation === "horizontal"
-        ? { ArrowRight: moveNext, ArrowLeft: movePrev }
+        ? {
+            ArrowRight: isRtl ? movePrev : moveNext,
+            ArrowLeft: isRtl ? moveNext : movePrev,
+          }
         : { ArrowDown: moveNext, ArrowUp: movePrev };
 
     const keyHandlers: Record<string, (triggers: HTMLButtonElement[]) => void> =

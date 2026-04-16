@@ -4,6 +4,7 @@ import { HeadingLevel } from "../types";
 type AccordionRootBaseProps = ComponentProps<"div"> & {
   multiple?: boolean;
   orientation?: "vertical" | "horizontal";
+  dir?: AccordionReadingDirection;
 };
 
 type AccordionRootUncontrolledProps = AccordionRootBaseProps & {
@@ -17,6 +18,8 @@ type AccordionRootControlledProps = AccordionRootBaseProps & {
   value: string[];
   onValueChange: (values: string[]) => void;
 };
+
+export type AccordionReadingDirection = "ltr" | "rtl";
 
 export type AccordionRootProps =
   | AccordionRootUncontrolledProps
@@ -51,6 +54,7 @@ export type AccordionContextValue = {
   accordionId: string;
   expandedItems: Set<string>;
   orientation: "vertical" | "horizontal";
+  dir: AccordionReadingDirection;
   toggleItem: (itemId: string) => void;
   registerTrigger: (itemId: string, element: HTMLButtonElement | null) => void;
   getTriggers: () => HTMLButtonElement[];

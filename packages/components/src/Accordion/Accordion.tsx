@@ -4,9 +4,7 @@ import {
   useCallback,
   useState,
   useId,
-  cloneElement,
   useEffect,
-  HTMLAttributes,
   MouseEvent,
   KeyboardEvent,
   Ref,
@@ -284,12 +282,13 @@ export function AccordionContent({
 
 AccordionContent.displayName = "AccordionContent";
 
-export function AccordionTriggerIcon({ icon }: AccordionTriggerIconProps) {
+export function AccordionTriggerIcon({ children }: AccordionTriggerIconProps) {
   const { isExpanded } = useAccordionItemContext();
-  return cloneElement(icon, {
-    "aria-hidden": "true",
-    "data-state": isExpanded ? "open" : "closed",
-  } as Partial<HTMLAttributes<HTMLElement>>);
+  return (
+    <Slot aria-hidden="true" data-state={isExpanded ? "open" : "closed"}>
+      {children}
+    </Slot>
+  );
 }
 
 AccordionTriggerIcon.displayName = "AccordionTriggerIcon";

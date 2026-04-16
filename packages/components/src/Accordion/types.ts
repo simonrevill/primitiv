@@ -47,7 +47,7 @@ export type AccordionContentProps = ComponentProps<"div"> & {
 };
 
 export type AccordionTriggerIconProps = {
-  icon: ReactElement;
+  children: ReactElement;
 };
 
 export type AccordionContextValue = {

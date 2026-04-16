@@ -28,9 +28,12 @@ export function useTabsRoot(
   const [internalValue, setInternalValue] = useState(defaultValue);
   const activeValue = isControlled ? value : internalValue;
   const triggersRef = useRef<Map<string, HTMLButtonElement>>(new Map());
+  // Tracks the ordered list of registered trigger values as state so that
+  // consumers can re-render when triggers mount/unmount (e.g. to compute
+  // the roving-tabindex home base when no active value is set).
+  const [triggerValues, setTriggerValues] = useState<string[]>([]);
 
   useEffect(() => {
-    const triggerValues = Array.from(triggersRef.current.keys());
     if (
       triggerValues.length > 0 &&
       activeValue !== undefined &&
@@ -42,7 +45,7 @@ export function useTabsRoot(
         )}]`,
       );
     }
-  }, [activeValue, triggersRef, triggersRef.current.size]);
+  }, [activeValue, triggerValues]);
 
   const registerTrigger = useCallback(
     (triggerValue: string, element: HTMLButtonElement | null) => {
@@ -51,6 +54,7 @@ export function useTabsRoot(
       } else {
         triggersRef.current.delete(triggerValue);
       }
+      setTriggerValues(Array.from(triggersRef.current.keys()));
     },
     [],
   );
@@ -60,7 +64,6 @@ export function useTabsRoot(
     ref,
     () => ({
       setActiveTab: (newValue: string) => {
-        const triggerValues = Array.from(triggersRef.current.keys());
         if (!triggerValues.includes(newValue)) {
           throw new Error(`Invalid tab value: ${newValue}`);
         }
@@ -72,7 +75,7 @@ export function useTabsRoot(
         }
       },
     }),
-    [isControlled, onValueChange],
+    [isControlled, onValueChange, triggerValues],
   );
 
   const contextValue = useMemo(
@@ -88,6 +91,7 @@ export function useTabsRoot(
       onChange,
       registerTrigger,
       triggersRef,
+      triggerValues,
     }),
     [
       orientation,
@@ -99,6 +103,7 @@ export function useTabsRoot(
       onValueChange,
       onChange,
       registerTrigger,
+      triggerValues,
     ],
   );
 

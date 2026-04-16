@@ -28,12 +28,17 @@ export function useTabsTrigger({
     tabsId,
     registerTrigger,
     triggersRef,
+    triggerValues,
   } = useTabsContext();
   const isActive = activeValue === value;
   const { triggerId, panelId } = getTriggerAndPanelIds(tabsId, value);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const state = isActive ? "active" : "inactive";
-  const tabIndex = isActive ? 0 : -1;
+  // When no tab is active (no defaultValue/value provided), the first registered
+  // trigger acts as the roving-tabindex home base so the tablist stays reachable
+  // via keyboard Tab navigation.
+  const isFirst = triggerValues[0] === value;
+  const tabIndex = isActive || (activeValue === undefined && isFirst) ? 0 : -1;
 
   useEffect(() => {
     registerTrigger(value, buttonRef.current);
@@ -56,7 +61,7 @@ export function useTabsTrigger({
   );
 
   function handleClick(e: MouseEvent<HTMLButtonElement>) {
-    const index = Array.from(triggersRef.current.keys()).indexOf(value);
+    const index = triggerValues.indexOf(value);
     if (!disabled) {
       activateTab(value, index);
     }
@@ -64,7 +69,6 @@ export function useTabsTrigger({
   }
 
   function handleKeyDown(e: KeyboardEvent<HTMLButtonElement>) {
-    const triggerValues = Array.from(triggersRef.current.keys());
     const currentIndex = triggerValues.indexOf(value);
     const totalTabs = triggerValues.length;
     const keyToAction = getKeyToAction(orientation, dir);

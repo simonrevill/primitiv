@@ -43,6 +43,7 @@ export type TabsContextValue = {
   tabsId: string;
   registerTrigger: (value: string, element: HTMLButtonElement | null) => void;
   triggersRef: RefObject<Map<string, HTMLButtonElement>>;
+  triggerValues: string[];
 };
 
 export type TabsListProps = Omit<

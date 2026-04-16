@@ -161,6 +161,7 @@ AccordionHeader.displayName = "AccordionHeader";
 export function AccordionTrigger({
   children,
   onClick,
+  disabled = false,
   ...rest
 }: AccordionTriggerProps) {
   const { buttonId, panelId, itemId, isExpanded } = useAccordionItemContext();
@@ -175,11 +176,16 @@ export function AccordionTrigger({
   }, [itemId, registerTrigger]);
 
   function handleClick(e: MouseEvent<HTMLButtonElement>) {
+    if (disabled) return;
     toggleItem(itemId);
     onClick?.(e);
   }
 
   function handleKeyDown(e: KeyboardEvent<HTMLButtonElement>) {
+    const enabledTriggers = getTriggers().filter(
+      (t) => t.getAttribute("aria-disabled") !== "true",
+    );
+
     const moveNext = (triggers: HTMLButtonElement[]) => {
       if (triggerRef.current) {
         const currentIndex = triggers.indexOf(triggerRef.current);
@@ -211,7 +217,7 @@ export function AccordionTrigger({
     const handler = keyHandlers[e.key];
     if (handler) {
       e.preventDefault();
-      handler(getTriggers());
+      handler(enabledTriggers);
     }
   }
 
@@ -222,6 +228,8 @@ export function AccordionTrigger({
       aria-expanded={isExpanded}
       id={buttonId}
       aria-controls={panelId}
+      aria-disabled={disabled}
+      data-disabled={disabled}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
       data-state={isExpanded ? "open" : "closed"}

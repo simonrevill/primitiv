@@ -27,8 +27,9 @@ export type AccordionItemProps = ComponentProps<"div"> & {
   value?: string; // Optional - if not provided, useId() will generate one
 };
 
-export type AccordionTriggerProps = ComponentProps<"button"> & {
+export type AccordionTriggerProps = Omit<ComponentProps<"button">, "disabled"> & {
   children: ReactNode;
+  disabled?: boolean;
 };
 
 export type AccordionHeaderProps = ComponentProps<"h3"> & {

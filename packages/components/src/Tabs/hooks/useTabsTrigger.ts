@@ -47,15 +47,13 @@ export function useTabsTrigger({
 
   const activateTab = useCallback(
     (newValue: string, index: number) => {
-      const wasAlreadyActive = activeValue === newValue;
+      if (activeValue === newValue) return;
       if (isControlled) {
         onValueChange?.(newValue);
       } else {
         setActiveValue(newValue);
       }
-      if (!wasAlreadyActive) {
-        onChange?.({ index, name: newValue });
-      }
+      onChange?.({ index, name: newValue });
     },
     [activeValue, isControlled, onValueChange, setActiveValue, onChange],
   );

@@ -89,7 +89,7 @@ describe("Accordion data attributes tests", () => {
     expect(accordionItemPanel).toHaveAttribute("data-state", "open");
   });
 
-  it('should apply data-state="closed" to accordion trigger icon by default', () => {
+  it('should apply data-state="closed" to accordion trigger icon wrapper by default', () => {
     // Arrange
     const title = "Accordion Trigger 1";
     render(
@@ -120,13 +120,13 @@ describe("Accordion data attributes tests", () => {
       </Accordion.Root>,
     );
     const accordionItemTrigger = screen.getByRole("button", { name: title });
-    const accordionItemTriggerIcon = accordionItemTrigger.querySelector("svg");
+    const iconWrapper = accordionItemTrigger.querySelector("[aria-hidden='true']");
 
     // Assert
-    expect(accordionItemTriggerIcon).toHaveAttribute("data-state", "closed");
+    expect(iconWrapper).toHaveAttribute("data-state", "closed");
   });
 
-  it('should apply data-state="open" to accordion trigger icon when expanded', async () => {
+  it('should apply data-state="open" to accordion trigger icon wrapper when expanded', async () => {
     // Arrange
     const user = userEvent.setup();
     const title = "Accordion Trigger 1";
@@ -158,12 +158,75 @@ describe("Accordion data attributes tests", () => {
       </Accordion.Root>,
     );
     const accordionItemTrigger = screen.getByRole("button", { name: title });
-    const accordionItemTriggerIcon = accordionItemTrigger.querySelector("svg");
+    const iconWrapper = accordionItemTrigger.querySelector("[aria-hidden='true']");
 
     // Act
     await user.click(accordionItemTrigger);
 
     // Assert
-    expect(accordionItemTriggerIcon).toHaveAttribute("data-state", "open");
+    expect(iconWrapper).toHaveAttribute("data-state", "open");
+  });
+
+  it('should apply data-state="closed" to the icon wrapper when the icon is a React component', () => {
+    // Arrange — simulates lucide-react, react-icons, or any custom icon component
+    const ComponentIcon = () => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+        <path d="M5 12h14" />
+      </svg>
+    );
+    const title = "Accordion Trigger 1";
+    render(
+      <Accordion.Root>
+        <Accordion.Item>
+          <Accordion.Header>
+            <Accordion.Trigger>
+              {title}
+              <Accordion.TriggerIcon>
+                <ComponentIcon />
+              </Accordion.TriggerIcon>
+            </Accordion.Trigger>
+          </Accordion.Header>
+        </Accordion.Item>
+      </Accordion.Root>,
+    );
+    const trigger = screen.getByRole("button", { name: title });
+    const iconWrapper = trigger.querySelector("[aria-hidden='true']");
+
+    // Assert
+    expect(iconWrapper).not.toBeNull();
+    expect(iconWrapper).toHaveAttribute("data-state", "closed");
+  });
+
+  it('should apply data-state="open" to the icon wrapper when the icon is a React component and the item is expanded', async () => {
+    // Arrange
+    const user = userEvent.setup();
+    const ComponentIcon = () => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+        <path d="M5 12h14" />
+      </svg>
+    );
+    const title = "Accordion Trigger 1";
+    render(
+      <Accordion.Root>
+        <Accordion.Item>
+          <Accordion.Header>
+            <Accordion.Trigger>
+              {title}
+              <Accordion.TriggerIcon>
+                <ComponentIcon />
+              </Accordion.TriggerIcon>
+            </Accordion.Trigger>
+          </Accordion.Header>
+        </Accordion.Item>
+      </Accordion.Root>,
+    );
+    const trigger = screen.getByRole("button", { name: title });
+
+    // Act
+    await user.click(trigger);
+
+    // Assert
+    const iconWrapper = trigger.querySelector("[aria-hidden='true']");
+    expect(iconWrapper).toHaveAttribute("data-state", "open");
   });
 });

@@ -101,7 +101,7 @@ describe("Accordion basic rendering tests", () => {
     );
   });
 
-  it('should apply the aria-hidden="true" attribute to the accordion trigger icon', () => {
+  it('should apply the aria-hidden="true" attribute to the accordion trigger icon wrapper', () => {
     // Arrange
     const title = "Accordion Trigger 1";
     render(
@@ -132,10 +132,40 @@ describe("Accordion basic rendering tests", () => {
       </Accordion.Root>,
     );
     const accordionItemTrigger = screen.getByRole("button", { name: title });
-    const accordionItemTriggerIcon = accordionItemTrigger.querySelector("svg");
+    const iconWrapper = accordionItemTrigger.querySelector("[aria-hidden='true']");
 
     // Assert
-    expect(accordionItemTriggerIcon).toHaveAttribute("aria-hidden", "true");
+    expect(iconWrapper).toHaveAttribute("aria-hidden", "true");
+  });
+
+  it('should apply aria-hidden="true" to the icon wrapper when the icon is a React component (not an inline DOM element)', () => {
+    // Arrange — simulates lucide-react, react-icons, or any custom icon component
+    const ComponentIcon = () => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+        <path d="M5 12h14" />
+      </svg>
+    );
+    const title = "Accordion Trigger 1";
+    render(
+      <Accordion.Root>
+        <Accordion.Item>
+          <Accordion.Header>
+            <Accordion.Trigger>
+              {title}
+              <Accordion.TriggerIcon>
+                <ComponentIcon />
+              </Accordion.TriggerIcon>
+            </Accordion.Trigger>
+          </Accordion.Header>
+        </Accordion.Item>
+      </Accordion.Root>,
+    );
+    const trigger = screen.getByRole("button", { name: title });
+    const iconWrapper = trigger.querySelector("[aria-hidden='true']");
+
+    // Assert
+    expect(iconWrapper).not.toBeNull();
+    expect(iconWrapper).toHaveAttribute("aria-hidden", "true");
   });
 
   it("should give the accordion item content panel a unique id", () => {

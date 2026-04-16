@@ -106,15 +106,21 @@ the trigger's):
 
 ## Trigger icon
 
-Wrap a decorative icon in `Accordion.TriggerIcon` to inject `aria-hidden`
-and a `data-state` hook for rotation animations. The child must be a single
-DOM element (e.g. `<svg>`), not a React component wrapper:
+Wrap a decorative icon in `Accordion.TriggerIcon` to hide it from assistive
+technology and expose a `data-state` hook for rotation animations. The child
+can be any renderable React content — an inline `<svg>`, a component from
+a third-party icon library (lucide-react, react-icons, etc.), or a custom
+icon component. `aria-hidden` and `data-state` are placed on a wrapping
+`<span>`, so they work regardless of whether the icon component forwards
+unknown props.
 
 ```tsx
+import { ChevronDown } from "lucide-react";
+
 <Accordion.Trigger>
   Shipping policy
   <Accordion.TriggerIcon>
-    <svg …><path d="…" /></svg>
+    <ChevronDown />
   </Accordion.TriggerIcon>
 </Accordion.Trigger>
 ```

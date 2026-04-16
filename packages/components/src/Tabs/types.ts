@@ -6,6 +6,15 @@ export type TabsReadingDirection = "ltr" | "rtl";
 
 export type TabsActivationMode = "automatic" | "manual";
 
+/**
+ * Payload delivered to the {@link BaseTabsRootProps.onChange | `onChange`} callback
+ * on every user-driven tab activation.
+ *
+ * - `index` — zero-based position of the activated trigger in registration order.
+ * - `name`  — the programmatic **value** string passed to `Tabs.Trigger` (e.g.
+ *   `"settings"`), **not** the human-readable label text rendered inside the
+ *   trigger. Use the `children` of the trigger for the visible label.
+ */
 export type TabMetadata = { index: number; name: string };
 
 export type BaseTabsRootProps = {

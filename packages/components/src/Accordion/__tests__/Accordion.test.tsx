@@ -491,6 +491,13 @@ describe("accordion tests", () => {
   });
 
   describe("context errors", () => {
+    it("should throw an error when AccordionHeader is used outside AccordionRoot", () => {
+      // Arrange & Act & Assert
+      expect(() => {
+        render(<Accordion.Header>Test</Accordion.Header>);
+      }).toThrow("AccordionHeader must be used within AccordionRoot");
+    });
+
     it("should throw an error when AccordionItem is used outside AccordionRoot", () => {
       // Arrange & Act & Assert
       expect(() => {

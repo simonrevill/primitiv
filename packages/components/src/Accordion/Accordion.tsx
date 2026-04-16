@@ -23,7 +23,11 @@ import type {
 import type { HeadingTag } from "../types";
 
 import { AccordionContext, AccordionItemContext } from "./AccordionContext";
-import { useAccordionContext, useAccordionItemContext } from "./hooks";
+import {
+  useAccordionContext,
+  useAccordionHeaderContext,
+  useAccordionItemContext,
+} from "./hooks";
 
 export function AccordionRoot({
   children,
@@ -130,7 +134,9 @@ export function AccordionHeader({
   level = 3,
   ...rest
 }: AccordionHeaderProps) {
+  useAccordionHeaderContext();
   const HeadingTag: HeadingTag = `h${level}`;
+
   return <HeadingTag {...rest}>{children}</HeadingTag>;
 }
 

@@ -16,7 +16,7 @@ export type AccordionTriggerProps = ComponentProps<"button"> & {
   children: ReactNode;
 };
 
-export type AccordionHeaderProps = Omit<ComponentProps<"h3">, "level"> & {
+export type AccordionHeaderProps = ComponentProps<"h3"> & {
   children: ReactNode;
   level?: HeadingLevel;
 };

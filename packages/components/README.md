@@ -16,9 +16,10 @@ import { Tabs } from "@primitiv/components";
 
 ## Components
 
-| Component                       | Description                                             |
-| ------------------------------- | ------------------------------------------------------- |
-| [Tabs](src/Tabs/README.md)      | WAI-ARIA Tabs pattern — compound component with keyboard navigation, controlled/uncontrolled state, and `asChild` composition |
+| Component                                 | Description                                             |
+| ----------------------------------------- | ------------------------------------------------------- |
+| [Accordion](src/Accordion/README.md)      | WAI-ARIA Accordion pattern — collapsible sections with keyboard navigation, controlled/uncontrolled state, multiple mode, and `asChild` composition |
+| [Tabs](src/Tabs/README.md)                | WAI-ARIA Tabs pattern — compound component with keyboard navigation, controlled/uncontrolled state, and `asChild` composition |
 
 ## Internal utilities
 

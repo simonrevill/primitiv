@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { useRef } from "react";
+import { createRef } from "react";
 
 import { Tabs } from "..";
 
@@ -74,23 +74,18 @@ describe("Tabs.Trigger asChild", () => {
   });
 
   it("forwards ref to the child DOM element", () => {
-    function WithRef() {
-      const ref = useRef<HTMLAnchorElement>(null);
-      return (
-        <>
-          <Tabs.Root defaultValue="tab1">
-            <Tabs.List label="Test tabs">
-              <Tabs.Trigger asChild value="tab1" ref={ref}>
-                <a href="/tab1">Tab 1</a>
-              </Tabs.Trigger>
-            </Tabs.List>
-            <Tabs.Content value="tab1">Content 1</Tabs.Content>
-          </Tabs.Root>
-          <div data-testid="tag">{ref.current?.tagName ?? "none"}</div>
-        </>
-      );
-    }
-    render(<WithRef />);
-    expect(screen.getByTestId("tag")).toHaveTextContent("A");
+    const ref = createRef<HTMLAnchorElement>();
+    render(
+      <Tabs.Root defaultValue="tab1">
+        <Tabs.List label="Test tabs">
+          <Tabs.Trigger asChild value="tab1" ref={ref}>
+            <a href="/tab1">Tab 1</a>
+          </Tabs.Trigger>
+        </Tabs.List>
+        <Tabs.Content value="tab1">Content 1</Tabs.Content>
+      </Tabs.Root>,
+    );
+    expect(ref.current).not.toBeNull();
+    expect(ref.current?.tagName).toBe("A");
   });
 });

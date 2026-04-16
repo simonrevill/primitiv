@@ -29,6 +29,20 @@ describe("accordion tests", () => {
       expect(accordion).toHaveAttribute("data-orientation", "horizontal");
     });
 
+    it("should NOT apply aria-orientation to the accordion root", () => {
+      // Arrange
+      render(
+        <Accordion.Root
+          data-testid="test-accordion"
+          orientation="horizontal"
+        />,
+      );
+      const accordion = screen.getByTestId("test-accordion");
+
+      // Assert
+      expect(accordion).not.toHaveAttribute("aria-orientation");
+    });
+
     it('should apply the attribute aria-expanded="false" to the accordion item trigger by default', () => {
       // Arrange
       const title = "Accordion Trigger 1";

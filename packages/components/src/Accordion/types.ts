@@ -1,11 +1,26 @@
 import { ComponentProps, ReactNode, ReactElement } from "react";
 import { HeadingLevel } from "../types";
 
-export type AccordionRootProps = ComponentProps<"div"> & {
+type AccordionRootBaseProps = ComponentProps<"div"> & {
   multiple?: boolean;
-  defaultValue?: string;
   orientation?: "vertical" | "horizontal";
 };
+
+type AccordionRootUncontrolledProps = AccordionRootBaseProps & {
+  defaultValue?: string;
+  value?: never;
+  onValueChange?: never;
+};
+
+type AccordionRootControlledProps = AccordionRootBaseProps & {
+  defaultValue?: never;
+  value: string[];
+  onValueChange: (values: string[]) => void;
+};
+
+export type AccordionRootProps =
+  | AccordionRootUncontrolledProps
+  | AccordionRootControlledProps;
 
 export type AccordionItemProps = ComponentProps<"div"> & {
   children: ReactNode;

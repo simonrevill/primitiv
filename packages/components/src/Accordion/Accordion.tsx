@@ -33,37 +33,52 @@ export function AccordionRoot({
   children,
   multiple = false,
   defaultValue,
+  value: controlledValue,
+  onValueChange,
   orientation = "vertical",
   ...rest
 }: AccordionRootProps) {
   const accordionId = useId();
   const triggersRef = useRef<Map<string, HTMLButtonElement>>(new Map());
-  const [expandedItems, setExpandedItems] = useState<Set<string>>(() => {
+  const isControlled = controlledValue !== undefined;
+
+  const [internalExpandedItems, setInternalExpandedItems] = useState<
+    Set<string>
+  >(() => {
     if (defaultValue !== undefined) {
       return new Set([defaultValue]);
     }
     return new Set();
   });
 
+  const expandedItems = isControlled
+    ? new Set(controlledValue)
+    : internalExpandedItems;
+
+  const computeNext = (prev: Set<string>, itemId: string): Set<string> => {
+    const next = new Set(prev);
+    if (next.has(itemId)) {
+      next.delete(itemId);
+    } else if (multiple) {
+      next.add(itemId);
+    } else {
+      next.clear();
+      next.add(itemId);
+    }
+    return next;
+  };
+
   const toggleItem = useCallback(
     (itemId: string) => {
-      setExpandedItems((prev) => {
-        const next = new Set(prev);
-        if (next.has(itemId)) {
-          // If the item is already expanded, collapse it
-          next.delete(itemId);
-        } else if (multiple) {
-          // Multiple mode: keep other items and add this one
-          next.add(itemId);
-        } else {
-          // Single mode: clear all other items and add only this one
-          next.clear();
-          next.add(itemId);
-        }
-        return next;
-      });
+      if (isControlled) {
+        const next = computeNext(new Set(controlledValue), itemId);
+        onValueChange?.(Array.from(next));
+      } else {
+        setInternalExpandedItems((prev) => computeNext(prev, itemId));
+      }
     },
-    [multiple],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isControlled, multiple, controlledValue, onValueChange],
   );
 
   const registerTrigger = useCallback(

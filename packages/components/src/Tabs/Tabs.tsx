@@ -1,4 +1,6 @@
-import { forwardRef } from "react";
+import { forwardRef, Ref } from "react";
+
+import { Slot, composeRefs } from "../Slot";
 
 import {
   useTabsRoot,
@@ -186,24 +188,36 @@ export function TabsList({
  * `useId()` plus the trigger's `value`, so they're stable and unique even
  * when multiple `Tabs` instances coexist on a page.
  *
- * **Keyboard support** (WAI-ARIA Tabs pattern, automatic activation):
+ * **Keyboard support** (WAI-ARIA Tabs pattern):
  *
- * | Key                          | Behaviour                              |
- * | ---------------------------- | -------------------------------------- |
- * | `ArrowRight` / `ArrowLeft`   | Move between triggers (horizontal)     |
- * | `ArrowDown`  / `ArrowUp`     | Move between triggers (vertical)       |
- * | `Home` / `End`               | Jump to first / last trigger           |
+ * | Key                          | Behaviour                                          |
+ * | ---------------------------- | -------------------------------------------------- |
+ * | `ArrowRight` / `ArrowLeft`   | Move between triggers (horizontal)                 |
+ * | `ArrowDown`  / `ArrowUp`     | Move between triggers (vertical)                   |
+ * | `Home` / `End`               | Jump to first / last trigger                       |
+ * | `Enter` / `Space`            | Activate focused trigger (manual mode only)        |
  *
- * Movement **wraps** at the ends. Activation is **automatic** on focus
- * movement, which is the recommended pattern for small, immediately-
- * loadable panels. For panels that are expensive to render, consider
- * using the controlled mode and debouncing panel swaps yourself.
+ * Movement **wraps** at the ends. In **automatic** activation mode (the default),
+ * focus movement immediately activates the panel. In **manual** mode, arrow keys
+ * move focus without switching the panel — `Enter` or `Space` confirms the
+ * selection. Use manual mode for panels that are expensive to render.
+ *
+ * **`asChild` prop.** Pass `asChild` to render an arbitrary child element
+ * instead of the default `<button>`. All tab ARIA attributes, event handlers,
+ * and the roving `tabIndex` are merged onto the child element following the
+ * Radix UI composition pattern:
+ * - Event handlers compose — the child's handler runs first, then the trigger's.
+ * - `style` is shallow-merged (child wins on collisions).
+ * - `className` strings are concatenated.
+ * - Refs from both sides are composed via `composeRefs`.
+ *
+ * The child **must** be a single React element that accepts a `ref`.
  *
  * **Styling hooks.**
- * - `data-state="active" | "inactive"` on the rendered button.
+ * - `data-state="active" | "inactive"` on the rendered element.
  * - `data-orientation="horizontal" | "vertical"`.
  *
- * @example
+ * @example Basic usage
  * ```tsx
  * <Tabs.Trigger value="account">Account</Tabs.Trigger>
  * ```
@@ -215,15 +229,24 @@ export function TabsList({
  *   <span>Billing</span>
  * </Tabs.Trigger>
  * ```
+ *
+ * @example asChild — render a router link with tab semantics
+ * ```tsx
+ * <Tabs.Trigger asChild value="settings">
+ *   <Link to="/settings">Settings</Link>
+ * </Tabs.Trigger>
+ * ```
  */
 export function TabsTrigger({
+  ref: externalRef,
   children,
   className = "",
   value,
   onClick,
   disabled = false,
+  asChild = false,
   ...rest
-}: TabsTriggerProps) {
+}: TabsTriggerProps & { ref?: Ref<HTMLButtonElement> }) {
   const {
     buttonRef,
     triggerId,
@@ -236,24 +259,35 @@ export function TabsTrigger({
     handleKeyDown,
   } = useTabsTrigger({ value, onClick, disabled });
 
+  // Compose our internal ref with any external ref the consumer passes.
+  // composeRefs returns a callback ref that sets both simultaneously.
+  const composedRef = externalRef
+    ? composeRefs(buttonRef, externalRef)
+    : buttonRef;
+
+  const triggerProps = {
+    ref: composedRef,
+    role: "tab" as const,
+    className,
+    id: triggerId,
+    "aria-controls": panelId,
+    "aria-selected": isActive,
+    "aria-disabled": disabled,
+    "data-disabled": disabled,
+    "data-orientation": orientation,
+    "data-state": state,
+    tabIndex,
+    onClick: handleClick,
+    onKeyDown: handleKeyDown,
+    ...rest,
+  };
+
+  if (asChild) {
+    return <Slot {...triggerProps}>{children}</Slot>;
+  }
+
   return (
-    <button
-      ref={buttonRef}
-      type="button"
-      role="tab"
-      className={className}
-      id={triggerId}
-      aria-controls={panelId}
-      aria-selected={isActive}
-      aria-disabled={disabled}
-      data-disabled={disabled}
-      data-orientation={orientation}
-      data-state={state}
-      tabIndex={tabIndex}
-      onClick={handleClick}
-      onKeyDown={handleKeyDown}
-      {...rest}
-    >
+    <button type="button" {...triggerProps}>
       {children}
     </button>
   );

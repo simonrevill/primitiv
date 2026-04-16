@@ -6,16 +6,16 @@ import { type HeadingLevel } from "../../types";
 
 describe("accordion tests", () => {
   describe("default accordion item rendering", () => {
-    it('should apply the attribute aria-orientation="vertical" to the accordion by default', () => {
+    it('should apply the attribute data-orientation="vertical" to the accordion by default', () => {
       // Arrange
       render(<Accordion.Root data-testid="test-accordion" />);
       const accordion = screen.getByTestId("test-accordion");
 
       // Assert
-      expect(accordion).toHaveAttribute("aria-orientation", "vertical");
+      expect(accordion).toHaveAttribute("data-orientation", "vertical");
     });
 
-    it('should apply the attribute aria-orientation="horizontal" to the accordion when orientation="horizontal" is provided', () => {
+    it('should apply the attribute data-orientation="horizontal" to the accordion when orientation="horizontal" is provided', () => {
       // Arrange
       render(
         <Accordion.Root
@@ -26,7 +26,7 @@ describe("accordion tests", () => {
       const accordion = screen.getByTestId("test-accordion");
 
       // Assert
-      expect(accordion).toHaveAttribute("aria-orientation", "horizontal");
+      expect(accordion).toHaveAttribute("data-orientation", "horizontal");
     });
 
     it('should apply the attribute aria-expanded="false" to the accordion item trigger by default', () => {

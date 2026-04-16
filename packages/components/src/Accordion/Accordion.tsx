@@ -90,7 +90,7 @@ export function AccordionRoot({
 
   return (
     <AccordionContext.Provider value={contextValue}>
-      <div aria-orientation={orientation} {...rest}>
+      <div data-orientation={orientation} {...rest}>
         {children}
       </div>
     </AccordionContext.Provider>

@@ -1,0 +1,296 @@
+import { render, screen } from "@testing-library/react";
+
+import { Accordion } from "../Accordion";
+import { type HeadingLevel } from "../../types";
+
+describe("Accordion basic rendering tests", () => {
+  it('should apply the attribute data-orientation="vertical" to the accordion by default', () => {
+    // Arrange
+    render(<Accordion.Root data-testid="test-accordion" />);
+    const accordion = screen.getByTestId("test-accordion");
+
+    // Assert
+    expect(accordion).toHaveAttribute("data-orientation", "vertical");
+  });
+
+  it('should apply the attribute data-orientation="horizontal" to the accordion when orientation="horizontal" is provided', () => {
+    // Arrange
+    render(
+      <Accordion.Root
+        data-testid="test-accordion"
+        orientation="horizontal"
+      />,
+    );
+    const accordion = screen.getByTestId("test-accordion");
+
+    // Assert
+    expect(accordion).toHaveAttribute("data-orientation", "horizontal");
+  });
+
+  it("should NOT apply aria-orientation to the accordion root", () => {
+    // Arrange
+    render(
+      <Accordion.Root
+        data-testid="test-accordion"
+        orientation="horizontal"
+      />,
+    );
+    const accordion = screen.getByTestId("test-accordion");
+
+    // Assert
+    expect(accordion).not.toHaveAttribute("aria-orientation");
+  });
+
+  it('should apply the attribute aria-expanded="false" to the accordion item trigger by default', () => {
+    // Arrange
+    const title = "Accordion Trigger 1";
+    render(
+      <Accordion.Root data-testid="test-accordion">
+        <Accordion.Item>
+          <Accordion.Header>
+            <Accordion.Trigger>{title}</Accordion.Trigger>
+          </Accordion.Header>
+        </Accordion.Item>
+      </Accordion.Root>,
+    );
+    const accordionItemTrigger = screen.getByRole("button", { name: title });
+
+    // Assert
+    expect(accordionItemTrigger).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("should give the accordion item trigger a unique id", () => {
+    // Arrange
+    const title = "Accordion Trigger 1";
+    render(
+      <Accordion.Root>
+        <Accordion.Item>
+          <Accordion.Header>
+            <Accordion.Trigger>{title}</Accordion.Trigger>
+          </Accordion.Header>
+        </Accordion.Item>
+      </Accordion.Root>,
+    );
+    const accordionItemTrigger = screen.getByRole("button", { name: title });
+
+    // Assert
+    expect(accordionItemTrigger).toHaveAttribute(
+      "id",
+      expect.stringContaining("-heading-"),
+    );
+  });
+
+  it('should apply the correct "aria-controls" attribute to the accordion item trigger button', () => {
+    // Arrange
+    const title = "Accordion Trigger 1";
+    render(
+      <Accordion.Root>
+        <Accordion.Item>
+          <Accordion.Header>
+            <Accordion.Trigger>{title}</Accordion.Trigger>
+          </Accordion.Header>
+        </Accordion.Item>
+      </Accordion.Root>,
+    );
+    const accordionItemTrigger = screen.getByRole("button", { name: title });
+
+    // Assert
+    expect(accordionItemTrigger).toHaveAttribute(
+      "aria-controls",
+      expect.stringContaining("-panel-"),
+    );
+  });
+
+  it('should apply the aria-hidden="true" attribute to the accordion trigger icon', () => {
+    // Arrange
+    const title = "Accordion Trigger 1";
+    render(
+      <Accordion.Root>
+        <Accordion.Item>
+          <Accordion.Header>
+            <Accordion.Trigger>
+              {title}
+              <Accordion.TriggerIcon>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M5 12h14" />
+                  <path d="M12 5v14" />
+                </svg>
+              </Accordion.TriggerIcon>
+            </Accordion.Trigger>
+          </Accordion.Header>
+        </Accordion.Item>
+      </Accordion.Root>,
+    );
+    const accordionItemTrigger = screen.getByRole("button", { name: title });
+    const accordionItemTriggerIcon = accordionItemTrigger.querySelector("svg");
+
+    // Assert
+    expect(accordionItemTriggerIcon).toHaveAttribute("aria-hidden", "true");
+  });
+
+  it("should give the accordion item content panel a unique id", () => {
+    // Arrange
+    const title = "Accordion Trigger 1";
+    const content = "Accordion Content 1";
+    render(
+      <Accordion.Root>
+        <Accordion.Item>
+          <Accordion.Header>
+            <Accordion.Trigger>{title}</Accordion.Trigger>
+          </Accordion.Header>
+          <Accordion.Content>{content}</Accordion.Content>
+        </Accordion.Item>
+      </Accordion.Root>,
+    );
+    const accordionItemPanel = screen.getByText(content);
+
+    // Assert
+    expect(accordionItemPanel).toHaveAttribute(
+      "id",
+      expect.stringContaining("-panel-"),
+    );
+  });
+
+  it('should apply the correct "aria-labelledby" attribute to the accordion item content panel', () => {
+    // Arrange
+    const title = "Accordion Trigger 1";
+    const content = "Accordion Content 1";
+    render(
+      <Accordion.Root>
+        <Accordion.Item>
+          <Accordion.Header>
+            <Accordion.Trigger>{title}</Accordion.Trigger>
+          </Accordion.Header>
+          <Accordion.Content>{content}</Accordion.Content>
+        </Accordion.Item>
+      </Accordion.Root>,
+    );
+    const accordionItemPanel = screen.getByText(content);
+
+    // Assert
+    expect(accordionItemPanel).toHaveAttribute(
+      "aria-labelledby",
+      expect.stringContaining("-heading-"),
+    );
+  });
+
+  it('should apply the attribute role="region" to the accordion item content panel', () => {
+    // Arrange
+    const title = "Accordion Trigger 1";
+    const content = "Accordion Content 1";
+    render(
+      <Accordion.Root>
+        <Accordion.Item>
+          <Accordion.Header>
+            <Accordion.Trigger>{title}</Accordion.Trigger>
+          </Accordion.Header>
+          <Accordion.Content>{content}</Accordion.Content>
+        </Accordion.Item>
+      </Accordion.Root>,
+    );
+    const accordionItemPanel = screen.getByText(content);
+
+    // Assert
+    expect(accordionItemPanel).toHaveAttribute("role", "region");
+  });
+
+  it("accordion item content panel should not be visible by default", () => {
+    // Arrange
+    const title = "Accordion Trigger 1";
+    const content = "Accordion Content 1";
+    render(
+      <Accordion.Root>
+        <Accordion.Item>
+          <Accordion.Header>
+            <Accordion.Trigger>{title}</Accordion.Trigger>
+          </Accordion.Header>
+          <Accordion.Content>{content}</Accordion.Content>
+        </Accordion.Item>
+      </Accordion.Root>,
+    );
+    const accordionItemPanel = screen.getByText(content);
+
+    // Assert
+    expect(accordionItemPanel).not.toBeVisible();
+  });
+
+  it("accordion item content panel should have a hidden attribute by default", () => {
+    // Arrange
+    const title = "Accordion Trigger 1";
+    const content = "Accordion Content 1";
+    render(
+      <Accordion.Root>
+        <Accordion.Item>
+          <Accordion.Header>
+            <Accordion.Trigger>{title}</Accordion.Trigger>
+          </Accordion.Header>
+          <Accordion.Content>{content}</Accordion.Content>
+        </Accordion.Item>
+      </Accordion.Root>,
+    );
+    const accordionItemPanel = screen.getByText(content);
+
+    // Assert
+    expect(accordionItemPanel).toHaveAttribute("hidden");
+  });
+
+  it("should render the accordion header as an h3 element by default", () => {
+    // Arrange
+    const title = "Accordion Trigger 1";
+    render(
+      <Accordion.Root>
+        <Accordion.Item>
+          <Accordion.Header>
+            <Accordion.Trigger>{title}</Accordion.Trigger>
+          </Accordion.Header>
+        </Accordion.Item>
+      </Accordion.Root>,
+    );
+    const accordionItemTrigger = screen.getByRole("button", { name: title });
+    const accordionHeader = accordionItemTrigger.parentElement;
+
+    // Assert
+    expect(accordionHeader?.tagName).toBe("H3");
+  });
+
+  it.each([
+    { level: 1 as HeadingLevel },
+    { level: 2 as HeadingLevel },
+    { level: 3 as HeadingLevel },
+    { level: 4 as HeadingLevel },
+    { level: 5 as HeadingLevel },
+    { level: 6 as HeadingLevel },
+  ])(
+    "should render the accordion header as an h$level element when level=$level is provided",
+    ({ level }) => {
+      // Arrange
+      const title = "Accordion Trigger 1";
+      render(
+        <Accordion.Root>
+          <Accordion.Item>
+            <Accordion.Header level={level}>
+              <Accordion.Trigger>{title}</Accordion.Trigger>
+            </Accordion.Header>
+          </Accordion.Item>
+        </Accordion.Root>,
+      );
+      const accordionItemTrigger = screen.getByRole("button", {
+        name: title,
+      });
+      const accordionHeader = accordionItemTrigger.parentElement;
+
+      // Assert
+      expect(accordionHeader?.tagName).toBe(`H${level}`);
+    },
+  );
+});

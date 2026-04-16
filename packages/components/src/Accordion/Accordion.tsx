@@ -331,23 +331,19 @@ export function AccordionTrigger({
     );
 
     const moveNext = (triggers: HTMLButtonElement[]) => {
-      if (triggerRef.current) {
-        const currentIndex = triggers.indexOf(triggerRef.current);
-        const nextIndex = (currentIndex + 1) % triggers.length;
-        triggers[nextIndex]?.focus();
-      }
+      const currentIndex = triggers.indexOf(triggerRef.current!);
+      const nextIndex = (currentIndex + 1) % triggers.length;
+      triggers[nextIndex]?.focus();
     };
 
     const movePrev = (triggers: HTMLButtonElement[]) => {
-      if (triggerRef.current) {
-        const currentIndex = triggers.indexOf(triggerRef.current);
-        const prevIndex = (currentIndex - 1 + triggers.length) % triggers.length;
-        triggers[prevIndex]?.focus();
-      }
+      const currentIndex = triggers.indexOf(triggerRef.current!);
+      const prevIndex = (currentIndex - 1 + triggers.length) % triggers.length;
+      triggers[prevIndex]?.focus();
     };
 
     const isRtl = orientation === "horizontal" && dir === "rtl";
-    const orientationKeys =
+    const orientationKeys: Record<string, (triggers: HTMLButtonElement[]) => void> =
       orientation === "horizontal"
         ? {
             ArrowRight: isRtl ? movePrev : moveNext,
@@ -355,12 +351,11 @@ export function AccordionTrigger({
           }
         : { ArrowDown: moveNext, ArrowUp: movePrev };
 
-    const keyHandlers: Record<string, (triggers: HTMLButtonElement[]) => void> =
-      {
-        ...orientationKeys,
-        Home: (triggers) => triggers[0]?.focus(),
-        End: (triggers) => triggers[triggers.length - 1]?.focus(),
-      };
+    const keyHandlers: Record<string, (triggers: HTMLButtonElement[]) => void> = {
+      ...orientationKeys,
+      Home: (triggers) => triggers[0]?.focus(),
+      End: (triggers) => triggers[triggers.length - 1]?.focus(),
+    };
 
     const handler = keyHandlers[e.key];
     if (handler) {

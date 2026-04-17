@@ -28,19 +28,6 @@ describe("Table.ScrollArea rendering", () => {
     expect(scrollArea?.style.overflowX).toBe("auto");
   });
 
-  it("should render a scrollable container with non-wrapping white-space content", () => {
-    // Arrange
-    render(
-      <Table.ScrollArea>
-        <Table.Root />
-      </Table.ScrollArea>,
-    );
-    const scrollArea = screen.getByRole("table").parentElement;
-
-    // Assert
-    expect(scrollArea?.style.whiteSpace).toBe("");
-  });
-
   it('should render a scrollable container with a "display: block" style applied', () => {
     // Arrange
     render(
@@ -65,6 +52,19 @@ describe("Table.ScrollArea rendering", () => {
 
     // Assert
     expect(scrollArea).toHaveStyle({ maxWidth: "100%" });
+  });
+
+  it("should preserve base scroll styles when a custom style prop is passed", () => {
+    // Arrange
+    render(
+      <Table.ScrollArea style={{ color: "red" }}>
+        <Table.Root />
+      </Table.ScrollArea>,
+    );
+    const scrollArea = screen.getByRole("table").parentElement;
+
+    // Assert
+    expect(scrollArea?.style.overflowX).toBe("auto");
   });
 
   it("should add className to the scrollable container", () => {

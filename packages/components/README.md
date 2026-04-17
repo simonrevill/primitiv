@@ -20,6 +20,7 @@ import { Tabs } from "@primitiv/components";
 | ----------------------------------------- | ------------------------------------------------------- |
 | [Accordion](src/Accordion/README.md)      | WAI-ARIA Accordion pattern — collapsible sections with keyboard navigation, controlled/uncontrolled state, multiple mode, and `asChild` composition |
 | [Divider](src/Divider/README.md)          | WAI-ARIA separator role — horizontal or vertical content separator, with semantic and decorative use |
+| [Table](src/Table/README.md)              | WAI-ARIA Table pattern — compound component wrapping standard HTML table elements with accessible headers, captions, and a responsive scroll wrapper |
 | [Tabs](src/Tabs/README.md)                | WAI-ARIA Tabs pattern — compound component with keyboard navigation, controlled/uncontrolled state, and `asChild` composition |
 
 ## Internal utilities

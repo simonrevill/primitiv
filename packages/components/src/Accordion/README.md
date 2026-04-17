@@ -91,6 +91,27 @@ By default the content panel is hidden with the `hidden` attribute. Pass
 }
 ```
 
+When `forceMount` is active and the panel is closed, `aria-hidden="true"` is
+applied automatically so assistive technology skips the off-screen content.
+It is removed when the panel opens. Consumers can override this by passing
+`aria-hidden` explicitly.
+
+## `role="region"` escape hatch
+
+Each `Accordion.Content` renders with `role="region"`, creating an ARIA
+landmark. This is appropriate for panels whose content benefits from
+landmark navigation, but accordions with many items can produce landmark
+overload in screen readers (JAWS/NVDA expose all landmarks in their landmark
+list).
+
+Opt out on individual panels by passing `role={undefined}`:
+
+```tsx
+<Accordion.Content role={undefined}>
+  Simple prose that doesn't need landmark navigation.
+</Accordion.Content>
+```
+
 ## `asChild` composition
 
 `Accordion.Trigger` accepts an `asChild` prop to render any child element
@@ -101,6 +122,20 @@ the trigger's):
 ```tsx
 <Accordion.Trigger asChild>
   <a href="#shipping">Shipping policy</a>
+</Accordion.Trigger>
+```
+
+`Enter` and `Space` are handled in `onKeyDown` so non-button elements (e.g.
+`<a>`) toggle correctly without relying on native click behaviour.
+
+When `asChild` is combined with `disabled`, `role="button"` is injected
+automatically so that `aria-disabled` is semantically valid on non-button
+elements. Without a button role, `aria-disabled` has no defined meaning:
+
+```tsx
+<Accordion.Trigger asChild disabled>
+  <a href="#shipping">Temporarily unavailable</a>
+  {/* rendered with role="button" aria-disabled="true" */}
 </Accordion.Trigger>
 ```
 

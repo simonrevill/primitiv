@@ -178,6 +178,11 @@ AccordionHeader.displayName = "AccordionHeader";
  * - `className` strings are concatenated.
  * - Refs from both sides are composed via `composeRefs`.
  *
+ * When `asChild` is `true` and `disabled` is `true`, `role="button"` is
+ * automatically injected so that `aria-disabled` is semantically valid on
+ * non-button elements (e.g. `<a>`, `<div>`). Without a button role the
+ * `aria-disabled` attribute has no defined meaning in the ARIA spec.
+ *
  * **Keyboard support** (WAI-ARIA Accordion pattern):
  *
  * | Key               | Behaviour                                    |
@@ -257,6 +262,18 @@ AccordionTrigger.displayName = "AccordionTrigger";
  * CSS transitions on open / close work correctly — consumers can use
  * `[data-state="closed"] { display: none; }` (or equivalent animation
  * classes) to control visibility themselves.
+ *
+ * When `forceMount` is `true` and the panel is closed, `aria-hidden="true"` is
+ * set automatically so assistive technology ignores the off-screen content.
+ * It is removed when the panel opens. Consumers can override this by passing
+ * `aria-hidden` explicitly (it appears after the automatic value in the spread).
+ *
+ * **`role="region"` escape hatch.** Each panel renders with `role="region"` by
+ * default, creating an ARIA landmark. Accordions with many items can produce
+ * landmark overload in screen readers. Opt out by passing `role={undefined}`:
+ * ```tsx
+ * <Accordion.Content role={undefined}>…</Accordion.Content>
+ * ```
  *
  * **Styling hooks.**
  * - `data-state="open" | "closed"` on the rendered element.

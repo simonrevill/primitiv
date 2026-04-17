@@ -15,6 +15,7 @@ describe("Accordion asChild tests", () => {
               <a href="#section-1">Section 1</a>
             </Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );
@@ -35,6 +36,7 @@ describe("Accordion asChild tests", () => {
               <a href="#section-1">Section 1</a>
             </Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );
@@ -86,6 +88,7 @@ describe("Accordion asChild tests", () => {
               <a href="#section-1">Section 1</a>
             </Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );
@@ -104,6 +107,7 @@ describe("Accordion asChild tests", () => {
           <Accordion.Header>
             <Accordion.Trigger ref={ref}>Section 1</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );
@@ -199,6 +203,7 @@ describe("Accordion asChild tests", () => {
               <a href="#section-1">Section 1</a>
             </Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );
@@ -219,6 +224,7 @@ describe("Accordion asChild tests", () => {
               <a href="#section-1">Section 1</a>
             </Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );

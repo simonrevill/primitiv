@@ -178,16 +178,19 @@ describe("Accordion keyboard interaction tests", () => {
           <Accordion.Header>
             <Accordion.Trigger>{title1}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
         <Accordion.Item>
           <Accordion.Header>
             <Accordion.Trigger>{title2}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
         <Accordion.Item>
           <Accordion.Header>
             <Accordion.Trigger>{title3}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );
@@ -215,16 +218,19 @@ describe("Accordion keyboard interaction tests", () => {
           <Accordion.Header>
             <Accordion.Trigger>{title1}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
         <Accordion.Item>
           <Accordion.Header>
             <Accordion.Trigger>{title2}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
         <Accordion.Item>
           <Accordion.Header>
             <Accordion.Trigger>{title3}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );
@@ -253,16 +259,19 @@ describe("Accordion keyboard interaction tests", () => {
           <Accordion.Header>
             <Accordion.Trigger>{title1}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
         <Accordion.Item>
           <Accordion.Header>
             <Accordion.Trigger>{title2}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
         <Accordion.Item>
           <Accordion.Header>
             <Accordion.Trigger>{title3}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );
@@ -297,16 +306,19 @@ describe("Accordion keyboard interaction tests", () => {
           <Accordion.Header>
             <Accordion.Trigger>{title1}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
         <Accordion.Item>
           <Accordion.Header>
             <Accordion.Trigger>{title2}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
         <Accordion.Item>
           <Accordion.Header>
             <Accordion.Trigger>{title3}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );
@@ -335,16 +347,19 @@ describe("Accordion keyboard interaction tests", () => {
           <Accordion.Header>
             <Accordion.Trigger>{title1}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
         <Accordion.Item>
           <Accordion.Header>
             <Accordion.Trigger>{title2}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
         <Accordion.Item>
           <Accordion.Header>
             <Accordion.Trigger>{title3}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );
@@ -374,16 +389,19 @@ describe("Accordion keyboard interaction tests", () => {
           <Accordion.Header>
             <Accordion.Trigger>{title1}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
         <Accordion.Item>
           <Accordion.Header>
             <Accordion.Trigger>{title2}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
         <Accordion.Item>
           <Accordion.Header>
             <Accordion.Trigger>{title3}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );
@@ -416,16 +434,19 @@ describe("Accordion keyboard interaction tests", () => {
           <Accordion.Header>
             <Accordion.Trigger>{title1}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
         <Accordion.Item>
           <Accordion.Header>
             <Accordion.Trigger>{title2}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
         <Accordion.Item>
           <Accordion.Header>
             <Accordion.Trigger>{title3}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );
@@ -455,16 +476,19 @@ describe("Accordion keyboard interaction tests", () => {
           <Accordion.Header>
             <Accordion.Trigger>{title1}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
         <Accordion.Item>
           <Accordion.Header>
             <Accordion.Trigger>{title2}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
         <Accordion.Item>
           <Accordion.Header>
             <Accordion.Trigger>{title3}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );
@@ -492,16 +516,19 @@ describe("Accordion keyboard interaction tests", () => {
           <Accordion.Header>
             <Accordion.Trigger>{title1}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
         <Accordion.Item>
           <Accordion.Header>
             <Accordion.Trigger>{title2}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
         <Accordion.Item>
           <Accordion.Header>
             <Accordion.Trigger>{title3}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );
@@ -529,16 +556,19 @@ describe("Accordion keyboard interaction tests", () => {
           <Accordion.Header>
             <Accordion.Trigger>{title1}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
         <Accordion.Item>
           <Accordion.Header>
             <Accordion.Trigger>{title2}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
         <Accordion.Item>
           <Accordion.Header>
             <Accordion.Trigger>{title3}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );
@@ -567,16 +597,19 @@ describe("Accordion keyboard interaction tests", () => {
           <Accordion.Header>
             <Accordion.Trigger>{title1}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
         <Accordion.Item>
           <Accordion.Header>
             <Accordion.Trigger>{title2}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
         <Accordion.Item>
           <Accordion.Header>
             <Accordion.Trigger>{title3}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );
@@ -606,16 +639,19 @@ describe("Accordion keyboard interaction tests", () => {
           <Accordion.Header>
             <Accordion.Trigger>{title1}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
         <Accordion.Item>
           <Accordion.Header>
             <Accordion.Trigger>{title2}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
         <Accordion.Item>
           <Accordion.Header>
             <Accordion.Trigger>{title3}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );
@@ -642,11 +678,13 @@ describe("Accordion keyboard interaction tests", () => {
           <Accordion.Header>
             <Accordion.Trigger>{title1}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
         <Accordion.Item>
           <Accordion.Header>
             <Accordion.Trigger>{title2}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );
@@ -673,11 +711,13 @@ describe("Accordion keyboard interaction tests", () => {
           <Accordion.Header>
             <Accordion.Trigger>{title1}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
         <Accordion.Item>
           <Accordion.Header>
             <Accordion.Trigger>{title2}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );

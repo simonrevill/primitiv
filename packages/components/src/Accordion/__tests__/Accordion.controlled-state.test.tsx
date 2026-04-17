@@ -77,6 +77,7 @@ describe("Accordion controlled state tests", () => {
           <Accordion.Header>
             <Accordion.Trigger>{title1}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );

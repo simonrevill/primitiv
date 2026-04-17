@@ -13,6 +13,7 @@ describe("Accordion data attributes tests", () => {
           <Accordion.Header>
             <Accordion.Trigger>{title}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );
@@ -32,6 +33,7 @@ describe("Accordion data attributes tests", () => {
           <Accordion.Header>
             <Accordion.Trigger>{title}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );
@@ -116,6 +118,7 @@ describe("Accordion data attributes tests", () => {
               </Accordion.TriggerIcon>
             </Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );
@@ -154,6 +157,7 @@ describe("Accordion data attributes tests", () => {
               </Accordion.TriggerIcon>
             </Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );
@@ -186,6 +190,7 @@ describe("Accordion data attributes tests", () => {
               </Accordion.TriggerIcon>
             </Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );
@@ -217,6 +222,7 @@ describe("Accordion data attributes tests", () => {
               </Accordion.TriggerIcon>
             </Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );

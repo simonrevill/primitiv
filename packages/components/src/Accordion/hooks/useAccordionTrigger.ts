@@ -39,6 +39,7 @@ export function useAccordionTrigger({
     const enabledTriggers = getTriggers().filter(
       (t) => t.getAttribute("aria-disabled") !== "true",
     );
+    if (enabledTriggers.length === 0) return;
 
     const moveNext = (triggers: HTMLButtonElement[]) => {
       const currentIndex = triggers.indexOf(triggerRef.current!);

@@ -75,4 +75,45 @@ describe("Accordion error handling tests", () => {
       );
     }).toThrow("Component must be used within AccordionItem");
   });
+
+  it("should throw in development when AccordionTrigger has no corresponding AccordionContent", () => {
+    // Arrange & Act & Assert
+    expect(() => {
+      render(
+        <Accordion.Root>
+          <Accordion.Item value="item-1">
+            <Accordion.Header>
+              <Accordion.Trigger>Trigger without content</Accordion.Trigger>
+            </Accordion.Header>
+            {/* No AccordionContent */}
+          </Accordion.Item>
+        </Accordion.Root>,
+      );
+    }).toThrow(/AccordionTrigger.*no corresponding AccordionContent/);
+  });
+
+  it("should not throw when AccordionItem with Trigger and Content is added dynamically", () => {
+    // Arrange
+    function DynamicAccordion({ showItem }: { showItem: boolean }) {
+      return (
+        <Accordion.Root>
+          {showItem && (
+            <Accordion.Item value="item-1">
+              <Accordion.Header>
+                <Accordion.Trigger>Dynamic Trigger</Accordion.Trigger>
+              </Accordion.Header>
+              <Accordion.Content>Dynamic Content</Accordion.Content>
+            </Accordion.Item>
+          )}
+        </Accordion.Root>
+      );
+    }
+
+    const { rerender } = render(<DynamicAccordion showItem={false} />);
+
+    // Act & Assert — adding both trigger and content together must not throw
+    expect(() => {
+      rerender(<DynamicAccordion showItem={true} />);
+    }).not.toThrow();
+  });
 });

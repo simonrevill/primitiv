@@ -1,4 +1,4 @@
-import { useRef, useMemo, useCallback, useState, useId } from "react";
+import { useRef, useMemo, useCallback, useState, useId, useEffect } from "react";
 import type { AccordionReadingDirection } from "../types";
 
 export function useAccordionRoot(
@@ -11,6 +11,9 @@ export function useAccordionRoot(
 ) {
   const accordionId = useId();
   const triggersRef = useRef<Map<string, HTMLButtonElement>>(new Map());
+  const [registeredTriggerItemIds, setRegisteredTriggerItemIds] = useState<string[]>([]);
+  const panelsRef = useRef<Set<string>>(new Set());
+  const [registeredPanelItemIds, setRegisteredPanelItemIds] = useState<string[]>([]);
   const isControlled = controlledValue !== undefined;
 
   const [internalExpandedItems, setInternalExpandedItems] = useState<
@@ -58,9 +61,32 @@ export function useAccordionRoot(
       } else {
         triggersRef.current.delete(itemId);
       }
+      setRegisteredTriggerItemIds(Array.from(triggersRef.current.keys()));
     },
     [],
   );
+
+  const registerPanel = useCallback((itemId: string) => {
+    panelsRef.current.add(itemId);
+    setRegisteredPanelItemIds(Array.from(panelsRef.current));
+  }, []);
+
+  const unregisterPanel = useCallback((itemId: string) => {
+    panelsRef.current.delete(itemId);
+    setRegisteredPanelItemIds(Array.from(panelsRef.current));
+  }, []);
+
+  useEffect(() => {
+    if (process.env.NODE_ENV !== "production") {
+      for (const triggerId of registeredTriggerItemIds) {
+        if (!registeredPanelItemIds.includes(triggerId)) {
+          throw new Error(
+            `AccordionTrigger (item "${triggerId}") has no corresponding AccordionContent. Every AccordionItem with a Trigger must also contain an AccordionContent.`,
+          );
+        }
+      }
+    }
+  }, [registeredTriggerItemIds, registeredPanelItemIds]);
 
   const getTriggers = useCallback(() => {
     return Array.from(triggersRef.current.values());
@@ -75,6 +101,8 @@ export function useAccordionRoot(
       toggleItem,
       registerTrigger,
       getTriggers,
+      registerPanel,
+      unregisterPanel,
     }),
     [
       accordionId,
@@ -84,6 +112,8 @@ export function useAccordionRoot(
       toggleItem,
       registerTrigger,
       getTriggers,
+      registerPanel,
+      unregisterPanel,
     ],
   );
 

@@ -61,6 +61,8 @@ export type AccordionContextValue = {
   toggleItem: (itemId: string) => void;
   registerTrigger: (itemId: string, element: HTMLButtonElement | null) => void;
   getTriggers: () => HTMLButtonElement[];
+  registerPanel: (itemId: string) => void;
+  unregisterPanel: (itemId: string) => void;
 };
 
 export type AccordionItemContextValue = {

@@ -50,6 +50,7 @@ describe("Accordion basic rendering tests", () => {
           <Accordion.Header>
             <Accordion.Trigger>{title}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );
@@ -68,6 +69,7 @@ describe("Accordion basic rendering tests", () => {
           <Accordion.Header>
             <Accordion.Trigger>{title}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );
@@ -89,6 +91,7 @@ describe("Accordion basic rendering tests", () => {
           <Accordion.Header>
             <Accordion.Trigger>{title}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );
@@ -128,6 +131,7 @@ describe("Accordion basic rendering tests", () => {
               </Accordion.TriggerIcon>
             </Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );
@@ -157,6 +161,7 @@ describe("Accordion basic rendering tests", () => {
               </Accordion.TriggerIcon>
             </Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );
@@ -283,6 +288,7 @@ describe("Accordion basic rendering tests", () => {
           <Accordion.Header>
             <Accordion.Trigger>{title}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );
@@ -311,6 +317,7 @@ describe("Accordion basic rendering tests", () => {
             <Accordion.Header level={level}>
               <Accordion.Trigger>{title}</Accordion.Trigger>
             </Accordion.Header>
+            <Accordion.Content>Content</Accordion.Content>
           </Accordion.Item>
         </Accordion.Root>,
       );

@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 import { Slot } from "../Slot";
 
 import type {
@@ -13,6 +15,7 @@ import type { HeadingTag } from "../types";
 
 import { AccordionContext, AccordionItemContext } from "./AccordionContext";
 import {
+  useAccordionContext,
   useAccordionHeaderContext,
   useAccordionItem,
   useAccordionItemContext,
@@ -275,7 +278,13 @@ export function AccordionContent({
   forceMount = false,
   ...rest
 }: AccordionContentProps) {
-  const { panelId, buttonId, isExpanded } = useAccordionItemContext();
+  const { panelId, buttonId, itemId, isExpanded } = useAccordionItemContext();
+  const { registerPanel, unregisterPanel } = useAccordionContext();
+
+  useEffect(() => {
+    registerPanel(itemId);
+    return () => unregisterPanel(itemId);
+  }, [itemId, registerPanel, unregisterPanel]);
 
   return (
     <div
@@ -283,6 +292,7 @@ export function AccordionContent({
       aria-labelledby={buttonId}
       role="region"
       hidden={forceMount ? undefined : !isExpanded}
+      aria-hidden={forceMount && !isExpanded ? true : undefined}
       data-state={isExpanded ? "open" : "closed"}
       {...rest}
     >

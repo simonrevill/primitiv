@@ -13,6 +13,7 @@ describe("Accordion disabled items tests", () => {
           <Accordion.Header>
             <Accordion.Trigger>{title}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );
@@ -31,6 +32,7 @@ describe("Accordion disabled items tests", () => {
           <Accordion.Header>
             <Accordion.Trigger disabled>{title}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );
@@ -49,6 +51,7 @@ describe("Accordion disabled items tests", () => {
           <Accordion.Header>
             <Accordion.Trigger disabled>{title}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );
@@ -67,6 +70,7 @@ describe("Accordion disabled items tests", () => {
           <Accordion.Header>
             <Accordion.Trigger>{title}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );
@@ -85,6 +89,7 @@ describe("Accordion disabled items tests", () => {
           <Accordion.Header>
             <Accordion.Trigger disabled>{title}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );
@@ -131,16 +136,19 @@ describe("Accordion disabled items tests", () => {
           <Accordion.Header>
             <Accordion.Trigger>{title1}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
         <Accordion.Item>
           <Accordion.Header>
             <Accordion.Trigger disabled>{title2}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
         <Accordion.Item>
           <Accordion.Header>
             <Accordion.Trigger>{title3}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );
@@ -166,16 +174,19 @@ describe("Accordion disabled items tests", () => {
           <Accordion.Header>
             <Accordion.Trigger>{title1}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
         <Accordion.Item>
           <Accordion.Header>
             <Accordion.Trigger disabled>{title2}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
         <Accordion.Item>
           <Accordion.Header>
             <Accordion.Trigger>{title3}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );
@@ -203,16 +214,19 @@ describe("Accordion disabled items tests", () => {
           <Accordion.Header>
             <Accordion.Trigger disabled>{title1}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
         <Accordion.Item>
           <Accordion.Header>
             <Accordion.Trigger>{title2}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
         <Accordion.Item>
           <Accordion.Header>
             <Accordion.Trigger>{title3}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );
@@ -239,16 +253,19 @@ describe("Accordion disabled items tests", () => {
           <Accordion.Header>
             <Accordion.Trigger>{title1}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
         <Accordion.Item>
           <Accordion.Header>
             <Accordion.Trigger>{title2}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
         <Accordion.Item>
           <Accordion.Header>
             <Accordion.Trigger disabled>{title3}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );
@@ -260,5 +277,35 @@ describe("Accordion disabled items tests", () => {
 
     // Assert
     expect(trigger2).toHaveFocus();
+  });
+
+  it("should not throw when all triggers are disabled and arrow key is pressed", async () => {
+    // Arrange
+    const user = userEvent.setup();
+    const title1 = "Trigger 1";
+    const title2 = "Trigger 2";
+    render(
+      <Accordion.Root>
+        <Accordion.Item>
+          <Accordion.Header>
+            <Accordion.Trigger disabled>{title1}</Accordion.Trigger>
+          </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
+        </Accordion.Item>
+        <Accordion.Item>
+          <Accordion.Header>
+            <Accordion.Trigger disabled>{title2}</Accordion.Trigger>
+          </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
+        </Accordion.Item>
+      </Accordion.Root>,
+    );
+    const trigger1 = screen.getByRole("button", { name: title1 });
+
+    // Act — focus trigger directly (tabbing skips aria-disabled elements) and press arrow
+    trigger1.focus();
+    await expect(
+      user.keyboard("[ArrowDown]"),
+    ).resolves.not.toThrow();
   });
 });

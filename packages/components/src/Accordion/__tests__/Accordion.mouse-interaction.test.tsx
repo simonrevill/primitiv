@@ -14,6 +14,7 @@ describe("Accordion mouse interaction tests", () => {
           <Accordion.Header>
             <Accordion.Trigger>{title}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );
@@ -44,6 +45,7 @@ describe("Accordion mouse interaction tests", () => {
           <Accordion.Header>
             <Accordion.Trigger>{title2}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );
@@ -119,6 +121,7 @@ describe("Accordion mouse interaction tests", () => {
           <Accordion.Header>
             <Accordion.Trigger>{title}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );
@@ -142,6 +145,7 @@ describe("Accordion mouse interaction tests", () => {
           <Accordion.Header>
             <Accordion.Trigger>{title}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );
@@ -193,6 +197,7 @@ describe("Accordion mouse interaction tests", () => {
           <Accordion.Header>
             <Accordion.Trigger onClick={onClick}>{title}</Accordion.Trigger>
           </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>,
     );

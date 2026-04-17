@@ -1,4 +1,4 @@
-import { ComponentProps, ReactNode } from "react";
+import { ComponentProps, ReactNode, Ref } from "react";
 import { HeadingLevel } from "../types";
 
 type AccordionRootBaseProps = ComponentProps<"div"> & {
@@ -30,11 +30,14 @@ export type AccordionItemProps = ComponentProps<"div"> & {
   value?: string; // Optional - if not provided, useId() will generate one
 };
 
-export type AccordionTriggerProps = Omit<ComponentProps<"button">, "disabled"> & {
+export type AccordionTriggerProps = Omit<
+  ComponentProps<"button">,
+  "disabled"
+> & {
   children: ReactNode;
   disabled?: boolean;
   asChild?: boolean;
-};
+} & { ref?: Ref<HTMLButtonElement> };
 
 export type AccordionHeaderProps = ComponentProps<"h3"> & {
   children: ReactNode;

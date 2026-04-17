@@ -6,22 +6,20 @@ import type {
   TdHTMLAttributes,
 } from "react";
 
-type TableSubcomponentProps<T extends HTMLElement> = TableHTMLAttributes<T>;
-
 /** Props for {@link Table.Root} — all `TableHTMLAttributes` on `<table>`. */
-export type TableRootProps = TableSubcomponentProps<HTMLTableElement>;
+export type TableRootProps = TableHTMLAttributes<HTMLTableElement>;
 
-/** Props for {@link Table.Head} — all `TableHTMLAttributes` on `<thead>`. */
-export type TableHeadProps = TableSubcomponentProps<HTMLTableSectionElement>;
+/** Props for {@link Table.Head} — all `HTMLAttributes` on `<thead>`. */
+export type TableHeadProps = HTMLAttributes<HTMLTableSectionElement>;
 
-/** Props for {@link Table.Body} — all `TableHTMLAttributes` on `<tbody>`. */
-export type TableBodyProps = TableSubcomponentProps<HTMLTableSectionElement>;
+/** Props for {@link Table.Body} — all `HTMLAttributes` on `<tbody>`. */
+export type TableBodyProps = HTMLAttributes<HTMLTableSectionElement>;
 
-/** Props for {@link Table.Footer} — all `TableHTMLAttributes` on `<tfoot>`. */
-export type TableFooterProps = TableSubcomponentProps<HTMLTableSectionElement>;
+/** Props for {@link Table.Footer} — all `HTMLAttributes` on `<tfoot>`. */
+export type TableFooterProps = HTMLAttributes<HTMLTableSectionElement>;
 
-/** Props for {@link Table.Row} — all `TableHTMLAttributes` on `<tr>`. */
-export type TableRowProps = TableSubcomponentProps<HTMLTableRowElement>;
+/** Props for {@link Table.Row} — all `HTMLAttributes` on `<tr>`. */
+export type TableRowProps = HTMLAttributes<HTMLTableRowElement>;
 
 /**
  * Props for {@link Table.Header} — all `ThHTMLAttributes` on `<th>`.

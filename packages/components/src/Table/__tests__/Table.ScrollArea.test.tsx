@@ -67,6 +67,19 @@ describe("Table.ScrollArea rendering", () => {
     expect(scrollArea).toHaveStyle({ maxWidth: "100%" });
   });
 
+  it("should preserve base scroll styles when a custom style prop is passed", () => {
+    // Arrange
+    render(
+      <Table.ScrollArea style={{ color: "red" }}>
+        <Table.Root />
+      </Table.ScrollArea>,
+    );
+    const scrollArea = screen.getByRole("table").parentElement;
+
+    // Assert
+    expect(scrollArea?.style.overflowX).toBe("auto");
+  });
+
   it("should add className to the scrollable container", () => {
     // Arrange
     const testClass = "test-class";

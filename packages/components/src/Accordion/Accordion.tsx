@@ -1,16 +1,6 @@
-import {
-  useRef,
-  useMemo,
-  useCallback,
-  useState,
-  useId,
-  useEffect,
-  MouseEvent,
-  KeyboardEvent,
-  Ref,
-} from "react";
+import { useRef, useMemo, useCallback, useState, useId } from "react";
 
-import { Slot, composeRefs } from "../Slot";
+import { Slot } from "../Slot";
 
 import type {
   AccordionRootProps,
@@ -27,6 +17,7 @@ import { AccordionContext, AccordionItemContext } from "./AccordionContext";
 import {
   useAccordionContext,
   useAccordionHeaderContext,
+  useAccordionItem,
   useAccordionItemContext,
 } from "./hooks";
 import { useAccordionTrigger } from "./hooks/useAccordionTrigger";
@@ -196,18 +187,7 @@ export function AccordionItem({
   value,
   ...rest
 }: AccordionItemProps) {
-  const { accordionId, expandedItems } = useAccordionContext();
-  // Use provided value prop, or fall back to React's useId for stable IDs
-  const autoId = useId();
-  const itemId = value ?? autoId;
-  const buttonId = `${accordionId}-heading-${itemId}`;
-  const panelId = `${accordionId}-panel-${itemId}`;
-  const isExpanded = expandedItems.has(itemId);
-
-  const contextValue = useMemo(
-    () => ({ buttonId, panelId, itemId, isExpanded }),
-    [buttonId, panelId, itemId, isExpanded],
-  );
+  const { contextValue } = useAccordionItem(value);
 
   return (
     <AccordionItemContext.Provider value={contextValue}>

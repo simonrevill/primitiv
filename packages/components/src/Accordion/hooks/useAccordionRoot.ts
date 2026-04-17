@@ -77,13 +77,11 @@ export function useAccordionRoot(
   }, []);
 
   useEffect(() => {
-    if (process.env.NODE_ENV !== "production") {
-      for (const triggerId of registeredTriggerItemIds) {
-        if (!registeredPanelItemIds.includes(triggerId)) {
-          throw new Error(
-            `AccordionTrigger (item "${triggerId}") has no corresponding AccordionContent. Every AccordionItem with a Trigger must also contain an AccordionContent.`,
-          );
-        }
+    for (const triggerId of registeredTriggerItemIds) {
+      if (!registeredPanelItemIds.includes(triggerId)) {
+        throw new Error(
+          `AccordionTrigger (item "${triggerId}") has no corresponding AccordionContent. Every AccordionItem with a Trigger must also contain an AccordionContent.`,
+        );
       }
     }
   }, [registeredTriggerItemIds, registeredPanelItemIds]);

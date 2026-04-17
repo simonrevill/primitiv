@@ -62,6 +62,21 @@ rules below are not suggestions.
 7. **GitHub interactions go through MCP tools** (`mcp__github__*`),
    not `gh` or the raw API. The available tools are restricted to
    `simonrevill/primitiv` — do not touch any other repo.
+8. **Every behaviour change ships with tests, JSDoc, and README.**
+   When fixing a bug, adding a feature, or correcting wrong behaviour
+   in any component:
+   - The new or modified behaviour **must** be covered by a new or
+     updated test. No exceptions — this is an extension of the
+     red → green TDD rule.
+   - The relevant **JSDoc** on the affected sub-component(s) must be
+     updated to reflect the change (new props, changed semantics,
+     new ARIA contracts, etc.).
+   - The component's **README** must be updated if the change is
+     consumer-facing: new props, changed defaults, new patterns,
+     escape hatches, or gotchas consumers need to know about.
+   These three updates — test, JSDoc, README — are not optional
+   follow-ups; they are part of the definition of "done" for any
+   component change.
 
 ## Claude model strategy
 

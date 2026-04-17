@@ -331,6 +331,7 @@ AccordionContent.displayName = "AccordionContent";
  */
 export function AccordionTriggerIcon({ children }: AccordionTriggerIconProps) {
   const { isExpanded } = useAccordionItemContext();
+
   return (
     <span aria-hidden="true" data-state={isExpanded ? "open" : "closed"}>
       {children}

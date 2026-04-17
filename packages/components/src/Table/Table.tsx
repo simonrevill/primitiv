@@ -223,13 +223,14 @@ TableCell.displayName = "TableCell";
  * </Table.ScrollArea>
  * ```
  */
-function TableScrollArea({ children, ...rest }: TableScrollAreaProps) {
+function TableScrollArea({ children, style, ...rest }: TableScrollAreaProps) {
   return (
     <div
       style={{
         display: "block",
         overflowX: "auto",
         maxWidth: "100%",
+        ...style,
       }}
       {...rest}
     >

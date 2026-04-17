@@ -128,14 +128,11 @@ narrow viewports instead of overflowing or compressing columns.
 </Table.ScrollArea>
 ```
 
-**Style override caveat.** If you pass a `style` prop to `Table.ScrollArea`
-it will completely replace the internal styles — not merge with them. Compose
-them explicitly to add additional styles without losing the scroll behaviour:
+Any `style` properties you pass are merged with (and take priority over) the
+base scroll styles, so you can layer additional styles freely:
 
 ```tsx
-<Table.ScrollArea
-  style={{ display: "block", overflowX: "auto", maxWidth: "100%", borderRadius: "8px" }}
->
+<Table.ScrollArea style={{ borderRadius: "8px" }}>
   <Table.Root>…</Table.Root>
 </Table.ScrollArea>
 ```

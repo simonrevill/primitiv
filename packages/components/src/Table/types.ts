@@ -43,10 +43,8 @@ export type TableCellProps = TdHTMLAttributes<HTMLTableCellElement>;
  * Props for {@link Table.ScrollArea} — `children` plus all `HTMLAttributes`
  * on the wrapping `<div>`.
  *
- * **Note:** passing a `style` prop replaces the internal scroll styles
- * (`display: block`, `overflow-x: auto`, `max-width: 100%`) entirely.
- * Compose them explicitly if you need additional styles alongside the
- * scroll behaviour.
+ * Any `style` properties you pass are merged with (and take priority over) the
+ * base scroll styles (`display: block`, `overflow-x: auto`, `max-width: 100%`).
  */
 export type TableScrollAreaProps = {
   children: ReactNode;

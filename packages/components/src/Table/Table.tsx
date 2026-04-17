@@ -203,13 +203,12 @@ TableCell.displayName = "TableCell";
  * scroll horizontally on narrow viewports instead of overflowing or
  * compressing.
  *
- * **Style override caveat.** The internal styles are set via the `style`
- * prop before spreading `rest`. If you pass your own `style` object it will
- * completely replace the internal styles — not merge with them. To add custom
- * styles without losing the scroll behaviour, compose them explicitly:
+ * **Custom styles.** Any `style` properties you pass are merged with (and take priority
+ * over) the base scroll styles, so you can layer additional styles freely without
+ * repeating the scroll declarations:
  *
  * ```tsx
- * <Table.ScrollArea style={{ display: "block", overflowX: "auto", maxWidth: "100%", color: "red" }}>
+ * <Table.ScrollArea style={{ borderRadius: "8px" }}>
  *   …
  * </Table.ScrollArea>
  * ```

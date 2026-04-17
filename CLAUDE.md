@@ -32,7 +32,7 @@ the identity split on purpose established during Step B.
 ## Working style (important)
 
 The user works under **strict TDD** and holds the line on it. The
-rules below are not suggestions.
+rules below are not suggestions. Coverage must remain at 100% at all times.
 
 1. **Red → green → refactor.** New behaviour starts with a
    failing test. The test is committed as the red state, then the
@@ -74,9 +74,9 @@ rules below are not suggestions.
    - The component's **README** must be updated if the change is
      consumer-facing: new props, changed defaults, new patterns,
      escape hatches, or gotchas consumers need to know about.
-   These three updates — test, JSDoc, README — are not optional
-   follow-ups; they are part of the definition of "done" for any
-   component change.
+     These three updates — test, JSDoc, README — are not optional
+     follow-ups; they are part of the definition of "done" for any
+     component change.
 
 ## Claude model strategy
 

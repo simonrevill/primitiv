@@ -1,5 +1,3 @@
-import { useRef, useMemo, useCallback, useState, useId } from "react";
-
 import { Slot } from "../Slot";
 
 import type {
@@ -15,10 +13,10 @@ import type { HeadingTag } from "../types";
 
 import { AccordionContext, AccordionItemContext } from "./AccordionContext";
 import {
-  useAccordionContext,
   useAccordionHeaderContext,
   useAccordionItem,
   useAccordionItemContext,
+  useAccordionRoot,
 } from "./hooks";
 import { useAccordionTrigger } from "./hooks/useAccordionTrigger";
 
@@ -72,83 +70,13 @@ export function AccordionRoot({
   dir = "ltr",
   ...rest
 }: AccordionRootProps) {
-  const accordionId = useId();
-  const triggersRef = useRef<Map<string, HTMLButtonElement>>(new Map());
-  const isControlled = controlledValue !== undefined;
-
-  const [internalExpandedItems, setInternalExpandedItems] = useState<
-    Set<string>
-  >(() => {
-    if (defaultValue !== undefined) {
-      return new Set([defaultValue]);
-    }
-    return new Set();
-  });
-
-  const expandedItems = isControlled
-    ? new Set(controlledValue)
-    : internalExpandedItems;
-
-  const computeNext = (prev: Set<string>, itemId: string): Set<string> => {
-    const next = new Set(prev);
-    if (next.has(itemId)) {
-      next.delete(itemId);
-    } else if (multiple) {
-      next.add(itemId);
-    } else {
-      next.clear();
-      next.add(itemId);
-    }
-    return next;
-  };
-
-  const toggleItem = useCallback(
-    (itemId: string) => {
-      if (isControlled) {
-        const next = computeNext(new Set(controlledValue), itemId);
-        onValueChange?.(Array.from(next));
-      } else {
-        setInternalExpandedItems((prev) => computeNext(prev, itemId));
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isControlled, multiple, controlledValue, onValueChange],
-  );
-
-  const registerTrigger = useCallback(
-    (itemId: string, element: HTMLButtonElement | null) => {
-      if (element) {
-        triggersRef.current.set(itemId, element);
-      } else {
-        triggersRef.current.delete(itemId);
-      }
-    },
-    [],
-  );
-
-  const getTriggers = useCallback(() => {
-    return Array.from(triggersRef.current.values());
-  }, []);
-
-  const contextValue = useMemo(
-    () => ({
-      accordionId,
-      expandedItems,
-      orientation,
-      dir,
-      toggleItem,
-      registerTrigger,
-      getTriggers,
-    }),
-    [
-      accordionId,
-      expandedItems,
-      orientation,
-      dir,
-      toggleItem,
-      registerTrigger,
-      getTriggers,
-    ],
+  const contextValue = useAccordionRoot(
+    controlledValue,
+    defaultValue,
+    multiple,
+    onValueChange,
+    orientation,
+    dir,
   );
 
   return (

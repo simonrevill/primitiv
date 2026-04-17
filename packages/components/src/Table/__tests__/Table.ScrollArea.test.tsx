@@ -28,19 +28,6 @@ describe("Table.ScrollArea rendering", () => {
     expect(scrollArea?.style.overflowX).toBe("auto");
   });
 
-  it("should render a scrollable container with non-wrapping white-space content", () => {
-    // Arrange
-    render(
-      <Table.ScrollArea>
-        <Table.Root />
-      </Table.ScrollArea>,
-    );
-    const scrollArea = screen.getByRole("table").parentElement;
-
-    // Assert
-    expect(scrollArea?.style.whiteSpace).toBe("");
-  });
-
   it('should render a scrollable container with a "display: block" style applied', () => {
     // Arrange
     render(

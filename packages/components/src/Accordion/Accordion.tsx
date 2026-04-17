@@ -226,6 +226,7 @@ export function AccordionTrigger({
     ref,
     onClick,
     disabled,
+    asChild,
     ...rest,
   });
 

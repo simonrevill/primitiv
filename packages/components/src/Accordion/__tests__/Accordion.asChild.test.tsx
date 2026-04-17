@@ -112,4 +112,120 @@ describe("Accordion asChild tests", () => {
     expect(ref.current).not.toBeNull();
     expect(ref.current?.tagName).toBe("BUTTON");
   });
+
+  it("should toggle the accordion when Enter is pressed on an asChild anchor element", async () => {
+    // Arrange
+    const user = userEvent.setup();
+    render(
+      <Accordion.Root>
+        <Accordion.Item>
+          <Accordion.Header>
+            <Accordion.Trigger asChild>
+              <a href="#section-1">Section 1</a>
+            </Accordion.Trigger>
+          </Accordion.Header>
+          <Accordion.Content>Content 1</Accordion.Content>
+        </Accordion.Item>
+      </Accordion.Root>,
+    );
+    const trigger = screen.getByRole("link", { name: "Section 1" });
+
+    // Act
+    trigger.focus();
+    await user.keyboard("[Enter]");
+
+    // Assert
+    expect(trigger).toHaveAttribute("aria-expanded", "true");
+  });
+
+  it("should toggle the accordion when Space is pressed on an asChild anchor element", async () => {
+    // Arrange
+    const user = userEvent.setup();
+    render(
+      <Accordion.Root>
+        <Accordion.Item>
+          <Accordion.Header>
+            <Accordion.Trigger asChild>
+              <a href="#section-1">Section 1</a>
+            </Accordion.Trigger>
+          </Accordion.Header>
+          <Accordion.Content>Content 1</Accordion.Content>
+        </Accordion.Item>
+      </Accordion.Root>,
+    );
+    const trigger = screen.getByRole("link", { name: "Section 1" });
+
+    // Act
+    trigger.focus();
+    await user.keyboard(" ");
+
+    // Assert
+    expect(trigger).toHaveAttribute("aria-expanded", "true");
+  });
+
+  it("should not toggle the accordion when Enter is pressed on a disabled asChild anchor element", async () => {
+    // Arrange
+    const user = userEvent.setup();
+    render(
+      <Accordion.Root>
+        <Accordion.Item>
+          <Accordion.Header>
+            <Accordion.Trigger asChild disabled>
+              <a href="#section-1">Section 1</a>
+            </Accordion.Trigger>
+          </Accordion.Header>
+          <Accordion.Content>Content 1</Accordion.Content>
+        </Accordion.Item>
+      </Accordion.Root>,
+    );
+    // disabled asChild gets role="button" injected, so query by button role
+    const trigger = screen.getByRole("button", { name: "Section 1" });
+
+    // Act
+    trigger.focus();
+    await user.keyboard("[Enter]");
+
+    // Assert
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("should apply role='button' when asChild is true and disabled is true", () => {
+    // Arrange
+    render(
+      <Accordion.Root>
+        <Accordion.Item>
+          <Accordion.Header>
+            <Accordion.Trigger asChild disabled>
+              <a href="#section-1">Section 1</a>
+            </Accordion.Trigger>
+          </Accordion.Header>
+        </Accordion.Item>
+      </Accordion.Root>,
+    );
+
+    // Assert — role="button" injected so aria-disabled is semantically valid on a non-button
+    const trigger = screen.getByRole("button", { name: "Section 1" });
+    expect(trigger.tagName).toBe("A");
+    expect(trigger).toHaveAttribute("aria-disabled", "true");
+  });
+
+  it("should NOT apply role='button' when asChild is true and disabled is false", () => {
+    // Arrange
+    render(
+      <Accordion.Root>
+        <Accordion.Item>
+          <Accordion.Header>
+            <Accordion.Trigger asChild>
+              <a href="#section-1">Section 1</a>
+            </Accordion.Trigger>
+          </Accordion.Header>
+        </Accordion.Item>
+      </Accordion.Root>,
+    );
+
+    const trigger = screen.getByRole("link", { name: "Section 1" });
+
+    // Assert — no role="button" injected on enabled asChild elements
+    expect(trigger).not.toHaveAttribute("role", "button");
+  });
 });

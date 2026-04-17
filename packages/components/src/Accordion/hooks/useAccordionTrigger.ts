@@ -8,8 +8,9 @@ export function useAccordionTrigger({
   ref,
   onClick,
   disabled,
+  asChild = false,
   ...rest
-}: Omit<AccordionTriggerProps, "children" | "asChild">) {
+}: Omit<AccordionTriggerProps, "children">) {
   const { buttonId, panelId, itemId, isExpanded } = useAccordionItemContext();
   const { toggleItem, registerTrigger, getTriggers, orientation, dir } =
     useAccordionContext();
@@ -29,6 +30,12 @@ export function useAccordionTrigger({
   }
 
   function handleKeyDown(e: KeyboardEvent<HTMLButtonElement>) {
+    if ((e.key === "Enter" || e.key === " ") && !disabled) {
+      e.preventDefault();
+      toggleItem(itemId);
+      return;
+    }
+
     const enabledTriggers = getTriggers().filter(
       (t) => t.getAttribute("aria-disabled") !== "true",
     );
@@ -78,6 +85,7 @@ export function useAccordionTrigger({
     "aria-controls": panelId,
     "aria-disabled": disabled,
     "data-disabled": disabled,
+    ...(asChild && disabled ? { role: "button" } : {}),
     onClick: handleClick,
     onKeyDown: handleKeyDown,
     "data-state": isExpanded ? "open" : "closed",

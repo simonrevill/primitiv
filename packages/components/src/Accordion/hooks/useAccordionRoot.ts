@@ -66,7 +66,7 @@ export function useAccordionRoot(
     return Array.from(triggersRef.current.values());
   }, []);
 
-  return useMemo(
+  const contextValue = useMemo(
     () => ({
       accordionId,
       expandedItems,
@@ -86,4 +86,6 @@ export function useAccordionRoot(
       getTriggers,
     ],
   );
+
+  return { contextValue };
 }

@@ -70,7 +70,7 @@ export function AccordionRoot({
   dir = "ltr",
   ...rest
 }: AccordionRootProps) {
-  const contextValue = useAccordionRoot(
+  const { contextValue } = useAccordionRoot(
     controlledValue,
     defaultValue,
     multiple,

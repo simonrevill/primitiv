@@ -76,7 +76,7 @@ describe("Accordion error handling tests", () => {
     }).toThrow("Component must be used within AccordionItem");
   });
 
-  it("should throw in development when AccordionTrigger has no corresponding AccordionContent", () => {
+  it("should throw when AccordionTrigger has no corresponding AccordionContent", () => {
     // Arrange & Act & Assert
     expect(() => {
       render(

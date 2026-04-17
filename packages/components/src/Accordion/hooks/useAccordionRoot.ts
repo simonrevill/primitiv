@@ -11,9 +11,10 @@ export function useAccordionRoot(
 ) {
   const accordionId = useId();
   const triggersRef = useRef<Map<string, HTMLButtonElement>>(new Map());
+  // State so validation re-runs when a trigger mounts. Only updated on mount,
+  // not on cleanup, to avoid setState calls outside act() in tests.
   const [registeredTriggerItemIds, setRegisteredTriggerItemIds] = useState<string[]>([]);
   const panelsRef = useRef<Set<string>>(new Set());
-  const [registeredPanelItemIds, setRegisteredPanelItemIds] = useState<string[]>([]);
   const isControlled = controlledValue !== undefined;
 
   const [internalExpandedItems, setInternalExpandedItems] = useState<
@@ -58,33 +59,38 @@ export function useAccordionRoot(
     (itemId: string, element: HTMLButtonElement | null) => {
       if (element) {
         triggersRef.current.set(itemId, element);
+        setRegisteredTriggerItemIds(Array.from(triggersRef.current.keys()));
       } else {
+        // Cleanup only — update the ref but not state, so no setState fires
+        // outside act() when components unmount after a validation throw.
         triggersRef.current.delete(itemId);
       }
-      setRegisteredTriggerItemIds(Array.from(triggersRef.current.keys()));
     },
     [],
   );
 
+  // Panels are tracked in a ref only. registerPanel does NOT call setState —
+  // the validation effect reads panelsRef.current directly. Because React 18
+  // runs all effects in a commit before flushing batched state updates, the
+  // panel effect always executes (and updates panelsRef) before the re-render
+  // triggered by setRegisteredTriggerItemIds reaches the validation effect.
   const registerPanel = useCallback((itemId: string) => {
     panelsRef.current.add(itemId);
-    setRegisteredPanelItemIds(Array.from(panelsRef.current));
   }, []);
 
   const unregisterPanel = useCallback((itemId: string) => {
     panelsRef.current.delete(itemId);
-    setRegisteredPanelItemIds(Array.from(panelsRef.current));
   }, []);
 
   useEffect(() => {
     for (const triggerId of registeredTriggerItemIds) {
-      if (!registeredPanelItemIds.includes(triggerId)) {
+      if (!panelsRef.current.has(triggerId)) {
         throw new Error(
           `AccordionTrigger (item "${triggerId}") has no corresponding AccordionContent. Every AccordionItem with a Trigger must also contain an AccordionContent.`,
         );
       }
     }
-  }, [registeredTriggerItemIds, registeredPanelItemIds]);
+  }, [registeredTriggerItemIds]);
 
   const getTriggers = useCallback(() => {
     return Array.from(triggersRef.current.values());

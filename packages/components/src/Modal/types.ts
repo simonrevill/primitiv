@@ -1,12 +1,18 @@
-import { ComponentProps, ReactNode } from "react";
+import { ComponentProps, MouseEvent, ReactNode, RefObject } from "react";
+
+export type ModalContentCallbacks = {
+  onEscapeKeyDown?: (event: Event) => void;
+  onPointerDownOutside?: (event: MouseEvent<HTMLDivElement>) => void;
+};
 
 export type ModalContextValue = {
   open: boolean;
   setOpen: (open: boolean) => void;
   contentId: string;
+  contentCallbacksRef: RefObject<ModalContentCallbacks>;
 };
 
-export type ModalContentProps = ComponentProps<"dialog">;
+export type ModalContentProps = ComponentProps<"dialog"> & ModalContentCallbacks;
 
 type UncontrolledModalRootProps = {
   defaultOpen?: boolean;

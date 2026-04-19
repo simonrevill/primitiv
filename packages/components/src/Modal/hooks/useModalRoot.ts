@@ -1,6 +1,6 @@
-import { useCallback, useId, useMemo, useState } from "react";
+import { useCallback, useId, useMemo, useRef, useState } from "react";
 
-import { ModalContextValue } from "../types";
+import { ModalContentCallbacks, ModalContextValue } from "../types";
 
 type UseModalRootArgs = {
   defaultOpen?: boolean;
@@ -17,6 +17,7 @@ export function useModalRoot({
   const [internalOpen, setInternalOpen] = useState(defaultOpen);
   const open = isControlled ? controlledOpen : internalOpen;
   const contentId = useId();
+  const contentCallbacksRef = useRef<ModalContentCallbacks>({});
 
   const setOpen = useCallback(
     (next: boolean) => {
@@ -29,7 +30,7 @@ export function useModalRoot({
   );
 
   const contextValue = useMemo<ModalContextValue>(
-    () => ({ open, setOpen, contentId }),
+    () => ({ open, setOpen, contentId, contentCallbacksRef }),
     [open, setOpen, contentId],
   );
 

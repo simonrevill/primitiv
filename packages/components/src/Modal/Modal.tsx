@@ -43,14 +43,18 @@ function ModalPortal({ children, container }: ModalPortalProps) {
 }
 
 function ModalOverlay({ onClick, ...rest }: ModalOverlayProps) {
-  const { open, setOpen } = useModalContext();
+  const { open, setOpen, contentCallbacksRef } = useModalContext();
   if (!open) return null;
   return (
     <div
       {...rest}
       aria-hidden="true"
       data-state="open"
-      onClick={composeEventHandlers(onClick, () => setOpen(false))}
+      onClick={composeEventHandlers(onClick, (event) => {
+        contentCallbacksRef.current?.onPointerDownOutside?.(event);
+        if (event.defaultPrevented) return;
+        setOpen(false);
+      })}
     />
   );
 }
@@ -58,10 +62,17 @@ function ModalOverlay({ onClick, ...rest }: ModalOverlayProps) {
 function ModalContent({
   children,
   id,
+  onEscapeKeyDown,
+  onPointerDownOutside,
   ref: externalRef,
   ...rest
 }: ModalContentProps & { ref?: Ref<HTMLDialogElement> }) {
   const { ref: innerRef, open, contentId } = useModalContent();
+  const { contentCallbacksRef } = useModalContext();
+  // Keep the ref pointed at the latest callbacks so event handlers wired
+  // through context (Overlay's onClick, native cancel) always see the most
+  // recent consumer props across re-renders.
+  contentCallbacksRef.current = { onEscapeKeyDown, onPointerDownOutside };
   const composedRef = externalRef
     ? composeRefs(innerRef, externalRef)
     : innerRef;

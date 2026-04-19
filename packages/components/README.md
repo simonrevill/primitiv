@@ -19,6 +19,7 @@ import { Tabs } from "@primitiv/components";
 | Component                                 | Description                                             |
 | ----------------------------------------- | ------------------------------------------------------- |
 | [Accordion](src/Accordion/README.md)      | WAI-ARIA Accordion pattern — collapsible sections with keyboard navigation, controlled/uncontrolled state, multiple mode, and `asChild` composition |
+| [Checkbox](src/Checkbox/README.md)        | WAI-ARIA Checkbox pattern — native `<button role="checkbox">` with tri-state (`"indeterminate"` / `aria-checked="mixed"`), controlled/uncontrolled state, `Indicator` slot, and `asChild` composition |
 | [Divider](src/Divider/README.md)          | WAI-ARIA separator role — horizontal or vertical content separator, with semantic and decorative use |
 | [Modal](src/Modal/README.md)              | WAI-ARIA Modal Dialog pattern — native `<dialog>`-based compound component with Portal, click-outside Overlay, controlled/uncontrolled state, escape hatches, imperative API, `asChild`, and `forceMount` animation hooks |
 | [Table](src/Table/README.md)              | WAI-ARIA Table pattern — compound component wrapping standard HTML table elements with accessible headers, captions, and a responsive scroll wrapper |

@@ -373,7 +373,7 @@ function ModalClose({ onClick, asChild = false, ...rest }: ModalCloseProps) {
 
 ModalClose.displayName = "ModalClose";
 
-type TModalCompound = typeof ModalRoot & {
+type ModalCompound = typeof ModalRoot & {
   Root: typeof ModalRoot;
   Trigger: typeof ModalTrigger;
   Portal: typeof ModalPortal;
@@ -429,7 +429,7 @@ type TModalCompound = typeof ModalRoot & {
  * @see {@link ModalContent} for the escape hatches and ARIA auto-wiring.
  * @see {@link ModalOverlay} for the click-outside contract.
  */
-const ModalCompound: TModalCompound = Object.assign(ModalRoot, {
+const ModalCompound: ModalCompound = Object.assign(ModalRoot, {
   Root: ModalRoot,
   Trigger: ModalTrigger,
   Portal: ModalPortal,

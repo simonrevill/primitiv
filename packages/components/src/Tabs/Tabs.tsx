@@ -350,7 +350,7 @@ export function TabsContent({
 
 TabsContent.displayName = "TabsContent";
 
-type TTabsCompound = typeof TabsRoot & {
+type TabsCompound = typeof TabsRoot & {
   Root: typeof TabsRoot;
   List: typeof TabsList;
   Trigger: typeof TabsTrigger;
@@ -404,7 +404,7 @@ type TTabsCompound = typeof TabsRoot & {
  * @see {@link TabsTrigger} for the full keyboard-interaction table.
  * @see {@link TabsContent} for panel lifecycle and unmount semantics.
  */
-const TabsCompound: TTabsCompound = Object.assign(TabsRoot, {
+const TabsCompound: TabsCompound = Object.assign(TabsRoot, {
   Root: TabsRoot,
   List: TabsList,
   Trigger: TabsTrigger,

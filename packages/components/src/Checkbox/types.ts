@@ -1,6 +1,11 @@
-import { ComponentProps, Ref } from "react";
+import { ComponentProps, ReactNode, Ref } from "react";
 
 export type CheckedState = boolean | "indeterminate";
+
+export type CheckboxIndicatorProps = ComponentProps<"span"> & {
+  children?: ReactNode;
+  forceMount?: boolean;
+};
 
 type CheckboxRootBaseProps = Omit<
   ComponentProps<"button">,

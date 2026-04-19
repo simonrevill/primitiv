@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-import { composeEventHandlers } from "../Slot";
+import { Slot, composeEventHandlers } from "../Slot";
 
 import { CheckboxContext } from "./CheckboxContext";
 import { useCheckboxContext, useCheckboxRoot } from "./hooks";
@@ -22,6 +22,7 @@ function CheckboxRoot(props: CheckboxRootProps) {
     onCheckedChange,
     onClick,
     disabled,
+    asChild = false,
     children,
     ...rest
   } = props;
@@ -31,22 +32,25 @@ function CheckboxRoot(props: CheckboxRootProps) {
     onCheckedChange,
   });
   const contextValue = useMemo(() => ({ checked: isChecked }), [isChecked]);
+  const rootProps = {
+    ...rest,
+    role: "checkbox" as const,
+    "aria-checked":
+      isChecked === "indeterminate" ? ("mixed" as const) : (isChecked as boolean),
+    "data-state": dataStateOf(isChecked),
+    "data-disabled": disabled ? "" : undefined,
+    disabled,
+    onClick: composeEventHandlers(onClick, toggle),
+  };
   return (
     <CheckboxContext.Provider value={contextValue}>
-      <button
-        type="button"
-        role="checkbox"
-        aria-checked={
-          isChecked === "indeterminate" ? "mixed" : (isChecked as boolean)
-        }
-        data-state={dataStateOf(isChecked)}
-        data-disabled={disabled ? "" : undefined}
-        disabled={disabled}
-        onClick={composeEventHandlers(onClick, toggle)}
-        {...rest}
-      >
-        {children}
-      </button>
+      {asChild ? (
+        <Slot {...rootProps}>{children}</Slot>
+      ) : (
+        <button type="button" {...rootProps}>
+          {children}
+        </button>
+      )}
     </CheckboxContext.Provider>
   );
 }
@@ -56,20 +60,21 @@ CheckboxRoot.displayName = "CheckboxRoot";
 function CheckboxIndicator({
   children,
   forceMount,
+  asChild = false,
   ...rest
 }: CheckboxIndicatorProps) {
   const { checked } = useCheckboxContext();
   const isVisible = checked !== false;
   if (!isVisible && !forceMount) return null;
-  return (
-    <span
-      aria-hidden="true"
-      data-state={dataStateOf(checked)}
-      {...rest}
-    >
-      {children}
-    </span>
-  );
+  const indicatorProps = {
+    ...rest,
+    "aria-hidden": "true" as const,
+    "data-state": dataStateOf(checked),
+  };
+  if (asChild) {
+    return <Slot {...indicatorProps}>{children}</Slot>;
+  }
+  return <span {...indicatorProps}>{children}</span>;
 }
 
 CheckboxIndicator.displayName = "CheckboxIndicator";

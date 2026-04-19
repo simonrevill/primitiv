@@ -5,12 +5,14 @@ export type CheckedState = boolean | "indeterminate";
 export type CheckboxIndicatorProps = ComponentProps<"span"> & {
   children?: ReactNode;
   forceMount?: boolean;
+  asChild?: boolean;
 };
 
 type CheckboxRootBaseProps = Omit<
   ComponentProps<"button">,
   "type" | "role" | "aria-checked" | "defaultChecked"
 > & {
+  asChild?: boolean;
   ref?: Ref<HTMLButtonElement>;
 };
 

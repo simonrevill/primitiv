@@ -1,9 +1,9 @@
-import { ReactNode } from "react";
+import { Ref, ReactNode } from "react";
 
-import { composeEventHandlers } from "../Slot";
+import { composeEventHandlers, composeRefs } from "../Slot";
 
 import { ModalProvider } from "./ModalContext";
-import { useModalContext, useModalRoot } from "./hooks";
+import { useModalContent, useModalContext, useModalRoot } from "./hooks";
 import {
   ModalCloseProps,
   ModalContentProps,
@@ -41,10 +41,23 @@ function ModalOverlay() {
   return null;
 }
 
-function ModalContent({ children, id, ...rest }: ModalContentProps) {
-  const { contentId } = useModalContext();
+function ModalContent({
+  children,
+  id,
+  ref: externalRef,
+  ...rest
+}: ModalContentProps & { ref?: Ref<HTMLDialogElement> }) {
+  const { ref: innerRef, open, contentId } = useModalContent();
+  const composedRef = externalRef
+    ? composeRefs(innerRef, externalRef)
+    : innerRef;
   return (
-    <dialog id={id ?? contentId} {...rest}>
+    <dialog
+      ref={composedRef}
+      id={id ?? contentId}
+      data-state={open ? "open" : "closed"}
+      {...rest}
+    >
       {children}
     </dialog>
   );

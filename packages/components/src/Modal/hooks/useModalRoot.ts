@@ -1,17 +1,35 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import { ModalContextValue } from "../types";
 
 type UseModalRootArgs = {
   defaultOpen?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 };
 
-export function useModalRoot({ defaultOpen = false }: UseModalRootArgs) {
-  const [open, setOpen] = useState(defaultOpen);
+export function useModalRoot({
+  defaultOpen = false,
+  open: controlledOpen,
+  onOpenChange,
+}: UseModalRootArgs) {
+  const isControlled = controlledOpen !== undefined;
+  const [internalOpen, setInternalOpen] = useState(defaultOpen);
+  const open = isControlled ? controlledOpen : internalOpen;
+
+  const setOpen = useCallback(
+    (next: boolean) => {
+      if (!isControlled) {
+        setInternalOpen(next);
+      }
+      onOpenChange?.(next);
+    },
+    [isControlled, onOpenChange],
+  );
 
   const contextValue = useMemo<ModalContextValue>(
     () => ({ open, setOpen }),
-    [open],
+    [open, setOpen],
   );
 
   return { contextValue };

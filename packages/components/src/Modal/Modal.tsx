@@ -10,8 +10,9 @@ import {
   ModalTriggerProps,
 } from "./types";
 
-function ModalRoot({ children, defaultOpen }: ModalRootProps) {
-  const { contextValue } = useModalRoot({ defaultOpen });
+function ModalRoot(props: ModalRootProps) {
+  const { children, defaultOpen, open, onOpenChange } = props;
+  const { contextValue } = useModalRoot({ defaultOpen, open, onOpenChange });
   return <ModalProvider value={contextValue}>{children}</ModalProvider>;
 }
 

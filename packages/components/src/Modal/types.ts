@@ -5,10 +5,21 @@ export type ModalContextValue = {
   setOpen: (open: boolean) => void;
 };
 
+type UncontrolledModalRootProps = {
+  defaultOpen?: boolean;
+  open?: never;
+  onOpenChange?: (open: boolean) => void;
+};
+
+type ControlledModalRootProps = {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  defaultOpen?: never;
+};
+
 export type ModalRootProps = {
   children?: ReactNode;
-  defaultOpen?: boolean;
-};
+} & (UncontrolledModalRootProps | ControlledModalRootProps);
 
 export type ModalTriggerProps = ComponentProps<"button">;
 

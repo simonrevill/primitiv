@@ -70,9 +70,11 @@ import {
  */
 function ModalRoot({
   ref,
-  ...props
-}: ModalRootProps & { ref?: Ref<ModalImperativeApi> }) {
-  const { children, defaultOpen, open, onOpenChange } = props;
+  children,
+  defaultOpen,
+  open,
+  onOpenChange,
+}: ModalRootProps) {
   const { contextValue } = useModalRoot(
     { defaultOpen, open, onOpenChange },
     ref,

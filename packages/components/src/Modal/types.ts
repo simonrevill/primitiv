@@ -1,4 +1,4 @@
-import { ComponentProps, MouseEvent, ReactNode, RefObject } from "react";
+import { ComponentProps, MouseEvent, ReactNode, Ref, RefObject } from "react";
 
 export type ModalImperativeApi = {
   open: () => void;
@@ -21,7 +21,8 @@ export type ModalContextValue = {
   registerDescription: (id: string | undefined) => void;
 };
 
-export type ModalContentProps = ComponentProps<"dialog"> & ModalContentCallbacks;
+export type ModalContentProps = ComponentProps<"dialog"> &
+  ModalContentCallbacks;
 
 type UncontrolledModalRootProps = {
   defaultOpen?: boolean;
@@ -37,7 +38,9 @@ type ControlledModalRootProps = {
 
 export type ModalRootProps = {
   children?: ReactNode;
-} & (UncontrolledModalRootProps | ControlledModalRootProps);
+} & (UncontrolledModalRootProps | ControlledModalRootProps) & {
+    ref?: Ref<ModalImperativeApi>;
+  };
 
 export type ModalTriggerProps = ComponentProps<"button"> & {
   asChild?: boolean;

@@ -40,12 +40,18 @@ function App() {
                 <div key={key} className="palette">
                   <ColorPalette palette={palette} />
                   <div className="palette__curve-editor">
-                    <Tabs.Root defaultValue="a">
+                    <Tabs.Root
+                      className="palette__curve-editor-tabs"
+                      defaultValue="a"
+                    >
                       <Tabs.List label="Demo tabs">
                         <Tabs.Trigger value="a">Sliders</Tabs.Trigger>
                         <Tabs.Trigger value="b">Curve</Tabs.Trigger>
                       </Tabs.List>
-                      <Tabs.Content value="a">
+                      <Tabs.Content
+                        className="palette__curve-editor palette__curve-editor--sliders"
+                        value="a"
+                      >
                         {palette?.lightness_curve.map(
                           (lightnessValue, index) => (
                             <input
@@ -62,7 +68,12 @@ function App() {
                           ),
                         )}
                       </Tabs.Content>
-                      <Tabs.Content value="b">Second panel</Tabs.Content>
+                      <Tabs.Content
+                        className="palette__curve-editor palette__curve-editor--curve"
+                        value="b"
+                      >
+                        Second panel
+                      </Tabs.Content>
                     </Tabs.Root>
                   </div>
                 </div>

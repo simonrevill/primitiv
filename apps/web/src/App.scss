@@ -22,7 +22,7 @@ $border-radius: 0.5rem;
 .palette {
   display: grid;
   grid-template-columns: repeat(10, 1fr);
-  grid-template-rows: 1fr 8rem;
+  grid-template-rows: 1fr 8.5rem;
   row-gap: 1rem;
   min-width: 0;
   padding-block-end: 1rem;
@@ -83,6 +83,32 @@ $border-radius: 0.5rem;
     grid-template-columns: subgrid;
     // display: flex;
     // justify-content: flex-start;
+
+    &-tabs {
+      display: grid;
+      grid-column: 1 / 11;
+
+      & [role="tablist"] {
+        display: grid;
+        grid-template-columns: repeat(10, 1fr);
+
+        & [role="tab"] {
+          display: grid;
+          grid-template-columns: subgrid;
+          grid-column: sibling-index() / calc(sibling-index() + 1);
+        }
+      }
+
+      [role="tabpanel"]:not([hidden]) {
+        display: grid;
+        grid-template-columns: repeat(10, 1fr);
+        grid-template-rows: min-content 129px;
+      }
+
+      [role="tabpanel"] {
+        grid-template-columns: repeat(10, 1fr);
+      }
+    }
   }
 }
 

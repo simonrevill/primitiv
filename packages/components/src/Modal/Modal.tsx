@@ -17,6 +17,52 @@ import {
   ModalTriggerProps,
 } from "./types";
 
+/**
+ * The root of a Modal — owns open state, registers the dialog's id,
+ * title id, and description id, and exposes an imperative handle for
+ * opening / closing from outside the React subtree.
+ *
+ * Supports two state modes, statically discriminated at the type level:
+ *
+ * - **Uncontrolled** — pass {@link ModalRootProps.defaultOpen | `defaultOpen`}
+ *   (or omit it for closed-on-mount). The component owns the open flag
+ *   internally.
+ * - **Controlled** — pass {@link ModalRootProps.open | `open`} *and*
+ *   {@link ModalRootProps.onOpenChange | `onOpenChange`} together. The
+ *   parent owns the flag; the component defers every state change back
+ *   through the callback.
+ *
+ * The imperative API is exposed via `ref`:
+ *
+ * ```tsx
+ * const ref = useRef<ModalImperativeApi>(null);
+ * ref.current?.open();
+ * ref.current?.close();
+ * ```
+ *
+ * In controlled mode the imperative methods call `onOpenChange` rather
+ * than flipping any internal state — the parent stays in charge.
+ *
+ * @example Uncontrolled
+ * ```tsx
+ * <Modal.Root defaultOpen>
+ *   <Modal.Content>…</Modal.Content>
+ * </Modal.Root>
+ * ```
+ *
+ * @example Controlled
+ * ```tsx
+ * const [open, setOpen] = useState(false);
+ *
+ * <Modal.Root open={open} onOpenChange={setOpen}>
+ *   <Modal.Trigger>Open</Modal.Trigger>
+ *   <Modal.Portal>
+ *     <Modal.Overlay />
+ *     <Modal.Content>…</Modal.Content>
+ *   </Modal.Portal>
+ * </Modal.Root>
+ * ```
+ */
 function ModalRoot({
   ref,
   ...props
@@ -29,6 +75,29 @@ function ModalRoot({
   return <ModalProvider value={contextValue}>{children}</ModalProvider>;
 }
 
+ModalRoot.displayName = "ModalRoot";
+
+/**
+ * A button that toggles the modal open. Renders a
+ * `<button type="button">` with full ARIA wiring:
+ *
+ * - `aria-haspopup="dialog"`
+ * - `aria-expanded` tracks open state
+ * - `aria-controls` points at the `Modal.Content` dialog's id
+ *
+ * **`asChild` prop.** Pass `asChild` to render any consumer-supplied
+ * element (e.g. a router `<Link>`) with the trigger's ARIA attributes,
+ * composed event handlers, and ref merged in.
+ *
+ * @example
+ * ```tsx
+ * <Modal.Trigger>Open</Modal.Trigger>
+ *
+ * <Modal.Trigger asChild>
+ *   <Link to="/upgrade">Upgrade</Link>
+ * </Modal.Trigger>
+ * ```
+ */
 function ModalTrigger({
   onClick,
   type,
@@ -49,6 +118,27 @@ function ModalTrigger({
   return <button type={type ?? "button"} {...triggerProps} />;
 }
 
+ModalTrigger.displayName = "ModalTrigger";
+
+/**
+ * Renders its children through `React.createPortal` so the dialog is
+ * detached from wherever `Modal.Root` lives in the React tree and
+ * becomes a direct child of {@link ModalPortalProps.container | `container`}
+ * (default `document.body`).
+ *
+ * By default the portal only renders while the modal is open. Pass
+ * {@link ModalPortalProps.forceMount | `forceMount`} to keep the
+ * subtree in the DOM after `open` flips false — useful for CSS exit
+ * animations driven by `data-state="closed"`.
+ *
+ * @example
+ * ```tsx
+ * <Modal.Portal container={document.getElementById("modal-root")!}>
+ *   <Modal.Overlay />
+ *   <Modal.Content>…</Modal.Content>
+ * </Modal.Portal>
+ * ```
+ */
 function ModalPortal({ children, container, forceMount }: ModalPortalProps) {
   const { open } = useModalContext();
   if (!open && !forceMount) return null;
@@ -57,6 +147,41 @@ function ModalPortal({ children, container, forceMount }: ModalPortalProps) {
   return createPortal(children, target);
 }
 
+ModalPortal.displayName = "ModalPortal";
+
+/**
+ * A full-bleed backdrop rendered as a **sibling** of `Modal.Content`.
+ * Native `<dialog>` elements live in the top layer and clicks inside
+ * them don't bubble to ancestors, so the overlay must sit next to the
+ * dialog — not around it — to catch click-outside.
+ *
+ * - `aria-hidden="true"` (the backdrop is decorative).
+ * - `data-state="open" | "closed"` follows the modal's open state.
+ * - `onClick` closes the modal and fires
+ *   `Modal.Content`'s `onPointerDownOutside`. Consumers can
+ *   `event.preventDefault()` on either their own `onClick` *or* on
+ *   `onPointerDownOutside` to veto closing.
+ *
+ * **`asChild` prop.** Pass `asChild` to render a consumer-supplied
+ * element (e.g. a motion wrapper) with the overlay's ARIA, data-state,
+ * and click handler merged in.
+ *
+ * **`forceMount` prop.** Pass `forceMount` to keep the overlay in the
+ * DOM while `open` is false so a CSS exit animation can play.
+ *
+ * @example
+ * ```tsx
+ * <Modal.Overlay />
+ *
+ * <Modal.Overlay asChild forceMount>
+ *   <motion.div
+ *     initial={{ opacity: 0 }}
+ *     animate={{ opacity: 1 }}
+ *     exit={{ opacity: 0 }}
+ *   />
+ * </Modal.Overlay>
+ * ```
+ */
 function ModalOverlay({
   onClick,
   asChild = false,
@@ -81,6 +206,44 @@ function ModalOverlay({
   return <div {...overlayProps} />;
 }
 
+ModalOverlay.displayName = "ModalOverlay";
+
+/**
+ * The native `<dialog>` element. React drives its `showModal()` and
+ * `close()` calls in response to `open` state changes, letting the
+ * browser own focus trapping, inert background, top-layer rendering,
+ * and the `Esc` key.
+ *
+ * **ARIA wiring.** `aria-labelledby` and `aria-describedby` are set
+ * automatically when `Modal.Title` and `Modal.Description` are rendered
+ * as descendants. The dialog has an implicit `role="dialog"` — do not
+ * pass one explicitly (WCAG redundancy rule).
+ *
+ * **Escape hatches.**
+ * - {@link ModalContentCallbacks.onEscapeKeyDown | `onEscapeKeyDown`}
+ *   fires on the native `cancel` event (Esc). Consumers can
+ *   `event.preventDefault()` to keep the modal open.
+ * - {@link ModalContentCallbacks.onPointerDownOutside | `onPointerDownOutside`}
+ *   fires when the overlay is clicked. Consumers can
+ *   `event.preventDefault()` to keep the modal open.
+ *
+ * **`asChild` is intentionally not supported.** The native dialog
+ * primitive is what provides the focus trap and the inert background;
+ * swapping it for a `<div>` would break both.
+ *
+ * **Styling hook.** `data-state="open" | "closed"` on the dialog.
+ *
+ * @example
+ * ```tsx
+ * <Modal.Content
+ *   onEscapeKeyDown={(event) => {
+ *     if (hasUnsavedChanges) event.preventDefault();
+ *   }}
+ * >
+ *   …
+ * </Modal.Content>
+ * ```
+ */
 function ModalContent({
   children,
   id,
@@ -112,6 +275,26 @@ function ModalContent({
   );
 }
 
+ModalContent.displayName = "ModalContent";
+
+/**
+ * The dialog's accessible name. Renders an `<h2>` by default and
+ * auto-registers its generated id with `Modal.Root` so
+ * `Modal.Content` can wire it up as `aria-labelledby`.
+ *
+ * Pass `asChild` to render the consumer's own heading element (e.g.
+ * an `<h3>` for a nested dialog or a styled heading component); the
+ * id is still registered.
+ *
+ * @example
+ * ```tsx
+ * <Modal.Title>Payment</Modal.Title>
+ *
+ * <Modal.Title asChild>
+ *   <h3>Nested section</h3>
+ * </Modal.Title>
+ * ```
+ */
 function ModalTitle({ children, asChild = false }: ModalTitleProps) {
   const { registerTitle } = useModalContext();
   const id = useId();
@@ -125,6 +308,23 @@ function ModalTitle({ children, asChild = false }: ModalTitleProps) {
   return <h2 id={id}>{children}</h2>;
 }
 
+ModalTitle.displayName = "ModalTitle";
+
+/**
+ * The dialog's accessible description. Renders a `<p>` by default and
+ * auto-registers its generated id with `Modal.Root` so
+ * `Modal.Content` can wire it up as `aria-describedby`.
+ *
+ * Pass `asChild` to render any consumer-supplied element; the id is
+ * still registered.
+ *
+ * @example
+ * ```tsx
+ * <Modal.Description>
+ *   Enter your card details below. You can change your plan later.
+ * </Modal.Description>
+ * ```
+ */
 function ModalDescription({
   children,
   asChild = false,
@@ -141,6 +341,26 @@ function ModalDescription({
   return <p id={id}>{children}</p>;
 }
 
+ModalDescription.displayName = "ModalDescription";
+
+/**
+ * A button that closes the modal. Renders a `<button type="button">`
+ * whose `onClick` is composed with `setOpen(false)` — consumer
+ * handlers run first and can `event.preventDefault()` to veto closing.
+ *
+ * **`asChild` prop.** Pass `asChild` to render any element (e.g. a
+ * text link or an icon-only `<button>` of your own) with the close
+ * behaviour merged in.
+ *
+ * @example
+ * ```tsx
+ * <Modal.Close>Cancel</Modal.Close>
+ *
+ * <Modal.Close asChild>
+ *   <IconButton aria-label="Close" icon={<XIcon />} />
+ * </Modal.Close>
+ * ```
+ */
 function ModalClose({ onClick, asChild = false, ...rest }: ModalCloseProps) {
   const { setOpen } = useModalContext();
   const closeProps = {
@@ -153,6 +373,8 @@ function ModalClose({ onClick, asChild = false, ...rest }: ModalCloseProps) {
   return <button type="button" {...closeProps} />;
 }
 
+ModalClose.displayName = "ModalClose";
+
 type TModalCompound = typeof ModalRoot & {
   Root: typeof ModalRoot;
   Trigger: typeof ModalTrigger;
@@ -164,6 +386,51 @@ type TModalCompound = typeof ModalRoot & {
   Close: typeof ModalClose;
 };
 
+/**
+ * Headless, accessible **Modal** — a compound component built on the
+ * native `<dialog>` element and its `showModal()` API. Implements the
+ * [WAI-ARIA Modal Dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/)
+ * with zero styles.
+ *
+ * `Modal` is both callable (it's an alias of {@link ModalRoot | `Modal.Root`})
+ * and carries its sub-components as static properties. Prefer the
+ * namespaced form in application code for readability and grep-ability.
+ *
+ * - {@link ModalRoot | `Modal.Root`} — state owner, context provider, imperative API holder.
+ * - {@link ModalTrigger | `Modal.Trigger`} — `<button>` that opens the modal.
+ * - {@link ModalPortal | `Modal.Portal`} — `createPortal` wrapper with `container` + `forceMount`.
+ * - {@link ModalOverlay | `Modal.Overlay`} — click-outside backdrop sibling of the dialog.
+ * - {@link ModalContent | `Modal.Content`} — native `<dialog>` with escape hatches and auto-ARIA.
+ * - {@link ModalTitle | `Modal.Title`} — accessible name; auto-wires `aria-labelledby`.
+ * - {@link ModalDescription | `Modal.Description`} — auto-wires `aria-describedby`.
+ * - {@link ModalClose | `Modal.Close`} — `<button>` that closes the modal.
+ *
+ * @example Minimal usage
+ * ```tsx
+ * import { Modal } from "@primitiv/components";
+ *
+ * <Modal.Root>
+ *   <Modal.Trigger>Open</Modal.Trigger>
+ *   <Modal.Portal>
+ *     <Modal.Overlay />
+ *     <Modal.Content>
+ *       <Modal.Title>Payment</Modal.Title>
+ *       <Modal.Description>Enter your card details</Modal.Description>
+ *       <Modal.Close>Cancel</Modal.Close>
+ *     </Modal.Content>
+ *   </Modal.Portal>
+ * </Modal.Root>;
+ * ```
+ *
+ * @example Scroll lock (CSS only)
+ * ```css
+ * html:has(dialog[open]) { overflow: hidden; }
+ * ```
+ *
+ * @see {@link ModalRoot} for state modes and the imperative API.
+ * @see {@link ModalContent} for the escape hatches and ARIA auto-wiring.
+ * @see {@link ModalOverlay} for the click-outside contract.
+ */
 const ModalCompound: TModalCompound = Object.assign(ModalRoot, {
   Root: ModalRoot,
   Trigger: ModalTrigger,
@@ -174,5 +441,7 @@ const ModalCompound: TModalCompound = Object.assign(ModalRoot, {
   Description: ModalDescription,
   Close: ModalClose,
 });
+
+ModalCompound.displayName = "Modal";
 
 export { ModalCompound as Modal };

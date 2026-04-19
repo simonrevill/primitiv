@@ -201,9 +201,11 @@ function ModalOverlay({
       setOpen(false);
     }),
   };
+
   if (asChild) {
     return <Slot {...overlayProps} />;
   }
+
   return <div {...overlayProps} />;
 }
 
@@ -262,6 +264,7 @@ function ModalContent({
   const composedRef = externalRef
     ? composeRefs(innerRef, externalRef)
     : innerRef;
+
   return (
     <dialog
       ref={composedRef}
@@ -299,13 +302,16 @@ ModalContent.displayName = "ModalContent";
 function ModalTitle({ children, asChild = false }: ModalTitleProps) {
   const { registerTitle } = useModalContext();
   const id = useId();
+
   useEffect(() => {
     registerTitle(id);
     return () => registerTitle(undefined);
   }, [registerTitle, id]);
+
   if (asChild) {
     return <Slot id={id}>{children}</Slot>;
   }
+
   return <h2 id={id}>{children}</h2>;
 }
 
@@ -332,13 +338,16 @@ function ModalDescription({
 }: ModalDescriptionProps) {
   const { registerDescription } = useModalContext();
   const id = useId();
+
   useEffect(() => {
     registerDescription(id);
     return () => registerDescription(undefined);
   }, [registerDescription, id]);
+
   if (asChild) {
     return <Slot id={id}>{children}</Slot>;
   }
+
   return <p id={id}>{children}</p>;
 }
 
@@ -368,9 +377,11 @@ function ModalClose({ onClick, asChild = false, ...rest }: ModalCloseProps) {
     ...rest,
     onClick: composeEventHandlers(onClick, () => setOpen(false)),
   };
+
   if (asChild) {
     return <Slot {...closeProps} />;
   }
+
   return <button type="button" {...closeProps} />;
 }
 

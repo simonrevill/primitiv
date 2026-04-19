@@ -4,7 +4,14 @@ import { useCheckboxRoot } from "./hooks";
 import { CheckboxRootProps } from "./types";
 
 function CheckboxRoot(props: CheckboxRootProps) {
-  const { defaultChecked, checked, onCheckedChange, onClick, ...rest } = props;
+  const {
+    defaultChecked,
+    checked,
+    onCheckedChange,
+    onClick,
+    disabled,
+    ...rest
+  } = props;
   const { checked: isChecked, toggle } = useCheckboxRoot({
     defaultChecked,
     checked,
@@ -16,6 +23,8 @@ function CheckboxRoot(props: CheckboxRootProps) {
       role="checkbox"
       aria-checked={isChecked}
       data-state={isChecked ? "checked" : "unchecked"}
+      data-disabled={disabled ? "" : undefined}
+      disabled={disabled}
       onClick={composeEventHandlers(onClick, toggle)}
       {...rest}
     />

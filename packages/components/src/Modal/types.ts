@@ -3,7 +3,10 @@ import { ComponentProps, ReactNode } from "react";
 export type ModalContextValue = {
   open: boolean;
   setOpen: (open: boolean) => void;
+  contentId: string;
 };
+
+export type ModalContentProps = ComponentProps<"dialog">;
 
 type UncontrolledModalRootProps = {
   defaultOpen?: boolean;

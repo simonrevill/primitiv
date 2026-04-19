@@ -6,6 +6,7 @@ import { ModalProvider } from "./ModalContext";
 import { useModalContext, useModalRoot } from "./hooks";
 import {
   ModalCloseProps,
+  ModalContentProps,
   ModalRootProps,
   ModalTriggerProps,
 } from "./types";
@@ -16,13 +17,15 @@ function ModalRoot(props: ModalRootProps) {
   return <ModalProvider value={contextValue}>{children}</ModalProvider>;
 }
 
-function ModalTrigger({ onClick, ...rest }: ModalTriggerProps) {
-  const { open, setOpen } = useModalContext();
+function ModalTrigger({ onClick, type, ...rest }: ModalTriggerProps) {
+  const { open, setOpen, contentId } = useModalContext();
   return (
     <button
-      type="button"
+      type={type ?? "button"}
       {...rest}
+      aria-haspopup="dialog"
       aria-expanded={open}
+      aria-controls={contentId}
       onClick={composeEventHandlers(onClick, () => setOpen(true))}
     />
   );
@@ -38,9 +41,13 @@ function ModalOverlay() {
   return null;
 }
 
-function ModalContent({ children }: { children?: ReactNode }) {
-  useModalContext();
-  return <>{children}</>;
+function ModalContent({ children, id, ...rest }: ModalContentProps) {
+  const { contentId } = useModalContext();
+  return (
+    <dialog id={id ?? contentId} {...rest}>
+      {children}
+    </dialog>
+  );
 }
 
 function ModalTitle({ children }: { children?: ReactNode }) {

@@ -8,6 +8,7 @@ import { useModalContent, useModalContext, useModalRoot } from "./hooks";
 import {
   ModalCloseProps,
   ModalContentProps,
+  ModalOverlayProps,
   ModalPortalProps,
   ModalRootProps,
   ModalTriggerProps,
@@ -41,9 +42,17 @@ function ModalPortal({ children, container }: ModalPortalProps) {
   return createPortal(children, target);
 }
 
-function ModalOverlay() {
-  useModalContext();
-  return null;
+function ModalOverlay({ onClick, ...rest }: ModalOverlayProps) {
+  const { open, setOpen } = useModalContext();
+  if (!open) return null;
+  return (
+    <div
+      {...rest}
+      aria-hidden="true"
+      data-state="open"
+      onClick={composeEventHandlers(onClick, () => setOpen(false))}
+    />
+  );
 }
 
 function ModalContent({

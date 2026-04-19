@@ -32,3 +32,5 @@ export type ModalPortalProps = {
   children?: ReactNode;
   container?: HTMLElement;
 };
+
+export type ModalOverlayProps = ComponentProps<"div">;

@@ -10,6 +10,10 @@ export type ModalContextValue = {
   setOpen: (open: boolean) => void;
   contentId: string;
   contentCallbacksRef: RefObject<ModalContentCallbacks>;
+  titleId: string | undefined;
+  descriptionId: string | undefined;
+  registerTitle: (id: string | undefined) => void;
+  registerDescription: (id: string | undefined) => void;
 };
 
 export type ModalContentProps = ComponentProps<"dialog"> & ModalContentCallbacks;

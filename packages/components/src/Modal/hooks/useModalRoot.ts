@@ -18,6 +18,10 @@ export function useModalRoot({
   const open = isControlled ? controlledOpen : internalOpen;
   const contentId = useId();
   const contentCallbacksRef = useRef<ModalContentCallbacks>({});
+  const [titleId, setTitleId] = useState<string | undefined>(undefined);
+  const [descriptionId, setDescriptionId] = useState<string | undefined>(
+    undefined,
+  );
 
   const setOpen = useCallback(
     (next: boolean) => {
@@ -29,9 +33,34 @@ export function useModalRoot({
     [isControlled, onOpenChange],
   );
 
+  const registerTitle = useCallback((id: string | undefined) => {
+    setTitleId(id);
+  }, []);
+
+  const registerDescription = useCallback((id: string | undefined) => {
+    setDescriptionId(id);
+  }, []);
+
   const contextValue = useMemo<ModalContextValue>(
-    () => ({ open, setOpen, contentId, contentCallbacksRef }),
-    [open, setOpen, contentId],
+    () => ({
+      open,
+      setOpen,
+      contentId,
+      contentCallbacksRef,
+      titleId,
+      descriptionId,
+      registerTitle,
+      registerDescription,
+    }),
+    [
+      open,
+      setOpen,
+      contentId,
+      titleId,
+      descriptionId,
+      registerTitle,
+      registerDescription,
+    ],
   );
 
   return { contextValue };

@@ -1,4 +1,4 @@
-import { Ref, ReactNode } from "react";
+import { Ref, ReactNode, useEffect, useId } from "react";
 import { createPortal } from "react-dom";
 
 import { composeEventHandlers, composeRefs } from "../Slot";
@@ -68,7 +68,7 @@ function ModalContent({
   ...rest
 }: ModalContentProps & { ref?: Ref<HTMLDialogElement> }) {
   const { ref: innerRef, open, contentId } = useModalContent();
-  const { contentCallbacksRef } = useModalContext();
+  const { contentCallbacksRef, titleId, descriptionId } = useModalContext();
   // Keep the ref pointed at the latest callbacks so event handlers wired
   // through context (Overlay's onClick, native cancel) always see the most
   // recent consumer props across re-renders.
@@ -81,6 +81,8 @@ function ModalContent({
       ref={composedRef}
       id={id ?? contentId}
       data-state={open ? "open" : "closed"}
+      aria-labelledby={titleId}
+      aria-describedby={descriptionId}
       {...rest}
     >
       {children}
@@ -89,13 +91,23 @@ function ModalContent({
 }
 
 function ModalTitle({ children }: { children?: ReactNode }) {
-  useModalContext();
-  return <>{children}</>;
+  const { registerTitle } = useModalContext();
+  const id = useId();
+  useEffect(() => {
+    registerTitle(id);
+    return () => registerTitle(undefined);
+  }, [registerTitle, id]);
+  return <h2 id={id}>{children}</h2>;
 }
 
 function ModalDescription({ children }: { children?: ReactNode }) {
-  useModalContext();
-  return <>{children}</>;
+  const { registerDescription } = useModalContext();
+  const id = useId();
+  useEffect(() => {
+    registerDescription(id);
+    return () => registerDescription(undefined);
+  }, [registerDescription, id]);
+  return <p id={id}>{children}</p>;
 }
 
 function ModalClose({ onClick, ...rest }: ModalCloseProps) {

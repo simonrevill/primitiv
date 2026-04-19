@@ -1,6 +1,18 @@
-import { useCallback, useId, useMemo, useRef, useState } from "react";
+import {
+  Ref,
+  useCallback,
+  useId,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
-import { ModalContentCallbacks, ModalContextValue } from "../types";
+import {
+  ModalContentCallbacks,
+  ModalContextValue,
+  ModalImperativeApi,
+} from "../types";
 
 type UseModalRootArgs = {
   defaultOpen?: boolean;
@@ -8,11 +20,10 @@ type UseModalRootArgs = {
   onOpenChange?: (open: boolean) => void;
 };
 
-export function useModalRoot({
-  defaultOpen = false,
-  open: controlledOpen,
-  onOpenChange,
-}: UseModalRootArgs) {
+export function useModalRoot(
+  { defaultOpen = false, open: controlledOpen, onOpenChange }: UseModalRootArgs,
+  ref?: Ref<ModalImperativeApi>,
+) {
   const isControlled = controlledOpen !== undefined;
   const [internalOpen, setInternalOpen] = useState(defaultOpen);
   const open = isControlled ? controlledOpen : internalOpen;
@@ -40,6 +51,15 @@ export function useModalRoot({
   const registerDescription = useCallback((id: string | undefined) => {
     setDescriptionId(id);
   }, []);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      open: () => setOpen(true),
+      close: () => setOpen(false),
+    }),
+    [setOpen],
+  );
 
   const contextValue = useMemo<ModalContextValue>(
     () => ({

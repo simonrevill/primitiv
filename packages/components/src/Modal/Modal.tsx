@@ -9,6 +9,7 @@ import {
   ModalCloseProps,
   ModalContentProps,
   ModalDescriptionProps,
+  ModalImperativeApi,
   ModalOverlayProps,
   ModalPortalProps,
   ModalRootProps,
@@ -16,9 +17,15 @@ import {
   ModalTriggerProps,
 } from "./types";
 
-function ModalRoot(props: ModalRootProps) {
+function ModalRoot({
+  ref,
+  ...props
+}: ModalRootProps & { ref?: Ref<ModalImperativeApi> }) {
   const { children, defaultOpen, open, onOpenChange } = props;
-  const { contextValue } = useModalRoot({ defaultOpen, open, onOpenChange });
+  const { contextValue } = useModalRoot(
+    { defaultOpen, open, onOpenChange },
+    ref,
+  );
   return <ModalProvider value={contextValue}>{children}</ModalProvider>;
 }
 

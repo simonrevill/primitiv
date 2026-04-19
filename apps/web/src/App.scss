@@ -102,7 +102,6 @@ $border-radius: 0.5rem;
       [role="tabpanel"]:not([hidden]) {
         display: grid;
         grid-template-columns: repeat(10, 1fr);
-        grid-template-rows: min-content 129px;
       }
 
       [role="tabpanel"] {

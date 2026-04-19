@@ -48,10 +48,7 @@ function App() {
                         <Tabs.Trigger value="a">Sliders</Tabs.Trigger>
                         <Tabs.Trigger value="b">Curve</Tabs.Trigger>
                       </Tabs.List>
-                      <Tabs.Content
-                        className="palette__curve-editor palette__curve-editor--sliders"
-                        value="a"
-                      >
+                      <Tabs.Content className="palette__sliders" value="a">
                         {palette?.lightness_curve.map(
                           (lightnessValue, index) => (
                             <input
@@ -68,10 +65,7 @@ function App() {
                           ),
                         )}
                       </Tabs.Content>
-                      <Tabs.Content
-                        className="palette__curve-editor palette__curve-editor--curve"
-                        value="b"
-                      >
+                      <Tabs.Content className="palette__curve" value="b">
                         Second panel
                       </Tabs.Content>
                     </Tabs.Root>

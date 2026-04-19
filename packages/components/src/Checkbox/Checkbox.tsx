@@ -4,9 +4,10 @@ import { useCheckboxRoot } from "./hooks";
 import { CheckboxRootProps } from "./types";
 
 function CheckboxRoot(props: CheckboxRootProps) {
-  const { defaultChecked, onCheckedChange, onClick, ...rest } = props;
+  const { defaultChecked, checked, onCheckedChange, onClick, ...rest } = props;
   const { checked: isChecked, toggle } = useCheckboxRoot({
     defaultChecked,
+    checked,
     onCheckedChange,
   });
   return (

@@ -2,20 +2,26 @@ import { useCallback, useState } from "react";
 
 type UseCheckboxRootArgs = {
   defaultChecked?: boolean;
+  checked?: boolean;
   onCheckedChange?: (checked: boolean) => void;
 };
 
 export function useCheckboxRoot({
   defaultChecked,
+  checked: controlledChecked,
   onCheckedChange,
 }: UseCheckboxRootArgs) {
-  const [checked, setChecked] = useState(defaultChecked ?? false);
+  const isControlled = controlledChecked !== undefined;
+  const [uncontrolledChecked, setUncontrolledChecked] = useState(
+    defaultChecked ?? false,
+  );
+  const checked = isControlled ? controlledChecked : uncontrolledChecked;
 
   const toggle = useCallback(() => {
     const next = !checked;
-    setChecked(next);
+    if (!isControlled) setUncontrolledChecked(next);
     onCheckedChange?.(next);
-  }, [checked, onCheckedChange]);
+  }, [checked, isControlled, onCheckedChange]);
 
   return { checked, toggle };
 }

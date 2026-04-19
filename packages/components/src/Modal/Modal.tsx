@@ -1,4 +1,5 @@
 import { Ref, ReactNode } from "react";
+import { createPortal } from "react-dom";
 
 import { composeEventHandlers, composeRefs } from "../Slot";
 
@@ -7,6 +8,7 @@ import { useModalContent, useModalContext, useModalRoot } from "./hooks";
 import {
   ModalCloseProps,
   ModalContentProps,
+  ModalPortalProps,
   ModalRootProps,
   ModalTriggerProps,
 } from "./types";
@@ -31,9 +33,12 @@ function ModalTrigger({ onClick, type, ...rest }: ModalTriggerProps) {
   );
 }
 
-function ModalPortal({ children }: { children?: ReactNode }) {
-  useModalContext();
-  return <>{children}</>;
+function ModalPortal({ children, container }: ModalPortalProps) {
+  const { open } = useModalContext();
+  if (!open) return null;
+  const target = container ?? (typeof document !== "undefined" ? document.body : null);
+  if (!target) return null;
+  return createPortal(children, target);
 }
 
 function ModalOverlay() {

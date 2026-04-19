@@ -27,3 +27,8 @@ export type ModalRootProps = {
 export type ModalTriggerProps = ComponentProps<"button">;
 
 export type ModalCloseProps = ComponentProps<"button">;
+
+export type ModalPortalProps = {
+  children?: ReactNode;
+  container?: HTMLElement;
+};

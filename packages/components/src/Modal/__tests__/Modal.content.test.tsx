@@ -2,7 +2,7 @@ import "./dialog-polyfill";
 
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { useState } from "react";
+import { createRef, useState } from "react";
 
 import { Modal } from "../Modal";
 
@@ -173,5 +173,21 @@ describe("Modal.Content — native <dialog> behaviour", () => {
 
     // Assert
     expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+
+  it("forwards a consumer-supplied ref to the underlying <dialog>", () => {
+    // Arrange
+    const ref = createRef<HTMLDialogElement>();
+
+    // Act
+    render(
+      <Modal.Root defaultOpen>
+        <Modal.Content ref={ref}>body</Modal.Content>
+      </Modal.Root>,
+    );
+
+    // Assert
+    expect(ref.current).toBe(getDialog());
+    expect(ref.current?.tagName).toBe("DIALOG");
   });
 });

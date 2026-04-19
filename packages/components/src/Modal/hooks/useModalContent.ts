@@ -7,8 +7,10 @@ export function useModalContent() {
   const ref = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
-    const dialog = ref.current;
-    if (!dialog) return;
+    // React guarantees the ref is populated before effects run for a
+    // successfully-committed element, and Content always renders the
+    // dialog — so ref.current is non-null here.
+    const dialog = ref.current as HTMLDialogElement;
     if (open && !dialog.open) {
       dialog.showModal();
     } else if (!open && dialog.open) {
@@ -17,8 +19,7 @@ export function useModalContent() {
   }, [open]);
 
   useEffect(() => {
-    const dialog = ref.current;
-    if (!dialog) return;
+    const dialog = ref.current as HTMLDialogElement;
     const handleClose = () => setOpen(false);
     const handleCancel = (event: Event) => {
       contentCallbacksRef.current?.onEscapeKeyDown?.(event);

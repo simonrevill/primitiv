@@ -43,6 +43,21 @@ describe("Modal forceMount", () => {
   });
 
   describe("Modal.Overlay", () => {
+    it("does not render while closed when only the Portal forceMounts", () => {
+      // Arrange & Act — Portal stays mounted but Overlay opts out of forceMount
+      render(
+        <Modal.Root>
+          <Modal.Portal forceMount>
+            <Modal.Overlay data-testid="overlay" />
+            <Modal.Content>body</Modal.Content>
+          </Modal.Portal>
+        </Modal.Root>,
+      );
+
+      // Assert — Overlay short-circuits independently
+      expect(screen.queryByTestId("overlay")).toBeNull();
+    });
+
     it('renders with data-state="closed" while closed when forceMount is set', () => {
       // Arrange & Act
       render(

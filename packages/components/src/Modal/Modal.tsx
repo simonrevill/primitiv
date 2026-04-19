@@ -142,9 +142,7 @@ ModalTrigger.displayName = "ModalTrigger";
 function ModalPortal({ children, container, forceMount }: ModalPortalProps) {
   const { open } = useModalContext();
   if (!open && !forceMount) return null;
-  const target = container ?? (typeof document !== "undefined" ? document.body : null);
-  if (!target) return null;
-  return createPortal(children, target);
+  return createPortal(children, container ?? document.body);
 }
 
 ModalPortal.displayName = "ModalPortal";

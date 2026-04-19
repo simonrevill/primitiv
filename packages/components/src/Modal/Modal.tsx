@@ -1,16 +1,18 @@
-import { Ref, ReactNode, useEffect, useId } from "react";
+import { Ref, useEffect, useId } from "react";
 import { createPortal } from "react-dom";
 
-import { composeEventHandlers, composeRefs } from "../Slot";
+import { Slot, composeEventHandlers, composeRefs } from "../Slot";
 
 import { ModalProvider } from "./ModalContext";
 import { useModalContent, useModalContext, useModalRoot } from "./hooks";
 import {
   ModalCloseProps,
   ModalContentProps,
+  ModalDescriptionProps,
   ModalOverlayProps,
   ModalPortalProps,
   ModalRootProps,
+  ModalTitleProps,
   ModalTriggerProps,
 } from "./types";
 
@@ -20,18 +22,24 @@ function ModalRoot(props: ModalRootProps) {
   return <ModalProvider value={contextValue}>{children}</ModalProvider>;
 }
 
-function ModalTrigger({ onClick, type, ...rest }: ModalTriggerProps) {
+function ModalTrigger({
+  onClick,
+  type,
+  asChild = false,
+  ...rest
+}: ModalTriggerProps) {
   const { open, setOpen, contentId } = useModalContext();
-  return (
-    <button
-      type={type ?? "button"}
-      {...rest}
-      aria-haspopup="dialog"
-      aria-expanded={open}
-      aria-controls={contentId}
-      onClick={composeEventHandlers(onClick, () => setOpen(true))}
-    />
-  );
+  const triggerProps = {
+    ...rest,
+    "aria-haspopup": "dialog" as const,
+    "aria-expanded": open,
+    "aria-controls": contentId,
+    onClick: composeEventHandlers(onClick, () => setOpen(true)),
+  };
+  if (asChild) {
+    return <Slot {...triggerProps} />;
+  }
+  return <button type={type ?? "button"} {...triggerProps} />;
 }
 
 function ModalPortal({ children, container }: ModalPortalProps) {
@@ -42,21 +50,23 @@ function ModalPortal({ children, container }: ModalPortalProps) {
   return createPortal(children, target);
 }
 
-function ModalOverlay({ onClick, ...rest }: ModalOverlayProps) {
+function ModalOverlay({ onClick, asChild = false, ...rest }: ModalOverlayProps) {
   const { open, setOpen, contentCallbacksRef } = useModalContext();
   if (!open) return null;
-  return (
-    <div
-      {...rest}
-      aria-hidden="true"
-      data-state="open"
-      onClick={composeEventHandlers(onClick, (event) => {
-        contentCallbacksRef.current?.onPointerDownOutside?.(event);
-        if (event.defaultPrevented) return;
-        setOpen(false);
-      })}
-    />
-  );
+  const overlayProps = {
+    ...rest,
+    "aria-hidden": "true" as const,
+    "data-state": "open" as const,
+    onClick: composeEventHandlers(onClick, (event) => {
+      contentCallbacksRef.current?.onPointerDownOutside?.(event);
+      if (event.defaultPrevented) return;
+      setOpen(false);
+    }),
+  };
+  if (asChild) {
+    return <Slot {...overlayProps} />;
+  }
+  return <div {...overlayProps} />;
 }
 
 function ModalContent({
@@ -90,35 +100,45 @@ function ModalContent({
   );
 }
 
-function ModalTitle({ children }: { children?: ReactNode }) {
+function ModalTitle({ children, asChild = false }: ModalTitleProps) {
   const { registerTitle } = useModalContext();
   const id = useId();
   useEffect(() => {
     registerTitle(id);
     return () => registerTitle(undefined);
   }, [registerTitle, id]);
+  if (asChild) {
+    return <Slot id={id}>{children}</Slot>;
+  }
   return <h2 id={id}>{children}</h2>;
 }
 
-function ModalDescription({ children }: { children?: ReactNode }) {
+function ModalDescription({
+  children,
+  asChild = false,
+}: ModalDescriptionProps) {
   const { registerDescription } = useModalContext();
   const id = useId();
   useEffect(() => {
     registerDescription(id);
     return () => registerDescription(undefined);
   }, [registerDescription, id]);
+  if (asChild) {
+    return <Slot id={id}>{children}</Slot>;
+  }
   return <p id={id}>{children}</p>;
 }
 
-function ModalClose({ onClick, ...rest }: ModalCloseProps) {
+function ModalClose({ onClick, asChild = false, ...rest }: ModalCloseProps) {
   const { setOpen } = useModalContext();
-  return (
-    <button
-      type="button"
-      onClick={composeEventHandlers(onClick, () => setOpen(false))}
-      {...rest}
-    />
-  );
+  const closeProps = {
+    ...rest,
+    onClick: composeEventHandlers(onClick, () => setOpen(false)),
+  };
+  if (asChild) {
+    return <Slot {...closeProps} />;
+  }
+  return <button type="button" {...closeProps} />;
 }
 
 type TModalCompound = typeof ModalRoot & {

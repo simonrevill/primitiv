@@ -34,13 +34,29 @@ export type ModalRootProps = {
   children?: ReactNode;
 } & (UncontrolledModalRootProps | ControlledModalRootProps);
 
-export type ModalTriggerProps = ComponentProps<"button">;
+export type ModalTriggerProps = ComponentProps<"button"> & {
+  asChild?: boolean;
+};
 
-export type ModalCloseProps = ComponentProps<"button">;
+export type ModalCloseProps = ComponentProps<"button"> & {
+  asChild?: boolean;
+};
 
 export type ModalPortalProps = {
   children?: ReactNode;
   container?: HTMLElement;
 };
 
-export type ModalOverlayProps = ComponentProps<"div">;
+export type ModalOverlayProps = ComponentProps<"div"> & {
+  asChild?: boolean;
+};
+
+export type ModalTitleProps = {
+  children?: ReactNode;
+  asChild?: boolean;
+};
+
+export type ModalDescriptionProps = {
+  children?: ReactNode;
+  asChild?: boolean;
+};

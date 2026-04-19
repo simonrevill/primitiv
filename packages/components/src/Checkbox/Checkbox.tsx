@@ -1,12 +1,22 @@
+import { composeEventHandlers } from "../Slot";
+
+import { useCheckboxRoot } from "./hooks";
 import { CheckboxRootProps } from "./types";
 
-function CheckboxRoot({ ...rest }: CheckboxRootProps) {
+function CheckboxRoot(props: CheckboxRootProps) {
+  const { defaultChecked, checked, onCheckedChange, onClick, ...rest } = props;
+  const { checked: isChecked, toggle } = useCheckboxRoot({
+    defaultChecked,
+    checked,
+    onCheckedChange,
+  });
   return (
     <button
       type="button"
       role="checkbox"
-      aria-checked={false}
-      data-state="unchecked"
+      aria-checked={isChecked}
+      data-state={isChecked ? "checked" : "unchecked"}
+      onClick={composeEventHandlers(onClick, toggle)}
       {...rest}
     />
   );

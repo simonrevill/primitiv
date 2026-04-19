@@ -77,6 +77,13 @@ rules below are not suggestions. Coverage must remain at 100% at all times.
      These three updates — test, JSDoc, README — are not optional
      follow-ups; they are part of the definition of "done" for any
      component change.
+   - When **adding a new component** to `packages/components`, the
+     package-level `packages/components/README.md` components table
+     must gain a new row for it, with a link to the component's own
+     `src/<Component>/README.md`. The component README alone is not
+     enough — the table is the index consumers hit first. This is
+     easy to miss if you only work from a per-component plan; add
+     the row before marking the component "done".
 
 ## Claude model strategy
 

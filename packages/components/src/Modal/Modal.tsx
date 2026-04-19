@@ -49,21 +49,26 @@ function ModalTrigger({
   return <button type={type ?? "button"} {...triggerProps} />;
 }
 
-function ModalPortal({ children, container }: ModalPortalProps) {
+function ModalPortal({ children, container, forceMount }: ModalPortalProps) {
   const { open } = useModalContext();
-  if (!open) return null;
+  if (!open && !forceMount) return null;
   const target = container ?? (typeof document !== "undefined" ? document.body : null);
   if (!target) return null;
   return createPortal(children, target);
 }
 
-function ModalOverlay({ onClick, asChild = false, ...rest }: ModalOverlayProps) {
+function ModalOverlay({
+  onClick,
+  asChild = false,
+  forceMount,
+  ...rest
+}: ModalOverlayProps) {
   const { open, setOpen, contentCallbacksRef } = useModalContext();
-  if (!open) return null;
+  if (!open && !forceMount) return null;
   const overlayProps = {
     ...rest,
     "aria-hidden": "true" as const,
-    "data-state": "open" as const,
+    "data-state": (open ? "open" : "closed") as "open" | "closed",
     onClick: composeEventHandlers(onClick, (event) => {
       contentCallbacksRef.current?.onPointerDownOutside?.(event);
       if (event.defaultPrevented) return;

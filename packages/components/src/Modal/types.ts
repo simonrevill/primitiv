@@ -50,10 +50,12 @@ export type ModalCloseProps = ComponentProps<"button"> & {
 export type ModalPortalProps = {
   children?: ReactNode;
   container?: HTMLElement;
+  forceMount?: boolean;
 };
 
 export type ModalOverlayProps = ComponentProps<"div"> & {
   asChild?: boolean;
+  forceMount?: boolean;
 };
 
 export type ModalTitleProps = {

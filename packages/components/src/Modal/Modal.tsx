@@ -1,14 +1,30 @@
 import { ReactNode } from "react";
 
-import { useModalContext } from "./hooks";
+import { composeEventHandlers } from "../Slot";
 
-function ModalRoot({ children }: { children?: ReactNode }) {
-  return <>{children}</>;
+import { ModalProvider } from "./ModalContext";
+import { useModalContext, useModalRoot } from "./hooks";
+import {
+  ModalCloseProps,
+  ModalRootProps,
+  ModalTriggerProps,
+} from "./types";
+
+function ModalRoot({ children, defaultOpen }: ModalRootProps) {
+  const { contextValue } = useModalRoot({ defaultOpen });
+  return <ModalProvider value={contextValue}>{children}</ModalProvider>;
 }
 
-function ModalTrigger({ children }: { children?: ReactNode }) {
-  useModalContext();
-  return <>{children}</>;
+function ModalTrigger({ onClick, ...rest }: ModalTriggerProps) {
+  const { open, setOpen } = useModalContext();
+  return (
+    <button
+      type="button"
+      {...rest}
+      aria-expanded={open}
+      onClick={composeEventHandlers(onClick, () => setOpen(true))}
+    />
+  );
 }
 
 function ModalPortal({ children }: { children?: ReactNode }) {
@@ -36,9 +52,15 @@ function ModalDescription({ children }: { children?: ReactNode }) {
   return <>{children}</>;
 }
 
-function ModalClose({ children }: { children?: ReactNode }) {
-  useModalContext();
-  return <>{children}</>;
+function ModalClose({ onClick, ...rest }: ModalCloseProps) {
+  const { setOpen } = useModalContext();
+  return (
+    <button
+      type="button"
+      onClick={composeEventHandlers(onClick, () => setOpen(false))}
+      {...rest}
+    />
+  );
 }
 
 type TModalCompound = typeof ModalRoot & {

@@ -104,7 +104,6 @@ ModalRoot.displayName = "ModalRoot";
  * </Modal.Trigger>
  * ```
  */
-
 function ModalTrigger({
   onClick,
   type,
@@ -116,6 +115,7 @@ function ModalTrigger({
   if (asChild) {
     return <Slot {...getTriggerProps()} />;
   }
+
   return <button type={type ?? "button"} {...getTriggerProps()} />;
 }
 
@@ -142,7 +142,9 @@ ModalTrigger.displayName = "ModalTrigger";
  */
 function ModalPortal({ children, container, forceMount }: ModalPortalProps) {
   const { open } = useModalContext();
+
   if (!open && !forceMount) return null;
+
   return createPortal(children, container ?? document.body);
 }
 

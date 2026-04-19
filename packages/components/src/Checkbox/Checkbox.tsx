@@ -21,8 +21,16 @@ function CheckboxRoot(props: CheckboxRootProps) {
     <button
       type="button"
       role="checkbox"
-      aria-checked={isChecked}
-      data-state={isChecked ? "checked" : "unchecked"}
+      aria-checked={
+        isChecked === "indeterminate" ? "mixed" : (isChecked as boolean)
+      }
+      data-state={
+        isChecked === "indeterminate"
+          ? "indeterminate"
+          : isChecked
+            ? "checked"
+            : "unchecked"
+      }
       data-disabled={disabled ? "" : undefined}
       disabled={disabled}
       onClick={composeEventHandlers(onClick, toggle)}

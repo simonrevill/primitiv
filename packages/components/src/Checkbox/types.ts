@@ -1,5 +1,7 @@
 import { ComponentProps, Ref } from "react";
 
+export type CheckedState = boolean | "indeterminate";
+
 type CheckboxRootBaseProps = Omit<
   ComponentProps<"button">,
   "type" | "role" | "aria-checked" | "defaultChecked"
@@ -8,14 +10,14 @@ type CheckboxRootBaseProps = Omit<
 };
 
 type CheckboxRootUncontrolledProps = CheckboxRootBaseProps & {
-  defaultChecked?: boolean;
+  defaultChecked?: CheckedState;
   checked?: never;
   onCheckedChange?: (checked: boolean) => void;
 };
 
 type CheckboxRootControlledProps = CheckboxRootBaseProps & {
   defaultChecked?: never;
-  checked: boolean;
+  checked: CheckedState;
   onCheckedChange: (checked: boolean) => void;
 };
 

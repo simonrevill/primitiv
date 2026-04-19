@@ -4,7 +4,12 @@ import { createPortal } from "react-dom";
 import { Slot, composeEventHandlers, composeRefs } from "../Slot";
 
 import { ModalProvider } from "./ModalContext";
-import { useModalContent, useModalContext, useModalRoot } from "./hooks";
+import {
+  useModalContent,
+  useModalContext,
+  useModalRoot,
+  useModalTrigger,
+} from "./hooks";
 import {
   ModalCloseProps,
   ModalContentProps,
@@ -72,6 +77,7 @@ function ModalRoot({
     { defaultOpen, open, onOpenChange },
     ref,
   );
+
   return <ModalProvider value={contextValue}>{children}</ModalProvider>;
 }
 
@@ -98,24 +104,19 @@ ModalRoot.displayName = "ModalRoot";
  * </Modal.Trigger>
  * ```
  */
+
 function ModalTrigger({
   onClick,
   type,
   asChild = false,
   ...rest
 }: ModalTriggerProps) {
-  const { open, setOpen, contentId } = useModalContext();
-  const triggerProps = {
-    ...rest,
-    "aria-haspopup": "dialog" as const,
-    "aria-expanded": open,
-    "aria-controls": contentId,
-    onClick: composeEventHandlers(onClick, () => setOpen(true)),
-  };
+  const { getTriggerProps } = useModalTrigger(onClick, rest);
+
   if (asChild) {
-    return <Slot {...triggerProps} />;
+    return <Slot {...getTriggerProps()} />;
   }
-  return <button type={type ?? "button"} {...triggerProps} />;
+  return <button type={type ?? "button"} {...getTriggerProps()} />;
 }
 
 ModalTrigger.displayName = "ModalTrigger";

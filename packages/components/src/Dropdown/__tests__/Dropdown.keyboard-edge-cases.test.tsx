@@ -24,6 +24,33 @@ describe("Dropdown keyboard edge cases", () => {
     window.removeEventListener("error", handler);
   });
 
+  it("does not surface an error during multi-character typeahead on a focusless menu", () => {
+    // Arrange
+    const errors: unknown[] = [];
+    const handler = (event: ErrorEvent) => errors.push(event.error ?? event);
+    window.addEventListener("error", handler);
+    render(
+      <Dropdown.Root defaultOpen>
+        <Dropdown.Trigger>Options</Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.Item>Apple</Dropdown.Item>
+          <Dropdown.Item>Banana</Dropdown.Item>
+        </Dropdown.Content>
+      </Dropdown.Root>,
+    );
+    const menu = screen.getByRole("menu", { hidden: true });
+    (document.activeElement as HTMLElement | null)?.blur();
+
+    // Act — two unmatched keystrokes accumulate the query to length 2
+    //        while currentIndex stays at -1 (no focused item)
+    fireEvent.keyDown(menu, { key: "z" });
+    fireEvent.keyDown(menu, { key: "a" });
+
+    // Assert — the typeahead loop does not dereference items[-1]
+    expect(errors).toHaveLength(0);
+    window.removeEventListener("error", handler);
+  });
+
   it("does not surface an error when Enter is pressed on a menu with no focused item", () => {
     // Arrange
     const errors: unknown[] = [];

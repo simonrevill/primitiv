@@ -449,7 +449,7 @@ function DropdownCheckboxItem({
     checked: controlledChecked,
     onCheckedChange,
   });
-  const ariaChecked =
+  const ariaChecked: "mixed" | "true" | "false" =
     checked === "indeterminate" ? "mixed" : checked ? "true" : "false";
   const handleClick = () => {
     if (disabled) return;

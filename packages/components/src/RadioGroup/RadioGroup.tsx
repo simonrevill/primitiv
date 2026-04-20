@@ -70,7 +70,6 @@ function RadioGroupItem({
   onKeyDown,
   disabled,
   asChild = false,
-  ref,
   ...rest
 }: RadioGroupItemProps) {
   const {
@@ -92,17 +91,9 @@ function RadioGroupItem({
       : enabledValues[0] === value;
 
   const localRef = useRef<HTMLButtonElement | null>(null);
-  const setRef = useCallback(
-    (node: HTMLButtonElement | null) => {
-      localRef.current = node;
-      if (typeof ref === "function") {
-        ref(node);
-      } else if (ref) {
-        ref.current = node;
-      }
-    },
-    [ref],
-  );
+  const setRef = useCallback((node: HTMLButtonElement | null) => {
+    localRef.current = node;
+  }, []);
 
   useEffect(() => {
     registerItem(value, localRef.current, disabled);

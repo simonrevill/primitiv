@@ -66,8 +66,15 @@ function DropdownContent({ children, ...rest }: DropdownContentProps) {
   useEffect(() => {
     const menu = menuRef.current;
     if (!menu) return;
-    if (open) menu.showPopover();
-    else menu.hidePopover();
+    if (open) {
+      menu.showPopover();
+      const firstItem = menu.querySelector<HTMLElement>(
+        '[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]',
+      );
+      firstItem?.focus();
+    } else {
+      menu.hidePopover();
+    }
   }, [open]);
 
   return (
@@ -101,6 +108,7 @@ function DropdownItem({
     <li
       {...rest}
       role="menuitem"
+      tabIndex={-1}
       onClick={composeEventHandlers(onClick, handleClick)}
     >
       {children}

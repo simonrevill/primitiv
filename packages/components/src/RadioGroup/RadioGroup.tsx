@@ -191,9 +191,7 @@ function RadioGroupItem({
   const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
     if (!NEXT_KEYS.has(event.key) && !PREV_KEYS.has(event.key)) return;
     event.preventDefault();
-    if (enabledValues.length === 0) return;
     const currentIndex = enabledValues.indexOf(value);
-    if (currentIndex === -1) return;
     const delta = NEXT_KEYS.has(event.key) ? 1 : -1;
     const nextIndex =
       (currentIndex + delta + enabledValues.length) % enabledValues.length;

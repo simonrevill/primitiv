@@ -1,5 +1,7 @@
 import { ComponentProps, ReactNode, Ref } from "react";
 
+import { CheckedState } from "../Checkbox/types";
+
 type DropdownRootBaseProps = {
   children?: ReactNode;
 };
@@ -73,3 +75,34 @@ export type DropdownLabelProps = ComponentProps<"li"> & {
   ref?: Ref<HTMLLIElement>;
   asChild?: boolean;
 };
+
+type DropdownCheckboxItemBaseProps = Omit<
+  ComponentProps<"li">,
+  "role" | "tabIndex" | "aria-checked" | "defaultChecked"
+> & {
+  children?: ReactNode;
+  ref?: Ref<HTMLLIElement>;
+  asChild?: boolean;
+  disabled?: boolean;
+  /**
+   * Fires when activation completes and the close auto-fires. Call
+   * `event.preventDefault()` to keep the menu open after toggling.
+   */
+  onSelect?: (event: Event) => void;
+};
+
+type DropdownCheckboxItemUncontrolledProps = DropdownCheckboxItemBaseProps & {
+  defaultChecked?: CheckedState;
+  checked?: never;
+  onCheckedChange?: (checked: boolean) => void;
+};
+
+type DropdownCheckboxItemControlledProps = DropdownCheckboxItemBaseProps & {
+  defaultChecked?: never;
+  checked: CheckedState;
+  onCheckedChange: (checked: boolean) => void;
+};
+
+export type DropdownCheckboxItemProps =
+  | DropdownCheckboxItemUncontrolledProps
+  | DropdownCheckboxItemControlledProps;

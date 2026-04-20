@@ -1,11 +1,13 @@
 import { useContext, useEffect, useId, useMemo, useRef } from "react";
 
+import { useCheckboxRoot } from "../Checkbox/hooks";
 import { composeEventHandlers } from "../Slot";
 
 import { DropdownContext } from "./DropdownContext";
 import { DropdownGroupContext } from "./DropdownGroupContext";
 import { useDropdownContext, useDropdownRoot } from "./hooks";
 import {
+  DropdownCheckboxItemProps,
   DropdownContentProps,
   DropdownGroupProps,
   DropdownItemProps,
@@ -243,6 +245,50 @@ function DropdownLabel({ id, children, ...rest }: DropdownLabelProps) {
 
 DropdownLabel.displayName = "DropdownLabel";
 
+function DropdownCheckboxItem({
+  children,
+  onClick,
+  onSelect,
+  disabled,
+  defaultChecked,
+  checked: controlledChecked,
+  onCheckedChange,
+  ...rest
+}: DropdownCheckboxItemProps) {
+  const { setOpen, triggerRef } = useDropdownContext();
+  const { checked, toggle } = useCheckboxRoot({
+    defaultChecked,
+    checked: controlledChecked,
+    onCheckedChange,
+  });
+  const ariaChecked =
+    checked === "indeterminate" ? "mixed" : checked ? "true" : "false";
+  const handleClick = () => {
+    if (disabled) return;
+    toggle();
+    const event = new Event("dropdown.select", { cancelable: true });
+    onSelect?.(event);
+    if (!event.defaultPrevented) {
+      setOpen(false);
+      triggerRef.current?.focus();
+    }
+  };
+  return (
+    <li
+      {...rest}
+      role="menuitemcheckbox"
+      tabIndex={-1}
+      aria-checked={ariaChecked}
+      aria-disabled={disabled || undefined}
+      onClick={composeEventHandlers(onClick, handleClick)}
+    >
+      {children}
+    </li>
+  );
+}
+
+DropdownCheckboxItem.displayName = "DropdownCheckboxItem";
+
 type TDropdownCompound = typeof DropdownRoot & {
   Root: typeof DropdownRoot;
   Trigger: typeof DropdownTrigger;
@@ -251,6 +297,7 @@ type TDropdownCompound = typeof DropdownRoot & {
   Separator: typeof DropdownSeparator;
   Group: typeof DropdownGroup;
   Label: typeof DropdownLabel;
+  CheckboxItem: typeof DropdownCheckboxItem;
 };
 
 const DropdownCompound: TDropdownCompound = Object.assign(DropdownRoot, {
@@ -261,6 +308,7 @@ const DropdownCompound: TDropdownCompound = Object.assign(DropdownRoot, {
   Separator: DropdownSeparator,
   Group: DropdownGroup,
   Label: DropdownLabel,
+  CheckboxItem: DropdownCheckboxItem,
 });
 
 DropdownCompound.displayName = "Dropdown";

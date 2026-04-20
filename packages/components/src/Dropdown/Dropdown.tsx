@@ -253,7 +253,7 @@ function DropdownContent({
         state.query.length > 1 &&
         state.query.split("").every((c) => c === state.query[0]);
       const searchQuery = isRepeat ? state.query[0] : state.query;
-      const startIndex = currentIndex;
+      const startIndex = currentIndex < 0 ? 0 : currentIndex;
       const offset = searchQuery.length === 1 || isRepeat ? 1 : 0;
       for (let i = 0; i < items.length; i++) {
         const index = (startIndex + offset + i) % items.length;

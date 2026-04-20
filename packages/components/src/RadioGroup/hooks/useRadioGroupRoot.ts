@@ -24,11 +24,11 @@ export function useRadioGroupRoot({
 
   const select = useCallback(
     (next: string) => {
-      if (value === next) return;
+      // Re-selection guard removed so a test can drive it back in.
       if (!isControlled) setUncontrolledValue(next);
       onValueChange?.(next);
     },
-    [value, isControlled, onValueChange],
+    [isControlled, onValueChange],
   );
 
   // Track registered item metadata in a ref (for focus handling) and

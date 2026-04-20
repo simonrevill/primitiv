@@ -317,7 +317,6 @@ function DropdownCheckboxItem({
   const ariaChecked =
     checked === "indeterminate" ? "mixed" : checked ? "true" : "false";
   const handleClick = () => {
-    if (disabled) return;
     toggle();
     const event = new Event("dropdown.select", { cancelable: true });
     onSelect?.(event);
@@ -390,7 +389,6 @@ function DropdownRadioItem({
   }
   const checked = group.value === itemValue;
   const handleClick = () => {
-    if (disabled) return;
     group.select(itemValue);
     const event = new Event("dropdown.select", { cancelable: true });
     onSelect?.(event);
@@ -451,11 +449,9 @@ function DropdownSubTrigger({
 }: DropdownSubTriggerProps) {
   const sub = useDropdownSubContext();
   const toggle = () => {
-    if (disabled) return;
     sub.setOpen(!sub.open);
   };
   const handleKeyDown = (event: React.KeyboardEvent<HTMLLIElement>) => {
-    if (disabled) return;
     if (event.key === "ArrowRight") {
       event.preventDefault();
       event.stopPropagation();

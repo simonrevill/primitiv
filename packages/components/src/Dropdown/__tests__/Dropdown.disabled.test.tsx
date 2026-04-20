@@ -30,6 +30,95 @@ describe("Dropdown disabled items", () => {
     expect(menu).toHaveAttribute("data-popover-open");
   });
 
+  it("does not fire onCheckedChange when a disabled Dropdown.CheckboxItem is clicked", async () => {
+    // Arrange
+    const user = userEvent.setup();
+    const onCheckedChange = vi.fn();
+    render(
+      <Dropdown.Root defaultOpen>
+        <Dropdown.Trigger>Options</Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.CheckboxItem disabled onCheckedChange={onCheckedChange}>
+            Show hidden
+          </Dropdown.CheckboxItem>
+        </Dropdown.Content>
+      </Dropdown.Root>,
+    );
+    const item = screen.getByRole("menuitemcheckbox", {
+      name: "Show hidden",
+      hidden: true,
+    });
+    expect(item).toHaveAttribute("aria-disabled", "true");
+
+    // Act
+    await user.click(item);
+
+    // Assert
+    expect(onCheckedChange).not.toHaveBeenCalled();
+    expect(item).toHaveAttribute("aria-checked", "false");
+  });
+
+  it("does not fire onValueChange when a disabled Dropdown.RadioItem is clicked", async () => {
+    // Arrange
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    render(
+      <Dropdown.Root defaultOpen>
+        <Dropdown.Trigger>Options</Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.RadioGroup onValueChange={onValueChange}>
+            <Dropdown.RadioItem value="a" disabled>
+              A
+            </Dropdown.RadioItem>
+          </Dropdown.RadioGroup>
+        </Dropdown.Content>
+      </Dropdown.Root>,
+    );
+    const item = screen.getByRole("menuitemradio", { name: "A", hidden: true });
+    expect(item).toHaveAttribute("aria-disabled", "true");
+
+    // Act
+    await user.click(item);
+
+    // Assert
+    expect(onValueChange).not.toHaveBeenCalled();
+  });
+
+  it("does not open the submenu when a disabled Dropdown.SubTrigger is clicked or receives ArrowRight", async () => {
+    // Arrange
+    const user = userEvent.setup();
+    render(
+      <Dropdown.Root defaultOpen>
+        <Dropdown.Trigger>File</Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.Sub>
+            <Dropdown.SubTrigger disabled>Open Recent</Dropdown.SubTrigger>
+            <Dropdown.SubContent>
+              <Dropdown.Item>Project A</Dropdown.Item>
+            </Dropdown.SubContent>
+          </Dropdown.Sub>
+        </Dropdown.Content>
+      </Dropdown.Root>,
+    );
+    const subTrigger = screen.getByRole("menuitem", {
+      name: "Open Recent",
+      hidden: true,
+    });
+    expect(subTrigger).toHaveAttribute("aria-disabled", "true");
+    expect(subTrigger).toHaveAttribute("aria-expanded", "false");
+
+    // Act — click is a no-op
+    await user.click(subTrigger);
+    expect(subTrigger).toHaveAttribute("aria-expanded", "false");
+
+    // Act — ArrowRight is a no-op
+    subTrigger.focus();
+    await user.keyboard("{ArrowRight}");
+
+    // Assert
+    expect(subTrigger).toHaveAttribute("aria-expanded", "false");
+  });
+
   it("skips disabled items during ArrowDown traversal", async () => {
     // Arrange
     const user = userEvent.setup();

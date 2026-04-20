@@ -142,14 +142,16 @@ function DropdownContent({
         state.timer = null;
       }, TYPEAHEAD_RESET_MS);
 
+      const isRepeat =
+        state.query.length > 1 &&
+        state.query.split("").every((c) => c === state.query[0]);
+      const searchQuery = isRepeat ? state.query[0] : state.query;
       const startIndex = currentIndex < 0 ? 0 : currentIndex;
-      const query = state.query;
-      const isRepeat = query.length > 1 && query.split("").every((c) => c === query[0]);
-      const offset = state.query.length === 1 || isRepeat ? 1 : 0;
+      const offset = searchQuery.length === 1 || isRepeat ? 1 : 0;
       for (let i = 0; i < items.length; i++) {
         const index = (startIndex + offset + i) % items.length;
         const text = (items[index].textContent ?? "").trim().toLowerCase();
-        if (text.startsWith(query)) {
+        if (text.startsWith(searchQuery)) {
           event.preventDefault();
           items[index].focus();
           return;

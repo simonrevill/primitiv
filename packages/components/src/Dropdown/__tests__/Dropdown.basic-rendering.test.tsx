@@ -29,7 +29,10 @@ describe("Dropdown basic rendering", () => {
 
     // Assert
     const trigger = screen.getByRole("button", { name: "Options" });
-    const menu = screen.getByRole("menu");
+    // `hidden: true` — a closed `popover` element is hidden from the
+    // accessibility tree by the browser. In jsdom the popover never
+    // opens either way, so we have to include hidden nodes to see it.
+    const menu = screen.getByRole("menu", { hidden: true });
     expect(menu.tagName).toBe("MENU");
     expect(menu).toHaveAttribute("popover", "auto");
     // aria-controls on the trigger and id on the content must match so

@@ -28,3 +28,12 @@ export type DropdownTriggerProps = Omit<
   ref?: Ref<HTMLButtonElement>;
   asChild?: boolean;
 };
+
+export type DropdownContentProps = Omit<
+  ComponentProps<"menu">,
+  "role" | "popover" | "id"
+> & {
+  children?: ReactNode;
+  ref?: Ref<HTMLMenuElement>;
+  asChild?: boolean;
+};

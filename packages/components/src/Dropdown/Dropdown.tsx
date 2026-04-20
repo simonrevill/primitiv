@@ -4,7 +4,11 @@ import { composeEventHandlers } from "../Slot";
 
 import { DropdownContext } from "./DropdownContext";
 import { useDropdownContext, useDropdownRoot } from "./hooks";
-import { DropdownRootProps, DropdownTriggerProps } from "./types";
+import {
+  DropdownContentProps,
+  DropdownRootProps,
+  DropdownTriggerProps,
+} from "./types";
 
 function DropdownRoot({
   defaultOpen,
@@ -54,14 +58,32 @@ function DropdownTrigger({
 
 DropdownTrigger.displayName = "DropdownTrigger";
 
+function DropdownContent({ children, ...rest }: DropdownContentProps) {
+  const { contentId } = useDropdownContext();
+  return (
+    <menu
+      {...rest}
+      id={contentId}
+      role="menu"
+      popover="auto"
+    >
+      {children}
+    </menu>
+  );
+}
+
+DropdownContent.displayName = "DropdownContent";
+
 type TDropdownCompound = typeof DropdownRoot & {
   Root: typeof DropdownRoot;
   Trigger: typeof DropdownTrigger;
+  Content: typeof DropdownContent;
 };
 
 const DropdownCompound: TDropdownCompound = Object.assign(DropdownRoot, {
   Root: DropdownRoot,
   Trigger: DropdownTrigger,
+  Content: DropdownContent,
 });
 
 DropdownCompound.displayName = "Dropdown";

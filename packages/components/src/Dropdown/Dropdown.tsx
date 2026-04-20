@@ -211,12 +211,9 @@ function DropdownContent({
 
     let nextIndex: number | null = null;
     if (event.key === "ArrowDown") {
-      nextIndex = currentIndex < 0 ? 0 : (currentIndex + 1) % items.length;
+      nextIndex = (currentIndex + 1) % items.length;
     } else if (event.key === "ArrowUp") {
-      nextIndex =
-        currentIndex < 0
-          ? items.length - 1
-          : (currentIndex - 1 + items.length) % items.length;
+      nextIndex = currentIndex <= 0 ? items.length - 1 : currentIndex - 1;
     } else if (event.key === "Home") {
       nextIndex = 0;
     } else if (event.key === "End") {

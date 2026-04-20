@@ -17,4 +17,24 @@ describe("Dropdown basic rendering", () => {
     expect(trigger).toHaveAttribute("aria-expanded", "false");
     expect(trigger).toHaveAttribute("aria-controls");
   });
+
+  it("renders Content as a native-popover <menu role=menu> wired to the trigger via aria-controls", () => {
+    // Arrange & Act
+    render(
+      <Dropdown.Root defaultOpen>
+        <Dropdown.Trigger>Options</Dropdown.Trigger>
+        <Dropdown.Content>Items go here</Dropdown.Content>
+      </Dropdown.Root>,
+    );
+
+    // Assert
+    const trigger = screen.getByRole("button", { name: "Options" });
+    const menu = screen.getByRole("menu");
+    expect(menu.tagName).toBe("MENU");
+    expect(menu).toHaveAttribute("popover", "auto");
+    // aria-controls on the trigger and id on the content must match so
+    // AT and browser popover-invoker wiring both resolve.
+    expect(menu.id).toBeTruthy();
+    expect(trigger).toHaveAttribute("aria-controls", menu.id);
+  });
 });

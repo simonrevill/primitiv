@@ -107,8 +107,10 @@ function DropdownContent({
     if (!menu) return;
     if (open) {
       menu.showPopover();
-      const firstItem = menu.querySelector<HTMLElement>(MENUITEM_SELECTOR);
-      firstItem?.focus();
+      if (!menu.contains(document.activeElement)) {
+        const firstItem = menu.querySelector<HTMLElement>(MENUITEM_SELECTOR);
+        firstItem?.focus();
+      }
     } else {
       menu.hidePopover();
     }
@@ -402,6 +404,7 @@ DropdownSub.displayName = "DropdownSub";
 function DropdownSubTrigger({
   children,
   onClick,
+  onKeyDown,
   disabled,
   ...rest
 }: DropdownSubTriggerProps) {
@@ -409,6 +412,14 @@ function DropdownSubTrigger({
   const toggle = () => {
     if (disabled) return;
     sub.setOpen(!sub.open);
+  };
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLLIElement>) => {
+    if (disabled) return;
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      event.stopPropagation();
+      sub.setOpen(true);
+    }
   };
   return (
     <li
@@ -421,6 +432,7 @@ function DropdownSubTrigger({
       aria-controls={sub.contentId}
       aria-disabled={disabled || undefined}
       onClick={composeEventHandlers(onClick, toggle)}
+      onKeyDown={composeEventHandlers(onKeyDown, handleKeyDown)}
     >
       {children}
     </li>
@@ -429,7 +441,11 @@ function DropdownSubTrigger({
 
 DropdownSubTrigger.displayName = "DropdownSubTrigger";
 
-function DropdownSubContent({ children, ...rest }: DropdownSubContentProps) {
+function DropdownSubContent({
+  children,
+  onKeyDown,
+  ...rest
+}: DropdownSubContentProps) {
   const sub = useDropdownSubContext();
   const menuRef = useRef<HTMLMenuElement | null>(null);
 
@@ -438,12 +454,23 @@ function DropdownSubContent({ children, ...rest }: DropdownSubContentProps) {
     if (!menu) return;
     if (sub.open) {
       menu.showPopover();
-      const firstItem = menu.querySelector<HTMLElement>(MENUITEM_SELECTOR);
-      firstItem?.focus();
+      if (!menu.contains(document.activeElement)) {
+        const firstItem = menu.querySelector<HTMLElement>(MENUITEM_SELECTOR);
+        firstItem?.focus();
+      }
     } else {
       menu.hidePopover();
     }
   }, [sub.open]);
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLMenuElement>) => {
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      event.stopPropagation();
+      sub.setOpen(false);
+      sub.triggerRef.current?.focus();
+    }
+  };
 
   return (
     <menu
@@ -452,6 +479,7 @@ function DropdownSubContent({ children, ...rest }: DropdownSubContentProps) {
       id={sub.contentId}
       role="menu"
       popover="auto"
+      onKeyDown={composeEventHandlers(onKeyDown, handleKeyDown)}
     >
       {children}
     </menu>

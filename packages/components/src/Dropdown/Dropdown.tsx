@@ -66,7 +66,7 @@ function DropdownTrigger({
 DropdownTrigger.displayName = "DropdownTrigger";
 
 const MENUITEM_SELECTOR =
-  '[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]';
+  '[role="menuitem"]:not([aria-disabled="true"]), [role="menuitemcheckbox"]:not([aria-disabled="true"]), [role="menuitemradio"]:not([aria-disabled="true"])';
 
 const TYPEAHEAD_RESET_MS = 500;
 
@@ -184,10 +184,12 @@ function DropdownItem({
   children,
   onClick,
   onSelect,
+  disabled,
   ...rest
 }: DropdownItemProps) {
   const { setOpen, triggerRef } = useDropdownContext();
   const handleClick = () => {
+    if (disabled) return;
     const event = new Event("dropdown.select", { cancelable: true });
     onSelect?.(event);
     if (!event.defaultPrevented) {
@@ -200,6 +202,7 @@ function DropdownItem({
       {...rest}
       role="menuitem"
       tabIndex={-1}
+      aria-disabled={disabled || undefined}
       onClick={composeEventHandlers(onClick, handleClick)}
     >
       {children}

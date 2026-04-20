@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
-import { composeEventHandlers } from "../Slot";
+import { Slot, composeEventHandlers } from "../Slot";
 
 import { RadioGroupContext } from "./RadioGroupContext";
 import { RadioGroupItemContext } from "./RadioGroupItemContext";
@@ -19,6 +19,7 @@ function RadioGroupRoot({
   defaultValue,
   value: controlledValue,
   onValueChange,
+  asChild = false,
   children,
   ...rest
 }: RadioGroupRootProps) {
@@ -45,11 +46,14 @@ function RadioGroupRoot({
     }),
     [value, select, registerItem, itemValues, disabledValues, focusItem],
   );
+  const rootProps = { role: "radiogroup" as const, ...rest };
   return (
     <RadioGroupContext.Provider value={contextValue}>
-      <div role="radiogroup" {...rest}>
-        {children}
-      </div>
+      {asChild ? (
+        <Slot {...rootProps}>{children}</Slot>
+      ) : (
+        <div {...rootProps}>{children}</div>
+      )}
     </RadioGroupContext.Provider>
   );
 }
@@ -65,6 +69,7 @@ function RadioGroupItem({
   onClick,
   onKeyDown,
   disabled,
+  asChild = false,
   ref,
   ...rest
 }: RadioGroupItemProps) {
@@ -123,22 +128,27 @@ function RadioGroupItem({
     [isChecked],
   );
 
+  const itemProps = {
+    ...rest,
+    ref: setRef,
+    role: "radio" as const,
+    "aria-checked": isChecked,
+    "data-state": isChecked ? ("checked" as const) : ("unchecked" as const),
+    tabIndex: isTabStop ? 0 : -1,
+    disabled,
+    onClick: composeEventHandlers(onClick, () => select(value)),
+    onKeyDown: composeEventHandlers(onKeyDown, handleKeyDown),
+  };
+
   return (
     <RadioGroupItemContext.Provider value={itemContextValue}>
-      <button
-        ref={setRef}
-        type="button"
-        role="radio"
-        aria-checked={isChecked}
-        data-state={isChecked ? "checked" : "unchecked"}
-        tabIndex={isTabStop ? 0 : -1}
-        disabled={disabled}
-        onClick={composeEventHandlers(onClick, () => select(value))}
-        onKeyDown={composeEventHandlers(onKeyDown, handleKeyDown)}
-        {...rest}
-      >
-        {children}
-      </button>
+      {asChild ? (
+        <Slot {...itemProps}>{children}</Slot>
+      ) : (
+        <button type="button" {...itemProps}>
+          {children}
+        </button>
+      )}
     </RadioGroupItemContext.Provider>
   );
 }
@@ -148,19 +158,20 @@ RadioGroupItem.displayName = "RadioGroupItem";
 function RadioGroupIndicator({
   children,
   forceMount,
+  asChild = false,
   ...rest
 }: RadioGroupIndicatorProps) {
   const { checked } = useRadioGroupItemContext();
   if (!checked && !forceMount) return null;
-  return (
-    <span
-      aria-hidden="true"
-      data-state={checked ? "checked" : "unchecked"}
-      {...rest}
-    >
-      {children}
-    </span>
-  );
+  const indicatorProps = {
+    ...rest,
+    "aria-hidden": "true" as const,
+    "data-state": checked ? ("checked" as const) : ("unchecked" as const),
+  };
+  if (asChild) {
+    return <Slot {...indicatorProps}>{children}</Slot>;
+  }
+  return <span {...indicatorProps}>{children}</span>;
 }
 
 RadioGroupIndicator.displayName = "RadioGroupIndicator";

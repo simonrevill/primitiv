@@ -3,6 +3,7 @@ import { ComponentProps, ReactNode, Ref } from "react";
 type RadioGroupRootBaseProps = Omit<ComponentProps<"div">, "role"> & {
   children?: ReactNode;
   ref?: Ref<HTMLDivElement>;
+  asChild?: boolean;
 };
 
 type RadioGroupRootUncontrolledProps = RadioGroupRootBaseProps & {
@@ -28,9 +29,11 @@ export type RadioGroupItemProps = Omit<
   value: string;
   children?: ReactNode;
   ref?: Ref<HTMLButtonElement>;
+  asChild?: boolean;
 };
 
 export type RadioGroupIndicatorProps = ComponentProps<"span"> & {
   children?: ReactNode;
   forceMount?: boolean;
+  asChild?: boolean;
 };

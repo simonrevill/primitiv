@@ -1,0 +1,79 @@
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+
+import { RadioGroup } from "../RadioGroup";
+
+describe("RadioGroup disabled", () => {
+  it("skips disabled items when arrowing forwards", async () => {
+    // Arrange
+    const user = userEvent.setup();
+    render(
+      <RadioGroup.Root aria-label="Colour" defaultValue="red">
+        <RadioGroup.Item value="red">Red</RadioGroup.Item>
+        <RadioGroup.Item value="green" disabled>
+          Green
+        </RadioGroup.Item>
+        <RadioGroup.Item value="blue">Blue</RadioGroup.Item>
+      </RadioGroup.Root>,
+    );
+    const red = screen.getByRole("radio", { name: "Red" });
+    const green = screen.getByRole("radio", { name: "Green" });
+    const blue = screen.getByRole("radio", { name: "Blue" });
+    red.focus();
+
+    // Act
+    await user.keyboard("{ArrowDown}");
+
+    // Assert
+    expect(blue).toHaveFocus();
+    expect(blue).toHaveAttribute("aria-checked", "true");
+    expect(green).toHaveAttribute("aria-checked", "false");
+  });
+
+  it("skips disabled items when arrowing backwards", async () => {
+    // Arrange
+    const user = userEvent.setup();
+    render(
+      <RadioGroup.Root aria-label="Colour" defaultValue="blue">
+        <RadioGroup.Item value="red">Red</RadioGroup.Item>
+        <RadioGroup.Item value="green" disabled>
+          Green
+        </RadioGroup.Item>
+        <RadioGroup.Item value="blue">Blue</RadioGroup.Item>
+      </RadioGroup.Root>,
+    );
+    const red = screen.getByRole("radio", { name: "Red" });
+    const blue = screen.getByRole("radio", { name: "Blue" });
+    blue.focus();
+
+    // Act
+    await user.keyboard("{ArrowUp}");
+
+    // Assert
+    expect(red).toHaveFocus();
+    expect(red).toHaveAttribute("aria-checked", "true");
+  });
+
+  it("skips disabled items when computing the home-base tab stop", () => {
+    // Arrange & Act
+    render(
+      <RadioGroup.Root aria-label="Colour">
+        <RadioGroup.Item value="red" disabled>
+          Red
+        </RadioGroup.Item>
+        <RadioGroup.Item value="green">Green</RadioGroup.Item>
+        <RadioGroup.Item value="blue">Blue</RadioGroup.Item>
+      </RadioGroup.Root>,
+    );
+
+    // Assert: first enabled item is the tab stop, not the disabled one
+    expect(screen.getByRole("radio", { name: "Red" })).toHaveAttribute(
+      "tabindex",
+      "-1",
+    );
+    expect(screen.getByRole("radio", { name: "Green" })).toHaveAttribute(
+      "tabindex",
+      "0",
+    );
+  });
+});

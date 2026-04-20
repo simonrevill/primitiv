@@ -1,5 +1,7 @@
 import { useId, useMemo } from "react";
 
+import { composeEventHandlers } from "../Slot";
+
 import { DropdownContext } from "./DropdownContext";
 import { useDropdownContext, useDropdownRoot } from "./hooks";
 import { DropdownRootProps, DropdownTriggerProps } from "./types";
@@ -31,16 +33,19 @@ DropdownRoot.displayName = "DropdownRoot";
 
 function DropdownTrigger({
   children,
+  onClick,
   ...rest
 }: DropdownTriggerProps) {
-  const { open, contentId } = useDropdownContext();
+  const { open, setOpen, contentId } = useDropdownContext();
+  const toggle = () => setOpen(!open);
   return (
     <button
       type="button"
+      {...rest}
       aria-haspopup="menu"
       aria-expanded={open}
       aria-controls={contentId}
-      {...rest}
+      onClick={composeEventHandlers(onClick, toggle)}
     >
       {children}
     </button>

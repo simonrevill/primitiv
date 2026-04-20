@@ -5,6 +5,7 @@ export type RadioGroupContextValue = {
   select: (value: string) => void;
   registerItem: (value: string, element: HTMLButtonElement | null) => void;
   itemValues: string[];
+  focusItem: (value: string) => void;
 };
 
 export const RadioGroupContext = createContext<RadioGroupContextValue | null>(

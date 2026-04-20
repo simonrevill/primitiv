@@ -26,8 +26,8 @@ export function useRadioGroupRoot({
     [value, isControlled, onValueChange],
   );
 
-  // Track registered item elements in a ref (for future focus handling)
-  // and their values as state so re-renders fire when items mount or
+  // Track registered item elements in a ref (for focus handling) and
+  // their values as state so re-renders fire when items mount or
   // unmount — required for the roving-tabindex home base.
   const itemsRef = useRef<Map<string, HTMLButtonElement>>(new Map());
   const [itemValues, setItemValues] = useState<string[]>([]);
@@ -44,5 +44,9 @@ export function useRadioGroupRoot({
     [],
   );
 
-  return { value, select, registerItem, itemValues };
+  const focusItem = useCallback((itemValue: string) => {
+    itemsRef.current.get(itemValue)?.focus();
+  }, []);
+
+  return { value, select, registerItem, itemValues, focusItem };
 }

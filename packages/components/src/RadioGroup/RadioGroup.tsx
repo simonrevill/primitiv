@@ -13,14 +13,15 @@ function RadioGroupRoot({
   children,
   ...rest
 }: RadioGroupRootProps) {
-  const { value, select, registerItem, itemValues } = useRadioGroupRoot({
-    defaultValue,
-    value: controlledValue,
-    onValueChange,
-  });
+  const { value, select, registerItem, itemValues, focusItem } =
+    useRadioGroupRoot({
+      defaultValue,
+      value: controlledValue,
+      onValueChange,
+    });
   const contextValue = useMemo(
-    () => ({ value, select, registerItem, itemValues }),
-    [value, select, registerItem, itemValues],
+    () => ({ value, select, registerItem, itemValues, focusItem }),
+    [value, select, registerItem, itemValues, focusItem],
   );
   return (
     <RadioGroupContext.Provider value={contextValue}>
@@ -33,10 +34,14 @@ function RadioGroupRoot({
 
 RadioGroupRoot.displayName = "RadioGroupRoot";
 
+const NEXT_KEYS = new Set(["ArrowDown", "ArrowRight"]);
+const PREV_KEYS = new Set(["ArrowUp", "ArrowLeft"]);
+
 function RadioGroupItem({
   value,
   children,
   onClick,
+  onKeyDown,
   ref,
   ...rest
 }: RadioGroupItemProps) {
@@ -45,6 +50,7 @@ function RadioGroupItem({
     select,
     registerItem,
     itemValues,
+    focusItem,
   } = useRadioGroupContext();
   const isChecked = selectedValue === value;
   const isTabStop =
@@ -70,6 +76,19 @@ function RadioGroupItem({
     return () => registerItem(value, null);
   }, [value, registerItem]);
 
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (!NEXT_KEYS.has(event.key) && !PREV_KEYS.has(event.key)) return;
+    event.preventDefault();
+    const currentIndex = itemValues.indexOf(value);
+    if (currentIndex === -1) return;
+    const delta = NEXT_KEYS.has(event.key) ? 1 : -1;
+    const nextIndex =
+      (currentIndex + delta + itemValues.length) % itemValues.length;
+    const nextValue = itemValues[nextIndex];
+    select(nextValue);
+    focusItem(nextValue);
+  };
+
   return (
     <button
       ref={setRef}
@@ -79,6 +98,7 @@ function RadioGroupItem({
       data-state={isChecked ? "checked" : "unchecked"}
       tabIndex={isTabStop ? 0 : -1}
       onClick={composeEventHandlers(onClick, () => select(value))}
+      onKeyDown={composeEventHandlers(onKeyDown, handleKeyDown)}
       {...rest}
     >
       {children}

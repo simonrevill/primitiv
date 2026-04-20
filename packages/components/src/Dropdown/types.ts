@@ -56,10 +56,8 @@ export type DropdownItemProps = Omit<
   onSelect?: (event: Event) => void;
 };
 
-export type DropdownSeparatorProps = Omit<
-  ComponentProps<"li">,
-  "role" | "children"
-> & {
+export type DropdownSeparatorProps = Omit<ComponentProps<"li">, "role"> & {
+  children?: ReactNode;
   ref?: Ref<HTMLLIElement>;
   asChild?: boolean;
 };

@@ -240,33 +240,59 @@ function DropdownItem({
 
 DropdownItem.displayName = "DropdownItem";
 
-function DropdownSeparator({ ...rest }: DropdownSeparatorProps) {
-  return <li {...rest} role="separator" />;
+function DropdownSeparator({
+  asChild = false,
+  children,
+  ...rest
+}: DropdownSeparatorProps) {
+  const separatorProps = { ...rest, role: "separator" as const };
+  if (asChild) {
+    return <Slot {...separatorProps}>{children}</Slot>;
+  }
+  return <li {...separatorProps} />;
 }
 
 DropdownSeparator.displayName = "DropdownSeparator";
 
-function DropdownGroup({ children, ...rest }: DropdownGroupProps) {
+function DropdownGroup({
+  children,
+  asChild = false,
+  ...rest
+}: DropdownGroupProps) {
   const labelId = useId();
   const contextValue = useMemo(() => ({ labelId }), [labelId]);
+  const groupProps = {
+    ...rest,
+    role: "group" as const,
+    "aria-labelledby": labelId,
+  };
   return (
     <DropdownGroupContext.Provider value={contextValue}>
-      <li {...rest} role="group" aria-labelledby={labelId}>
-        <ul role="none">{children}</ul>
-      </li>
+      {asChild ? (
+        <Slot {...groupProps}>{children}</Slot>
+      ) : (
+        <li {...groupProps}>
+          <ul role="none">{children}</ul>
+        </li>
+      )}
     </DropdownGroupContext.Provider>
   );
 }
 
 DropdownGroup.displayName = "DropdownGroup";
 
-function DropdownLabel({ id, children, ...rest }: DropdownLabelProps) {
+function DropdownLabel({
+  id,
+  children,
+  asChild = false,
+  ...rest
+}: DropdownLabelProps) {
   const group = useContext(DropdownGroupContext);
-  return (
-    <li {...rest} id={id ?? group?.labelId}>
-      {children}
-    </li>
-  );
+  const labelProps = { ...rest, id: id ?? group?.labelId };
+  if (asChild) {
+    return <Slot {...labelProps}>{children}</Slot>;
+  }
+  return <li {...labelProps}>{children}</li>;
 }
 
 DropdownLabel.displayName = "DropdownLabel";
@@ -279,6 +305,7 @@ function DropdownCheckboxItem({
   defaultChecked,
   checked: controlledChecked,
   onCheckedChange,
+  asChild = false,
   ...rest
 }: DropdownCheckboxItemProps) {
   const { setOpen, triggerRef } = useDropdownContext();
@@ -299,18 +326,18 @@ function DropdownCheckboxItem({
       triggerRef.current?.focus();
     }
   };
-  return (
-    <li
-      {...rest}
-      role="menuitemcheckbox"
-      tabIndex={-1}
-      aria-checked={ariaChecked}
-      aria-disabled={disabled || undefined}
-      onClick={composeEventHandlers(onClick, handleClick)}
-    >
-      {children}
-    </li>
-  );
+  const itemProps = {
+    ...rest,
+    role: "menuitemcheckbox" as const,
+    tabIndex: -1,
+    "aria-checked": ariaChecked,
+    "aria-disabled": disabled || undefined,
+    onClick: composeEventHandlers(onClick, handleClick),
+  };
+  if (asChild) {
+    return <Slot {...itemProps}>{children}</Slot>;
+  }
+  return <li {...itemProps}>{children}</li>;
 }
 
 DropdownCheckboxItem.displayName = "DropdownCheckboxItem";
@@ -320,6 +347,7 @@ function DropdownRadioGroup({
   value: controlledValue,
   onValueChange,
   children,
+  asChild = false,
   ...rest
 }: DropdownRadioGroupProps) {
   const { value, select } = useRadioGroupRoot({
@@ -328,11 +356,16 @@ function DropdownRadioGroup({
     onValueChange,
   });
   const contextValue = useMemo(() => ({ value, select }), [value, select]);
+  const groupProps = { ...rest, role: "group" as const };
   return (
     <DropdownRadioGroupContext.Provider value={contextValue}>
-      <li {...rest} role="group">
-        <ul role="none">{children}</ul>
-      </li>
+      {asChild ? (
+        <Slot {...groupProps}>{children}</Slot>
+      ) : (
+        <li {...groupProps}>
+          <ul role="none">{children}</ul>
+        </li>
+      )}
     </DropdownRadioGroupContext.Provider>
   );
 }
@@ -345,6 +378,7 @@ function DropdownRadioItem({
   onSelect,
   disabled,
   value: itemValue,
+  asChild = false,
   ...rest
 }: DropdownRadioItemProps) {
   const { setOpen, triggerRef } = useDropdownContext();
@@ -365,18 +399,18 @@ function DropdownRadioItem({
       triggerRef.current?.focus();
     }
   };
-  return (
-    <li
-      {...rest}
-      role="menuitemradio"
-      tabIndex={-1}
-      aria-checked={checked}
-      aria-disabled={disabled || undefined}
-      onClick={composeEventHandlers(onClick, handleClick)}
-    >
-      {children}
-    </li>
-  );
+  const itemProps = {
+    ...rest,
+    role: "menuitemradio" as const,
+    tabIndex: -1,
+    "aria-checked": checked,
+    "aria-disabled": disabled || undefined,
+    onClick: composeEventHandlers(onClick, handleClick),
+  };
+  if (asChild) {
+    return <Slot {...itemProps}>{children}</Slot>;
+  }
+  return <li {...itemProps}>{children}</li>;
 }
 
 DropdownRadioItem.displayName = "DropdownRadioItem";
@@ -412,6 +446,7 @@ function DropdownSubTrigger({
   onClick,
   onKeyDown,
   disabled,
+  asChild = false,
   ...rest
 }: DropdownSubTriggerProps) {
   const sub = useDropdownSubContext();
@@ -427,22 +462,22 @@ function DropdownSubTrigger({
       sub.setOpen(true);
     }
   };
-  return (
-    <li
-      {...rest}
-      ref={sub.triggerRef}
-      role="menuitem"
-      tabIndex={-1}
-      aria-haspopup="menu"
-      aria-expanded={sub.open}
-      aria-controls={sub.contentId}
-      aria-disabled={disabled || undefined}
-      onClick={composeEventHandlers(onClick, toggle)}
-      onKeyDown={composeEventHandlers(onKeyDown, handleKeyDown)}
-    >
-      {children}
-    </li>
-  );
+  const subTriggerProps = {
+    ...rest,
+    ref: sub.triggerRef,
+    role: "menuitem" as const,
+    tabIndex: -1,
+    "aria-haspopup": "menu" as const,
+    "aria-expanded": sub.open,
+    "aria-controls": sub.contentId,
+    "aria-disabled": disabled || undefined,
+    onClick: composeEventHandlers(onClick, toggle),
+    onKeyDown: composeEventHandlers(onKeyDown, handleKeyDown),
+  };
+  if (asChild) {
+    return <Slot {...subTriggerProps}>{children}</Slot>;
+  }
+  return <li {...subTriggerProps}>{children}</li>;
 }
 
 DropdownSubTrigger.displayName = "DropdownSubTrigger";
@@ -450,6 +485,7 @@ DropdownSubTrigger.displayName = "DropdownSubTrigger";
 function DropdownSubContent({
   children,
   onKeyDown,
+  asChild = false,
   ...rest
 }: DropdownSubContentProps) {
   const sub = useDropdownSubContext();
@@ -478,18 +514,18 @@ function DropdownSubContent({
     }
   };
 
-  return (
-    <menu
-      {...rest}
-      ref={menuRef}
-      id={sub.contentId}
-      role="menu"
-      popover="auto"
-      onKeyDown={composeEventHandlers(onKeyDown, handleKeyDown)}
-    >
-      {children}
-    </menu>
-  );
+  const subContentProps = {
+    ...rest,
+    ref: menuRef,
+    id: sub.contentId,
+    role: "menu" as const,
+    popover: "auto" as const,
+    onKeyDown: composeEventHandlers(onKeyDown, handleKeyDown),
+  };
+  if (asChild) {
+    return <Slot {...subContentProps}>{children}</Slot>;
+  }
+  return <menu {...subContentProps}>{children}</menu>;
 }
 
 DropdownSubContent.displayName = "DropdownSubContent";

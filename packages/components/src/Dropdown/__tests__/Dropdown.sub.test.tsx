@@ -90,6 +90,68 @@ describe("Dropdown submenus", () => {
     expect(subTrigger).toHaveFocus();
   });
 
+  it("does not open the SubContent when the SubTrigger receives a non-ArrowRight key", async () => {
+    // Arrange
+    const user = userEvent.setup();
+    render(
+      <Dropdown.Root defaultOpen>
+        <Dropdown.Trigger>File</Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.Sub>
+            <Dropdown.SubTrigger>Open Recent</Dropdown.SubTrigger>
+            <Dropdown.SubContent>
+              <Dropdown.Item>Project A</Dropdown.Item>
+            </Dropdown.SubContent>
+          </Dropdown.Sub>
+        </Dropdown.Content>
+      </Dropdown.Root>,
+    );
+    const subTrigger = screen.getByRole("menuitem", {
+      name: "Open Recent",
+      hidden: true,
+    });
+    const [, subMenu] = screen.getAllByRole("menu", { hidden: true });
+    expect(subTrigger).toHaveAttribute("aria-expanded", "false");
+
+    // Act — press arbitrary key on SubTrigger; must not open the submenu
+    subTrigger.focus();
+    await user.keyboard("x");
+
+    // Assert
+    expect(subTrigger).toHaveAttribute("aria-expanded", "false");
+    expect(subMenu).not.toHaveAttribute("data-popover-open");
+  });
+
+  it("does not close the SubContent when a non-ArrowLeft key is pressed inside it", async () => {
+    // Arrange
+    const user = userEvent.setup();
+    render(
+      <Dropdown.Root defaultOpen>
+        <Dropdown.Trigger>File</Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.Sub defaultOpen>
+            <Dropdown.SubTrigger>Open Recent</Dropdown.SubTrigger>
+            <Dropdown.SubContent>
+              <Dropdown.Item>Project A</Dropdown.Item>
+            </Dropdown.SubContent>
+          </Dropdown.Sub>
+        </Dropdown.Content>
+      </Dropdown.Root>,
+    );
+    const [, subMenu] = screen.getAllByRole("menu", { hidden: true });
+    const projectA = screen.getByRole("menuitem", {
+      name: "Project A",
+      hidden: true,
+    });
+
+    // Act
+    projectA.focus();
+    await user.keyboard("x");
+
+    // Assert
+    expect(subMenu).toHaveAttribute("data-popover-open");
+  });
+
   it("opens the SubContent popover when the SubTrigger is clicked", async () => {
     // Arrange
     const user = userEvent.setup();

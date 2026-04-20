@@ -456,11 +456,9 @@ function DropdownSubTrigger({
   };
   const handleKeyDown = (event: React.KeyboardEvent<HTMLLIElement>) => {
     if (disabled) return;
-    if (event.key === "ArrowRight") {
-      event.preventDefault();
-      event.stopPropagation();
-      sub.setOpen(true);
-    }
+    event.preventDefault();
+    event.stopPropagation();
+    sub.setOpen(true);
   };
   const subTriggerProps = {
     ...rest,
@@ -506,12 +504,10 @@ function DropdownSubContent({
   }, [sub.open]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLMenuElement>) => {
-    if (event.key === "ArrowLeft") {
-      event.preventDefault();
-      event.stopPropagation();
-      sub.setOpen(false);
-      sub.triggerRef.current?.focus();
-    }
+    event.preventDefault();
+    event.stopPropagation();
+    sub.setOpen(false);
+    sub.triggerRef.current?.focus();
   };
 
   const subContentProps = {

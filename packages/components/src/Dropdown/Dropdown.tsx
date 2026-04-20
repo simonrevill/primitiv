@@ -166,12 +166,7 @@ function DropdownContent({
 
     if (event.key.length === 1 && event.key !== " ") {
       const state = typeaheadRef.current;
-      if (state.timer !== null) window.clearTimeout(state.timer);
       state.query = (state.query + event.key).toLowerCase();
-      state.timer = window.setTimeout(() => {
-        state.query = "";
-        state.timer = null;
-      }, TYPEAHEAD_RESET_MS);
 
       const isRepeat =
         state.query.length > 1 &&

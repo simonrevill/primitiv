@@ -8,20 +8,12 @@ type UseDropdownRootArgs = {
 
 export function useDropdownRoot({
   defaultOpen = false,
-  open: controlledOpen,
-  onOpenChange,
 }: UseDropdownRootArgs) {
-  const isControlled = controlledOpen !== undefined;
-  const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen);
-  const open = isControlled ? controlledOpen : uncontrolledOpen;
+  const [open, setInternalOpen] = useState(defaultOpen);
 
-  const setOpen = useCallback(
-    (next: boolean) => {
-      if (!isControlled) setUncontrolledOpen(next);
-      onOpenChange?.(next);
-    },
-    [isControlled, onOpenChange],
-  );
+  const setOpen = useCallback((next: boolean) => {
+    setInternalOpen(next);
+  }, []);
 
   return { open, setOpen };
 }

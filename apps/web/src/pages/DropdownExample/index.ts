@@ -1,2 +1,1 @@
 export * from "./DropdownExample";
-export * from "./ModalExample";

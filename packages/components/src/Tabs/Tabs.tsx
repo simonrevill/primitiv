@@ -241,7 +241,7 @@ TabsList.displayName = "TabsList";
  * </Tabs.Trigger>
  * ```
  */
-export function TabsTrigger({
+export function TabsTrigger<T extends HTMLElement = HTMLButtonElement>({
   ref: externalRef,
   children,
   className = "",
@@ -250,7 +250,7 @@ export function TabsTrigger({
   disabled = false,
   asChild = false,
   ...rest
-}: TabsTriggerProps & { ref?: Ref<HTMLButtonElement> }) {
+}: TabsTriggerProps<T>) {
   const {
     buttonRef,
     triggerId,
@@ -264,9 +264,11 @@ export function TabsTrigger({
   } = useTabsTrigger({ value, onClick, disabled });
 
   // Compose our internal ref with any external ref the consumer passes.
-  // composeRefs returns a callback ref that sets both simultaneously.
+  // The external ref is cast to match the internal ref's element type —
+  // RefObject<T> is invariant in React's types, but at runtime the callback
+  // receives whatever DOM element is actually rendered (button or asChild).
   const composedRef = externalRef
-    ? composeRefs(buttonRef, externalRef)
+    ? composeRefs(buttonRef, externalRef as Ref<HTMLButtonElement>)
     : buttonRef;
 
   const triggerProps = {

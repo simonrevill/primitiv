@@ -30,14 +30,16 @@ export type AccordionItemProps = ComponentProps<"div"> & {
   value?: string; // Optional - if not provided, useId() will generate one
 };
 
-export type AccordionTriggerProps = Omit<
-  ComponentProps<"button">,
-  "disabled"
-> & {
+export type AccordionTriggerProps<
+  T extends HTMLElement = HTMLButtonElement,
+> = Omit<ComponentProps<"button">, "disabled" | "ref"> & {
   children: ReactNode;
   disabled?: boolean;
   asChild?: boolean;
-} & { ref?: Ref<HTMLButtonElement> };
+  /** Ref to the rendered element. Defaults to `HTMLButtonElement`; when using
+   * `asChild`, specify the child's element type (e.g. `HTMLAnchorElement`). */
+  ref?: Ref<T>;
+};
 
 export type AccordionHeaderProps = ComponentProps<"h3"> & {
   children: ReactNode;

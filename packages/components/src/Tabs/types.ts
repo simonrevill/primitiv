@@ -1,4 +1,4 @@
-import { ComponentProps, Dispatch, RefObject, SetStateAction } from "react";
+import { ComponentProps, Dispatch, Ref, RefObject, SetStateAction } from "react";
 
 export type TabsOrientation = "horizontal" | "vertical";
 
@@ -63,13 +63,19 @@ export type TabsListProps = Omit<
     | { label: string; ariaLabelledBy?: never }
     | { label?: never; ariaLabelledBy: string }
   );
-export type TabsTriggerProps = ComponentProps<"button"> & {
+export type TabsTriggerProps<T extends HTMLElement = HTMLButtonElement> = Omit<
+  ComponentProps<"button">,
+  "ref"
+> & {
   disabled?: boolean;
   value: string;
   /** Render the child element instead of the default `<button>`. All tab
    * ARIA attributes and event handlers are merged onto the child. The child
    * must accept a `ref`. Useful for routing links that need tab semantics. */
   asChild?: boolean;
+  /** Ref to the rendered element. Defaults to `HTMLButtonElement`; when using
+   * `asChild`, specify the child's element type (e.g. `HTMLAnchorElement`). */
+  ref?: Ref<T>;
 };
 
 export type TabsContentProps = ComponentProps<"div"> & {

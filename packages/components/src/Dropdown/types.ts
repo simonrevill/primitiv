@@ -42,7 +42,7 @@ export type DropdownContentProps = Omit<
 
 export type DropdownItemProps = Omit<
   ComponentProps<"li">,
-  "role" | "tabIndex"
+  "role" | "tabIndex" | "onSelect"
 > & {
   children?: ReactNode;
   ref?: Ref<HTMLLIElement>;
@@ -76,7 +76,7 @@ export type DropdownLabelProps = ComponentProps<"li"> & {
 
 type DropdownCheckboxItemBaseProps = Omit<
   ComponentProps<"li">,
-  "role" | "tabIndex" | "aria-checked" | "defaultChecked"
+  "role" | "tabIndex" | "aria-checked" | "defaultChecked" | "onSelect"
 > & {
   children?: ReactNode;
   ref?: Ref<HTMLLIElement>;
@@ -129,7 +129,7 @@ export type DropdownRadioGroupProps =
 
 export type DropdownRadioItemProps = Omit<
   ComponentProps<"li">,
-  "role" | "tabIndex" | "aria-checked"
+  "role" | "tabIndex" | "aria-checked" | "onSelect"
 > & {
   children?: ReactNode;
   ref?: Ref<HTMLLIElement>;

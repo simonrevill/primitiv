@@ -61,3 +61,15 @@ export type DropdownSeparatorProps = Omit<
   ref?: Ref<HTMLLIElement>;
   asChild?: boolean;
 };
+
+export type DropdownGroupProps = Omit<ComponentProps<"li">, "role"> & {
+  children?: ReactNode;
+  ref?: Ref<HTMLLIElement>;
+  asChild?: boolean;
+};
+
+export type DropdownLabelProps = ComponentProps<"li"> & {
+  children?: ReactNode;
+  ref?: Ref<HTMLLIElement>;
+  asChild?: boolean;
+};

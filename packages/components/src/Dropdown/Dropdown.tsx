@@ -1,12 +1,15 @@
-import { useEffect, useId, useMemo, useRef } from "react";
+import { useContext, useEffect, useId, useMemo, useRef } from "react";
 
 import { composeEventHandlers } from "../Slot";
 
 import { DropdownContext } from "./DropdownContext";
+import { DropdownGroupContext } from "./DropdownGroupContext";
 import { useDropdownContext, useDropdownRoot } from "./hooks";
 import {
   DropdownContentProps,
+  DropdownGroupProps,
   DropdownItemProps,
+  DropdownLabelProps,
   DropdownRootProps,
   DropdownSeparatorProps,
   DropdownTriggerProps,
@@ -212,12 +215,39 @@ function DropdownSeparator({ ...rest }: DropdownSeparatorProps) {
 
 DropdownSeparator.displayName = "DropdownSeparator";
 
+function DropdownGroup({ children, ...rest }: DropdownGroupProps) {
+  const labelId = useId();
+  const contextValue = useMemo(() => ({ labelId }), [labelId]);
+  return (
+    <DropdownGroupContext.Provider value={contextValue}>
+      <li {...rest} role="group" aria-labelledby={labelId}>
+        <ul role="none">{children}</ul>
+      </li>
+    </DropdownGroupContext.Provider>
+  );
+}
+
+DropdownGroup.displayName = "DropdownGroup";
+
+function DropdownLabel({ id, children, ...rest }: DropdownLabelProps) {
+  const group = useContext(DropdownGroupContext);
+  return (
+    <li {...rest} id={id ?? group?.labelId}>
+      {children}
+    </li>
+  );
+}
+
+DropdownLabel.displayName = "DropdownLabel";
+
 type TDropdownCompound = typeof DropdownRoot & {
   Root: typeof DropdownRoot;
   Trigger: typeof DropdownTrigger;
   Content: typeof DropdownContent;
   Item: typeof DropdownItem;
   Separator: typeof DropdownSeparator;
+  Group: typeof DropdownGroup;
+  Label: typeof DropdownLabel;
 };
 
 const DropdownCompound: TDropdownCompound = Object.assign(DropdownRoot, {
@@ -226,6 +256,8 @@ const DropdownCompound: TDropdownCompound = Object.assign(DropdownRoot, {
   Content: DropdownContent,
   Item: DropdownItem,
   Separator: DropdownSeparator,
+  Group: DropdownGroup,
+  Label: DropdownLabel,
 });
 
 DropdownCompound.displayName = "Dropdown";

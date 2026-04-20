@@ -227,7 +227,6 @@ function DropdownContent({
     }
 
     if (event.key === "Enter" || event.key === " ") {
-      if (currentIndex < 0) return;
       event.preventDefault();
       items[currentIndex].click();
       return;

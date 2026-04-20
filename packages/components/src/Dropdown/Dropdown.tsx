@@ -2,7 +2,7 @@ import { useContext, useEffect, useId, useMemo, useRef } from "react";
 
 import { useCheckboxRoot } from "../Checkbox/hooks";
 import { useRadioGroupRoot } from "../RadioGroup/hooks";
-import { composeEventHandlers } from "../Slot";
+import { composeEventHandlers, Slot } from "../Slot";
 
 import { DropdownContext } from "./DropdownContext";
 import { DropdownGroupContext } from "./DropdownGroupContext";
@@ -64,20 +64,24 @@ DropdownRoot.displayName = "DropdownRoot";
 function DropdownTrigger({
   children,
   onClick,
+  asChild = false,
   ...rest
 }: DropdownTriggerProps) {
   const { open, setOpen, contentId, triggerRef } = useDropdownContext();
   const toggle = () => setOpen(!open);
+  const triggerProps = {
+    ...rest,
+    ref: triggerRef,
+    "aria-haspopup": "menu" as const,
+    "aria-expanded": open,
+    "aria-controls": contentId,
+    onClick: composeEventHandlers(onClick, toggle),
+  };
+  if (asChild) {
+    return <Slot {...triggerProps}>{children}</Slot>;
+  }
   return (
-    <button
-      type="button"
-      {...rest}
-      ref={triggerRef}
-      aria-haspopup="menu"
-      aria-expanded={open}
-      aria-controls={contentId}
-      onClick={composeEventHandlers(onClick, toggle)}
-    >
+    <button type="button" {...triggerProps}>
       {children}
     </button>
   );
@@ -93,6 +97,7 @@ const TYPEAHEAD_RESET_MS = 500;
 function DropdownContent({
   children,
   onKeyDown,
+  asChild = false,
   ...rest
 }: DropdownContentProps) {
   const { open, setOpen, contentId, triggerRef } = useDropdownContext();
@@ -186,18 +191,18 @@ function DropdownContent({
     }
   };
 
-  return (
-    <menu
-      {...rest}
-      ref={menuRef}
-      id={contentId}
-      role="menu"
-      popover="auto"
-      onKeyDown={composeEventHandlers(onKeyDown, handleKeyDown)}
-    >
-      {children}
-    </menu>
-  );
+  const contentProps = {
+    ...rest,
+    ref: menuRef,
+    id: contentId,
+    role: "menu" as const,
+    popover: "auto" as const,
+    onKeyDown: composeEventHandlers(onKeyDown, handleKeyDown),
+  };
+  if (asChild) {
+    return <Slot {...contentProps}>{children}</Slot>;
+  }
+  return <menu {...contentProps}>{children}</menu>;
 }
 
 DropdownContent.displayName = "DropdownContent";
@@ -207,6 +212,7 @@ function DropdownItem({
   onClick,
   onSelect,
   disabled,
+  asChild = false,
   ...rest
 }: DropdownItemProps) {
   const { setOpen, triggerRef } = useDropdownContext();
@@ -219,17 +225,17 @@ function DropdownItem({
       triggerRef.current?.focus();
     }
   };
-  return (
-    <li
-      {...rest}
-      role="menuitem"
-      tabIndex={-1}
-      aria-disabled={disabled || undefined}
-      onClick={composeEventHandlers(onClick, handleClick)}
-    >
-      {children}
-    </li>
-  );
+  const itemProps = {
+    ...rest,
+    role: "menuitem" as const,
+    tabIndex: -1,
+    "aria-disabled": disabled || undefined,
+    onClick: composeEventHandlers(onClick, handleClick),
+  };
+  if (asChild) {
+    return <Slot {...itemProps}>{children}</Slot>;
+  }
+  return <li {...itemProps}>{children}</li>;
 }
 
 DropdownItem.displayName = "DropdownItem";

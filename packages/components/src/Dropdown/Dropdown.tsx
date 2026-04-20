@@ -206,6 +206,7 @@ function DropdownContent({
     const items = Array.from(
       menu.querySelectorAll<HTMLElement>(MENUITEM_SELECTOR),
     );
+    if (items.length === 0) return;
     const currentIndex = items.indexOf(document.activeElement as HTMLElement);
 
     let nextIndex: number | null = null;

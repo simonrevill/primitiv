@@ -59,7 +59,14 @@ function DropdownTrigger({
 
 DropdownTrigger.displayName = "DropdownTrigger";
 
-function DropdownContent({ children, ...rest }: DropdownContentProps) {
+const MENUITEM_SELECTOR =
+  '[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]';
+
+function DropdownContent({
+  children,
+  onKeyDown,
+  ...rest
+}: DropdownContentProps) {
   const { open, contentId } = useDropdownContext();
   const menuRef = useRef<HTMLMenuElement | null>(null);
 
@@ -68,14 +75,41 @@ function DropdownContent({ children, ...rest }: DropdownContentProps) {
     if (!menu) return;
     if (open) {
       menu.showPopover();
-      const firstItem = menu.querySelector<HTMLElement>(
-        '[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]',
-      );
+      const firstItem = menu.querySelector<HTMLElement>(MENUITEM_SELECTOR);
       firstItem?.focus();
     } else {
       menu.hidePopover();
     }
   }, [open]);
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLMenuElement>) => {
+    const menu = menuRef.current;
+    if (!menu) return;
+    const items = Array.from(
+      menu.querySelectorAll<HTMLElement>(MENUITEM_SELECTOR),
+    );
+    if (items.length === 0) return;
+    const currentIndex = items.indexOf(document.activeElement as HTMLElement);
+
+    let nextIndex: number | null = null;
+    if (event.key === "ArrowDown") {
+      nextIndex = currentIndex < 0 ? 0 : (currentIndex + 1) % items.length;
+    } else if (event.key === "ArrowUp") {
+      nextIndex =
+        currentIndex < 0
+          ? items.length - 1
+          : (currentIndex - 1 + items.length) % items.length;
+    } else if (event.key === "Home") {
+      nextIndex = 0;
+    } else if (event.key === "End") {
+      nextIndex = items.length - 1;
+    }
+
+    if (nextIndex !== null) {
+      event.preventDefault();
+      items[nextIndex].focus();
+    }
+  };
 
   return (
     <menu
@@ -84,6 +118,7 @@ function DropdownContent({ children, ...rest }: DropdownContentProps) {
       id={contentId}
       role="menu"
       popover="auto"
+      onKeyDown={composeEventHandlers(onKeyDown, handleKeyDown)}
     >
       {children}
     </menu>

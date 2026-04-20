@@ -69,4 +69,28 @@ describe("RadioGroup uncontrolled state", () => {
     expect(onValueChange).toHaveBeenNthCalledWith(2, "blue");
   });
 
+  it("does not re-fire onValueChange when the already-selected item is clicked again", async () => {
+    // Arrange
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    render(
+      <RadioGroup.Root
+        aria-label="Colour"
+        defaultValue="red"
+        onValueChange={onValueChange}
+      >
+        <RadioGroup.Item value="red">Red</RadioGroup.Item>
+        <RadioGroup.Item value="blue">Blue</RadioGroup.Item>
+      </RadioGroup.Root>,
+    );
+
+    // Act
+    await user.click(screen.getByRole("radio", { name: "Red" }));
+    await user.click(screen.getByRole("radio", { name: "Red" }));
+
+    // Assert: the selection is already "red"; onValueChange should
+    // stay quiet because nothing actually changed.
+    expect(onValueChange).not.toHaveBeenCalled();
+  });
+
 });

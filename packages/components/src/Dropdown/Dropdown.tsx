@@ -35,6 +35,45 @@ function useDropdownSubContext() {
   return context;
 }
 
+/**
+ * The root of a Dropdown menu — owns the open state and provides context to
+ * descendants. Renders no DOM of its own; it is a context boundary.
+ *
+ * Supports two state modes, statically discriminated at the type level so
+ * only one shape is accepted by TypeScript:
+ *
+ * - **Uncontrolled** — pass {@link DropdownRootProps.defaultOpen | `defaultOpen`}
+ *   (or omit it to start closed). The component owns and updates the open
+ *   state internally. Optional {@link DropdownRootProps.onOpenChange | `onOpenChange`}
+ *   observes transitions.
+ * - **Controlled** — pass {@link DropdownRootProps.open | `open`} *and*
+ *   {@link DropdownRootProps.onOpenChange | `onOpenChange`} together. The
+ *   parent owns the state; the component defers every transition back through
+ *   the callback.
+ *
+ * Only user-driven transitions (trigger clicks, Escape, selection) invoke
+ * `onOpenChange`. External state flips made by the parent do not.
+ *
+ * @example Uncontrolled
+ * ```tsx
+ * <Dropdown.Root>
+ *   <Dropdown.Trigger>Options</Dropdown.Trigger>
+ *   <Dropdown.Content>
+ *     <Dropdown.Item>Rename</Dropdown.Item>
+ *     <Dropdown.Item>Delete</Dropdown.Item>
+ *   </Dropdown.Content>
+ * </Dropdown.Root>
+ * ```
+ *
+ * @example Controlled
+ * ```tsx
+ * const [open, setOpen] = useState(false);
+ *
+ * <Dropdown.Root open={open} onOpenChange={setOpen}>
+ *   …
+ * </Dropdown.Root>
+ * ```
+ */
 function DropdownRoot({
   defaultOpen,
   open: controlledOpen,
@@ -61,6 +100,24 @@ function DropdownRoot({
 
 DropdownRoot.displayName = "DropdownRoot";
 
+/**
+ * The menu button. Toggles the Dropdown open/closed on click and exposes
+ * the ARIA contract for WAI-ARIA Menu Button: `aria-haspopup="menu"`,
+ * `aria-expanded` reflecting the open state, and `aria-controls` pointing
+ * at the content's id.
+ *
+ * Renders a `<button type="button">` by default. Pass `asChild` to render
+ * the composed child element instead (e.g. a link, or a custom button
+ * component). All ARIA attributes and event handlers are merged onto the
+ * child following the {@link Slot} composition rules.
+ *
+ * @example With an anchor via `asChild`
+ * ```tsx
+ * <Dropdown.Trigger asChild>
+ *   <a href="#options">Options</a>
+ * </Dropdown.Trigger>
+ * ```
+ */
 function DropdownTrigger({
   children,
   onClick,
@@ -94,6 +151,30 @@ const MENUITEM_SELECTOR =
 
 const TYPEAHEAD_RESET_MS = 500;
 
+/**
+ * The menu panel rendered with the native HTML
+ * [Popover API](https://developer.mozilla.org/en-US/docs/Web/API/Popover_API)
+ * (`popover="auto"`) — no portal, no floating-ui. The browser manages
+ * layering via the top layer and dispatches a light-dismiss on outside
+ * click and Escape in the light-dismiss flow.
+ *
+ * Renders a `<menu role="menu">` by default; pass `asChild` to render
+ * any element with menu semantics.
+ *
+ * **Keyboard interaction.** While the menu is open:
+ *
+ * | Key                     | Behaviour                                          |
+ * | ----------------------- | -------------------------------------------------- |
+ * | `ArrowDown` / `ArrowUp` | Move focus to next / previous item (wraps)         |
+ * | `Home` / `End`          | Jump to first / last item                          |
+ * | `Enter` / `Space`       | Activate the focused item                          |
+ * | `Escape`                | Close the menu and return focus to the trigger     |
+ * | any printable character | Typeahead — focuses the next item matching prefix  |
+ *
+ * Typeahead accumulates keystrokes within a 500 ms window; pressing the
+ * same character repeatedly cycles through items that share that first
+ * letter. Disabled items are skipped during arrow navigation and typeahead.
+ */
 function DropdownContent({
   children,
   onKeyDown,
@@ -207,6 +288,19 @@ function DropdownContent({
 
 DropdownContent.displayName = "DropdownContent";
 
+/**
+ * A standard menu item. Renders a `<li role="menuitem">` by default; pass
+ * `asChild` to render any element with menuitem semantics.
+ *
+ * Clicking the item (or pressing Enter / Space while focused) fires
+ * {@link DropdownItemProps.onSelect | `onSelect`} with a cancellable
+ * `Event`. The menu auto-closes after selection; call
+ * `event.preventDefault()` inside `onSelect` to keep it open — useful
+ * for actions that perform in-place mutations (e.g. copying to clipboard).
+ *
+ * Disabled items receive `aria-disabled="true"` and are skipped by arrow
+ * navigation, typeahead, and activation handlers.
+ */
 function DropdownItem({
   children,
   onClick,
@@ -240,6 +334,11 @@ function DropdownItem({
 
 DropdownItem.displayName = "DropdownItem";
 
+/**
+ * A visual separator between groups of items. Renders a `<li role="separator">`
+ * by default; pass `asChild` to render any element with separator semantics.
+ * Non-interactive — skipped by focus, arrow navigation, and typeahead.
+ */
 function DropdownSeparator({
   asChild = false,
   children,
@@ -254,6 +353,16 @@ function DropdownSeparator({
 
 DropdownSeparator.displayName = "DropdownSeparator";
 
+/**
+ * A semantic grouping of related items. Renders as a `<li role="group">`
+ * wrapping an inner `<ul role="none">`, or — with `asChild` — a single
+ * grouping element composed onto the provided child.
+ *
+ * Generates a stable id for its accompanying {@link DropdownLabel | `Dropdown.Label`},
+ * wired automatically via `aria-labelledby`. Nest a `Dropdown.Label` as the
+ * first child to provide the accessible name; screen readers will announce
+ * the group when arrowing into it.
+ */
 function DropdownGroup({
   children,
   asChild = false,
@@ -281,6 +390,15 @@ function DropdownGroup({
 
 DropdownGroup.displayName = "DropdownGroup";
 
+/**
+ * A non-interactive label, typically used inside a {@link DropdownGroup |
+ * `Dropdown.Group`} to give that group an accessible name. When nested in
+ * a group, the label's `id` is auto-wired to the group's `aria-labelledby`
+ * — consumers don't need to thread ids manually.
+ *
+ * Renders a `<li>` by default; pass `asChild` to render any element. A
+ * caller-supplied `id` takes precedence over the auto-generated one.
+ */
 function DropdownLabel({
   id,
   children,
@@ -297,6 +415,28 @@ function DropdownLabel({
 
 DropdownLabel.displayName = "DropdownLabel";
 
+/**
+ * A toggleable menu item. Renders a `<li role="menuitemcheckbox">` with
+ * `aria-checked` reflecting the current state. `asChild` is supported.
+ *
+ * Supports a WAI-ARIA tri-state: `true`, `false`, or `"indeterminate"`
+ * (encoded as `aria-checked="mixed"`). An indeterminate item resolves to
+ * `true` on the next activation, matching the native `<input type="checkbox">`
+ * behaviour.
+ *
+ * State modes are discriminated at the type level:
+ *
+ * - **Uncontrolled** — pass `defaultChecked` (or omit to start unchecked).
+ *   Optional `onCheckedChange` observes toggles.
+ * - **Controlled** — pass `checked` *and* `onCheckedChange` together.
+ *
+ * Activation (click / Enter / Space) toggles the checked state, then
+ * fires {@link DropdownCheckboxItemProps.onSelect | `onSelect`} with a
+ * cancellable `Event`. Call `event.preventDefault()` to keep the menu
+ * open — useful for rapidly toggling multiple checkboxes.
+ *
+ * Disabled items receive `aria-disabled="true"` and no-op on activation.
+ */
 function DropdownCheckboxItem({
   children,
   onClick,
@@ -342,6 +482,18 @@ function DropdownCheckboxItem({
 
 DropdownCheckboxItem.displayName = "DropdownCheckboxItem";
 
+/**
+ * A single-selection group of menu items. Children must be
+ * {@link DropdownRadioItem | `Dropdown.RadioItem`} elements. Renders a
+ * `<li role="group">` wrapping `<ul role="none">`, or — with `asChild` —
+ * composes onto the provided child.
+ *
+ * State modes are discriminated at the type level:
+ *
+ * - **Uncontrolled** — pass `defaultValue` (or omit for no initial selection).
+ *   Optional `onValueChange` observes selections.
+ * - **Controlled** — pass `value` *and* `onValueChange` together.
+ */
 function DropdownRadioGroup({
   defaultValue,
   value: controlledValue,
@@ -372,6 +524,22 @@ function DropdownRadioGroup({
 
 DropdownRadioGroup.displayName = "DropdownRadioGroup";
 
+/**
+ * A single radio choice. Must be rendered inside a
+ * {@link DropdownRadioGroup | `Dropdown.RadioGroup`}; rendering it outside
+ * one throws a descriptive error.
+ *
+ * Renders a `<li role="menuitemradio">` with `aria-checked` reflecting
+ * whether this item's `value` matches the group's active value. `asChild`
+ * is supported.
+ *
+ * Activation (click / Enter / Space) selects this item, updating the
+ * group's value, then fires {@link DropdownRadioItemProps.onSelect |
+ * `onSelect`} with a cancellable `Event`. Call `event.preventDefault()`
+ * to keep the menu open.
+ *
+ * Disabled items receive `aria-disabled="true"` and no-op on activation.
+ */
 function DropdownRadioItem({
   children,
   onClick,
@@ -415,6 +583,31 @@ function DropdownRadioItem({
 
 DropdownRadioItem.displayName = "DropdownRadioItem";
 
+/**
+ * A submenu boundary. Wrap a {@link DropdownSubTrigger | `Dropdown.SubTrigger`}
+ * and its {@link DropdownSubContent | `Dropdown.SubContent`} in a
+ * `Dropdown.Sub` to establish an independent open state for the nested menu.
+ *
+ * Supports uncontrolled (`defaultOpen`) and controlled (`open` +
+ * `onOpenChange`) modes, discriminated at the type level — same contract
+ * as {@link DropdownRoot | `Dropdown.Root`}.
+ *
+ * @example
+ * ```tsx
+ * <Dropdown.Root>
+ *   <Dropdown.Trigger>File</Dropdown.Trigger>
+ *   <Dropdown.Content>
+ *     <Dropdown.Sub>
+ *       <Dropdown.SubTrigger>Open Recent</Dropdown.SubTrigger>
+ *       <Dropdown.SubContent>
+ *         <Dropdown.Item>Project A</Dropdown.Item>
+ *         <Dropdown.Item>Project B</Dropdown.Item>
+ *       </Dropdown.SubContent>
+ *     </Dropdown.Sub>
+ *   </Dropdown.Content>
+ * </Dropdown.Root>
+ * ```
+ */
 function DropdownSub({
   defaultOpen,
   open: controlledOpen,
@@ -441,6 +634,21 @@ function DropdownSub({
 
 DropdownSub.displayName = "DropdownSub";
 
+/**
+ * The submenu trigger. Must be rendered inside a {@link DropdownSub |
+ * `Dropdown.Sub`}; rendering it outside one throws a descriptive error.
+ *
+ * Renders a `<li role="menuitem">` with `aria-haspopup="menu"`,
+ * `aria-expanded`, and `aria-controls` wiring it to the sibling
+ * {@link DropdownSubContent | `Dropdown.SubContent`}. `asChild` is supported.
+ *
+ * Opens the submenu on click or `ArrowRight`; all other keys bubble to the
+ * parent {@link DropdownContent | `Dropdown.Content`} so its roving focus
+ * and typeahead continue to work while a submenu is in play.
+ *
+ * Disabled triggers receive `aria-disabled="true"` and ignore both click
+ * and `ArrowRight`.
+ */
 function DropdownSubTrigger({
   children,
   onClick,
@@ -481,6 +689,19 @@ function DropdownSubTrigger({
 
 DropdownSubTrigger.displayName = "DropdownSubTrigger";
 
+/**
+ * The submenu panel. Must be rendered inside a {@link DropdownSub |
+ * `Dropdown.Sub`}; rendering it outside one throws a descriptive error.
+ *
+ * Renders a `<menu role="menu" popover="auto">` by default; pass `asChild`
+ * to render any element with menu semantics. When the submenu opens, focus
+ * moves to its first enabled item.
+ *
+ * Presses of `ArrowLeft` close the submenu and return focus to the
+ * {@link DropdownSubTrigger | `Dropdown.SubTrigger`}; all other keys bubble
+ * to the parent {@link DropdownContent | `Dropdown.Content`} so arrow
+ * navigation and typeahead apply to the submenu's items.
+ */
 function DropdownSubContent({
   children,
   onKeyDown,

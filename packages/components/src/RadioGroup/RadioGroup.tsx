@@ -1,22 +1,45 @@
+import { useMemo } from "react";
+
+import { composeEventHandlers } from "../Slot";
+
+import { RadioGroupContext } from "./RadioGroupContext";
+import { useRadioGroupContext, useRadioGroupRoot } from "./hooks";
 import { RadioGroupItemProps, RadioGroupRootProps } from "./types";
 
-function RadioGroupRoot({ children, ...rest }: RadioGroupRootProps) {
+function RadioGroupRoot({
+  defaultValue,
+  onValueChange,
+  children,
+  ...rest
+}: RadioGroupRootProps) {
+  const { value, select } = useRadioGroupRoot({ defaultValue, onValueChange });
+  const contextValue = useMemo(() => ({ value, select }), [value, select]);
   return (
-    <div role="radiogroup" {...rest}>
-      {children}
-    </div>
+    <RadioGroupContext.Provider value={contextValue}>
+      <div role="radiogroup" {...rest}>
+        {children}
+      </div>
+    </RadioGroupContext.Provider>
   );
 }
 
 RadioGroupRoot.displayName = "RadioGroupRoot";
 
-function RadioGroupItem({ value, children, ...rest }: RadioGroupItemProps) {
+function RadioGroupItem({
+  value,
+  children,
+  onClick,
+  ...rest
+}: RadioGroupItemProps) {
+  const { value: selectedValue, select } = useRadioGroupContext();
+  const isChecked = selectedValue === value;
   return (
     <button
       type="button"
       role="radio"
-      aria-checked={false}
-      data-state="unchecked"
+      aria-checked={isChecked}
+      data-state={isChecked ? "checked" : "unchecked"}
+      onClick={composeEventHandlers(onClick, () => select(value))}
       {...rest}
     >
       {children}

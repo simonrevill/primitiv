@@ -2,9 +2,22 @@
 $border-color: #ccc;
 $border-radius: 0.5rem;
 
+body {
+  padding: 2rem;
+}
+
+header {
+  margin-block-end: 1rem;
+
+  nav {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+}
+
 .container {
   display: grid;
-  padding: 2rem;
   grid-template-columns: 1fr;
   max-width: 62rem;
   margin: 0 auto;

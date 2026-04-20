@@ -13,7 +13,8 @@
     "@primitiv/components": "workspace:*",
     "harmoni-wasm": "workspace:*",
     "react": "^19.2.5",
-    "react-dom": "^19.2.5"
+    "react-dom": "^19.2.5",
+    "react-router-dom": "^7.14.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",

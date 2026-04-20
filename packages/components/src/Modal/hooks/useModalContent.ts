@@ -44,6 +44,8 @@ export function useModalContent() {
         event.clientY >= rect.top &&
         event.clientY <= rect.bottom;
       if (inside) return;
+      contentCallbacksRef.current?.onPointerDownOutside?.(event);
+      if (event.defaultPrevented) return;
       setOpen(false);
     };
     dialog.addEventListener("close", handleClose);

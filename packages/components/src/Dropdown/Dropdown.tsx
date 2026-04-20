@@ -23,8 +23,9 @@ function DropdownRoot({
     onOpenChange,
   });
   const contentId = useId();
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
   const contextValue = useMemo(
-    () => ({ open, setOpen, contentId }),
+    () => ({ open, setOpen, contentId, triggerRef }),
     [open, setOpen, contentId],
   );
   return (
@@ -41,12 +42,13 @@ function DropdownTrigger({
   onClick,
   ...rest
 }: DropdownTriggerProps) {
-  const { open, setOpen, contentId } = useDropdownContext();
+  const { open, setOpen, contentId, triggerRef } = useDropdownContext();
   const toggle = () => setOpen(!open);
   return (
     <button
       type="button"
       {...rest}
+      ref={triggerRef}
       aria-haspopup="menu"
       aria-expanded={open}
       aria-controls={contentId}
@@ -67,7 +69,7 @@ function DropdownContent({
   onKeyDown,
   ...rest
 }: DropdownContentProps) {
-  const { open, contentId } = useDropdownContext();
+  const { open, setOpen, contentId, triggerRef } = useDropdownContext();
   const menuRef = useRef<HTMLMenuElement | null>(null);
 
   useEffect(() => {
@@ -115,6 +117,13 @@ function DropdownContent({
       if (currentIndex < 0) return;
       event.preventDefault();
       items[currentIndex].click();
+      return;
+    }
+
+    if (event.key === "Escape") {
+      event.preventDefault();
+      setOpen(false);
+      triggerRef.current?.focus();
     }
   };
 

@@ -713,10 +713,8 @@ function DropdownSubContent({
     const menu = menuRef.current!;
     if (sub.open) {
       menu.showPopover();
-      if (!menu.contains(document.activeElement)) {
-        const firstItem = menu.querySelector<HTMLElement>(MENUITEM_SELECTOR);
-        firstItem?.focus();
-      }
+      const firstItem = menu.querySelector<HTMLElement>(MENUITEM_SELECTOR);
+      firstItem?.focus();
     } else {
       menu.hidePopover();
     }

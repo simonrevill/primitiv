@@ -108,6 +108,13 @@ function DropdownContent({
     if (nextIndex !== null) {
       event.preventDefault();
       items[nextIndex].focus();
+      return;
+    }
+
+    if (event.key === "Enter" || event.key === " ") {
+      if (currentIndex < 0) return;
+      event.preventDefault();
+      items[currentIndex].click();
     }
   };
 

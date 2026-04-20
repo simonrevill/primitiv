@@ -3,8 +3,17 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 import { composeEventHandlers } from "../Slot";
 
 import { RadioGroupContext } from "./RadioGroupContext";
-import { useRadioGroupContext, useRadioGroupRoot } from "./hooks";
-import { RadioGroupItemProps, RadioGroupRootProps } from "./types";
+import { RadioGroupItemContext } from "./RadioGroupItemContext";
+import {
+  useRadioGroupContext,
+  useRadioGroupItemContext,
+  useRadioGroupRoot,
+} from "./hooks";
+import {
+  RadioGroupIndicatorProps,
+  RadioGroupItemProps,
+  RadioGroupRootProps,
+} from "./types";
 
 function RadioGroupRoot({
   defaultValue,
@@ -109,34 +118,63 @@ function RadioGroupItem({
     focusItem(nextValue);
   };
 
+  const itemContextValue = useMemo(
+    () => ({ checked: isChecked }),
+    [isChecked],
+  );
+
   return (
-    <button
-      ref={setRef}
-      type="button"
-      role="radio"
-      aria-checked={isChecked}
-      data-state={isChecked ? "checked" : "unchecked"}
-      tabIndex={isTabStop ? 0 : -1}
-      disabled={disabled}
-      onClick={composeEventHandlers(onClick, () => select(value))}
-      onKeyDown={composeEventHandlers(onKeyDown, handleKeyDown)}
-      {...rest}
-    >
-      {children}
-    </button>
+    <RadioGroupItemContext.Provider value={itemContextValue}>
+      <button
+        ref={setRef}
+        type="button"
+        role="radio"
+        aria-checked={isChecked}
+        data-state={isChecked ? "checked" : "unchecked"}
+        tabIndex={isTabStop ? 0 : -1}
+        disabled={disabled}
+        onClick={composeEventHandlers(onClick, () => select(value))}
+        onKeyDown={composeEventHandlers(onKeyDown, handleKeyDown)}
+        {...rest}
+      >
+        {children}
+      </button>
+    </RadioGroupItemContext.Provider>
   );
 }
 
 RadioGroupItem.displayName = "RadioGroupItem";
 
+function RadioGroupIndicator({
+  children,
+  forceMount,
+  ...rest
+}: RadioGroupIndicatorProps) {
+  const { checked } = useRadioGroupItemContext();
+  if (!checked && !forceMount) return null;
+  return (
+    <span
+      aria-hidden="true"
+      data-state={checked ? "checked" : "unchecked"}
+      {...rest}
+    >
+      {children}
+    </span>
+  );
+}
+
+RadioGroupIndicator.displayName = "RadioGroupIndicator";
+
 type TRadioGroupCompound = typeof RadioGroupRoot & {
   Root: typeof RadioGroupRoot;
   Item: typeof RadioGroupItem;
+  Indicator: typeof RadioGroupIndicator;
 };
 
 const RadioGroupCompound: TRadioGroupCompound = Object.assign(RadioGroupRoot, {
   Root: RadioGroupRoot,
   Item: RadioGroupItem,
+  Indicator: RadioGroupIndicator,
 });
 
 RadioGroupCompound.displayName = "RadioGroup";

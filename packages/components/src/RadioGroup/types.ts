@@ -29,3 +29,8 @@ export type RadioGroupItemProps = Omit<
   children?: ReactNode;
   ref?: Ref<HTMLButtonElement>;
 };
+
+export type RadioGroupIndicatorProps = ComponentProps<"span"> & {
+  children?: ReactNode;
+  forceMount?: boolean;
+};

@@ -189,8 +189,7 @@ function DropdownContent({
   });
 
   useEffect(() => {
-    const menu = menuRef.current;
-    if (!menu) return;
+    const menu = menuRef.current!;
     if (open) {
       menu.showPopover();
       if (!menu.contains(document.activeElement)) {
@@ -203,8 +202,7 @@ function DropdownContent({
   }, [open]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLMenuElement>) => {
-    const menu = menuRef.current;
-    if (!menu) return;
+    const menu = menuRef.current!;
     const items = Array.from(
       menu.querySelectorAll<HTMLElement>(MENUITEM_SELECTOR),
     );
@@ -262,7 +260,7 @@ function DropdownContent({
       const offset = searchQuery.length === 1 || isRepeat ? 1 : 0;
       for (let i = 0; i < items.length; i++) {
         const index = (startIndex + offset + i) % items.length;
-        const text = (items[index].textContent ?? "").trim().toLowerCase();
+        const text = items[index].textContent!.trim().toLowerCase();
         if (text.startsWith(searchQuery)) {
           event.preventDefault();
           items[index].focus();
@@ -712,8 +710,7 @@ function DropdownSubContent({
   const menuRef = useRef<HTMLMenuElement | null>(null);
 
   useEffect(() => {
-    const menu = menuRef.current;
-    if (!menu) return;
+    const menu = menuRef.current!;
     if (sub.open) {
       menu.showPopover();
       if (!menu.contains(document.activeElement)) {

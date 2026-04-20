@@ -30,6 +30,66 @@ describe("Dropdown submenus", () => {
     expect(subTrigger).toHaveAttribute("aria-expanded", "false");
   });
 
+  it("opens the SubContent on ArrowRight and focuses its first item", async () => {
+    // Arrange
+    const user = userEvent.setup();
+    render(
+      <Dropdown.Root defaultOpen>
+        <Dropdown.Trigger>File</Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.Sub>
+            <Dropdown.SubTrigger>Open Recent</Dropdown.SubTrigger>
+            <Dropdown.SubContent>
+              <Dropdown.Item>Project A</Dropdown.Item>
+              <Dropdown.Item>Project B</Dropdown.Item>
+            </Dropdown.SubContent>
+          </Dropdown.Sub>
+        </Dropdown.Content>
+      </Dropdown.Root>,
+    );
+    const projectA = screen.getByRole("menuitem", {
+      name: "Project A",
+      hidden: true,
+    });
+
+    // Act — focus starts on SubTrigger (the first menuitem in the parent)
+    await user.keyboard("{ArrowRight}");
+
+    // Assert
+    expect(projectA).toHaveFocus();
+  });
+
+  it("closes the SubContent on ArrowLeft and returns focus to the SubTrigger", async () => {
+    // Arrange
+    const user = userEvent.setup();
+    render(
+      <Dropdown.Root defaultOpen>
+        <Dropdown.Trigger>File</Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.Sub defaultOpen>
+            <Dropdown.SubTrigger>Open Recent</Dropdown.SubTrigger>
+            <Dropdown.SubContent>
+              <Dropdown.Item>Project A</Dropdown.Item>
+            </Dropdown.SubContent>
+          </Dropdown.Sub>
+        </Dropdown.Content>
+      </Dropdown.Root>,
+    );
+    const subTrigger = screen.getByRole("menuitem", {
+      name: "Open Recent",
+      hidden: true,
+    });
+    const [, subMenu] = screen.getAllByRole("menu", { hidden: true });
+    expect(subMenu).toHaveAttribute("data-popover-open");
+
+    // Act
+    await user.keyboard("{ArrowLeft}");
+
+    // Assert
+    expect(subMenu).not.toHaveAttribute("data-popover-open");
+    expect(subTrigger).toHaveFocus();
+  });
+
   it("opens the SubContent popover when the SubTrigger is clicked", async () => {
     // Arrange
     const user = userEvent.setup();

@@ -13,15 +13,28 @@ function RadioGroupRoot({
   children,
   ...rest
 }: RadioGroupRootProps) {
-  const { value, select, registerItem, itemValues, focusItem } =
-    useRadioGroupRoot({
-      defaultValue,
-      value: controlledValue,
-      onValueChange,
-    });
+  const {
+    value,
+    select,
+    registerItem,
+    itemValues,
+    disabledValues,
+    focusItem,
+  } = useRadioGroupRoot({
+    defaultValue,
+    value: controlledValue,
+    onValueChange,
+  });
   const contextValue = useMemo(
-    () => ({ value, select, registerItem, itemValues, focusItem }),
-    [value, select, registerItem, itemValues, focusItem],
+    () => ({
+      value,
+      select,
+      registerItem,
+      itemValues,
+      disabledValues,
+      focusItem,
+    }),
+    [value, select, registerItem, itemValues, disabledValues, focusItem],
   );
   return (
     <RadioGroupContext.Provider value={contextValue}>
@@ -42,6 +55,7 @@ function RadioGroupItem({
   children,
   onClick,
   onKeyDown,
+  disabled,
   ref,
   ...rest
 }: RadioGroupItemProps) {
@@ -50,13 +64,18 @@ function RadioGroupItem({
     select,
     registerItem,
     itemValues,
+    disabledValues,
     focusItem,
   } = useRadioGroupContext();
   const isChecked = selectedValue === value;
+  const enabledValues = useMemo(
+    () => itemValues.filter((v) => !disabledValues.has(v)),
+    [itemValues, disabledValues],
+  );
   const isTabStop =
     selectedValue !== undefined
       ? isChecked
-      : itemValues[0] === value;
+      : enabledValues[0] === value;
 
   const localRef = useRef<HTMLButtonElement | null>(null);
   const setRef = useCallback(
@@ -72,19 +91,20 @@ function RadioGroupItem({
   );
 
   useEffect(() => {
-    registerItem(value, localRef.current);
+    registerItem(value, localRef.current, disabled);
     return () => registerItem(value, null);
-  }, [value, registerItem]);
+  }, [value, disabled, registerItem]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
     if (!NEXT_KEYS.has(event.key) && !PREV_KEYS.has(event.key)) return;
     event.preventDefault();
-    const currentIndex = itemValues.indexOf(value);
+    if (enabledValues.length === 0) return;
+    const currentIndex = enabledValues.indexOf(value);
     if (currentIndex === -1) return;
     const delta = NEXT_KEYS.has(event.key) ? 1 : -1;
     const nextIndex =
-      (currentIndex + delta + itemValues.length) % itemValues.length;
-    const nextValue = itemValues[nextIndex];
+      (currentIndex + delta + enabledValues.length) % enabledValues.length;
+    const nextValue = enabledValues[nextIndex];
     select(nextValue);
     focusItem(nextValue);
   };
@@ -97,6 +117,7 @@ function RadioGroupItem({
       aria-checked={isChecked}
       data-state={isChecked ? "checked" : "unchecked"}
       tabIndex={isTabStop ? 0 : -1}
+      disabled={disabled}
       onClick={composeEventHandlers(onClick, () => select(value))}
       onKeyDown={composeEventHandlers(onKeyDown, handleKeyDown)}
       {...rest}

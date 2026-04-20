@@ -321,8 +321,10 @@ function DropdownCheckboxItem({
     toggle();
     const event = new Event("dropdown.select", { cancelable: true });
     onSelect?.(event);
-    setOpen(false);
-    triggerRef.current?.focus();
+    if (!event.defaultPrevented) {
+      setOpen(false);
+      triggerRef.current?.focus();
+    }
   };
   const itemProps = {
     ...rest,
@@ -392,8 +394,10 @@ function DropdownRadioItem({
     group.select(itemValue);
     const event = new Event("dropdown.select", { cancelable: true });
     onSelect?.(event);
-    setOpen(false);
-    triggerRef.current?.focus();
+    if (!event.defaultPrevented) {
+      setOpen(false);
+      triggerRef.current?.focus();
+    }
   };
   const itemProps = {
     ...rest,

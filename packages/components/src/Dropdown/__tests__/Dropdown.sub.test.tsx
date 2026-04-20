@@ -1,0 +1,63 @@
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+
+import { Dropdown } from "../Dropdown";
+
+describe("Dropdown submenus", () => {
+  it("renders SubTrigger as a menuitem with aria-haspopup and initially collapsed state", () => {
+    // Arrange & Act
+    render(
+      <Dropdown.Root defaultOpen>
+        <Dropdown.Trigger>File</Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.Item>New</Dropdown.Item>
+          <Dropdown.Sub>
+            <Dropdown.SubTrigger>Open Recent</Dropdown.SubTrigger>
+            <Dropdown.SubContent>
+              <Dropdown.Item>Project A</Dropdown.Item>
+            </Dropdown.SubContent>
+          </Dropdown.Sub>
+        </Dropdown.Content>
+      </Dropdown.Root>,
+    );
+
+    // Assert
+    const subTrigger = screen.getByRole("menuitem", {
+      name: "Open Recent",
+      hidden: true,
+    });
+    expect(subTrigger).toHaveAttribute("aria-haspopup", "menu");
+    expect(subTrigger).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("opens the SubContent popover when the SubTrigger is clicked", async () => {
+    // Arrange
+    const user = userEvent.setup();
+    render(
+      <Dropdown.Root defaultOpen>
+        <Dropdown.Trigger>File</Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.Sub>
+            <Dropdown.SubTrigger>Open Recent</Dropdown.SubTrigger>
+            <Dropdown.SubContent>
+              <Dropdown.Item>Project A</Dropdown.Item>
+            </Dropdown.SubContent>
+          </Dropdown.Sub>
+        </Dropdown.Content>
+      </Dropdown.Root>,
+    );
+    const subTrigger = screen.getByRole("menuitem", {
+      name: "Open Recent",
+      hidden: true,
+    });
+    const [, subMenu] = screen.getAllByRole("menu", { hidden: true });
+    expect(subMenu).not.toHaveAttribute("data-popover-open");
+
+    // Act
+    await user.click(subTrigger);
+
+    // Assert
+    expect(subMenu).toHaveAttribute("data-popover-open");
+    expect(subTrigger).toHaveAttribute("aria-expanded", "true");
+  });
+});

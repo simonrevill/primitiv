@@ -64,6 +64,8 @@ DropdownTrigger.displayName = "DropdownTrigger";
 const MENUITEM_SELECTOR =
   '[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]';
 
+const TYPEAHEAD_RESET_MS = 500;
+
 function DropdownContent({
   children,
   onKeyDown,
@@ -71,6 +73,10 @@ function DropdownContent({
 }: DropdownContentProps) {
   const { open, setOpen, contentId, triggerRef } = useDropdownContext();
   const menuRef = useRef<HTMLMenuElement | null>(null);
+  const typeaheadRef = useRef<{ query: string; timer: number | null }>({
+    query: "",
+    timer: null,
+  });
 
   useEffect(() => {
     const menu = menuRef.current;
@@ -124,6 +130,31 @@ function DropdownContent({
       event.preventDefault();
       setOpen(false);
       triggerRef.current?.focus();
+      return;
+    }
+
+    if (event.key.length === 1 && event.key !== " ") {
+      const state = typeaheadRef.current;
+      if (state.timer !== null) window.clearTimeout(state.timer);
+      state.query = (state.query + event.key).toLowerCase();
+      state.timer = window.setTimeout(() => {
+        state.query = "";
+        state.timer = null;
+      }, TYPEAHEAD_RESET_MS);
+
+      const startIndex = currentIndex < 0 ? 0 : currentIndex;
+      const query = state.query;
+      const isRepeat = query.length > 1 && query.split("").every((c) => c === query[0]);
+      const offset = state.query.length === 1 || isRepeat ? 1 : 0;
+      for (let i = 0; i < items.length; i++) {
+        const index = (startIndex + offset + i) % items.length;
+        const text = (items[index].textContent ?? "").trim().toLowerCase();
+        if (text.startsWith(query)) {
+          event.preventDefault();
+          items[index].focus();
+          return;
+        }
+      }
     }
   };
 

@@ -1,10 +1,12 @@
 import { useContext, useEffect, useId, useMemo, useRef } from "react";
 
 import { useCheckboxRoot } from "../Checkbox/hooks";
+import { useRadioGroupRoot } from "../RadioGroup/hooks";
 import { composeEventHandlers } from "../Slot";
 
 import { DropdownContext } from "./DropdownContext";
 import { DropdownGroupContext } from "./DropdownGroupContext";
+import { DropdownRadioGroupContext } from "./DropdownRadioGroupContext";
 import { useDropdownContext, useDropdownRoot } from "./hooks";
 import {
   DropdownCheckboxItemProps,
@@ -12,6 +14,8 @@ import {
   DropdownGroupProps,
   DropdownItemProps,
   DropdownLabelProps,
+  DropdownRadioGroupProps,
+  DropdownRadioItemProps,
   DropdownRootProps,
   DropdownSeparatorProps,
   DropdownTriggerProps,
@@ -289,6 +293,72 @@ function DropdownCheckboxItem({
 
 DropdownCheckboxItem.displayName = "DropdownCheckboxItem";
 
+function DropdownRadioGroup({
+  defaultValue,
+  value: controlledValue,
+  onValueChange,
+  children,
+  ...rest
+}: DropdownRadioGroupProps) {
+  const { value, select } = useRadioGroupRoot({
+    defaultValue,
+    value: controlledValue,
+    onValueChange,
+  });
+  const contextValue = useMemo(() => ({ value, select }), [value, select]);
+  return (
+    <DropdownRadioGroupContext.Provider value={contextValue}>
+      <li {...rest} role="group">
+        <ul role="none">{children}</ul>
+      </li>
+    </DropdownRadioGroupContext.Provider>
+  );
+}
+
+DropdownRadioGroup.displayName = "DropdownRadioGroup";
+
+function DropdownRadioItem({
+  children,
+  onClick,
+  onSelect,
+  disabled,
+  value: itemValue,
+  ...rest
+}: DropdownRadioItemProps) {
+  const { setOpen, triggerRef } = useDropdownContext();
+  const group = useContext(DropdownRadioGroupContext);
+  if (!group) {
+    throw new Error(
+      "Dropdown.RadioItem must be rendered inside a <Dropdown.RadioGroup>.",
+    );
+  }
+  const checked = group.value === itemValue;
+  const handleClick = () => {
+    if (disabled) return;
+    group.select(itemValue);
+    const event = new Event("dropdown.select", { cancelable: true });
+    onSelect?.(event);
+    if (!event.defaultPrevented) {
+      setOpen(false);
+      triggerRef.current?.focus();
+    }
+  };
+  return (
+    <li
+      {...rest}
+      role="menuitemradio"
+      tabIndex={-1}
+      aria-checked={checked}
+      aria-disabled={disabled || undefined}
+      onClick={composeEventHandlers(onClick, handleClick)}
+    >
+      {children}
+    </li>
+  );
+}
+
+DropdownRadioItem.displayName = "DropdownRadioItem";
+
 type TDropdownCompound = typeof DropdownRoot & {
   Root: typeof DropdownRoot;
   Trigger: typeof DropdownTrigger;
@@ -298,6 +368,8 @@ type TDropdownCompound = typeof DropdownRoot & {
   Group: typeof DropdownGroup;
   Label: typeof DropdownLabel;
   CheckboxItem: typeof DropdownCheckboxItem;
+  RadioGroup: typeof DropdownRadioGroup;
+  RadioItem: typeof DropdownRadioItem;
 };
 
 const DropdownCompound: TDropdownCompound = Object.assign(DropdownRoot, {
@@ -309,6 +381,8 @@ const DropdownCompound: TDropdownCompound = Object.assign(DropdownRoot, {
   Group: DropdownGroup,
   Label: DropdownLabel,
   CheckboxItem: DropdownCheckboxItem,
+  RadioGroup: DropdownRadioGroup,
+  RadioItem: DropdownRadioItem,
 });
 
 DropdownCompound.displayName = "Dropdown";

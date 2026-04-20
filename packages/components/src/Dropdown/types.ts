@@ -106,3 +106,37 @@ type DropdownCheckboxItemControlledProps = DropdownCheckboxItemBaseProps & {
 export type DropdownCheckboxItemProps =
   | DropdownCheckboxItemUncontrolledProps
   | DropdownCheckboxItemControlledProps;
+
+type DropdownRadioGroupBaseProps = Omit<ComponentProps<"li">, "role"> & {
+  children?: ReactNode;
+  ref?: Ref<HTMLLIElement>;
+  asChild?: boolean;
+};
+
+type DropdownRadioGroupUncontrolledProps = DropdownRadioGroupBaseProps & {
+  defaultValue?: string;
+  value?: never;
+  onValueChange?: (value: string) => void;
+};
+
+type DropdownRadioGroupControlledProps = DropdownRadioGroupBaseProps & {
+  defaultValue?: never;
+  value: string;
+  onValueChange: (value: string) => void;
+};
+
+export type DropdownRadioGroupProps =
+  | DropdownRadioGroupUncontrolledProps
+  | DropdownRadioGroupControlledProps;
+
+export type DropdownRadioItemProps = Omit<
+  ComponentProps<"li">,
+  "role" | "tabIndex" | "aria-checked"
+> & {
+  children?: ReactNode;
+  ref?: Ref<HTMLLIElement>;
+  asChild?: boolean;
+  disabled?: boolean;
+  value: string;
+  onSelect?: (event: Event) => void;
+};

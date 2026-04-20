@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { act, useState, Fragment } from 'react';
+import { act, useState } from 'react';
 
 import { Tabs } from '..';
 

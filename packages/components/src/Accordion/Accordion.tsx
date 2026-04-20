@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { Ref, useEffect } from "react";
 
 import { Slot } from "../Slot";
 
@@ -222,16 +222,21 @@ AccordionHeader.displayName = "AccordionHeader";
  * </Accordion.Trigger>
  * ```
  */
-export function AccordionTrigger({
+export function AccordionTrigger<
+  T extends HTMLElement = HTMLButtonElement,
+>({
   ref,
   children,
   onClick,
   disabled = false,
   asChild = false,
   ...rest
-}: AccordionTriggerProps) {
+}: AccordionTriggerProps<T>) {
+  // Cast the external ref to match the internal button ref's element type —
+  // RefObject<T> is invariant in React's types, but at runtime the callback
+  // receives whatever DOM element is actually rendered (button or asChild).
   const { triggerProps } = useAccordionTrigger({
-    ref,
+    ref: ref as Ref<HTMLButtonElement>,
     onClick,
     disabled,
     asChild,

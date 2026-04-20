@@ -14,7 +14,6 @@ import {
   ModalCloseProps,
   ModalContentProps,
   ModalDescriptionProps,
-  ModalImperativeApi,
   ModalOverlayProps,
   ModalPortalProps,
   ModalRootProps,

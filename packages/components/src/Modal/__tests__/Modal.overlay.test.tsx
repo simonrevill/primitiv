@@ -57,7 +57,7 @@ describe("Modal.Overlay", () => {
     );
   });
 
-  it("closes the modal when clicked", async () => {
+  it("does not close the modal when clicked — the native <dialog>'s ::backdrop paints over this div, so click-outside is wired on the dialog itself", async () => {
     // Arrange
     const user = userEvent.setup();
     const onOpenChange = vi.fn();
@@ -73,54 +73,27 @@ describe("Modal.Overlay", () => {
     // Act
     await user.click(screen.getByTestId("overlay"));
 
-    // Assert
-    expect(onOpenChange).toHaveBeenCalledWith(false);
-  });
-
-  it("runs the consumer's onClick before the library's close handler", async () => {
-    // Arrange
-    const user = userEvent.setup();
-    const order: string[] = [];
-    const onOpenChange = vi.fn(() => order.push("close"));
-    render(
-      <Modal.Root open={true} onOpenChange={onOpenChange}>
-        <Modal.Portal>
-          <Modal.Overlay
-            data-testid="overlay"
-            onClick={() => order.push("consumer")}
-          />
-          <Modal.Content>body</Modal.Content>
-        </Modal.Portal>
-      </Modal.Root>,
-    );
-
-    // Act
-    await user.click(screen.getByTestId("overlay"));
-
-    // Assert
-    expect(order).toEqual(["consumer", "close"]);
-  });
-
-  it("lets the consumer veto close via preventDefault on onClick", async () => {
-    // Arrange
-    const user = userEvent.setup();
-    const onOpenChange = vi.fn();
-    render(
-      <Modal.Root open={true} onOpenChange={onOpenChange}>
-        <Modal.Portal>
-          <Modal.Overlay
-            data-testid="overlay"
-            onClick={(event) => event.preventDefault()}
-          />
-          <Modal.Content>body</Modal.Content>
-        </Modal.Portal>
-      </Modal.Root>,
-    );
-
-    // Act
-    await user.click(screen.getByTestId("overlay"));
-
-    // Assert
+    // Assert — overlay click is a no-op for closing; see Modal.click-outside.test.tsx
     expect(onOpenChange).not.toHaveBeenCalled();
+  });
+
+  it("still forwards consumer onClick handlers", async () => {
+    // Arrange
+    const user = userEvent.setup();
+    const onClick = vi.fn();
+    render(
+      <Modal.Root defaultOpen>
+        <Modal.Portal>
+          <Modal.Overlay data-testid="overlay" onClick={onClick} />
+          <Modal.Content>body</Modal.Content>
+        </Modal.Portal>
+      </Modal.Root>,
+    );
+
+    // Act
+    await user.click(screen.getByTestId("overlay"));
+
+    // Assert
+    expect(onClick).toHaveBeenCalledTimes(1);
   });
 });

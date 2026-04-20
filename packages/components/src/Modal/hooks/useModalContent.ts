@@ -31,11 +31,30 @@ export function useModalContent() {
       if (consumerVetoed) return;
       setOpen(false);
     };
+    const handlePointerDown = (event: PointerEvent) => {
+      // Native <dialog>.showModal() puts the dialog in the top layer and
+      // paints its own ::backdrop over any sibling overlay, so clicks on
+      // the visual backdrop target the <dialog> itself — not the overlay.
+      // Bounding-rect check: pointer inside the dialog's box (content or
+      // padding) is "inside"; anything else is a backdrop click.
+      const rect = dialog.getBoundingClientRect();
+      const inside =
+        event.clientX >= rect.left &&
+        event.clientX <= rect.right &&
+        event.clientY >= rect.top &&
+        event.clientY <= rect.bottom;
+      if (inside) return;
+      contentCallbacksRef.current?.onPointerDownOutside?.(event);
+      if (event.defaultPrevented) return;
+      setOpen(false);
+    };
     dialog.addEventListener("close", handleClose);
     dialog.addEventListener("cancel", handleCancel);
+    dialog.addEventListener("pointerdown", handlePointerDown);
     return () => {
       dialog.removeEventListener("close", handleClose);
       dialog.removeEventListener("cancel", handleCancel);
+      dialog.removeEventListener("pointerdown", handlePointerDown);
     };
   }, [setOpen, contentCallbacksRef]);
 

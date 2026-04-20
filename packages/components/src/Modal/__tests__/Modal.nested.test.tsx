@@ -54,13 +54,29 @@ describe("Modal — nested dialogs", () => {
     );
   });
 
-  it("closes only the inner modal when the inner Overlay is clicked", async () => {
+  it("closes only the inner modal when a pointerdown lands on the inner dialog's backdrop", () => {
     // Arrange
-    const user = userEvent.setup();
     render(<NestedModals />);
+    const innerDialog = screen.getByTestId(
+      "inner-content",
+    ) as HTMLDialogElement;
+    innerDialog.getBoundingClientRect = () =>
+      ({
+        left: 100,
+        top: 100,
+        right: 300,
+        bottom: 300,
+        x: 100,
+        y: 100,
+        width: 200,
+        height: 200,
+        toJSON: () => ({}),
+      }) as DOMRect;
 
-    // Act
-    await user.click(screen.getByTestId("inner-overlay"));
+    // Act — pointerdown at (50, 50), outside the inner dialog's rect
+    act(() => {
+      fireEvent.pointerDown(innerDialog, { clientX: 50, clientY: 50 });
+    });
 
     // Assert
     expect(screen.queryByTestId("inner-content")).toBeNull();

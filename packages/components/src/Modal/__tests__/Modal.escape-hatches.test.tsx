@@ -1,7 +1,6 @@
 import "./dialog-polyfill";
 
-import { act, fireEvent, render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { act, fireEvent, render } from "@testing-library/react";
 
 import { Modal } from "../Modal";
 
@@ -93,70 +92,8 @@ describe("Modal.Content — onEscapeKeyDown", () => {
   });
 });
 
-describe("Modal.Content — onPointerDownOutside", () => {
-  it("fires onPointerDownOutside when the overlay is clicked", async () => {
-    // Arrange
-    const user = userEvent.setup();
-    const onPointerDownOutside = vi.fn();
-    render(
-      <Modal.Root defaultOpen>
-        <Modal.Portal>
-          <Modal.Overlay data-testid="overlay" />
-          <Modal.Content onPointerDownOutside={onPointerDownOutside}>
-            body
-          </Modal.Content>
-        </Modal.Portal>
-      </Modal.Root>,
-    );
-
-    // Act
-    await user.click(screen.getByTestId("overlay"));
-
-    // Assert
-    expect(onPointerDownOutside).toHaveBeenCalledTimes(1);
-  });
-
-  it("still closes the modal when the consumer does not veto", async () => {
-    // Arrange
-    const user = userEvent.setup();
-    const onOpenChange = vi.fn();
-    render(
-      <Modal.Root open={true} onOpenChange={onOpenChange}>
-        <Modal.Portal>
-          <Modal.Overlay data-testid="overlay" />
-          <Modal.Content onPointerDownOutside={() => undefined}>body</Modal.Content>
-        </Modal.Portal>
-      </Modal.Root>,
-    );
-
-    // Act
-    await user.click(screen.getByTestId("overlay"));
-
-    // Assert
-    expect(onOpenChange).toHaveBeenCalledWith(false);
-  });
-
-  it("does not close when the consumer calls event.preventDefault()", async () => {
-    // Arrange
-    const user = userEvent.setup();
-    const onOpenChange = vi.fn();
-    render(
-      <Modal.Root open={true} onOpenChange={onOpenChange}>
-        <Modal.Portal>
-          <Modal.Overlay data-testid="overlay" />
-          <Modal.Content
-            onPointerDownOutside={(event) => event.preventDefault()}
-          >
-            body
-          </Modal.Content>
-        </Modal.Portal>
-      </Modal.Root>,
-    );
-
-    // Act
-    await user.click(screen.getByTestId("overlay"));
-
-    // Assert
-    expect(onOpenChange).not.toHaveBeenCalled();
-  });
-});
+// onPointerDownOutside is driven by the dialog's own pointerdown event
+// and is covered in Modal.click-outside.test.tsx — it used to be wired
+// through the sibling Overlay's onClick, but the native <dialog>'s
+// ::backdrop paints over the overlay so that path was unreachable in
+// real browsers.

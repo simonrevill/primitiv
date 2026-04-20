@@ -140,12 +140,10 @@ describe("Modal.Description — asChild", () => {
 });
 
 describe("Modal.Overlay — asChild", () => {
-  it("renders the consumer-supplied element and closes on click", async () => {
-    // Arrange
-    const user = userEvent.setup();
-    const onOpenChange = vi.fn();
+  it("renders the consumer-supplied element with the overlay's ARIA and data-state forwarded", () => {
+    // Arrange & Act
     render(
-      <Modal.Root open={true} onOpenChange={onOpenChange}>
+      <Modal.Root defaultOpen>
         <Modal.Portal>
           <Modal.Overlay asChild>
             <section data-testid="custom-overlay" />
@@ -154,19 +152,11 @@ describe("Modal.Overlay — asChild", () => {
         </Modal.Portal>
       </Modal.Root>,
     );
-
-    // Act
     const overlay = screen.getByTestId("custom-overlay");
 
-    // Assert — ARIA + data-state are forwarded to the consumer element
+    // Assert — Slot-composed tag, ARIA, and data-state are forwarded to the consumer element
     expect(overlay.tagName).toBe("SECTION");
     expect(overlay).toHaveAttribute("aria-hidden", "true");
     expect(overlay).toHaveAttribute("data-state", "open");
-
-    // Act
-    await user.click(overlay);
-
-    // Assert
-    expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 });

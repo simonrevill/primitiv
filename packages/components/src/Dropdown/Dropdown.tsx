@@ -1,4 +1,4 @@
-import { useId, useMemo } from "react";
+import { useEffect, useId, useMemo, useRef } from "react";
 
 import { composeEventHandlers } from "../Slot";
 
@@ -59,10 +59,20 @@ function DropdownTrigger({
 DropdownTrigger.displayName = "DropdownTrigger";
 
 function DropdownContent({ children, ...rest }: DropdownContentProps) {
-  const { contentId } = useDropdownContext();
+  const { open, contentId } = useDropdownContext();
+  const menuRef = useRef<HTMLMenuElement | null>(null);
+
+  useEffect(() => {
+    const menu = menuRef.current;
+    if (!menu) return;
+    if (open) menu.showPopover();
+    else menu.hidePopover();
+  }, [open]);
+
   return (
     <menu
       {...rest}
+      ref={menuRef}
       id={contentId}
       role="menu"
       popover="auto"

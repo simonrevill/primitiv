@@ -45,4 +45,24 @@ describe("Modal.Content — click-outside via dialog bounding rect", () => {
     // Assert
     expect(onOpenChange).toHaveBeenCalledWith(false);
   });
+
+  it("does not close the modal when pointerdown lands inside the dialog's rect (content or padding)", () => {
+    // Arrange
+    const onOpenChange = vi.fn();
+    render(
+      <Modal.Root open={true} onOpenChange={onOpenChange}>
+        <Modal.Content>body</Modal.Content>
+      </Modal.Root>,
+    );
+    const dialog = getDialog();
+    stubRect(dialog, { left: 100, top: 100, right: 300, bottom: 300 });
+
+    // Act — pointerdown at (200, 200), inside the rect
+    act(() => {
+      fireEvent.pointerDown(dialog, { clientX: 200, clientY: 200 });
+    });
+
+    // Assert
+    expect(onOpenChange).not.toHaveBeenCalled();
+  });
 });

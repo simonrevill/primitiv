@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 
 type UseRadioGroupRootArgs = {
   defaultValue?: string;
@@ -26,5 +26,23 @@ export function useRadioGroupRoot({
     [value, isControlled, onValueChange],
   );
 
-  return { value, select };
+  // Track registered item elements in a ref (for future focus handling)
+  // and their values as state so re-renders fire when items mount or
+  // unmount — required for the roving-tabindex home base.
+  const itemsRef = useRef<Map<string, HTMLButtonElement>>(new Map());
+  const [itemValues, setItemValues] = useState<string[]>([]);
+
+  const registerItem = useCallback(
+    (itemValue: string, element: HTMLButtonElement | null) => {
+      if (element) {
+        itemsRef.current.set(itemValue, element);
+      } else {
+        itemsRef.current.delete(itemValue);
+      }
+      setItemValues(Array.from(itemsRef.current.keys()));
+    },
+    [],
+  );
+
+  return { value, select, registerItem, itemValues };
 }

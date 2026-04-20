@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import { composeEventHandlers } from "../Slot";
 
@@ -13,12 +13,15 @@ function RadioGroupRoot({
   children,
   ...rest
 }: RadioGroupRootProps) {
-  const { value, select } = useRadioGroupRoot({
+  const { value, select, registerItem, itemValues } = useRadioGroupRoot({
     defaultValue,
     value: controlledValue,
     onValueChange,
   });
-  const contextValue = useMemo(() => ({ value, select }), [value, select]);
+  const contextValue = useMemo(
+    () => ({ value, select, registerItem, itemValues }),
+    [value, select, registerItem, itemValues],
+  );
   return (
     <RadioGroupContext.Provider value={contextValue}>
       <div role="radiogroup" {...rest}>
@@ -34,16 +37,47 @@ function RadioGroupItem({
   value,
   children,
   onClick,
+  ref,
   ...rest
 }: RadioGroupItemProps) {
-  const { value: selectedValue, select } = useRadioGroupContext();
+  const {
+    value: selectedValue,
+    select,
+    registerItem,
+    itemValues,
+  } = useRadioGroupContext();
   const isChecked = selectedValue === value;
+  const isTabStop =
+    selectedValue !== undefined
+      ? isChecked
+      : itemValues[0] === value;
+
+  const localRef = useRef<HTMLButtonElement | null>(null);
+  const setRef = useCallback(
+    (node: HTMLButtonElement | null) => {
+      localRef.current = node;
+      if (typeof ref === "function") {
+        ref(node);
+      } else if (ref) {
+        ref.current = node;
+      }
+    },
+    [ref],
+  );
+
+  useEffect(() => {
+    registerItem(value, localRef.current);
+    return () => registerItem(value, null);
+  }, [value, registerItem]);
+
   return (
     <button
+      ref={setRef}
       type="button"
       role="radio"
       aria-checked={isChecked}
       data-state={isChecked ? "checked" : "unchecked"}
+      tabIndex={isTabStop ? 0 : -1}
       onClick={composeEventHandlers(onClick, () => select(value))}
       {...rest}
     >

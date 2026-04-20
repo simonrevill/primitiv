@@ -31,11 +31,16 @@ export function useModalContent() {
       if (consumerVetoed) return;
       setOpen(false);
     };
+    const handlePointerDown = () => {
+      setOpen(false);
+    };
     dialog.addEventListener("close", handleClose);
     dialog.addEventListener("cancel", handleCancel);
+    dialog.addEventListener("pointerdown", handlePointerDown);
     return () => {
       dialog.removeEventListener("close", handleClose);
       dialog.removeEventListener("cancel", handleCancel);
+      dialog.removeEventListener("pointerdown", handlePointerDown);
     };
   }, [setOpen, contentCallbacksRef]);
 

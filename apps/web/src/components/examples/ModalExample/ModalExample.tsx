@@ -8,12 +8,7 @@ export function ModalExample() {
       <Modal.Trigger>Open modal</Modal.Trigger>
       <Modal.Portal>
         <Modal.Overlay className="modal-overlay" />
-        <Modal.Content
-          className="modal__content"
-          onPointerDownOutside={(e) =>
-            console.log("content onPointerDownOutside", e)
-          }
-        >
+        <Modal.Content className="modal__content">
           <Modal.Title>Payment</Modal.Title>
           <Modal.Description>Enter your card details</Modal.Description>
           <Modal.Close>Cancel</Modal.Close>

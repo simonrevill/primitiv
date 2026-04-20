@@ -1,7 +1,7 @@
 import { Routes, Route, Link } from "react-router-dom";
 
 import { ColorEngine } from "./ColorEngine";
-import { ModalExample } from "./components/examples";
+import { ModalExample } from "./pages";
 
 import "./App.scss";
 

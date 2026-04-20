@@ -1,11 +1,25 @@
 import { ComponentProps, ReactNode, Ref } from "react";
 
-export type RadioGroupRootProps = Omit<ComponentProps<"div">, "role"> & {
-  defaultValue?: string;
-  onValueChange?: (value: string) => void;
+type RadioGroupRootBaseProps = Omit<ComponentProps<"div">, "role"> & {
   children?: ReactNode;
   ref?: Ref<HTMLDivElement>;
 };
+
+type RadioGroupRootUncontrolledProps = RadioGroupRootBaseProps & {
+  defaultValue?: string;
+  value?: never;
+  onValueChange?: (value: string) => void;
+};
+
+type RadioGroupRootControlledProps = RadioGroupRootBaseProps & {
+  defaultValue?: never;
+  value: string;
+  onValueChange: (value: string) => void;
+};
+
+export type RadioGroupRootProps =
+  | RadioGroupRootUncontrolledProps
+  | RadioGroupRootControlledProps;
 
 export type RadioGroupItemProps = Omit<
   ComponentProps<"button">,

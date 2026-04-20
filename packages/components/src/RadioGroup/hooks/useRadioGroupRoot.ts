@@ -2,24 +2,28 @@ import { useCallback, useState } from "react";
 
 type UseRadioGroupRootArgs = {
   defaultValue?: string;
+  value?: string;
   onValueChange?: (value: string) => void;
 };
 
 export function useRadioGroupRoot({
   defaultValue,
+  value: controlledValue,
   onValueChange,
 }: UseRadioGroupRootArgs) {
-  const [value, setValue] = useState<string | undefined>(defaultValue);
+  const isControlled = controlledValue !== undefined;
+  const [uncontrolledValue, setUncontrolledValue] = useState<
+    string | undefined
+  >(defaultValue);
+  const value = isControlled ? controlledValue : uncontrolledValue;
 
   const select = useCallback(
     (next: string) => {
-      setValue((prev) => {
-        if (prev === next) return prev;
-        onValueChange?.(next);
-        return next;
-      });
+      if (value === next) return;
+      if (!isControlled) setUncontrolledValue(next);
+      onValueChange?.(next);
     },
-    [onValueChange],
+    [value, isControlled, onValueChange],
   );
 
   return { value, select };

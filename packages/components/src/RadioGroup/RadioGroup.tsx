@@ -8,11 +8,16 @@ import { RadioGroupItemProps, RadioGroupRootProps } from "./types";
 
 function RadioGroupRoot({
   defaultValue,
+  value: controlledValue,
   onValueChange,
   children,
   ...rest
 }: RadioGroupRootProps) {
-  const { value, select } = useRadioGroupRoot({ defaultValue, onValueChange });
+  const { value, select } = useRadioGroupRoot({
+    defaultValue,
+    value: controlledValue,
+    onValueChange,
+  });
   const contextValue = useMemo(() => ({ value, select }), [value, select]);
   return (
     <RadioGroupContext.Provider value={contextValue}>

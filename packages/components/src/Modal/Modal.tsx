@@ -186,22 +186,16 @@ ModalPortal.displayName = "ModalPortal";
  * ```
  */
 function ModalOverlay({
-  onClick,
   asChild = false,
   forceMount,
   ...rest
 }: ModalOverlayProps) {
-  const { open, setOpen, contentCallbacksRef } = useModalContext();
+  const { open } = useModalContext();
   if (!open && !forceMount) return null;
   const overlayProps = {
     ...rest,
     "aria-hidden": "true" as const,
     "data-state": (open ? "open" : "closed") as "open" | "closed",
-    onClick: composeEventHandlers(onClick, (event) => {
-      contentCallbacksRef.current?.onPointerDownOutside?.(event);
-      if (event.defaultPrevented) return;
-      setOpen(false);
-    }),
   };
 
   if (asChild) {

@@ -65,4 +65,51 @@ describe("Modal.Content — click-outside via dialog bounding rect", () => {
     // Assert
     expect(onOpenChange).not.toHaveBeenCalled();
   });
+
+  it("fires onPointerDownOutside with the native event when the backdrop is pressed", () => {
+    // Arrange
+    const onPointerDownOutside = vi.fn();
+    render(
+      <Modal.Root defaultOpen>
+        <Modal.Content onPointerDownOutside={onPointerDownOutside}>
+          body
+        </Modal.Content>
+      </Modal.Root>,
+    );
+    const dialog = getDialog();
+    stubRect(dialog, { left: 100, top: 100, right: 300, bottom: 300 });
+
+    // Act
+    act(() => {
+      fireEvent.pointerDown(dialog, { clientX: 50, clientY: 50 });
+    });
+
+    // Assert
+    expect(onPointerDownOutside).toHaveBeenCalledTimes(1);
+    expect(onPointerDownOutside.mock.calls[0][0]).toBeInstanceOf(Event);
+  });
+
+  it("does not close when the consumer's onPointerDownOutside calls event.preventDefault()", () => {
+    // Arrange
+    const onOpenChange = vi.fn();
+    render(
+      <Modal.Root open={true} onOpenChange={onOpenChange}>
+        <Modal.Content
+          onPointerDownOutside={(event) => event.preventDefault()}
+        >
+          body
+        </Modal.Content>
+      </Modal.Root>,
+    );
+    const dialog = getDialog();
+    stubRect(dialog, { left: 100, top: 100, right: 300, bottom: 300 });
+
+    // Act
+    act(() => {
+      fireEvent.pointerDown(dialog, { clientX: 50, clientY: 50 });
+    });
+
+    // Assert
+    expect(onOpenChange).not.toHaveBeenCalled();
+  });
 });

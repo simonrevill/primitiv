@@ -1,4 +1,4 @@
-import { ComponentProps, MouseEvent, ReactNode, Ref, RefObject } from "react";
+import { ComponentProps, ReactNode, Ref, RefObject } from "react";
 
 export type ModalImperativeApi = {
   open: () => void;
@@ -7,7 +7,7 @@ export type ModalImperativeApi = {
 
 export type ModalContentCallbacks = {
   onEscapeKeyDown?: (event: Event) => void;
-  onPointerDownOutside?: (event: MouseEvent<HTMLDivElement>) => void;
+  onPointerDownOutside?: (event: PointerEvent) => void;
 };
 
 export type ModalContextValue = {

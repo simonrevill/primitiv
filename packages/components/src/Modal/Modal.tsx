@@ -153,21 +153,22 @@ function ModalPortal({ children, container, forceMount }: ModalPortalProps) {
 ModalPortal.displayName = "ModalPortal";
 
 /**
- * A full-bleed backdrop rendered as a **sibling** of `Modal.Content`.
- * Native `<dialog>` elements live in the top layer and clicks inside
- * them don't bubble to ancestors, so the overlay must sit next to the
- * dialog — not around it — to catch click-outside.
+ * A decorative, animation-friendly backdrop rendered as a **sibling**
+ * of `Modal.Content`. It is **not** an event surface for
+ * click-outside — opening a native `<dialog>` via `showModal()`
+ * promotes it to the top layer with a browser-painted `::backdrop`
+ * that sits *above* this overlay, so clicks on the visible backdrop
+ * never reach the overlay div. Click-outside-to-close is wired on
+ * the dialog itself via {@link ModalContentCallbacks.onPointerDownOutside | `onPointerDownOutside`}.
  *
  * - `aria-hidden="true"` (the backdrop is decorative).
  * - `data-state="open" | "closed"` follows the modal's open state.
- * - `onClick` closes the modal and fires
- *   `Modal.Content`'s `onPointerDownOutside`. Consumers can
- *   `event.preventDefault()` on either their own `onClick` *or* on
- *   `onPointerDownOutside` to veto closing.
+ * - Consumer `onClick` (and any other event handler) is forwarded
+ *   through — the overlay does not compose or intercept them.
  *
  * **`asChild` prop.** Pass `asChild` to render a consumer-supplied
- * element (e.g. a motion wrapper) with the overlay's ARIA, data-state,
- * and click handler merged in.
+ * element (e.g. a motion wrapper) with the overlay's ARIA and
+ * data-state merged in.
  *
  * **`forceMount` prop.** Pass `forceMount` to keep the overlay in the
  * DOM while `open` is false so a CSS exit animation can play.
@@ -223,8 +224,10 @@ ModalOverlay.displayName = "ModalOverlay";
  *   fires on the native `cancel` event (Esc). Consumers can
  *   `event.preventDefault()` to keep the modal open.
  * - {@link ModalContentCallbacks.onPointerDownOutside | `onPointerDownOutside`}
- *   fires when the overlay is clicked. Consumers can
- *   `event.preventDefault()` to keep the modal open.
+ *   fires on a `pointerdown` whose coordinates land outside the
+ *   dialog's bounding rect — i.e. on the native `::backdrop`. Consumers
+ *   can `event.preventDefault()` to keep the modal open. The native
+ *   `PointerEvent` is passed through, not a synthetic React event.
  *
  * **`asChild` is intentionally not supported.** The native dialog
  * primitive is what provides the focus trap and the inert background;
@@ -254,7 +257,7 @@ function ModalContent({
   const { ref: innerRef, open, contentId } = useModalContent();
   const { contentCallbacksRef, titleId, descriptionId } = useModalContext();
   // Keep the ref pointed at the latest callbacks so event handlers wired
-  // through context (Overlay's onClick, native cancel) always see the most
+  // through context (dialog pointerdown, native cancel) always see the most
   // recent consumer props across re-renders.
   contentCallbacksRef.current = { onEscapeKeyDown, onPointerDownOutside };
   const composedRef = externalRef

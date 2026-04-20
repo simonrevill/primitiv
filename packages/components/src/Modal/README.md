@@ -9,13 +9,26 @@ element and its `showModal()` API, so focus trapping, inert background,
 top-layer stacking, and Esc-to-close are handled by the browser. The
 React layer adds what native `<dialog>` doesn't give you:
 
-- Click-outside-to-close via a sibling overlay (backdrop clicks don't
-  reach `<dialog>` on their own).
+- Click-outside-to-close via a `pointerdown` listener on the dialog
+  that checks the pointer against `getBoundingClientRect()` — coords
+  outside the rect mean the pointer landed on the native `::backdrop`.
 - A portal for placing the dialog at the end of `document.body`.
 - Controlled / uncontrolled state plumbing.
 - `asChild` composition for every slot-able sub-component.
 - An imperative API for firing open/close from outside the subtree.
 - `forceMount` hooks for driving CSS exit animations.
+
+### Why is click-outside on the dialog, not the overlay?
+
+`showModal()` promotes the `<dialog>` into the browser's **top layer**
+and paints a `::backdrop` pseudo-element underneath it — also in the
+top layer. Any sibling `Modal.Overlay` sits *below* that backdrop
+visually, so clicks on the "outside" area never reach it. Detection
+therefore has to live on the dialog itself: a `pointerdown` whose
+coordinates fall outside the dialog's bounding rect is, by
+elimination, a click on the backdrop. `Modal.Overlay` stays in the
+tree as a cosmetic + animation surface (for custom backdrop styling
+or motion wrappers that exceed what `::backdrop` can express).
 
 ```tsx
 import { Modal } from "@primitiv/components";
@@ -41,7 +54,7 @@ import { Modal } from "@primitiv/components";
 | `Modal.Root`        | context provider  | Owns open state. Exposes `ModalImperativeApi` via `ref`                             |
 | `Modal.Trigger`     | `<button>`        | `aria-haspopup="dialog"`, `aria-expanded`, `aria-controls`. `asChild`               |
 | `Modal.Portal`      | `createPortal`    | `container?: HTMLElement` (default `document.body`). `forceMount`                   |
-| `Modal.Overlay`     | `<div>` (sibling) | Click closes the modal. `aria-hidden="true"`. `data-state`. `asChild`, `forceMount` |
+| `Modal.Overlay`     | `<div>` (sibling) | Decorative / animation target — **not** a click-outside event surface (see below). `aria-hidden="true"`. `data-state`. `asChild`, `forceMount` |
 | `Modal.Content`     | `<dialog>`        | Native modal dialog. `data-state`. Escape hatches for Esc / click-outside           |
 | `Modal.Title`       | `<h2>`            | Auto-wires `aria-labelledby` on Content. `asChild`                                  |
 | `Modal.Description` | `<p>`             | Auto-wires `aria-describedby` on Content. `asChild`                                 |
@@ -73,8 +86,10 @@ const [open, setOpen] = useState(false);
 
 ## Escape hatches
 
-Both close paths — `Esc` and click-on-overlay — fire observable callbacks
-on `Modal.Content`. Call `event.preventDefault()` to keep the modal open.
+Both close paths — `Esc` and click-outside — fire observable callbacks
+on `Modal.Content`. Call `event.preventDefault()` to keep the modal
+open. `onPointerDownOutside` receives the native `PointerEvent`
+(fires on `pointerdown`, not `click`, matching the prop name).
 
 ```tsx
 <Modal.Content
@@ -112,7 +127,8 @@ the parent stays in charge of the actual state update.
 delegates rendering to its single child element and merges its own ARIA
 attributes, ids, composed event handlers, and ref onto the child
 following the asChild pattern (child handler runs first, then the
-library's).
+library's). `Modal.Overlay` is decorative and has no library-side
+handlers, so only its ARIA and `data-state` are forwarded.
 
 ```tsx
 // Router link with dialog-trigger semantics

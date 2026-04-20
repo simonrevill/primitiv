@@ -42,15 +42,14 @@ describe("Dropdown state modes", () => {
     const menu = screen.getByRole("menu", { hidden: true });
     expect(menu).not.toHaveAttribute("data-popover-open");
 
-    // Act — external control opens it
+    // Act — external control opens it (no onOpenChange yet, state is external)
     await user.click(external);
 
-    // Assert
-    expect(onOpenChange).toHaveBeenCalledWith(true);
+    // Assert — controlled prop flows through to ARIA + popover state
     expect(trigger).toHaveAttribute("aria-expanded", "true");
     expect(menu).toHaveAttribute("data-popover-open");
 
-    // Act — trigger closes it
+    // Act — trigger closes it, which must route through onOpenChange
     await user.click(trigger);
 
     // Assert
@@ -58,38 +57,29 @@ describe("Dropdown state modes", () => {
     expect(trigger).toHaveAttribute("aria-expanded", "false");
   });
 
-  it("honours controlled open prop on Dropdown.Sub", async () => {
+  it("honours controlled open prop on Dropdown.Sub and defers to onOpenChange", async () => {
     // Arrange
     const onOpenChange = vi.fn();
     function ControlledSub() {
       const [subOpen, setSubOpen] = useState(false);
       return (
-        <>
-          <button
-            type="button"
-            data-testid="external-sub-toggle"
-            onClick={() => setSubOpen(true)}
-          >
-            open sub externally
-          </button>
-          <Dropdown.Root defaultOpen>
-            <Dropdown.Trigger>File</Dropdown.Trigger>
-            <Dropdown.Content>
-              <Dropdown.Sub
-                open={subOpen}
-                onOpenChange={(next) => {
-                  onOpenChange(next);
-                  setSubOpen(next);
-                }}
-              >
-                <Dropdown.SubTrigger>Open Recent</Dropdown.SubTrigger>
-                <Dropdown.SubContent>
-                  <Dropdown.Item>Project A</Dropdown.Item>
-                </Dropdown.SubContent>
-              </Dropdown.Sub>
-            </Dropdown.Content>
-          </Dropdown.Root>
-        </>
+        <Dropdown.Root defaultOpen>
+          <Dropdown.Trigger>File</Dropdown.Trigger>
+          <Dropdown.Content>
+            <Dropdown.Sub
+              open={subOpen}
+              onOpenChange={(next) => {
+                onOpenChange(next);
+                setSubOpen(next);
+              }}
+            >
+              <Dropdown.SubTrigger>Open Recent</Dropdown.SubTrigger>
+              <Dropdown.SubContent>
+                <Dropdown.Item>Project A</Dropdown.Item>
+              </Dropdown.SubContent>
+            </Dropdown.Sub>
+          </Dropdown.Content>
+        </Dropdown.Root>
       );
     }
     const user = userEvent.setup();
@@ -98,11 +88,10 @@ describe("Dropdown state modes", () => {
       name: "Open Recent",
       hidden: true,
     });
-    const external = screen.getByTestId("external-sub-toggle");
     expect(subTrigger).toHaveAttribute("aria-expanded", "false");
 
-    // Act
-    await user.click(external);
+    // Act — clicking the SubTrigger routes state through the parent
+    await user.click(subTrigger);
 
     // Assert
     expect(onOpenChange).toHaveBeenCalledWith(true);

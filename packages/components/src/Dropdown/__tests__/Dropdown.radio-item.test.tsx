@@ -63,6 +63,37 @@ describe("Dropdown.RadioGroup and Dropdown.RadioItem", () => {
     expect(onValueChange).toHaveBeenLastCalledWith("dark");
   });
 
+  it("stays open when onSelect calls preventDefault", async () => {
+    // Arrange
+    const user = userEvent.setup();
+    const onSelect = vi.fn((event: Event) => event.preventDefault());
+    render(
+      <Dropdown.Root defaultOpen>
+        <Dropdown.Trigger>Theme</Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.RadioGroup>
+            <Dropdown.RadioItem value="dark" onSelect={onSelect}>
+              Dark
+            </Dropdown.RadioItem>
+          </Dropdown.RadioGroup>
+        </Dropdown.Content>
+      </Dropdown.Root>,
+    );
+    const dark = screen.getByRole("menuitemradio", {
+      name: "Dark",
+      hidden: true,
+    });
+    const menu = screen.getByRole("menu", { hidden: true });
+
+    // Act
+    await user.click(dark);
+
+    // Assert
+    expect(onSelect).toHaveBeenCalledTimes(1);
+    expect(dark).toHaveAttribute("aria-checked", "true");
+    expect(menu).toHaveAttribute("data-popover-open");
+  });
+
   it("reflects the consumer-driven value in controlled mode", async () => {
     // Arrange
     const user = userEvent.setup();

@@ -52,6 +52,35 @@ describe("Dropdown.CheckboxItem", () => {
     expect(onCheckedChange).toHaveBeenLastCalledWith(true);
   });
 
+  it("stays open when onSelect calls preventDefault", async () => {
+    // Arrange
+    const user = userEvent.setup();
+    const onSelect = vi.fn((event: Event) => event.preventDefault());
+    render(
+      <Dropdown.Root defaultOpen>
+        <Dropdown.Trigger>Options</Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.CheckboxItem onSelect={onSelect}>
+            Show grid
+          </Dropdown.CheckboxItem>
+        </Dropdown.Content>
+      </Dropdown.Root>,
+    );
+    const item = screen.getByRole("menuitemcheckbox", {
+      name: "Show grid",
+      hidden: true,
+    });
+    const menu = screen.getByRole("menu", { hidden: true });
+
+    // Act
+    await user.click(item);
+
+    // Assert
+    expect(onSelect).toHaveBeenCalledTimes(1);
+    expect(item).toHaveAttribute("aria-checked", "true");
+    expect(menu).toHaveAttribute("data-popover-open");
+  });
+
   it("reads the checked value from the consumer in controlled mode", async () => {
     // Arrange
     const user = userEvent.setup();

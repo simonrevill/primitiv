@@ -6,6 +6,7 @@ import { DropdownContext } from "./DropdownContext";
 import { useDropdownContext, useDropdownRoot } from "./hooks";
 import {
   DropdownContentProps,
+  DropdownItemProps,
   DropdownRootProps,
   DropdownTriggerProps,
 } from "./types";
@@ -84,16 +85,43 @@ function DropdownContent({ children, ...rest }: DropdownContentProps) {
 
 DropdownContent.displayName = "DropdownContent";
 
+function DropdownItem({
+  children,
+  onClick,
+  onSelect,
+  ...rest
+}: DropdownItemProps) {
+  const { setOpen } = useDropdownContext();
+  const handleClick = () => {
+    const event = new Event("dropdown.select", { cancelable: true });
+    onSelect?.(event);
+    if (!event.defaultPrevented) setOpen(false);
+  };
+  return (
+    <li
+      {...rest}
+      role="menuitem"
+      onClick={composeEventHandlers(onClick, handleClick)}
+    >
+      {children}
+    </li>
+  );
+}
+
+DropdownItem.displayName = "DropdownItem";
+
 type TDropdownCompound = typeof DropdownRoot & {
   Root: typeof DropdownRoot;
   Trigger: typeof DropdownTrigger;
   Content: typeof DropdownContent;
+  Item: typeof DropdownItem;
 };
 
 const DropdownCompound: TDropdownCompound = Object.assign(DropdownRoot, {
   Root: DropdownRoot,
   Trigger: DropdownTrigger,
   Content: DropdownContent,
+  Item: DropdownItem,
 });
 
 DropdownCompound.displayName = "Dropdown";

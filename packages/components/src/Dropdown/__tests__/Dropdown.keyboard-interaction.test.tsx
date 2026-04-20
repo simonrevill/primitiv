@@ -109,6 +109,30 @@ describe("Dropdown keyboard interaction", () => {
     expect(menu).not.toHaveAttribute("data-popover-open");
   });
 
+  it("closes the dropdown on Escape and returns focus to the trigger", async () => {
+    // Arrange
+    const user = userEvent.setup();
+    render(
+      <Dropdown.Root defaultOpen>
+        <Dropdown.Trigger>Options</Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.Item>Rename</Dropdown.Item>
+          <Dropdown.Item>Duplicate</Dropdown.Item>
+        </Dropdown.Content>
+      </Dropdown.Root>,
+    );
+    const trigger = screen.getByRole("button", { name: "Options" });
+    const menu = screen.getByRole("menu", { hidden: true });
+    expect(menu).toHaveAttribute("data-popover-open");
+
+    // Act
+    await user.keyboard("{Escape}");
+
+    // Assert
+    expect(menu).not.toHaveAttribute("data-popover-open");
+    expect(trigger).toHaveFocus();
+  });
+
   it("jumps to the first item on Home and the last item on End", async () => {
     // Arrange
     const user = userEvent.setup();

@@ -140,3 +140,42 @@ export type DropdownRadioItemProps = Omit<
   value: string;
   onSelect?: (event: Event) => void;
 };
+
+type DropdownSubBaseProps = {
+  children?: ReactNode;
+};
+
+type DropdownSubUncontrolledProps = DropdownSubBaseProps & {
+  defaultOpen?: boolean;
+  open?: never;
+  onOpenChange?: (open: boolean) => void;
+};
+
+type DropdownSubControlledProps = DropdownSubBaseProps & {
+  defaultOpen?: never;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+};
+
+export type DropdownSubProps =
+  | DropdownSubUncontrolledProps
+  | DropdownSubControlledProps;
+
+export type DropdownSubTriggerProps = Omit<
+  ComponentProps<"li">,
+  "role" | "tabIndex" | "aria-haspopup" | "aria-expanded" | "aria-controls"
+> & {
+  children?: ReactNode;
+  ref?: Ref<HTMLLIElement>;
+  asChild?: boolean;
+  disabled?: boolean;
+};
+
+export type DropdownSubContentProps = Omit<
+  ComponentProps<"menu">,
+  "role" | "popover" | "id"
+> & {
+  children?: ReactNode;
+  ref?: Ref<HTMLMenuElement>;
+  asChild?: boolean;
+};

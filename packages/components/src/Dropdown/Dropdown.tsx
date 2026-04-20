@@ -7,6 +7,7 @@ import { composeEventHandlers } from "../Slot";
 import { DropdownContext } from "./DropdownContext";
 import { DropdownGroupContext } from "./DropdownGroupContext";
 import { DropdownRadioGroupContext } from "./DropdownRadioGroupContext";
+import { DropdownSubContext } from "./DropdownSubContext";
 import { useDropdownContext, useDropdownRoot } from "./hooks";
 import {
   DropdownCheckboxItemProps,
@@ -18,8 +19,21 @@ import {
   DropdownRadioItemProps,
   DropdownRootProps,
   DropdownSeparatorProps,
+  DropdownSubContentProps,
+  DropdownSubProps,
+  DropdownSubTriggerProps,
   DropdownTriggerProps,
 } from "./types";
+
+function useDropdownSubContext() {
+  const context = useContext(DropdownSubContext);
+  if (!context) {
+    throw new Error(
+      "Dropdown.SubTrigger and Dropdown.SubContent must be rendered inside a <Dropdown.Sub>.",
+    );
+  }
+  return context;
+}
 
 function DropdownRoot({
   defaultOpen,
@@ -359,6 +373,93 @@ function DropdownRadioItem({
 
 DropdownRadioItem.displayName = "DropdownRadioItem";
 
+function DropdownSub({
+  defaultOpen,
+  open: controlledOpen,
+  onOpenChange,
+  children,
+}: DropdownSubProps) {
+  const { open, setOpen } = useDropdownRoot({
+    defaultOpen,
+    open: controlledOpen,
+    onOpenChange,
+  });
+  const contentId = useId();
+  const triggerRef = useRef<HTMLLIElement | null>(null);
+  const contextValue = useMemo(
+    () => ({ open, setOpen, contentId, triggerRef }),
+    [open, setOpen, contentId],
+  );
+  return (
+    <DropdownSubContext.Provider value={contextValue}>
+      {children}
+    </DropdownSubContext.Provider>
+  );
+}
+
+DropdownSub.displayName = "DropdownSub";
+
+function DropdownSubTrigger({
+  children,
+  onClick,
+  disabled,
+  ...rest
+}: DropdownSubTriggerProps) {
+  const sub = useDropdownSubContext();
+  const toggle = () => {
+    if (disabled) return;
+    sub.setOpen(!sub.open);
+  };
+  return (
+    <li
+      {...rest}
+      ref={sub.triggerRef}
+      role="menuitem"
+      tabIndex={-1}
+      aria-haspopup="menu"
+      aria-expanded={sub.open}
+      aria-controls={sub.contentId}
+      aria-disabled={disabled || undefined}
+      onClick={composeEventHandlers(onClick, toggle)}
+    >
+      {children}
+    </li>
+  );
+}
+
+DropdownSubTrigger.displayName = "DropdownSubTrigger";
+
+function DropdownSubContent({ children, ...rest }: DropdownSubContentProps) {
+  const sub = useDropdownSubContext();
+  const menuRef = useRef<HTMLMenuElement | null>(null);
+
+  useEffect(() => {
+    const menu = menuRef.current;
+    if (!menu) return;
+    if (sub.open) {
+      menu.showPopover();
+      const firstItem = menu.querySelector<HTMLElement>(MENUITEM_SELECTOR);
+      firstItem?.focus();
+    } else {
+      menu.hidePopover();
+    }
+  }, [sub.open]);
+
+  return (
+    <menu
+      {...rest}
+      ref={menuRef}
+      id={sub.contentId}
+      role="menu"
+      popover="auto"
+    >
+      {children}
+    </menu>
+  );
+}
+
+DropdownSubContent.displayName = "DropdownSubContent";
+
 type TDropdownCompound = typeof DropdownRoot & {
   Root: typeof DropdownRoot;
   Trigger: typeof DropdownTrigger;
@@ -370,6 +471,9 @@ type TDropdownCompound = typeof DropdownRoot & {
   CheckboxItem: typeof DropdownCheckboxItem;
   RadioGroup: typeof DropdownRadioGroup;
   RadioItem: typeof DropdownRadioItem;
+  Sub: typeof DropdownSub;
+  SubTrigger: typeof DropdownSubTrigger;
+  SubContent: typeof DropdownSubContent;
 };
 
 const DropdownCompound: TDropdownCompound = Object.assign(DropdownRoot, {
@@ -383,6 +487,9 @@ const DropdownCompound: TDropdownCompound = Object.assign(DropdownRoot, {
   CheckboxItem: DropdownCheckboxItem,
   RadioGroup: DropdownRadioGroup,
   RadioItem: DropdownRadioItem,
+  Sub: DropdownSub,
+  SubTrigger: DropdownSubTrigger,
+  SubContent: DropdownSubContent,
 });
 
 DropdownCompound.displayName = "Dropdown";

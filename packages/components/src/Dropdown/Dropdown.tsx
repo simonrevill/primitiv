@@ -33,10 +33,15 @@ function DropdownTrigger({
   children,
   ...rest
 }: DropdownTriggerProps) {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const _context = useDropdownContext();
+  const { open, contentId } = useDropdownContext();
   return (
-    <button type="button" {...rest}>
+    <button
+      type="button"
+      aria-haspopup="menu"
+      aria-expanded={open}
+      aria-controls={contentId}
+      {...rest}
+    >
       {children}
     </button>
   );

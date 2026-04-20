@@ -26,7 +26,13 @@ import {
 } from "./types";
 
 function useDropdownSubContext() {
-  return useContext(DropdownSubContext)!;
+  const context = useContext(DropdownSubContext);
+  if (!context) {
+    throw new Error(
+      "Dropdown.SubTrigger and Dropdown.SubContent must be rendered inside a <Dropdown.Sub>.",
+    );
+  }
+  return context;
 }
 
 function DropdownRoot({
@@ -376,7 +382,12 @@ function DropdownRadioItem({
   ...rest
 }: DropdownRadioItemProps) {
   const { setOpen, triggerRef } = useDropdownContext();
-  const group = useContext(DropdownRadioGroupContext)!;
+  const group = useContext(DropdownRadioGroupContext);
+  if (!group) {
+    throw new Error(
+      "Dropdown.RadioItem must be rendered inside a <Dropdown.RadioGroup>.",
+    );
+  }
   const checked = group.value === itemValue;
   const handleClick = () => {
     if (disabled) return;

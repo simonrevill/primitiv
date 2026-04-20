@@ -8,6 +8,7 @@ import {
   DropdownContentProps,
   DropdownItemProps,
   DropdownRootProps,
+  DropdownSeparatorProps,
   DropdownTriggerProps,
 } from "./types";
 
@@ -205,11 +206,18 @@ function DropdownItem({
 
 DropdownItem.displayName = "DropdownItem";
 
+function DropdownSeparator({ ...rest }: DropdownSeparatorProps) {
+  return <li {...rest} role="separator" />;
+}
+
+DropdownSeparator.displayName = "DropdownSeparator";
+
 type TDropdownCompound = typeof DropdownRoot & {
   Root: typeof DropdownRoot;
   Trigger: typeof DropdownTrigger;
   Content: typeof DropdownContent;
   Item: typeof DropdownItem;
+  Separator: typeof DropdownSeparator;
 };
 
 const DropdownCompound: TDropdownCompound = Object.assign(DropdownRoot, {
@@ -217,6 +225,7 @@ const DropdownCompound: TDropdownCompound = Object.assign(DropdownRoot, {
   Trigger: DropdownTrigger,
   Content: DropdownContent,
   Item: DropdownItem,
+  Separator: DropdownSeparator,
 });
 
 DropdownCompound.displayName = "Dropdown";

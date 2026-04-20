@@ -64,6 +64,51 @@ describe("Dropdown keyboard interaction", () => {
     expect(duplicate).toHaveFocus();
   });
 
+  it("activates the focused item on Enter and closes the dropdown", async () => {
+    // Arrange
+    const user = userEvent.setup();
+    const onSelect = vi.fn();
+    render(
+      <Dropdown.Root defaultOpen>
+        <Dropdown.Trigger>Options</Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.Item onSelect={onSelect}>Rename</Dropdown.Item>
+          <Dropdown.Item>Duplicate</Dropdown.Item>
+        </Dropdown.Content>
+      </Dropdown.Root>,
+    );
+    const menu = screen.getByRole("menu", { hidden: true });
+
+    // Act
+    await user.keyboard("{Enter}");
+
+    // Assert
+    expect(onSelect).toHaveBeenCalledTimes(1);
+    expect(menu).not.toHaveAttribute("data-popover-open");
+  });
+
+  it("activates the focused item on Space and closes the dropdown", async () => {
+    // Arrange
+    const user = userEvent.setup();
+    const onSelect = vi.fn();
+    render(
+      <Dropdown.Root defaultOpen>
+        <Dropdown.Trigger>Options</Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.Item onSelect={onSelect}>Rename</Dropdown.Item>
+        </Dropdown.Content>
+      </Dropdown.Root>,
+    );
+    const menu = screen.getByRole("menu", { hidden: true });
+
+    // Act — literal space, not "{Space}" (which emits key="Space")
+    await user.keyboard(" ");
+
+    // Assert
+    expect(onSelect).toHaveBeenCalledTimes(1);
+    expect(menu).not.toHaveAttribute("data-popover-open");
+  });
+
   it("jumps to the first item on Home and the last item on End", async () => {
     // Arrange
     const user = userEvent.setup();

@@ -149,11 +149,14 @@ function DropdownItem({
   onSelect,
   ...rest
 }: DropdownItemProps) {
-  const { setOpen } = useDropdownContext();
+  const { setOpen, triggerRef } = useDropdownContext();
   const handleClick = () => {
     const event = new Event("dropdown.select", { cancelable: true });
     onSelect?.(event);
-    if (!event.defaultPrevented) setOpen(false);
+    if (!event.defaultPrevented) {
+      setOpen(false);
+      triggerRef.current?.focus();
+    }
   };
   return (
     <li

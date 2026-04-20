@@ -133,6 +133,27 @@ describe("Dropdown keyboard interaction", () => {
     expect(trigger).toHaveFocus();
   });
 
+  it("returns focus to the trigger after activating an item with Enter", async () => {
+    // Arrange
+    const user = userEvent.setup();
+    render(
+      <Dropdown.Root defaultOpen>
+        <Dropdown.Trigger>Options</Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.Item>Rename</Dropdown.Item>
+          <Dropdown.Item>Duplicate</Dropdown.Item>
+        </Dropdown.Content>
+      </Dropdown.Root>,
+    );
+    const trigger = screen.getByRole("button", { name: "Options" });
+
+    // Act
+    await user.keyboard("{Enter}");
+
+    // Assert
+    expect(trigger).toHaveFocus();
+  });
+
   it("jumps to the first item on Home and the last item on End", async () => {
     // Arrange
     const user = userEvent.setup();

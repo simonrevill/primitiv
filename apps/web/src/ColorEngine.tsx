@@ -13,6 +13,8 @@ export function ColorEngine() {
     handleDarkPaddingChange,
     handleLightnessCurveChange,
     STANDARD_KEYS,
+    handleShiftLeft,
+    handleShiftRight,
   } = useColors();
 
   return (
@@ -87,6 +89,18 @@ export function ColorEngine() {
                       {((lightPadding ?? 0) * 100).toFixed(0)}%
                     </span>
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => handleShiftLeft(key, palette?.swatches[6])}
+                  >
+                    {"< Shift"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleShiftRight(key, palette?.swatches[4])}
+                  >
+                    {"Shift >"}
+                  </button>
                   <div className="palette__slider-container palette__slider-container--dark-padding">
                     <input
                       type="range"

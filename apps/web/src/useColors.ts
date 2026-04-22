@@ -1,5 +1,6 @@
 import init, {
   type Palette,
+  Swatch,
   generate_greyscale_oklch,
   generate_palette_with_lightness,
 } from "harmoni-wasm";
@@ -118,7 +119,9 @@ export function useColors() {
 
       setColors((prev) => {
         const prevLightness = prev[key].lightnessArray ?? DEFAULT_LIGHTNESS;
-        const lightnessArray = prevLightness.map((v, i) => (i === index ? value : v));
+        const lightnessArray = prevLightness.map((v, i) =>
+          i === index ? value : v,
+        );
         return {
           ...prev,
           [key]: {
@@ -135,6 +138,50 @@ export function useColors() {
       });
     };
 
+  const handleShiftLeft = (key: ColorKey, targetSwatch?: Swatch) => {
+    const hex = `oklch(${targetSwatch?.l} ${targetSwatch?.c} ${targetSwatch?.h})`;
+
+    setColors((prev) => {
+      const lightnessArray = prev[key].lightnessArray ?? DEFAULT_LIGHTNESS;
+      return {
+        ...prev,
+        [key]: {
+          ...prev[key],
+          hex,
+          lightnessArray,
+          palette: generate_palette_with_lightness(
+            hex,
+            lightnessArray,
+            prev[key].lightPadding ?? 0,
+            prev[key].darkPadding ?? 0,
+          ),
+        },
+      };
+    });
+  };
+
+  const handleShiftRight = (key: ColorKey, targetSwatch?: Swatch) => {
+    const hex = `oklch(${targetSwatch?.l} ${targetSwatch?.c} ${targetSwatch?.h})`;
+
+    setColors((prev) => {
+      const lightnessArray = prev[key].lightnessArray ?? DEFAULT_LIGHTNESS;
+      return {
+        ...prev,
+        [key]: {
+          ...prev[key],
+          hex,
+          lightnessArray,
+          palette: generate_palette_with_lightness(
+            hex,
+            lightnessArray,
+            prev[key].lightPadding ?? 0,
+            prev[key].darkPadding ?? 0,
+          ),
+        },
+      };
+    });
+  };
+
   return {
     greyscalePalette,
     handleColorChange,
@@ -143,5 +190,7 @@ export function useColors() {
     handleDarkPaddingChange,
     handleLightnessCurveChange,
     STANDARD_KEYS,
+    handleShiftLeft,
+    handleShiftRight,
   };
 }

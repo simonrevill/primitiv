@@ -5,8 +5,8 @@ import "./DropdownExample.scss";
 export function DropdownExample() {
   return (
     <Dropdown.Root>
-      <Dropdown.Trigger>Options</Dropdown.Trigger>
-      <Dropdown.Content>
+      <Dropdown.Trigger className="dd-trigger">Options</Dropdown.Trigger>
+      <Dropdown.Content className="dd-content">
         <Dropdown.Item onSelect={() => console.log("Rename selected.")}>
           Rename
         </Dropdown.Item>
@@ -15,12 +15,12 @@ export function DropdownExample() {
         </Dropdown.Item>
         <Dropdown.Separator />
         <Dropdown.Item disabled>Archive</Dropdown.Item>
-      </Dropdown.Content>
-      <Dropdown.Content>
         <Dropdown.Item>New</Dropdown.Item>
         <Dropdown.Sub>
-          <Dropdown.SubTrigger>Open Recent</Dropdown.SubTrigger>
-          <Dropdown.SubContent>
+          <Dropdown.SubTrigger className="dd-sub-trigger">
+            Open Recent
+          </Dropdown.SubTrigger>
+          <Dropdown.SubContent className="dd-sub-content">
             <Dropdown.Item>Project A</Dropdown.Item>
             <Dropdown.Item>Project B</Dropdown.Item>
           </Dropdown.SubContent>

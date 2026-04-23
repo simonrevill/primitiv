@@ -184,6 +184,14 @@ the component's):
   animation: fade-in 120ms ease-out;
 }
 
+/* Highlighted item — pointer focus */
+[role="menuitem"][data-highlighted],
+[role="menuitemcheckbox"][data-highlighted],
+[role="menuitemradio"][data-highlighted] {
+  background: rgba(0 0 0 / 0.06);
+  outline: none;
+}
+
 /* Disabled items */
 [aria-disabled="true"] {
   opacity: 0.5;
@@ -200,3 +208,8 @@ the component's):
 The native popover API adds `data-popover-open` on the element while the
 popover is showing; combine it with the standard ARIA attributes for
 state-driven styling.
+
+`data-highlighted` is present on `Item`, `CheckboxItem`, `RadioItem`, and
+`SubTrigger` while the item has pointer focus (mouseenter). On `SubTrigger`
+it also remains present for the duration its sub-menu is open, so the
+active path stays highlighted as the user navigates nested levels.

@@ -197,9 +197,43 @@ function DropdownContent({
         firstItem?.focus();
       }
     } else {
-      menu.hidePopover();
+      try {
+        menu.hidePopover();
+      } catch {
+        // already hidden — no-op (e.g. browser already light-dismissed it)
+      }
     }
   }, [open]);
+
+  // Track open in a ref so the document click listener always sees the latest
+  // value without needing it as a dependency (avoids listener churn).
+  const openRef = useRef(open);
+  useEffect(() => {
+    openRef.current = open;
+  });
+
+  // Sync React state when the browser closes the popover without our code
+  // doing it (real-browser ToggleEvent on light-dismiss or native Escape).
+  useEffect(() => {
+    const menu = menuRef.current!;
+    const handleToggle = (event: Event) => {
+      if ((event as ToggleEvent).newState === "closed") setOpen(false);
+    };
+    menu.addEventListener("toggle", handleToggle);
+    return () => menu.removeEventListener("toggle", handleToggle);
+  }, [setOpen]);
+
+  // Belt-and-suspenders for environments where the toggle event is not
+  // dispatched on light-dismiss (e.g. jsdom). Skip clicks that land inside
+  // any [popover] element so nested sub-menus don't close their parent.
+  useEffect(() => {
+    const handleClick = (event: MouseEvent) => {
+      if (!openRef.current) return;
+      if (!(event.target as Element).closest?.("[popover]")) setOpen(false);
+    };
+    document.addEventListener("click", handleClick);
+    return () => document.removeEventListener("click", handleClick);
+  }, [setOpen]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLMenuElement>) => {
     const menu = menuRef.current!;
@@ -680,7 +714,7 @@ function DropdownSubTrigger({
   const [hovered, setHovered] = useState(false);
   const toggle = () => {
     if (disabled) return;
-    sub.setOpen(!sub.open);
+    sub.setOpen(true);
   };
   const handleKeyDown = (event: React.KeyboardEvent<HTMLLIElement>) => {
     if (disabled) return;
@@ -701,9 +735,10 @@ function DropdownSubTrigger({
     "data-highlighted": hovered || sub.open ? "" : undefined,
     onClick: composeEventHandlers(onClick, toggle),
     onKeyDown: composeEventHandlers(onKeyDown, handleKeyDown),
-    onMouseEnter: composeEventHandlers(rest.onMouseEnter, () =>
-      setHovered(true),
-    ),
+    onMouseEnter: composeEventHandlers(rest.onMouseEnter, () => {
+      setHovered(true);
+      if (!disabled) sub.setOpen(true);
+    }),
     onMouseLeave: composeEventHandlers(rest.onMouseLeave, () =>
       setHovered(false),
     ),
@@ -745,9 +780,22 @@ function DropdownSubContent({
       const firstItem = menu.querySelector<HTMLElement>(MENUITEM_SELECTOR);
       firstItem?.focus();
     } else {
-      menu.hidePopover();
+      try {
+        menu.hidePopover();
+      } catch {
+        // already hidden — no-op
+      }
     }
   }, [sub.open]);
+
+  useEffect(() => {
+    const menu = menuRef.current!;
+    const handleToggle = (event: ToggleEvent) => {
+      if (event.newState === "closed") sub.setOpen(false);
+    };
+    menu.addEventListener("toggle", handleToggle);
+    return () => menu.removeEventListener("toggle", handleToggle);
+  }, [sub.setOpen]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLMenuElement>) => {
     if (event.key !== "ArrowLeft") return;

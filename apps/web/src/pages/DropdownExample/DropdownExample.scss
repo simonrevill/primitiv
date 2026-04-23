@@ -1,0 +1,77 @@
+/* ── Trigger: declare the anchor ─────────────────────────────────── */
+.dd-trigger {
+  anchor-name: --dd-trigger;
+}
+
+/* ── Main menu: position below-start of trigger ──────────────────── */
+.dd-content {
+  /* Popovers sit in the top layer; position:fixed lets anchor() resolve */
+  position: fixed;
+  position-anchor: --dd-trigger;
+  top: anchor(bottom);
+  left: anchor(left);
+  /* Clear UA popover stylesheet's inset:0 so anchor values take effect */
+  inset: unset;
+  margin-top: 4px;
+
+  background: #fff;
+  border: 1px solid rgba(0 0 0 / 0.12);
+  border-radius: 6px;
+  padding: 4px;
+  min-width: 180px;
+  box-shadow: 0 4px 16px rgba(0 0 0 / 0.12);
+  list-style: none;
+}
+
+/* ── Sub-trigger: declare a second anchor ────────────────────────── */
+.dd-sub-trigger {
+  anchor-name: --dd-sub-trigger;
+}
+
+/* ── Sub-menu: positioned to the right, top-aligned with sub-trigger */
+.dd-sub-content {
+  position: fixed;
+  position-anchor: --dd-sub-trigger;
+  top: anchor(top);
+  left: anchor(right);
+  inset: unset;
+  margin-left: 4px;
+
+  background: #fff;
+  border: 1px solid rgba(0 0 0 / 0.12);
+  border-radius: 6px;
+  padding: 4px;
+  min-width: 180px;
+  box-shadow: 0 4px 16px rgba(0 0 0 / 0.12);
+  list-style: none;
+}
+
+/* ── Shared item styles ───────────────────────────────────────────── */
+.dd-content li,
+.dd-sub-content li {
+  padding: 6px 8px;
+  border-radius: 4px;
+  cursor: default;
+  font-size: 14px;
+  user-select: none;
+}
+
+.dd-content [data-highlighted],
+.dd-sub-content [data-highlighted] {
+  background: rgba(0 0 0 / 0.06);
+  outline: none;
+}
+
+.dd-content [aria-disabled="true"],
+.dd-sub-content [aria-disabled="true"] {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.dd-content [role="separator"],
+.dd-sub-content [role="separator"] {
+  height: 1px;
+  background: rgba(0 0 0 / 0.1);
+  margin: 4px 0;
+  padding: 0;
+}

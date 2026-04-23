@@ -6,13 +6,14 @@
 /* ── Main menu: position below-start of trigger ──────────────────── */
 .dd-content {
   /* Popovers sit in the top layer; position:fixed lets anchor() resolve */
+  inset: unset;
   position: fixed;
   position-anchor: --dd-trigger;
   top: anchor(bottom);
   left: anchor(left);
   /* Clear UA popover stylesheet's inset:0 so anchor values take effect */
-  inset: unset;
   margin-top: 4px;
+  color: #000;
 
   background: #fff;
   border: 1px solid rgba(0 0 0 / 0.12);
@@ -30,14 +31,15 @@
 
 /* ── Sub-menu: positioned to the right, top-aligned with sub-trigger */
 .dd-sub-content {
+  inset: unset;
   position: fixed;
   position-anchor: --dd-sub-trigger;
   top: anchor(top);
   left: anchor(right);
-  inset: unset;
   margin-left: 4px;
 
   background: #fff;
+  color: #000;
   border: 1px solid rgba(0 0 0 / 0.12);
   border-radius: 6px;
   padding: 4px;

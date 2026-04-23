@@ -54,4 +54,26 @@ describe("Dropdown trigger", () => {
     // Assert
     expect(menu).not.toHaveAttribute("data-popover-open");
   });
+
+  it("syncs aria-expanded to false when the popover is light-dismissed by clicking outside", async () => {
+    // Arrange
+    const user = userEvent.setup();
+    render(
+      <Dropdown.Root>
+        <Dropdown.Trigger>Options</Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.Item>Rename</Dropdown.Item>
+        </Dropdown.Content>
+      </Dropdown.Root>,
+    );
+    const trigger = screen.getByRole("button", { name: "Options" });
+
+    // Act — open, then light-dismiss by clicking outside the popover
+    await user.click(trigger);
+    expect(trigger).toHaveAttribute("aria-expanded", "true");
+    await user.click(document.body);
+
+    // Assert
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+  });
 });

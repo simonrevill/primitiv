@@ -73,6 +73,38 @@ describe("Dropdown mouse interaction", () => {
     expect(subTrigger).toHaveAttribute("data-highlighted");
   });
 
+  it("opens the sub-menu and sets aria-expanded when the pointer enters the SubTrigger", async () => {
+    // Arrange
+    const user = userEvent.setup();
+    render(
+      <Dropdown.Root defaultOpen>
+        <Dropdown.Trigger>File</Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.Sub>
+            <Dropdown.SubTrigger>Open Recent</Dropdown.SubTrigger>
+            <Dropdown.SubContent>
+              <Dropdown.Item>Project A</Dropdown.Item>
+            </Dropdown.SubContent>
+          </Dropdown.Sub>
+        </Dropdown.Content>
+      </Dropdown.Root>,
+    );
+    const subTrigger = screen.getByRole("menuitem", {
+      name: "Open Recent",
+      hidden: true,
+    });
+    const [, subMenu] = screen.getAllByRole("menu", { hidden: true });
+    expect(subMenu).not.toHaveAttribute("data-popover-open");
+    expect(subTrigger).toHaveAttribute("aria-expanded", "false");
+
+    // Act
+    await user.hover(subTrigger);
+
+    // Assert
+    expect(subMenu).toHaveAttribute("data-popover-open");
+    expect(subTrigger).toHaveAttribute("aria-expanded", "true");
+  });
+
   it("keeps data-highlighted on a SubTrigger after the pointer leaves while its sub-menu stays open", async () => {
     // Arrange
     const user = userEvent.setup();

@@ -327,6 +327,9 @@ DropdownContent.displayName = "DropdownContent";
  * `event.preventDefault()` inside `onSelect` to keep it open — useful
  * for actions that perform in-place mutations (e.g. copying to clipboard).
  *
+ * Receives `data-highlighted=""` while the pointer is over it, making CSS
+ * hover styling possible without `:hover` (which doesn't survive focus moves).
+ *
  * Disabled items receive `aria-disabled="true"` and are skipped by arrow
  * navigation, typeahead, and activation handlers.
  */
@@ -472,6 +475,8 @@ DropdownLabel.displayName = "DropdownLabel";
  * cancellable `Event`. Call `event.preventDefault()` to keep the menu
  * open — useful for rapidly toggling multiple checkboxes.
  *
+ * Receives `data-highlighted=""` while the pointer is over it.
+ *
  * Disabled items receive `aria-disabled="true"` and no-op on activation.
  */
 function DropdownCheckboxItem({
@@ -582,6 +587,8 @@ DropdownRadioGroup.displayName = "DropdownRadioGroup";
  * group's value, then fires {@link DropdownRadioItemProps.onSelect |
  * `onSelect`} with a cancellable `Event`. Call `event.preventDefault()`
  * to keep the menu open.
+ *
+ * Receives `data-highlighted=""` while the pointer is over it.
  *
  * Disabled items receive `aria-disabled="true"` and no-op on activation.
  */
@@ -695,12 +702,18 @@ DropdownSub.displayName = "DropdownSub";
  * `aria-expanded`, and `aria-controls` wiring it to the sibling
  * {@link DropdownSubContent | `Dropdown.SubContent`}. `asChild` is supported.
  *
- * Opens the submenu on click or `ArrowRight`; all other keys bubble to the
- * parent {@link DropdownContent | `Dropdown.Content`} so its roving focus
- * and typeahead continue to work while a submenu is in play.
+ * Opens the submenu on pointer enter (hover), click, or `ArrowRight`. Click
+ * always opens — it never toggles — so hovering then clicking does not
+ * reverse the state. All other keys bubble to the parent
+ * {@link DropdownContent | `Dropdown.Content`} so its roving focus and
+ * typeahead continue to work while a submenu is in play.
  *
- * Disabled triggers receive `aria-disabled="true"` and ignore both click
- * and `ArrowRight`.
+ * Receives `data-highlighted=""` while the pointer is over it or while its
+ * sub-menu is open, keeping the active path visually highlighted during
+ * nested navigation.
+ *
+ * Disabled triggers receive `aria-disabled="true"` and ignore pointer enter,
+ * click, and `ArrowRight`.
  */
 function DropdownSubTrigger({
   children,

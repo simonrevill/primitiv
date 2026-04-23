@@ -35,7 +35,7 @@ import { Dropdown } from "@primitiv/components";
 | `Dropdown.Group`        | `group`              | Semantic grouping for related items                                                    |
 | `Dropdown.Separator`    | `separator`          | Visual divider; skipped by focus and typeahead                                         |
 | `Dropdown.Sub`          | State owner          | Submenu boundary; same state modes as `Root`                                           |
-| `Dropdown.SubTrigger`   | `menuitem`           | Opens the submenu on click or `ArrowRight`                                             |
+| `Dropdown.SubTrigger`   | `menuitem`           | Opens the submenu on hover, click, or `ArrowRight`; `data-highlighted` tracks pointer focus and open-path |
 | `Dropdown.SubContent`   | `menu`               | Submenu panel; `ArrowLeft` closes it and returns focus to the trigger                  |
 
 All sub-components that render an element accept `asChild` to compose
@@ -95,7 +95,7 @@ no-op on activation. Arrow navigation and typeahead skip them.
 <Dropdown.Item disabled>Archive (coming soon)</Dropdown.Item>
 ```
 
-A disabled `SubTrigger` refuses to open on both click and `ArrowRight`.
+A disabled `SubTrigger` refuses to open on hover, click, and `ArrowRight`.
 
 ## Checkbox and radio items
 
@@ -133,9 +133,9 @@ to `true` on the next activation, matching the native
 </Dropdown.Content>
 ```
 
-Open a submenu with `ArrowRight` or a click on the trigger; close it with
-`ArrowLeft` or by selecting an item. Focus returns to the `SubTrigger`
-when the submenu closes.
+Open a submenu by hovering the `SubTrigger`, clicking it, or pressing
+`ArrowRight`; close it with `ArrowLeft` or by selecting an item. Focus
+returns to the `SubTrigger` when the submenu closes.
 
 ## Groups and labels
 

@@ -1,4 +1,4 @@
-import { useContext, useEffect, useId, useMemo, useRef } from "react";
+import { useContext, useEffect, useId, useMemo, useRef, useState } from "react";
 
 import { useCheckboxRoot } from "../Checkbox/hooks";
 import { useRadioGroupRoot } from "../RadioGroup/hooks";
@@ -305,6 +305,7 @@ function DropdownItem({
   ...rest
 }: DropdownItemProps) {
   const { setOpen, triggerRef } = useDropdownContext();
+  const [highlighted, setHighlighted] = useState(false);
   const handleClick = () => {
     if (disabled) return;
     const event = new Event("dropdown.select", { cancelable: true });
@@ -319,7 +320,14 @@ function DropdownItem({
     role: "menuitem" as const,
     tabIndex: -1,
     "aria-disabled": disabled || undefined,
+    "data-highlighted": highlighted ? "" : undefined,
     onClick: composeEventHandlers(onClick, handleClick),
+    onMouseEnter: composeEventHandlers(rest.onMouseEnter, () =>
+      setHighlighted(true),
+    ),
+    onMouseLeave: composeEventHandlers(rest.onMouseLeave, () =>
+      setHighlighted(false),
+    ),
   };
   if (asChild) {
     return <Slot {...itemProps}>{children}</Slot>;
@@ -444,6 +452,7 @@ function DropdownCheckboxItem({
   ...rest
 }: DropdownCheckboxItemProps) {
   const { setOpen, triggerRef } = useDropdownContext();
+  const [highlighted, setHighlighted] = useState(false);
   const { checked, toggle } = useCheckboxRoot({
     defaultChecked,
     checked: controlledChecked,
@@ -467,7 +476,14 @@ function DropdownCheckboxItem({
     tabIndex: -1,
     "aria-checked": ariaChecked,
     "aria-disabled": disabled || undefined,
+    "data-highlighted": highlighted ? "" : undefined,
     onClick: composeEventHandlers(onClick, handleClick),
+    onMouseEnter: composeEventHandlers(rest.onMouseEnter, () =>
+      setHighlighted(true),
+    ),
+    onMouseLeave: composeEventHandlers(rest.onMouseLeave, () =>
+      setHighlighted(false),
+    ),
   };
   if (asChild) {
     return <Slot {...itemProps}>{children}</Slot>;
@@ -545,6 +561,7 @@ function DropdownRadioItem({
   ...rest
 }: DropdownRadioItemProps) {
   const { setOpen, triggerRef } = useDropdownContext();
+  const [highlighted, setHighlighted] = useState(false);
   const group = useContext(DropdownRadioGroupContext);
   if (!group) {
     throw new Error(
@@ -568,7 +585,14 @@ function DropdownRadioItem({
     tabIndex: -1,
     "aria-checked": checked,
     "aria-disabled": disabled || undefined,
+    "data-highlighted": highlighted ? "" : undefined,
     onClick: composeEventHandlers(onClick, handleClick),
+    onMouseEnter: composeEventHandlers(rest.onMouseEnter, () =>
+      setHighlighted(true),
+    ),
+    onMouseLeave: composeEventHandlers(rest.onMouseLeave, () =>
+      setHighlighted(false),
+    ),
   };
   if (asChild) {
     return <Slot {...itemProps}>{children}</Slot>;
@@ -653,6 +677,7 @@ function DropdownSubTrigger({
   ...rest
 }: DropdownSubTriggerProps) {
   const sub = useDropdownSubContext();
+  const [hovered, setHovered] = useState(false);
   const toggle = () => {
     if (disabled) return;
     sub.setOpen(!sub.open);
@@ -673,8 +698,15 @@ function DropdownSubTrigger({
     "aria-expanded": sub.open,
     "aria-controls": sub.contentId,
     "aria-disabled": disabled || undefined,
+    "data-highlighted": hovered || sub.open ? "" : undefined,
     onClick: composeEventHandlers(onClick, toggle),
     onKeyDown: composeEventHandlers(onKeyDown, handleKeyDown),
+    onMouseEnter: composeEventHandlers(rest.onMouseEnter, () =>
+      setHovered(true),
+    ),
+    onMouseLeave: composeEventHandlers(rest.onMouseLeave, () =>
+      setHovered(false),
+    ),
   };
   if (asChild) {
     return <Slot {...subTriggerProps}>{children}</Slot>;

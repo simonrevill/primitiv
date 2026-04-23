@@ -103,7 +103,7 @@ describe("Dropdown mouse interaction", () => {
   });
 
   it("removes data-highlighted from a SubTrigger when the sub-menu closes and the pointer is not over it", async () => {
-    // Arrange
+    // Arrange — render with sub already open; focus auto-lands in sub-content
     const user = userEvent.setup();
     render(
       <Dropdown.Root defaultOpen>
@@ -122,13 +122,14 @@ describe("Dropdown mouse interaction", () => {
       name: "Open Recent",
       hidden: true,
     });
+    // sub.open=true on render, so data-highlighted is present without any hover
+    expect(subTrigger).toHaveAttribute("data-highlighted");
 
-    // Act — pointer is not over the trigger; close the sub-menu with ArrowLeft
-    subTrigger.focus();
-    await user.keyboard("{ArrowRight}"); // re-open so we can close with ArrowLeft
-    await user.keyboard("{ArrowLeft}"); // close
+    // Act — ArrowLeft from inside the sub-content closes the sub-menu;
+    // focus never passes through the sub-trigger so hovered stays false
+    await user.keyboard("{ArrowLeft}");
 
-    // Assert — sub.open is now false and pointer never hovered it
+    // Assert — sub.open is now false and pointer never hovered the trigger
     expect(subTrigger).not.toHaveAttribute("data-highlighted");
   });
 

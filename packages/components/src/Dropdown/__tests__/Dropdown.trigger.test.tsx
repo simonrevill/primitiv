@@ -76,4 +76,35 @@ describe("Dropdown trigger", () => {
     // Assert
     expect(trigger).toHaveAttribute("aria-expanded", "false");
   });
+
+  it("does not route a trigger click through the outside-click listener", async () => {
+    // The Content's outside-click listener must ignore clicks on the trigger
+    // itself — the trigger's own onClick already decides whether to open or
+    // close. Without this guard, a trigger click while open would produce two
+    // onOpenChange(false) calls (one from the trigger, one from the document
+    // listener), and the opening click on a freshly-mounted trigger would be
+    // seen as "outside" and self-dismiss the popover (this manifests in real
+    // browsers where React 19 can flush the opening commit's effects
+    // synchronously, leaving the listener attached before the click bubbles
+    // to the document).
+    const user = userEvent.setup();
+    const onOpenChange = vi.fn();
+    render(
+      <Dropdown.Root defaultOpen onOpenChange={onOpenChange}>
+        <Dropdown.Trigger>Options</Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.Item>Rename</Dropdown.Item>
+        </Dropdown.Content>
+      </Dropdown.Root>,
+    );
+    const trigger = screen.getByRole("button", { name: "Options" });
+
+    // Act — click the trigger while the menu is open
+    await user.click(trigger);
+
+    // Assert — exactly one onOpenChange(false): from the trigger's own
+    // onClick, not a duplicate from the document listener.
+    expect(onOpenChange).toHaveBeenCalledTimes(1);
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
 });

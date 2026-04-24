@@ -205,13 +205,6 @@ function DropdownContent({
     }
   }, [open]);
 
-  // Track open in a ref so the document click listener always sees the latest
-  // value without needing it as a dependency (avoids listener churn).
-  const openRef = useRef(open);
-  useEffect(() => {
-    openRef.current = open;
-  });
-
   // Sync React state when the browser closes the popover without our code
   // doing it (real-browser ToggleEvent on light-dismiss or native Escape).
   useEffect(() => {
@@ -223,17 +216,26 @@ function DropdownContent({
     return () => menu.removeEventListener("toggle", handleToggle);
   }, [setOpen]);
 
-  // Belt-and-suspenders for environments where the toggle event is not
-  // dispatched on light-dismiss (e.g. jsdom). Skip clicks that land inside
-  // any [popover] element so nested sub-menus don't close their parent.
+  // Close on clicks outside the popover (belt-and-suspenders for environments
+  // where the native toggle event is not dispatched on light-dismiss, e.g.
+  // jsdom). Attached only while open. Clicks on the trigger are ignored —
+  // the trigger's own onClick already decides whether to open or close, and
+  // if this listener handled the trigger too it would immediately close the
+  // popover on the opening click (React 19 can flush the opening commit's
+  // effects synchronously, so the listener is already attached by the time
+  // the click bubbles up to the document). Clicks inside any [popover] are
+  // ignored so nested sub-menus don't close their parent.
   useEffect(() => {
+    if (!open) return;
     const handleClick = (event: MouseEvent) => {
-      if (!openRef.current) return;
-      if (!(event.target as Element).closest?.("[popover]")) setOpen(false);
+      const target = event.target as Element;
+      if (triggerRef.current?.contains(target)) return;
+      if (target.closest?.("[popover]")) return;
+      setOpen(false);
     };
     document.addEventListener("click", handleClick);
     return () => document.removeEventListener("click", handleClick);
-  }, [setOpen]);
+  }, [open, setOpen, triggerRef]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLMenuElement>) => {
     const menu = menuRef.current!;

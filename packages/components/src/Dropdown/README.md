@@ -31,6 +31,7 @@ import { Dropdown } from "@primitiv/components";
 | `Dropdown.CheckboxItem` | `menuitemcheckbox`   | Tri-state toggle (`true` / `false` / `"indeterminate"`)                                |
 | `Dropdown.RadioGroup`   | `group`              | Single-selection container for `RadioItem`s                                            |
 | `Dropdown.RadioItem`    | `menuitemradio`      | Must live inside a `RadioGroup`                                                        |
+| `Dropdown.ItemIndicator`| —                    | Icon slot inside a `CheckboxItem` / `RadioItem`; exposes `data-state` + `forceMount`   |
 | `Dropdown.Label`        | —                    | Non-interactive label; auto-wired to the enclosing `Group` via `aria-labelledby`       |
 | `Dropdown.Group`        | `group`              | Semantic grouping for related items                                                    |
 | `Dropdown.Separator`    | `separator`          | Visual divider; skipped by focus and typeahead                                         |
@@ -117,6 +118,41 @@ A disabled `SubTrigger` refuses to open on both click and `ArrowRight`.
 (which renders as `aria-checked="mixed"`). An indeterminate item resolves
 to `true` on the next activation, matching the native
 `<input type="checkbox">` contract.
+
+### `ItemIndicator`
+
+Render the visible mark (usually a checkmark or a bullet) inside the
+item via `Dropdown.ItemIndicator`. It defaults to a `<span>`, supports
+`asChild` so consumers can compose onto an SVG icon, and exposes
+`data-state` for styling:
+
+```tsx
+<Dropdown.CheckboxItem checked={showBookmarks} onCheckedChange={setShowBookmarks}>
+  <Dropdown.ItemIndicator>
+    <CheckIcon />
+  </Dropdown.ItemIndicator>
+  Show bookmarks
+</Dropdown.CheckboxItem>
+```
+
+| `data-state`      | When                                                                                |
+| ----------------- | ----------------------------------------------------------------------------------- |
+| `"checked"`       | Parent `CheckboxItem` is `true`, or parent `RadioItem` is the group's current value |
+| `"unchecked"`     | Parent is `false` (only reachable when `forceMount` is set — see below)             |
+| `"indeterminate"` | Parent `CheckboxItem` is `"indeterminate"`                                          |
+
+By default the indicator **unmounts** when its parent is unchecked. Pass
+`forceMount` to keep the DOM node in both states so CSS transitions or a
+React animation library can drive the visual state off `data-state`:
+
+```tsx
+<Dropdown.ItemIndicator forceMount>
+  <CheckIcon className="indicator" /> {/* fade in/out via data-state */}
+</Dropdown.ItemIndicator>
+```
+
+Rendering `Dropdown.ItemIndicator` outside a `CheckboxItem` or `RadioItem`
+throws a descriptive error.
 
 ## Submenus
 

@@ -7,6 +7,7 @@ import { composeEventHandlers, Slot } from "../Slot";
 import { DropdownContext } from "./DropdownContext";
 import { DropdownContentContext } from "./DropdownContentContext";
 import { DropdownGroupContext } from "./DropdownGroupContext";
+import { DropdownItemIndicatorContext } from "./DropdownItemIndicatorContext";
 import { DropdownRadioGroupContext } from "./DropdownRadioGroupContext";
 import { DropdownSubContext } from "./DropdownSubContext";
 import { useDropdownContext, useDropdownRoot } from "./hooks";
@@ -14,6 +15,7 @@ import {
   DropdownCheckboxItemProps,
   DropdownContentProps,
   DropdownGroupProps,
+  DropdownItemIndicatorProps,
   DropdownItemProps,
   DropdownLabelProps,
   DropdownRadioGroupProps,
@@ -496,6 +498,10 @@ DropdownLabel.displayName = "DropdownLabel";
  * cancellable `Event`. Call `event.preventDefault()` to keep the menu
  * open — useful for rapidly toggling multiple checkboxes.
  *
+ * Nest a {@link DropdownItemIndicator | `Dropdown.ItemIndicator`} to
+ * render the visible check mark; it reads its parent's state from
+ * context and exposes `data-state` for styling.
+ *
  * Disabled items receive `aria-disabled="true"` and no-op on activation.
  */
 function DropdownCheckboxItem({
@@ -545,10 +551,17 @@ function DropdownCheckboxItem({
       setHighlighted(false),
     ),
   };
-  if (asChild) {
-    return <Slot {...itemProps}>{children}</Slot>;
-  }
-  return <li {...itemProps}>{children}</li>;
+  const indicatorContextValue = useMemo(() => ({ checked }), [checked]);
+  const content = asChild ? (
+    <Slot {...itemProps}>{children}</Slot>
+  ) : (
+    <li {...itemProps}>{children}</li>
+  );
+  return (
+    <DropdownItemIndicatorContext.Provider value={indicatorContextValue}>
+      {content}
+    </DropdownItemIndicatorContext.Provider>
+  );
 }
 
 DropdownCheckboxItem.displayName = "DropdownCheckboxItem";
@@ -609,6 +622,10 @@ DropdownRadioGroup.displayName = "DropdownRadioGroup";
  * `onSelect`} with a cancellable `Event`. Call `event.preventDefault()`
  * to keep the menu open.
  *
+ * Nest a {@link DropdownItemIndicator | `Dropdown.ItemIndicator`} to
+ * render the visible bullet; it reads its parent's state from context
+ * and exposes `data-state` for styling.
+ *
  * Disabled items receive `aria-disabled="true"` and no-op on activation.
  */
 function DropdownRadioItem({
@@ -656,13 +673,76 @@ function DropdownRadioItem({
       setHighlighted(false),
     ),
   };
-  if (asChild) {
-    return <Slot {...itemProps}>{children}</Slot>;
-  }
-  return <li {...itemProps}>{children}</li>;
+  const indicatorContextValue = useMemo(() => ({ checked }), [checked]);
+  const content = asChild ? (
+    <Slot {...itemProps}>{children}</Slot>
+  ) : (
+    <li {...itemProps}>{children}</li>
+  );
+  return (
+    <DropdownItemIndicatorContext.Provider value={indicatorContextValue}>
+      {content}
+    </DropdownItemIndicatorContext.Provider>
+  );
 }
 
 DropdownRadioItem.displayName = "DropdownRadioItem";
+
+/**
+ * The visible mark (usually a checkmark or a bullet) rendered inside a
+ * {@link DropdownCheckboxItem | `Dropdown.CheckboxItem`} or
+ * {@link DropdownRadioItem | `Dropdown.RadioItem`}. Must be a descendant
+ * of one of those; rendering it anywhere else throws a descriptive error.
+ *
+ * Renders a `<span>` by default; pass `asChild` to compose onto any
+ * element (commonly an SVG icon). Exposes `data-state` reflecting the
+ * parent item's live state: `"checked"`, `"unchecked"`, or
+ * `"indeterminate"` — the last being reachable only through a tri-state
+ * `Dropdown.CheckboxItem`.
+ *
+ * By default the indicator unmounts when its parent is unchecked. Pass
+ * {@link DropdownItemIndicatorProps.forceMount | `forceMount`} to keep
+ * the DOM node mounted in both states, which is handy when animating the
+ * indicator in and out via CSS transitions or a React animation library.
+ *
+ * @example
+ * ```tsx
+ * <Dropdown.CheckboxItem checked={showBookmarks} onCheckedChange={setShowBookmarks}>
+ *   <Dropdown.ItemIndicator>
+ *     <CheckIcon />
+ *   </Dropdown.ItemIndicator>
+ *   Show bookmarks
+ * </Dropdown.CheckboxItem>
+ * ```
+ */
+function DropdownItemIndicator({
+  children,
+  asChild = false,
+  forceMount = false,
+  ...rest
+}: DropdownItemIndicatorProps) {
+  const context = useContext(DropdownItemIndicatorContext);
+  if (!context) {
+    throw new Error(
+      "Dropdown.ItemIndicator must be rendered inside a <Dropdown.CheckboxItem> or <Dropdown.RadioItem>.",
+    );
+  }
+  const { checked } = context;
+  const dataState =
+    checked === "indeterminate"
+      ? "indeterminate"
+      : checked
+        ? "checked"
+        : "unchecked";
+  if (!forceMount && checked === false) return null;
+  const indicatorProps = { ...rest, "data-state": dataState };
+  if (asChild) {
+    return <Slot {...indicatorProps}>{children}</Slot>;
+  }
+  return <span {...indicatorProps}>{children}</span>;
+}
+
+DropdownItemIndicator.displayName = "DropdownItemIndicator";
 
 /**
  * A submenu boundary. Wrap a {@link DropdownSubTrigger | `Dropdown.SubTrigger`}
@@ -889,6 +969,7 @@ type TDropdownCompound = typeof DropdownRoot & {
   CheckboxItem: typeof DropdownCheckboxItem;
   RadioGroup: typeof DropdownRadioGroup;
   RadioItem: typeof DropdownRadioItem;
+  ItemIndicator: typeof DropdownItemIndicator;
   Sub: typeof DropdownSub;
   SubTrigger: typeof DropdownSubTrigger;
   SubContent: typeof DropdownSubContent;
@@ -905,6 +986,7 @@ const DropdownCompound: TDropdownCompound = Object.assign(DropdownRoot, {
   CheckboxItem: DropdownCheckboxItem,
   RadioGroup: DropdownRadioGroup,
   RadioItem: DropdownRadioItem,
+  ItemIndicator: DropdownItemIndicator,
   Sub: DropdownSub,
   SubTrigger: DropdownSubTrigger,
   SubContent: DropdownSubContent,

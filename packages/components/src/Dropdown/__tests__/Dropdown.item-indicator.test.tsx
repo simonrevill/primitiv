@@ -189,7 +189,10 @@ describe("Dropdown.ItemIndicator", () => {
       );
     }
     render(<UncontrolledSingleRadio />);
-    const optionB = screen.getByRole("menuitemradio", { name: "Option B" });
+    const optionB = screen.getByRole("menuitemradio", {
+      name: "Option B",
+      hidden: true,
+    });
 
     // Act
     await user.click(optionB);

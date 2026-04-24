@@ -11,6 +11,7 @@ import { DropdownItemIndicatorContext } from "./DropdownItemIndicatorContext";
 import { DropdownRadioGroupContext } from "./DropdownRadioGroupContext";
 import { DropdownSubContext } from "./DropdownSubContext";
 import {
+  useCloseSiblingSub,
   useDropdownContext,
   useDropdownRoot,
   useDropdownSubContext,
@@ -31,17 +32,6 @@ import {
   DropdownSubTriggerProps,
   DropdownTriggerProps,
 } from "./types";
-
-/**
- * Returns a callback that closes any direct-child sub-menu registered with
- * the enclosing {@link DropdownContent} / {@link DropdownSubContent}. Items
- * invoke this on mouse-enter so hovering a sibling dismisses an open sub,
- * mirroring the keyboard contract.
- */
-function useCloseSiblingSub() {
-  const content = useContext(DropdownContentContext);
-  return () => content?.closeOpenSubRef.current?.();
-}
 
 /**
  * The root of a Dropdown menu — owns the open state and provides context to

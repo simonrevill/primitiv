@@ -75,13 +75,13 @@ import { MENUITEM_SELECTOR, TYPEAHEAD_RESET_MS } from "./constants";
  */
 function DropdownRoot({
   defaultOpen,
-  open: controlledOpen,
+  open,
   onOpenChange,
   children,
 }: DropdownRootProps) {
   const { contextValue } = useDropdownRoot({
     defaultOpen,
-    open: controlledOpen,
+    open,
     onOpenChange,
   });
 

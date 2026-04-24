@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 type UseDropdownRootArgs = {
   defaultOpen?: boolean;
@@ -14,9 +14,20 @@ export function useDropdownRoot({
   const isControlled = controlledOpen !== undefined;
   const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen);
   const open = isControlled ? controlledOpen : uncontrolledOpen;
+  // Mirror `open` so setOpen can short-circuit repeat transitions within a
+  // single event without a re-render in between. Without this, internal
+  // paths that converge on the same close (e.g. a light-dismiss firing
+  // both a `toggle` event and a document click) would double-notify
+  // consumers via onOpenChange.
+  const openRef = useRef(open);
+  useEffect(() => {
+    openRef.current = open;
+  });
 
   const setOpen = useCallback(
     (next: boolean) => {
+      if (openRef.current === next) return;
+      openRef.current = next;
       if (!isControlled) setUncontrolledOpen(next);
       onOpenChange?.(next);
     },

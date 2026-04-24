@@ -45,6 +45,60 @@ describe("Dropdown mouse interaction", () => {
     expect(item).not.toHaveAttribute("data-highlighted");
   });
 
+  it("removes data-highlighted from a CheckboxItem when the pointer leaves", async () => {
+    // Arrange — mirrors the plain-Item unhover contract for the tri-state
+    // checkbox variant, which has its own setHighlighted(false) path.
+    const user = userEvent.setup();
+    render(
+      <Dropdown.Root defaultOpen>
+        <Dropdown.Trigger>Options</Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.CheckboxItem>Show bookmarks</Dropdown.CheckboxItem>
+        </Dropdown.Content>
+      </Dropdown.Root>,
+    );
+    const item = screen.getByRole("menuitemcheckbox", {
+      name: "Show bookmarks",
+      hidden: true,
+    });
+
+    // Act
+    await user.hover(item);
+    expect(item).toHaveAttribute("data-highlighted");
+    await user.unhover(item);
+
+    // Assert
+    expect(item).not.toHaveAttribute("data-highlighted");
+  });
+
+  it("removes data-highlighted from a RadioItem when the pointer leaves", async () => {
+    // Arrange — mirrors the plain-Item unhover contract for the radio
+    // variant, which has its own setHighlighted(false) path.
+    const user = userEvent.setup();
+    render(
+      <Dropdown.Root defaultOpen>
+        <Dropdown.Trigger>Options</Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.RadioGroup>
+            <Dropdown.RadioItem value="light">Light</Dropdown.RadioItem>
+          </Dropdown.RadioGroup>
+        </Dropdown.Content>
+      </Dropdown.Root>,
+    );
+    const item = screen.getByRole("menuitemradio", {
+      name: "Light",
+      hidden: true,
+    });
+
+    // Act
+    await user.hover(item);
+    expect(item).toHaveAttribute("data-highlighted");
+    await user.unhover(item);
+
+    // Assert
+    expect(item).not.toHaveAttribute("data-highlighted");
+  });
+
   it("adds data-highlighted to a SubTrigger when the pointer enters it", async () => {
     // Arrange
     const user = userEvent.setup();
@@ -244,5 +298,50 @@ describe("Dropdown mouse interaction", () => {
     expect(subTrigger).toHaveAttribute("aria-expanded", "false");
     expect(subTrigger).not.toHaveAttribute("data-highlighted");
     expect(sibling).toHaveAttribute("data-highlighted");
+  });
+
+  it("supplants an open sibling sub when the pointer hovers a second SubTrigger", async () => {
+    // Two sibling subs in the same parent menu. Hovering A opens A, then
+    // hovering B must close A and open B — the new sub's registration
+    // invokes the previously-registered close callback on the way in,
+    // rather than waiting for a separate "leave A" event.
+    const user = userEvent.setup();
+    render(
+      <Dropdown.Root defaultOpen>
+        <Dropdown.Trigger>File</Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.Sub>
+            <Dropdown.SubTrigger>Open Recent</Dropdown.SubTrigger>
+            <Dropdown.SubContent>
+              <Dropdown.Item>Project A</Dropdown.Item>
+            </Dropdown.SubContent>
+          </Dropdown.Sub>
+          <Dropdown.Sub>
+            <Dropdown.SubTrigger>Share</Dropdown.SubTrigger>
+            <Dropdown.SubContent>
+              <Dropdown.Item>Email</Dropdown.Item>
+            </Dropdown.SubContent>
+          </Dropdown.Sub>
+        </Dropdown.Content>
+      </Dropdown.Root>,
+    );
+    const subTriggerA = screen.getByRole("menuitem", {
+      name: "Open Recent",
+      hidden: true,
+    });
+    const subTriggerB = screen.getByRole("menuitem", {
+      name: "Share",
+      hidden: true,
+    });
+
+    // Act — open A via hover, then move onto B's trigger
+    await user.hover(subTriggerA);
+    expect(subTriggerA).toHaveAttribute("aria-expanded", "true");
+    await user.hover(subTriggerB);
+
+    // Assert — A has been supplanted by B without any sibling-item
+    // bouncing, proving B's registration ran the previous close callback.
+    expect(subTriggerA).toHaveAttribute("aria-expanded", "false");
+    expect(subTriggerB).toHaveAttribute("aria-expanded", "true");
   });
 });

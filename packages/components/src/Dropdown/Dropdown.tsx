@@ -10,7 +10,11 @@ import { DropdownGroupContext } from "./DropdownGroupContext";
 import { DropdownItemIndicatorContext } from "./DropdownItemIndicatorContext";
 import { DropdownRadioGroupContext } from "./DropdownRadioGroupContext";
 import { DropdownSubContext } from "./DropdownSubContext";
-import { useDropdownContext, useDropdownRoot } from "./hooks";
+import {
+  useDropdownContext,
+  useDropdownRoot,
+  useDropdownSubContext,
+} from "./hooks";
 import {
   DropdownCheckboxItemProps,
   DropdownContentProps,
@@ -27,16 +31,6 @@ import {
   DropdownSubTriggerProps,
   DropdownTriggerProps,
 } from "./types";
-
-function useDropdownSubContext() {
-  const context = useContext(DropdownSubContext);
-  if (!context) {
-    throw new Error(
-      "Dropdown.SubTrigger and Dropdown.SubContent must be rendered inside a <Dropdown.Sub>.",
-    );
-  }
-  return context;
-}
 
 /**
  * Returns a callback that closes any direct-child sub-menu registered with

@@ -94,17 +94,12 @@ function DropdownRoot({
   onOpenChange,
   children,
 }: DropdownRootProps) {
-  const { open, setOpen } = useDropdownRoot({
+  const { contextValue } = useDropdownRoot({
     defaultOpen,
     open: controlledOpen,
     onOpenChange,
   });
-  const contentId = useId();
-  const triggerRef = useRef<HTMLButtonElement | null>(null);
-  const contextValue = useMemo(
-    () => ({ open, setOpen, contentId, triggerRef }),
-    [open, setOpen, contentId],
-  );
+
   return (
     <DropdownContext.Provider value={contextValue}>
       {children}

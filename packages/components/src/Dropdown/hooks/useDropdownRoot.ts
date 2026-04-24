@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 type UseDropdownRootArgs = {
   defaultOpen?: boolean;
@@ -12,6 +19,8 @@ export function useDropdownRoot({
   onOpenChange,
 }: UseDropdownRootArgs) {
   const isControlled = controlledOpen !== undefined;
+  const contentId = useId();
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
   const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen);
   const open = isControlled ? controlledOpen : uncontrolledOpen;
   // Mirror `open` so setOpen can short-circuit repeat transitions within a
@@ -34,5 +43,10 @@ export function useDropdownRoot({
     [isControlled, onOpenChange],
   );
 
-  return { open, setOpen };
+  const contextValue = useMemo(
+    () => ({ open, setOpen, contentId, triggerRef }),
+    [open, setOpen, contentId],
+  );
+
+  return { open, setOpen, contextValue };
 }

@@ -137,6 +137,10 @@ Open a submenu with `ArrowRight` or a click on the trigger; close it with
 `ArrowLeft` or by selecting an item. Focus returns to the `SubTrigger`
 when the submenu closes.
 
+Hovering the `SubTrigger` opens the submenu automatically; hovering onto
+a sibling item in the parent menu closes it, mirroring the keyboard
+contract in which focus returning to the parent menu dismisses the sub.
+
 ## Groups and labels
 
 ```tsx

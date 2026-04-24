@@ -5,6 +5,7 @@ import { useRadioGroupRoot } from "../RadioGroup/hooks";
 import { composeEventHandlers, Slot } from "../Slot";
 
 import { DropdownContext } from "./DropdownContext";
+import { DropdownContentContext } from "./DropdownContentContext";
 import { DropdownGroupContext } from "./DropdownGroupContext";
 import { DropdownRadioGroupContext } from "./DropdownRadioGroupContext";
 import { DropdownSubContext } from "./DropdownSubContext";
@@ -33,6 +34,17 @@ function useDropdownSubContext() {
     );
   }
   return context;
+}
+
+/**
+ * Returns a callback that closes any direct-child sub-menu registered with
+ * the enclosing {@link DropdownContent} / {@link DropdownSubContent}. Items
+ * invoke this on mouse-enter so hovering a sibling dismisses an open sub,
+ * mirroring the keyboard contract.
+ */
+function useCloseSiblingSub() {
+  const content = useContext(DropdownContentContext);
+  return () => content?.closeOpenSubRef.current?.();
 }
 
 /**
@@ -303,6 +315,9 @@ function DropdownContent({
     }
   };
 
+  const closeOpenSubRef = useRef<(() => void) | null>(null);
+  const contentContextValue = useMemo(() => ({ closeOpenSubRef }), []);
+
   const contentProps = {
     ...rest,
     ref: menuRef,
@@ -311,10 +326,15 @@ function DropdownContent({
     popover: "auto" as const,
     onKeyDown: composeEventHandlers(onKeyDown, handleKeyDown),
   };
-  if (asChild) {
-    return <Slot {...contentProps}>{children}</Slot>;
-  }
-  return <menu {...contentProps}>{children}</menu>;
+  return (
+    <DropdownContentContext.Provider value={contentContextValue}>
+      {asChild ? (
+        <Slot {...contentProps}>{children}</Slot>
+      ) : (
+        <menu {...contentProps}>{children}</menu>
+      )}
+    </DropdownContentContext.Provider>
+  );
 }
 
 DropdownContent.displayName = "DropdownContent";
@@ -341,6 +361,7 @@ function DropdownItem({
   ...rest
 }: DropdownItemProps) {
   const { setOpen, triggerRef } = useDropdownContext();
+  const closeSiblingSub = useCloseSiblingSub();
   const [highlighted, setHighlighted] = useState(false);
   const handleClick = () => {
     if (disabled) return;
@@ -358,9 +379,10 @@ function DropdownItem({
     "aria-disabled": disabled || undefined,
     "data-highlighted": highlighted ? "" : undefined,
     onClick: composeEventHandlers(onClick, handleClick),
-    onMouseEnter: composeEventHandlers(rest.onMouseEnter, () =>
-      setHighlighted(true),
-    ),
+    onMouseEnter: composeEventHandlers(rest.onMouseEnter, () => {
+      setHighlighted(true);
+      closeSiblingSub();
+    }),
     onMouseLeave: composeEventHandlers(rest.onMouseLeave, () =>
       setHighlighted(false),
     ),
@@ -488,6 +510,7 @@ function DropdownCheckboxItem({
   ...rest
 }: DropdownCheckboxItemProps) {
   const { setOpen, triggerRef } = useDropdownContext();
+  const closeSiblingSub = useCloseSiblingSub();
   const [highlighted, setHighlighted] = useState(false);
   const { checked, toggle } = useCheckboxRoot({
     defaultChecked,
@@ -514,9 +537,10 @@ function DropdownCheckboxItem({
     "aria-disabled": disabled || undefined,
     "data-highlighted": highlighted ? "" : undefined,
     onClick: composeEventHandlers(onClick, handleClick),
-    onMouseEnter: composeEventHandlers(rest.onMouseEnter, () =>
-      setHighlighted(true),
-    ),
+    onMouseEnter: composeEventHandlers(rest.onMouseEnter, () => {
+      setHighlighted(true);
+      closeSiblingSub();
+    }),
     onMouseLeave: composeEventHandlers(rest.onMouseLeave, () =>
       setHighlighted(false),
     ),
@@ -597,6 +621,7 @@ function DropdownRadioItem({
   ...rest
 }: DropdownRadioItemProps) {
   const { setOpen, triggerRef } = useDropdownContext();
+  const closeSiblingSub = useCloseSiblingSub();
   const [highlighted, setHighlighted] = useState(false);
   const group = useContext(DropdownRadioGroupContext);
   if (!group) {
@@ -623,9 +648,10 @@ function DropdownRadioItem({
     "aria-disabled": disabled || undefined,
     "data-highlighted": highlighted ? "" : undefined,
     onClick: composeEventHandlers(onClick, handleClick),
-    onMouseEnter: composeEventHandlers(rest.onMouseEnter, () =>
-      setHighlighted(true),
-    ),
+    onMouseEnter: composeEventHandlers(rest.onMouseEnter, () => {
+      setHighlighted(true);
+      closeSiblingSub();
+    }),
     onMouseLeave: composeEventHandlers(rest.onMouseLeave, () =>
       setHighlighted(false),
     ),
@@ -680,6 +706,24 @@ function DropdownSub({
     () => ({ open, setOpen, contentId, triggerRef }),
     [open, setOpen, contentId],
   );
+  // Register with the enclosing Content so sibling items can close this sub
+  // on hover (mirroring the keyboard behaviour where returning focus to the
+  // parent menu dismisses the sub). If another sibling sub is already
+  // registered as open, close it first — a hover-to-open transition onto
+  // our SubTrigger should supplant the prior sub, not stack it.
+  const parentContent = useContext(DropdownContentContext);
+  useEffect(() => {
+    if (!open || !parentContent) return;
+    const close = () => setOpen(false);
+    const prev = parentContent.closeOpenSubRef.current;
+    if (prev && prev !== close) prev();
+    parentContent.closeOpenSubRef.current = close;
+    return () => {
+      if (parentContent.closeOpenSubRef.current === close) {
+        parentContent.closeOpenSubRef.current = null;
+      }
+    };
+  }, [open, parentContent, setOpen]);
   return (
     <DropdownSubContext.Provider value={contextValue}>
       {children}
@@ -697,9 +741,12 @@ DropdownSub.displayName = "DropdownSub";
  * `aria-expanded`, and `aria-controls` wiring it to the sibling
  * {@link DropdownSubContent | `Dropdown.SubContent`}. `asChild` is supported.
  *
- * Opens the submenu on click or `ArrowRight`; all other keys bubble to the
- * parent {@link DropdownContent | `Dropdown.Content`} so its roving focus
- * and typeahead continue to work while a submenu is in play.
+ * Opens the submenu on click, `ArrowRight`, or pointer hover; all other
+ * keys bubble to the parent {@link DropdownContent | `Dropdown.Content`}
+ * so its roving focus and typeahead continue to work while a submenu is
+ * in play. Hovering onto a sibling item in the parent menu closes the
+ * submenu — mirroring the keyboard contract where focus returning to
+ * the parent dismisses it.
  *
  * Disabled triggers receive `aria-disabled="true"` and ignore both click
  * and `ArrowRight`.
@@ -807,6 +854,9 @@ function DropdownSubContent({
     sub.triggerRef.current?.focus();
   };
 
+  const closeOpenSubRef = useRef<(() => void) | null>(null);
+  const contentContextValue = useMemo(() => ({ closeOpenSubRef }), []);
+
   const subContentProps = {
     ...rest,
     ref: menuRef,
@@ -815,10 +865,15 @@ function DropdownSubContent({
     popover: "auto" as const,
     onKeyDown: composeEventHandlers(onKeyDown, handleKeyDown),
   };
-  if (asChild) {
-    return <Slot {...subContentProps}>{children}</Slot>;
-  }
-  return <menu {...subContentProps}>{children}</menu>;
+  return (
+    <DropdownContentContext.Provider value={contentContextValue}>
+      {asChild ? (
+        <Slot {...subContentProps}>{children}</Slot>
+      ) : (
+        <menu {...subContentProps}>{children}</menu>
+      )}
+    </DropdownContentContext.Provider>
+  );
 }
 
 DropdownSubContent.displayName = "DropdownSubContent";

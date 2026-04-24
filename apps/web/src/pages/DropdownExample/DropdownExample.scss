@@ -54,7 +54,7 @@
 /* ── Shared item styles ───────────────────────────────────────────── */
 .dd-content li,
 .dd-sub-content li {
-  padding: 6px 8px;
+  padding: 6px 12px 6px 28px;
   border-radius: 4px;
   cursor: default;
   font-size: 14px;
@@ -79,4 +79,13 @@
   background: rgba(0 0 0 / 0.1);
   margin: 4px 0;
   padding: 0;
+}
+
+.dd-sub-radio-group ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.dd-sub-radio-group-item[role="menuitemradio"] {
+  padding-inline-start: 0;
 }

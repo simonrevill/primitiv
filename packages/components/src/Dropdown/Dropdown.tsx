@@ -15,6 +15,7 @@ import {
   useDropdownContext,
   useDropdownRoot,
   useDropdownSubContext,
+  useDropdownTrigger,
 } from "./hooks";
 import {
   DropdownCheckboxItemProps,
@@ -118,19 +119,12 @@ function DropdownTrigger({
   asChild = false,
   ...rest
 }: DropdownTriggerProps) {
-  const { open, setOpen, contentId, triggerRef } = useDropdownContext();
-  const toggle = () => setOpen(!open);
-  const triggerProps = {
-    ...rest,
-    ref: triggerRef,
-    "aria-haspopup": "menu" as const,
-    "aria-expanded": open,
-    "aria-controls": contentId,
-    onClick: composeEventHandlers(onClick, toggle),
-  };
+  const { triggerProps } = useDropdownTrigger({ onClick, restProps: rest });
+
   if (asChild) {
     return <Slot {...triggerProps}>{children}</Slot>;
   }
+
   return (
     <button type="button" {...triggerProps}>
       {children}

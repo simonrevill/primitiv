@@ -5,7 +5,9 @@ import { useRadioGroupRoot } from "../RadioGroup/hooks";
 import { composeEventHandlers, Slot } from "../Slot";
 
 import { DropdownContext } from "./DropdownContext";
+import { DropdownContentContext } from "./DropdownContentContext";
 import { DropdownGroupContext } from "./DropdownGroupContext";
+import { DropdownItemIndicatorContext } from "./DropdownItemIndicatorContext";
 import { DropdownRadioGroupContext } from "./DropdownRadioGroupContext";
 import { DropdownSubContext } from "./DropdownSubContext";
 import { useDropdownContext, useDropdownRoot } from "./hooks";
@@ -13,6 +15,7 @@ import {
   DropdownCheckboxItemProps,
   DropdownContentProps,
   DropdownGroupProps,
+  DropdownItemIndicatorProps,
   DropdownItemProps,
   DropdownLabelProps,
   DropdownRadioGroupProps,
@@ -33,6 +36,17 @@ function useDropdownSubContext() {
     );
   }
   return context;
+}
+
+/**
+ * Returns a callback that closes any direct-child sub-menu registered with
+ * the enclosing {@link DropdownContent} / {@link DropdownSubContent}. Items
+ * invoke this on mouse-enter so hovering a sibling dismisses an open sub,
+ * mirroring the keyboard contract.
+ */
+function useCloseSiblingSub() {
+  const content = useContext(DropdownContentContext);
+  return () => content?.closeOpenSubRef.current?.();
 }
 
 /**
@@ -303,6 +317,9 @@ function DropdownContent({
     }
   };
 
+  const closeOpenSubRef = useRef<(() => void) | null>(null);
+  const contentContextValue = useMemo(() => ({ closeOpenSubRef }), []);
+
   const contentProps = {
     ...rest,
     ref: menuRef,
@@ -311,10 +328,15 @@ function DropdownContent({
     popover: "auto" as const,
     onKeyDown: composeEventHandlers(onKeyDown, handleKeyDown),
   };
-  if (asChild) {
-    return <Slot {...contentProps}>{children}</Slot>;
-  }
-  return <menu {...contentProps}>{children}</menu>;
+  return (
+    <DropdownContentContext.Provider value={contentContextValue}>
+      {asChild ? (
+        <Slot {...contentProps}>{children}</Slot>
+      ) : (
+        <menu {...contentProps}>{children}</menu>
+      )}
+    </DropdownContentContext.Provider>
+  );
 }
 
 DropdownContent.displayName = "DropdownContent";
@@ -341,6 +363,7 @@ function DropdownItem({
   ...rest
 }: DropdownItemProps) {
   const { setOpen, triggerRef } = useDropdownContext();
+  const closeSiblingSub = useCloseSiblingSub();
   const [highlighted, setHighlighted] = useState(false);
   const handleClick = () => {
     if (disabled) return;
@@ -358,9 +381,10 @@ function DropdownItem({
     "aria-disabled": disabled || undefined,
     "data-highlighted": highlighted ? "" : undefined,
     onClick: composeEventHandlers(onClick, handleClick),
-    onMouseEnter: composeEventHandlers(rest.onMouseEnter, () =>
-      setHighlighted(true),
-    ),
+    onMouseEnter: composeEventHandlers(rest.onMouseEnter, () => {
+      setHighlighted(true);
+      closeSiblingSub();
+    }),
     onMouseLeave: composeEventHandlers(rest.onMouseLeave, () =>
       setHighlighted(false),
     ),
@@ -474,6 +498,10 @@ DropdownLabel.displayName = "DropdownLabel";
  * cancellable `Event`. Call `event.preventDefault()` to keep the menu
  * open — useful for rapidly toggling multiple checkboxes.
  *
+ * Nest a {@link DropdownItemIndicator | `Dropdown.ItemIndicator`} to
+ * render the visible check mark; it reads its parent's state from
+ * context and exposes `data-state` for styling.
+ *
  * Disabled items receive `aria-disabled="true"` and no-op on activation.
  */
 function DropdownCheckboxItem({
@@ -488,6 +516,7 @@ function DropdownCheckboxItem({
   ...rest
 }: DropdownCheckboxItemProps) {
   const { setOpen, triggerRef } = useDropdownContext();
+  const closeSiblingSub = useCloseSiblingSub();
   const [highlighted, setHighlighted] = useState(false);
   const { checked, toggle } = useCheckboxRoot({
     defaultChecked,
@@ -514,17 +543,25 @@ function DropdownCheckboxItem({
     "aria-disabled": disabled || undefined,
     "data-highlighted": highlighted ? "" : undefined,
     onClick: composeEventHandlers(onClick, handleClick),
-    onMouseEnter: composeEventHandlers(rest.onMouseEnter, () =>
-      setHighlighted(true),
-    ),
+    onMouseEnter: composeEventHandlers(rest.onMouseEnter, () => {
+      setHighlighted(true);
+      closeSiblingSub();
+    }),
     onMouseLeave: composeEventHandlers(rest.onMouseLeave, () =>
       setHighlighted(false),
     ),
   };
-  if (asChild) {
-    return <Slot {...itemProps}>{children}</Slot>;
-  }
-  return <li {...itemProps}>{children}</li>;
+  const indicatorContextValue = useMemo(() => ({ checked }), [checked]);
+  const content = asChild ? (
+    <Slot {...itemProps}>{children}</Slot>
+  ) : (
+    <li {...itemProps}>{children}</li>
+  );
+  return (
+    <DropdownItemIndicatorContext.Provider value={indicatorContextValue}>
+      {content}
+    </DropdownItemIndicatorContext.Provider>
+  );
 }
 
 DropdownCheckboxItem.displayName = "DropdownCheckboxItem";
@@ -585,6 +622,10 @@ DropdownRadioGroup.displayName = "DropdownRadioGroup";
  * `onSelect`} with a cancellable `Event`. Call `event.preventDefault()`
  * to keep the menu open.
  *
+ * Nest a {@link DropdownItemIndicator | `Dropdown.ItemIndicator`} to
+ * render the visible bullet; it reads its parent's state from context
+ * and exposes `data-state` for styling.
+ *
  * Disabled items receive `aria-disabled="true"` and no-op on activation.
  */
 function DropdownRadioItem({
@@ -597,6 +638,7 @@ function DropdownRadioItem({
   ...rest
 }: DropdownRadioItemProps) {
   const { setOpen, triggerRef } = useDropdownContext();
+  const closeSiblingSub = useCloseSiblingSub();
   const [highlighted, setHighlighted] = useState(false);
   const group = useContext(DropdownRadioGroupContext);
   if (!group) {
@@ -623,20 +665,84 @@ function DropdownRadioItem({
     "aria-disabled": disabled || undefined,
     "data-highlighted": highlighted ? "" : undefined,
     onClick: composeEventHandlers(onClick, handleClick),
-    onMouseEnter: composeEventHandlers(rest.onMouseEnter, () =>
-      setHighlighted(true),
-    ),
+    onMouseEnter: composeEventHandlers(rest.onMouseEnter, () => {
+      setHighlighted(true);
+      closeSiblingSub();
+    }),
     onMouseLeave: composeEventHandlers(rest.onMouseLeave, () =>
       setHighlighted(false),
     ),
   };
-  if (asChild) {
-    return <Slot {...itemProps}>{children}</Slot>;
-  }
-  return <li {...itemProps}>{children}</li>;
+  const indicatorContextValue = useMemo(() => ({ checked }), [checked]);
+  const content = asChild ? (
+    <Slot {...itemProps}>{children}</Slot>
+  ) : (
+    <li {...itemProps}>{children}</li>
+  );
+  return (
+    <DropdownItemIndicatorContext.Provider value={indicatorContextValue}>
+      {content}
+    </DropdownItemIndicatorContext.Provider>
+  );
 }
 
 DropdownRadioItem.displayName = "DropdownRadioItem";
+
+/**
+ * The visible mark (usually a checkmark or a bullet) rendered inside a
+ * {@link DropdownCheckboxItem | `Dropdown.CheckboxItem`} or
+ * {@link DropdownRadioItem | `Dropdown.RadioItem`}. Must be a descendant
+ * of one of those; rendering it anywhere else throws a descriptive error.
+ *
+ * Renders a `<span>` by default; pass `asChild` to compose onto any
+ * element (commonly an SVG icon). Exposes `data-state` reflecting the
+ * parent item's live state: `"checked"`, `"unchecked"`, or
+ * `"indeterminate"` — the last being reachable only through a tri-state
+ * `Dropdown.CheckboxItem`.
+ *
+ * By default the indicator unmounts when its parent is unchecked. Pass
+ * {@link DropdownItemIndicatorProps.forceMount | `forceMount`} to keep
+ * the DOM node mounted in both states, which is handy when animating the
+ * indicator in and out via CSS transitions or a React animation library.
+ *
+ * @example
+ * ```tsx
+ * <Dropdown.CheckboxItem checked={showBookmarks} onCheckedChange={setShowBookmarks}>
+ *   <Dropdown.ItemIndicator>
+ *     <CheckIcon />
+ *   </Dropdown.ItemIndicator>
+ *   Show bookmarks
+ * </Dropdown.CheckboxItem>
+ * ```
+ */
+function DropdownItemIndicator({
+  children,
+  asChild = false,
+  forceMount = false,
+  ...rest
+}: DropdownItemIndicatorProps) {
+  const context = useContext(DropdownItemIndicatorContext);
+  if (!context) {
+    throw new Error(
+      "Dropdown.ItemIndicator must be rendered inside a <Dropdown.CheckboxItem> or <Dropdown.RadioItem>.",
+    );
+  }
+  const { checked } = context;
+  const dataState =
+    checked === "indeterminate"
+      ? "indeterminate"
+      : checked
+        ? "checked"
+        : "unchecked";
+  if (!forceMount && checked === false) return null;
+  const indicatorProps = { ...rest, "data-state": dataState };
+  if (asChild) {
+    return <Slot {...indicatorProps}>{children}</Slot>;
+  }
+  return <span {...indicatorProps}>{children}</span>;
+}
+
+DropdownItemIndicator.displayName = "DropdownItemIndicator";
 
 /**
  * A submenu boundary. Wrap a {@link DropdownSubTrigger | `Dropdown.SubTrigger`}
@@ -680,6 +786,24 @@ function DropdownSub({
     () => ({ open, setOpen, contentId, triggerRef }),
     [open, setOpen, contentId],
   );
+  // Register with the enclosing Content so sibling items can close this sub
+  // on hover (mirroring the keyboard behaviour where returning focus to the
+  // parent menu dismisses the sub). If another sibling sub is already
+  // registered as open, close it first — a hover-to-open transition onto
+  // our SubTrigger should supplant the prior sub, not stack it.
+  const parentContent = useContext(DropdownContentContext);
+  useEffect(() => {
+    if (!open || !parentContent) return;
+    const close = () => setOpen(false);
+    const prev = parentContent.closeOpenSubRef.current;
+    if (prev && prev !== close) prev();
+    parentContent.closeOpenSubRef.current = close;
+    return () => {
+      if (parentContent.closeOpenSubRef.current === close) {
+        parentContent.closeOpenSubRef.current = null;
+      }
+    };
+  }, [open, parentContent, setOpen]);
   return (
     <DropdownSubContext.Provider value={contextValue}>
       {children}
@@ -697,9 +821,12 @@ DropdownSub.displayName = "DropdownSub";
  * `aria-expanded`, and `aria-controls` wiring it to the sibling
  * {@link DropdownSubContent | `Dropdown.SubContent`}. `asChild` is supported.
  *
- * Opens the submenu on click or `ArrowRight`; all other keys bubble to the
- * parent {@link DropdownContent | `Dropdown.Content`} so its roving focus
- * and typeahead continue to work while a submenu is in play.
+ * Opens the submenu on click, `ArrowRight`, or pointer hover; all other
+ * keys bubble to the parent {@link DropdownContent | `Dropdown.Content`}
+ * so its roving focus and typeahead continue to work while a submenu is
+ * in play. Hovering onto a sibling item in the parent menu closes the
+ * submenu — mirroring the keyboard contract where focus returning to
+ * the parent dismisses it.
  *
  * Disabled triggers receive `aria-disabled="true"` and ignore both click
  * and `ArrowRight`.
@@ -807,6 +934,9 @@ function DropdownSubContent({
     sub.triggerRef.current?.focus();
   };
 
+  const closeOpenSubRef = useRef<(() => void) | null>(null);
+  const contentContextValue = useMemo(() => ({ closeOpenSubRef }), []);
+
   const subContentProps = {
     ...rest,
     ref: menuRef,
@@ -815,10 +945,15 @@ function DropdownSubContent({
     popover: "auto" as const,
     onKeyDown: composeEventHandlers(onKeyDown, handleKeyDown),
   };
-  if (asChild) {
-    return <Slot {...subContentProps}>{children}</Slot>;
-  }
-  return <menu {...subContentProps}>{children}</menu>;
+  return (
+    <DropdownContentContext.Provider value={contentContextValue}>
+      {asChild ? (
+        <Slot {...subContentProps}>{children}</Slot>
+      ) : (
+        <menu {...subContentProps}>{children}</menu>
+      )}
+    </DropdownContentContext.Provider>
+  );
 }
 
 DropdownSubContent.displayName = "DropdownSubContent";
@@ -834,6 +969,7 @@ type TDropdownCompound = typeof DropdownRoot & {
   CheckboxItem: typeof DropdownCheckboxItem;
   RadioGroup: typeof DropdownRadioGroup;
   RadioItem: typeof DropdownRadioItem;
+  ItemIndicator: typeof DropdownItemIndicator;
   Sub: typeof DropdownSub;
   SubTrigger: typeof DropdownSubTrigger;
   SubContent: typeof DropdownSubContent;
@@ -850,6 +986,7 @@ const DropdownCompound: TDropdownCompound = Object.assign(DropdownRoot, {
   CheckboxItem: DropdownCheckboxItem,
   RadioGroup: DropdownRadioGroup,
   RadioItem: DropdownRadioItem,
+  ItemIndicator: DropdownItemIndicator,
   Sub: DropdownSub,
   SubTrigger: DropdownSubTrigger,
   SubContent: DropdownSubContent,

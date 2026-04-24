@@ -27,6 +27,9 @@
 /* ── Sub-trigger: declare a second anchor ────────────────────────── */
 .dd-sub-trigger {
   anchor-name: --dd-sub-trigger;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 /* ── Sub-menu: positioned to the right, top-aligned with sub-trigger */
@@ -36,7 +39,7 @@
   position-anchor: --dd-sub-trigger;
   top: anchor(top);
   left: anchor(right);
-  margin-left: 4px;
+  margin-left: 8px;
 
   background: #fff;
   color: #000;
@@ -51,7 +54,7 @@
 /* ── Shared item styles ───────────────────────────────────────────── */
 .dd-content li,
 .dd-sub-content li {
-  padding: 6px 8px;
+  padding: 6px 12px 6px 28px;
   border-radius: 4px;
   cursor: default;
   font-size: 14px;
@@ -76,4 +79,13 @@
   background: rgba(0 0 0 / 0.1);
   margin: 4px 0;
   padding: 0;
+}
+
+.dd-sub-radio-group ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.dd-sub-radio-group-item[role="menuitemradio"] {
+  padding-inline-start: 0;
 }

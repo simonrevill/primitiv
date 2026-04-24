@@ -198,4 +198,51 @@ describe("Dropdown mouse interaction", () => {
     expect(outerTrigger).toHaveAttribute("data-highlighted");
     expect(innerTrigger).toHaveAttribute("data-highlighted");
   });
+
+  it("closes an open sub-menu when the pointer moves onto a sibling item in the parent menu", async () => {
+    // Mirrors the keyboard behaviour (ArrowLeft returns focus to the parent
+    // and closes the sub). With the mouse, moving off the sub-trigger and
+    // onto another item in the same parent menu must likewise close the sub
+    // and clear the sub-trigger's data-highlighted, while the newly hovered
+    // item picks up data-highlighted.
+    const user = userEvent.setup();
+    render(
+      <Dropdown.Root defaultOpen>
+        <Dropdown.Trigger>File</Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.Item>New</Dropdown.Item>
+          <Dropdown.Sub>
+            <Dropdown.SubTrigger>Open Recent</Dropdown.SubTrigger>
+            <Dropdown.SubContent>
+              <Dropdown.Item>Project A</Dropdown.Item>
+            </Dropdown.SubContent>
+          </Dropdown.Sub>
+        </Dropdown.Content>
+      </Dropdown.Root>,
+    );
+    const subTrigger = screen.getByRole("menuitem", {
+      name: "Open Recent",
+      hidden: true,
+    });
+    const sibling = screen.getByRole("menuitem", {
+      name: "New",
+      hidden: true,
+    });
+    const [, subMenu] = screen.getAllByRole("menu", { hidden: true });
+
+    // Act — hover sub-trigger to open, then move onto a sibling item
+    await user.hover(subTrigger);
+    expect(subMenu).toHaveAttribute("data-popover-open");
+    expect(subTrigger).toHaveAttribute("aria-expanded", "true");
+    expect(subTrigger).toHaveAttribute("data-highlighted");
+
+    await user.hover(sibling);
+
+    // Assert — sub has closed, its trigger is no longer highlighted, and the
+    // sibling owns data-highlighted.
+    expect(subMenu).not.toHaveAttribute("data-popover-open");
+    expect(subTrigger).toHaveAttribute("aria-expanded", "false");
+    expect(subTrigger).not.toHaveAttribute("data-highlighted");
+    expect(sibling).toHaveAttribute("data-highlighted");
+  });
 });

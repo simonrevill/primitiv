@@ -62,6 +62,19 @@ export type DropdownSeparatorProps = Omit<ComponentProps<"li">, "role"> & {
   asChild?: boolean;
 };
 
+export type DropdownItemIndicatorProps = ComponentProps<"span"> & {
+  children?: ReactNode;
+  ref?: Ref<HTMLSpanElement>;
+  asChild?: boolean;
+  /**
+   * Render the indicator even when its parent item is unchecked. The
+   * `data-state` attribute still reflects the live state (`"checked"` /
+   * `"unchecked"` / `"indeterminate"`), so consumers can animate the
+   * indicator in and out instead of mounting / unmounting it.
+   */
+  forceMount?: boolean;
+};
+
 export type DropdownGroupProps = Omit<ComponentProps<"li">, "role"> & {
   children?: ReactNode;
   ref?: Ref<HTMLLIElement>;

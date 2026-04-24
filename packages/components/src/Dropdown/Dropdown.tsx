@@ -32,6 +32,7 @@ import {
   DropdownSubTriggerProps,
   DropdownTriggerProps,
 } from "./types";
+import { MENUITEM_SELECTOR, TYPEAHEAD_RESET_MS } from "./constants";
 
 /**
  * The root of a Dropdown menu — owns the open state and provides context to
@@ -138,11 +139,6 @@ function DropdownTrigger({
 }
 
 DropdownTrigger.displayName = "DropdownTrigger";
-
-const MENUITEM_SELECTOR =
-  '[role="menuitem"]:not([aria-disabled="true"]), [role="menuitemcheckbox"]:not([aria-disabled="true"]), [role="menuitemradio"]:not([aria-disabled="true"])';
-
-const TYPEAHEAD_RESET_MS = 500;
 
 /**
  * The menu panel rendered with the native HTML

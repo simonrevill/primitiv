@@ -1,6 +1,6 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useMemo } from "react";
 
-import { useControllableState } from "../../hooks";
+import { useCollection, useControllableState } from "../../hooks";
 
 type UseRadioGroupRootArgs = {
   defaultValue?: string;
@@ -33,14 +33,16 @@ export function useRadioGroupRoot({
   );
 
   // Track registered item metadata in a ref (for focus handling) and
-  // their ordered values as state so re-renders fire when items mount,
-  // unmount, or toggle disabled — required for the roving-tabindex
-  // home base and for arrow-key skipping.
-  const itemsRef = useRef<Map<string, ItemMeta>>(new Map());
-  const [itemValues, setItemValues] = useState<string[]>([]);
-  const [disabledValues, setDisabledValues] = useState<Set<string>>(
-    () => new Set(),
-  );
+  // their ordered values as state — required for the roving-tabindex
+  // home base. Disabled values are derived per render from itemsRef:
+  // any change that affects the set (mount, unmount, disabled toggle)
+  // already re-runs the registrar effect, which updates the keys state
+  // and forces the re-render that recomputes the memo.
+  const {
+    register: registerItemBase,
+    itemsRef,
+    keys: itemValues,
+  } = useCollection<string, ItemMeta>();
 
   const registerItem = useCallback(
     (
@@ -48,26 +50,31 @@ export function useRadioGroupRoot({
       element: HTMLButtonElement | null,
       disabled = false,
     ) => {
-      if (element) {
-        itemsRef.current.set(itemValue, { element, disabled });
-      } else {
-        itemsRef.current.delete(itemValue);
-      }
-      setItemValues(Array.from(itemsRef.current.keys()));
-      setDisabledValues(
-        new Set(
-          Array.from(itemsRef.current.entries())
-            .filter(([, meta]) => meta.disabled)
-            .map(([v]) => v),
-        ),
-      );
+      registerItemBase(itemValue, element ? { element, disabled } : null);
     },
-    [],
+    [registerItemBase],
   );
 
-  const focusItem = useCallback((itemValue: string) => {
-    itemsRef.current.get(itemValue)?.element.focus();
-  }, []);
+  const disabledValues = useMemo(
+    () =>
+      new Set(
+        Array.from(itemsRef.current.entries())
+          .filter(([, meta]) => meta.disabled)
+          .map(([v]) => v),
+      ),
+    // itemValues is a fresh array on every register call (new identity even
+    // when the keys are the same), so the memo re-runs whenever any item
+    // mounts, unmounts, or toggles disabled — which is exactly the trigger
+    // we want for re-deriving disabledValues.
+    [itemValues, itemsRef],
+  );
+
+  const focusItem = useCallback(
+    (itemValue: string) => {
+      itemsRef.current.get(itemValue)?.element.focus();
+    },
+    [itemsRef],
+  );
 
   return {
     value,

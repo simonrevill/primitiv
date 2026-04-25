@@ -14,6 +14,7 @@ import {
   useCloseSiblingSub,
   useDropdownContent,
   useDropdownContext,
+  useDropdownGroup,
   useDropdownItem,
   useDropdownRoot,
   useDropdownSubContext,
@@ -264,13 +265,8 @@ function DropdownGroup({
   asChild = false,
   ...rest
 }: DropdownGroupProps) {
-  const labelId = useId();
-  const contextValue = useMemo(() => ({ labelId }), [labelId]);
-  const groupProps = {
-    ...rest,
-    role: "group" as const,
-    "aria-labelledby": labelId,
-  };
+  const { contextValue, groupProps } = useDropdownGroup({ restProps: rest });
+
   return (
     <DropdownGroupContext.Provider value={contextValue}>
       {asChild ? (

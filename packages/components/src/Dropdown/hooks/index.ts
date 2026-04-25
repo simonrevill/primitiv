@@ -1,6 +1,7 @@
 export { useCloseSiblingSub } from "./useCloseSiblingSub";
 export { useDropdownContent } from "./useDropdownContent";
 export { useDropdownContext } from "./useDropdownContext";
+export { useDropdownGroup } from "./useDropdownGroup";
 export { useDropdownItem } from "./useDropdownItem";
 export { useDropdownRoot } from "./useDropdownRoot";
 export { useDropdownSubContext } from "./useDropdownSubContext";

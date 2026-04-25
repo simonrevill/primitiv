@@ -68,6 +68,7 @@
 }
 
 .dd-content [aria-disabled="true"],
+.dd-label [aria-disabled="true"],
 .dd-sub-content [aria-disabled="true"] {
   opacity: 0.4;
   pointer-events: none;

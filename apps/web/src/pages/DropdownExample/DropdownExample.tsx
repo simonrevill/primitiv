@@ -40,7 +40,9 @@ export function DropdownExample() {
           Show bookmarks
         </Dropdown.CheckboxItem>
         <Dropdown.Separator />
-        <Dropdown.Label>People</Dropdown.Label>
+        <Dropdown.Label className="dd-label" aria-disabled>
+          People
+        </Dropdown.Label>
         <Dropdown.RadioGroup className="dd-sub-radio-group">
           <Dropdown.RadioItem
             value="Simon Revil"

@@ -50,6 +50,16 @@ import { useCallback, useState } from "react";
  */
 export function useControllableState<T>(
   controlled: T | undefined,
+  defaultValue: T,
+  onChange?: (next: T) => void,
+): readonly [T, (next: T) => void, boolean];
+export function useControllableState<T>(
+  controlled: T | undefined,
+  defaultValue: T | undefined,
+  onChange?: (next: T) => void,
+): readonly [T | undefined, (next: T) => void, boolean];
+export function useControllableState<T>(
+  controlled: T | undefined,
   defaultValue: T | undefined,
   onChange?: (next: T) => void,
 ): readonly [T | undefined, (next: T) => void, boolean] {

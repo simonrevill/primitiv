@@ -6,8 +6,10 @@ import {
   KeyboardEvent,
 } from "react";
 
-import { TabsKeyActionsKey, TabsKeyActions, TabsTriggerProps } from "../types";
-import { getTriggerAndPanelIds, getKeyToAction } from "../utils";
+import { getKeyToActionMap, type RovingKeyAction } from "../../utils";
+
+import { TabsTriggerProps } from "../types";
+import { getTriggerAndPanelIds } from "../utils";
 
 import { useTabsContext } from "./useTabsContext";
 
@@ -75,12 +77,16 @@ export function useTabsTrigger({
   function handleKeyDown(e: KeyboardEvent<HTMLButtonElement>) {
     const currentIndex = triggerValues.indexOf(value);
     const totalTabs = triggerValues.length;
-    const keyToAction = getKeyToAction(orientation, dir);
-    const action = keyToAction[e.key as TabsKeyActionsKey];
+    const action = getKeyToActionMap({
+      orientation,
+      dir,
+      homeEnd: true,
+      activate: true,
+    })[e.key];
 
     function activateIfEnabled(
       targetIndex: number,
-      key?: keyof TabsKeyActions,
+      sourceAction?: RovingKeyAction,
     ) {
       const targetValue = triggerValues[targetIndex];
       const targetElement = triggersRef.current.get(targetValue);
@@ -89,23 +95,22 @@ export function useTabsTrigger({
       if (
         !isDisabled &&
         (activationMode === "automatic" ||
-          (activationMode === "manual" && key === "enter"))
+          (activationMode === "manual" && sourceAction === "activate"))
       ) {
         activateTab(targetValue, targetIndex);
       }
       targetElement?.focus();
     }
 
-    const actions: TabsKeyActions = {
-      moveForward: () => activateIfEnabled((currentIndex + 1) % totalTabs),
-      moveBackward: () =>
-        activateIfEnabled((currentIndex - 1 + totalTabs) % totalTabs),
-      home: () => activateIfEnabled(0),
-      end: () => activateIfEnabled(totalTabs - 1),
-      enter: () => activateIfEnabled(currentIndex, "enter"),
+    const actions: Record<RovingKeyAction, () => void> = {
+      next: () => activateIfEnabled((currentIndex + 1) % totalTabs),
+      prev: () => activateIfEnabled((currentIndex - 1 + totalTabs) % totalTabs),
+      first: () => activateIfEnabled(0),
+      last: () => activateIfEnabled(totalTabs - 1),
+      activate: () => activateIfEnabled(currentIndex, "activate"),
     };
 
-    if (action && actions[action]) {
+    if (action) {
       e.preventDefault();
       actions[action]();
     }

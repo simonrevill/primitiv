@@ -82,31 +82,6 @@ export type TabsContentProps = ComponentProps<"div"> & {
   value: string;
 };
 
-export type TabsKeyActionsKey =
-  | "ArrowRight"
-  | "ArrowLeft"
-  | "ArrowDown"
-  | "ArrowUp"
-  | "Home"
-  | "End"
-  | " "
-  | "Enter";
-
-export type TabsKeyActions = {
-  moveForward: () => void;
-  moveBackward: () => void;
-  home: () => void;
-  end: () => void;
-  enter: () => void;
-};
-
-export type KeyToActionMapper = Partial<
-  Record<
-    TabsKeyActionsKey,
-    "moveForward" | "moveBackward" | "home" | "end" | "enter"
-  >
->;
-
 export type TabsImperativeApi = {
   setActiveTab: (value: string) => void;
 };

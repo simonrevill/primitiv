@@ -1,4 +1,7 @@
 import { useRef, useMemo, useCallback, useState, useId, useEffect } from "react";
+
+import { useControllableState } from "../../hooks";
+
 import type { AccordionReadingDirection } from "../types";
 
 export function useAccordionRoot(
@@ -15,20 +18,17 @@ export function useAccordionRoot(
   // not on cleanup, to avoid setState calls outside act() in tests.
   const [registeredTriggerItemIds, setRegisteredTriggerItemIds] = useState<string[]>([]);
   const panelsRef = useRef<Set<string>>(new Set());
-  const isControlled = controlledValue !== undefined;
 
-  const [internalExpandedItems, setInternalExpandedItems] = useState<
+  // Like Tabs, Accordion's existing public contract is that uncontrolled
+  // mode does NOT call onValueChange — only the controlled path notifies the
+  // consumer. So we don't pass onValueChange to useControllableState; the
+  // toggleItem branch below fires it directly in controlled mode.
+  const [expandedItems, setExpandedItems, isControlled] = useControllableState<
     Set<string>
-  >(() => {
-    if (defaultValue !== undefined) {
-      return new Set([defaultValue]);
-    }
-    return new Set();
-  });
-
-  const expandedItems = isControlled
-    ? new Set(controlledValue)
-    : internalExpandedItems;
+  >(
+    controlledValue !== undefined ? new Set(controlledValue) : undefined,
+    defaultValue !== undefined ? new Set([defaultValue]) : new Set(),
+  );
 
   const computeNext = (prev: Set<string>, itemId: string): Set<string> => {
     const next = new Set(prev);
@@ -45,14 +45,14 @@ export function useAccordionRoot(
 
   const toggleItem = useCallback(
     (itemId: string) => {
+      const next = computeNext(expandedItems, itemId);
       if (isControlled) {
-        const next = computeNext(new Set(controlledValue), itemId);
         onValueChange?.(Array.from(next));
       } else {
-        setInternalExpandedItems((prev) => computeNext(prev, itemId));
+        setExpandedItems(next);
       }
     },
-    [isControlled, multiple, controlledValue, onValueChange],
+    [expandedItems, isControlled, multiple, setExpandedItems, onValueChange],
   );
 
   const registerTrigger = useCallback(

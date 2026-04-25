@@ -1,17 +1,16 @@
+import { deriveId } from "../utils";
+
 import {
   TabsOrientation,
   TabsReadingDirection,
   KeyToActionMapper,
 } from "./types";
 
-export function getTriggerAndPanelIds(
-  tabsId: string,
-  value: string | undefined,
-) {
-  const triggerId = `${tabsId}-trigger-${value}`;
-  const panelId = `${tabsId}-panel-${value}`;
-
-  return { triggerId, panelId };
+export function getTriggerAndPanelIds(tabsId: string, value: string) {
+  return {
+    triggerId: deriveId(tabsId, "trigger", value),
+    panelId: deriveId(tabsId, "panel", value),
+  };
 }
 
 // Utility function for key-to-action mapping

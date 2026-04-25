@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
-import { Slot, composeEventHandlers } from "../Slot";
+import { Slot, composeEventHandlers, composeRefs } from "../Slot";
 
 import { RadioGroupContext } from "./RadioGroupContext";
 import { RadioGroupItemContext } from "./RadioGroupItemContext";
@@ -171,15 +171,8 @@ function RadioGroupItem({
       : enabledValues[0] === value;
 
   const localRef = useRef<HTMLButtonElement | null>(null);
-  const setRef = useCallback(
-    (node: HTMLButtonElement | null) => {
-      localRef.current = node;
-      if (typeof ref === "function") {
-        ref(node);
-      } else if (ref) {
-        ref.current = node;
-      }
-    },
+  const setRef = useMemo(
+    () => composeRefs(localRef, ref),
     [ref],
   );
 

@@ -1,6 +1,10 @@
 import { useRef, useEffect, MouseEvent, KeyboardEvent } from "react";
+
 import { composeRefs } from "../../Slot";
+import { getKeyToActionMap, type RovingKeyAction } from "../../utils";
+
 import { AccordionTriggerProps } from "../types";
+
 import { useAccordionContext } from "./useAccordionContext";
 import { useAccordionItemContext } from "./useAccordionItemContext";
 
@@ -36,47 +40,31 @@ export function useAccordionTrigger({
       return;
     }
 
+    const action = getKeyToActionMap({ orientation, dir, homeEnd: true })[
+      e.key
+    ];
+    if (!action) return;
+
     const enabledTriggers = getTriggers().filter(
       (t) => t.getAttribute("aria-disabled") !== "true",
     );
     if (enabledTriggers.length === 0) return;
 
-    const moveNext = (triggers: HTMLButtonElement[]) => {
-      const currentIndex = triggers.indexOf(triggerRef.current!);
-      const nextIndex = (currentIndex + 1) % triggers.length;
-      triggers[nextIndex]?.focus();
+    e.preventDefault();
+    const currentIndex = enabledTriggers.indexOf(triggerRef.current!);
+    const handlers: Partial<Record<RovingKeyAction, () => void>> = {
+      next: () =>
+        enabledTriggers[
+          (currentIndex + 1) % enabledTriggers.length
+        ]?.focus(),
+      prev: () =>
+        enabledTriggers[
+          (currentIndex - 1 + enabledTriggers.length) % enabledTriggers.length
+        ]?.focus(),
+      first: () => enabledTriggers[0]?.focus(),
+      last: () => enabledTriggers[enabledTriggers.length - 1]?.focus(),
     };
-
-    const movePrev = (triggers: HTMLButtonElement[]) => {
-      const currentIndex = triggers.indexOf(triggerRef.current!);
-      const prevIndex = (currentIndex - 1 + triggers.length) % triggers.length;
-      triggers[prevIndex]?.focus();
-    };
-
-    const isRtl = orientation === "horizontal" && dir === "rtl";
-    const orientationKeys: Record<
-      string,
-      (triggers: HTMLButtonElement[]) => void
-    > =
-      orientation === "horizontal"
-        ? {
-            ArrowRight: isRtl ? movePrev : moveNext,
-            ArrowLeft: isRtl ? moveNext : movePrev,
-          }
-        : { ArrowDown: moveNext, ArrowUp: movePrev };
-
-    const keyHandlers: Record<string, (triggers: HTMLButtonElement[]) => void> =
-      {
-        ...orientationKeys,
-        Home: (triggers) => triggers[0]?.focus(),
-        End: (triggers) => triggers[triggers.length - 1]?.focus(),
-      };
-
-    const handler = keyHandlers[e.key];
-    if (handler) {
-      e.preventDefault();
-      handler(enabledTriggers);
-    }
+    handlers[action]?.();
   }
 
   const triggerProps = {

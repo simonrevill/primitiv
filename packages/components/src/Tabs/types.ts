@@ -1,4 +1,4 @@
-import { ComponentProps, Dispatch, Ref, RefObject, SetStateAction } from "react";
+import { ComponentProps, Ref, RefObject } from "react";
 
 export type TabsOrientation = "horizontal" | "vertical";
 
@@ -46,7 +46,7 @@ export type TabsContextValue = {
   activationMode: TabsActivationMode;
   activeValue: string | undefined;
   isControlled: boolean;
-  setActiveValue: Dispatch<SetStateAction<string | undefined>>;
+  setActiveValue: (next: string) => void;
   onValueChange?: (value: string) => void;
   onChange?: ({ index, name }: TabMetadata) => void;
   tabsId: string;

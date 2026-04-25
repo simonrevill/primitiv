@@ -1,4 +1,6 @@
-import { createContext, RefObject } from "react";
+import { RefObject } from "react";
+
+import { createStrictContext } from "../utils";
 
 export type DropdownContextValue = {
   open: boolean;
@@ -7,4 +9,7 @@ export type DropdownContextValue = {
   triggerRef: RefObject<HTMLButtonElement | null>;
 };
 
-export const DropdownContext = createContext<DropdownContextValue | null>(null);
+export const [DropdownContext, useDropdownContext] =
+  createStrictContext<DropdownContextValue>(
+    "Dropdown sub-components must be rendered inside a <Dropdown.Root>.",
+  );

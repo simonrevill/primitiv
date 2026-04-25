@@ -11,8 +11,11 @@ type GetKeyToActionMapOptions = {
    * Which arrow-key axis is active. `"horizontal"` enables Arrow Left/Right
    * (with RTL inversion); `"vertical"` enables Arrow Up/Down (RTL is a
    * no-op since vertical reading order does not depend on direction).
+   * `"both"` enables all four arrow keys with no RTL inversion — used by
+   * patterns like RadioGroup whose ARIA contract treats every arrow as
+   * equivalent next/prev movement.
    */
-  orientation: "horizontal" | "vertical";
+  orientation: "horizontal" | "vertical" | "both";
   /**
    * Reading direction. Only affects horizontal orientation, where it swaps
    * the meaning of Arrow Left and Arrow Right. Defaults to `"ltr"`.
@@ -66,12 +69,13 @@ export function getKeyToActionMap({
 }: GetKeyToActionMapOptions): Record<string, RovingKeyAction> {
   const map: Record<string, RovingKeyAction> = {};
 
-  if (orientation === "horizontal") {
+  if (orientation === "horizontal" || orientation === "both") {
     const forward = dir === "rtl" ? "ArrowLeft" : "ArrowRight";
     const backward = dir === "rtl" ? "ArrowRight" : "ArrowLeft";
     map[forward] = "next";
     map[backward] = "prev";
-  } else {
+  }
+  if (orientation === "vertical" || orientation === "both") {
     map.ArrowDown = "next";
     map.ArrowUp = "prev";
   }

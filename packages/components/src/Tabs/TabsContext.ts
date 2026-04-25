@@ -1,10 +1,12 @@
-import { createContext } from "react";
+import { createStrictContext } from "../utils";
 
 import { TabsContextValue } from "./types";
 
-export const TabsContext = createContext<TabsContextValue | null>(null);
-
-TabsContext.displayName = "TabsContext";
+export const [TabsContext, useTabsContext] =
+  createStrictContext<TabsContextValue>(
+    "Component must be rendered as a child of Tabs.Root",
+    "TabsContext",
+  );
 
 const TabsProvider = TabsContext.Provider;
 

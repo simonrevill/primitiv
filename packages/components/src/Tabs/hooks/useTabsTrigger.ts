@@ -58,6 +58,12 @@ export function useTabsTrigger({
     [activeValue, isControlled, onValueChange, setActiveValue, onChange],
   );
 
+  // Note: this composition is deliberately bespoke and does NOT use the
+  // shared composeEventHandlers from ../../Slot. It runs the library's
+  // activation BEFORE the consumer's onClick, and offers no preventDefault
+  // veto path — both differ from the shared util's contract. Switching to
+  // composeEventHandlers here would be an observable behaviour change for
+  // consumers (handler ordering and preventDefault semantics).
   function handleClick(e: MouseEvent<HTMLButtonElement>) {
     const index = triggerValues.indexOf(value);
     if (!disabled) {

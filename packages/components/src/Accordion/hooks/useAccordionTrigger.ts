@@ -1,7 +1,7 @@
-import { useRef, useEffect, MouseEvent, KeyboardEvent } from "react";
+import { useMemo, useRef, useEffect, MouseEvent, KeyboardEvent } from "react";
 
+import { useRovingTabindex } from "../../hooks";
 import { composeRefs } from "../../Slot";
-import { getKeyToActionMap, type RovingKeyAction } from "../../utils";
 
 import { AccordionTriggerProps } from "../types";
 
@@ -44,40 +44,32 @@ export function useAccordionTrigger({
     onClick?.(e);
   }
 
+  // Pre-filter disabled triggers out of the navigable list — Accordion's
+  // ARIA contract is that arrow keys skip past disabled triggers (unlike
+  // Tabs, which lands on disabled triggers without activating them).
+  const enabledItemIds = useMemo(
+    () => registeredTriggerItemIds.filter((id) => !disabledItemIds.has(id)),
+    [registeredTriggerItemIds, disabledItemIds],
+  );
+  const { handleKeyDown: rovingKeyDown } = useRovingTabindex<string>({
+    orientation,
+    dir,
+    navigable: enabledItemIds,
+    currentKey: itemId,
+    onNavigate: focusTrigger,
+    includeHomeEnd: true,
+  });
+
   function handleKeyDown(e: KeyboardEvent<HTMLButtonElement>) {
+    // Accordion-specific: Enter / Space toggle the focused item rather than
+    // activate something else, so they're handled here before delegating
+    // arrow / Home / End to the shared hook.
     if ((e.key === "Enter" || e.key === " ") && !disabled) {
       e.preventDefault();
       toggleItem(itemId);
       return;
     }
-
-    const action = getKeyToActionMap({ orientation, dir, homeEnd: true })[
-      e.key
-    ];
-    if (!action) return;
-
-    const enabledItemIds = registeredTriggerItemIds.filter(
-      (id) => !disabledItemIds.has(id),
-    );
-    if (enabledItemIds.length === 0) return;
-
-    e.preventDefault();
-    const currentIndex = enabledItemIds.indexOf(itemId);
-    const handlers: Partial<Record<RovingKeyAction, () => void>> = {
-      next: () =>
-        focusTrigger(
-          enabledItemIds[(currentIndex + 1) % enabledItemIds.length],
-        ),
-      prev: () =>
-        focusTrigger(
-          enabledItemIds[
-            (currentIndex - 1 + enabledItemIds.length) % enabledItemIds.length
-          ],
-        ),
-      first: () => focusTrigger(enabledItemIds[0]),
-      last: () => focusTrigger(enabledItemIds[enabledItemIds.length - 1]),
-    };
-    handlers[action]?.();
+    rovingKeyDown(e);
   }
 
   const triggerProps = {

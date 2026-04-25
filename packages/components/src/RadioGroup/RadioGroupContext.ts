@@ -1,4 +1,4 @@
-import { createContext } from "react";
+import { createStrictContext } from "../utils";
 
 export type RadioGroupContextValue = {
   value: string | undefined;
@@ -13,6 +13,7 @@ export type RadioGroupContextValue = {
   focusItem: (value: string) => void;
 };
 
-export const RadioGroupContext = createContext<RadioGroupContextValue | null>(
-  null,
-);
+export const [RadioGroupContext, useRadioGroupContext] =
+  createStrictContext<RadioGroupContextValue>(
+    "RadioGroup sub-components must be rendered inside a <RadioGroup.Root>.",
+  );

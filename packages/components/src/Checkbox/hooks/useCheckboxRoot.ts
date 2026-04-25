@@ -1,4 +1,6 @@
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
+
+import { useControllableState } from "../../hooks";
 
 import { CheckedState } from "../types";
 
@@ -13,21 +15,18 @@ export function useCheckboxRoot({
   checked: controlledChecked,
   onCheckedChange,
 }: UseCheckboxRootArgs) {
-  const isControlled = controlledChecked !== undefined;
-  const [uncontrolledChecked, setUncontrolledChecked] = useState<CheckedState>(
+  const [checked, setChecked] = useControllableState<CheckedState>(
+    controlledChecked,
     defaultChecked ?? false,
   );
-  const checked: CheckedState = isControlled
-    ? controlledChecked
-    : uncontrolledChecked;
 
   const toggle = useCallback(() => {
     // Indeterminate resolves to checked per the WAI-ARIA tri-state
     // convention; boolean flips.
     const next = checked === "indeterminate" ? true : !checked;
-    if (!isControlled) setUncontrolledChecked(next);
+    setChecked(next);
     onCheckedChange?.(next);
-  }, [checked, isControlled, onCheckedChange]);
+  }, [checked, setChecked, onCheckedChange]);
 
   return { checked, toggle };
 }

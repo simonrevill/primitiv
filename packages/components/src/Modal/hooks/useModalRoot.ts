@@ -8,6 +8,8 @@ import {
   useState,
 } from "react";
 
+import { useControllableState } from "../../hooks";
+
 import {
   ModalContentCallbacks,
   ModalContextValue,
@@ -24,24 +26,16 @@ export function useModalRoot(
   { defaultOpen = false, open: controlledOpen, onOpenChange }: UseModalRootArgs,
   ref?: Ref<ModalImperativeApi>,
 ) {
-  const isControlled = controlledOpen !== undefined;
-  const [internalOpen, setInternalOpen] = useState(defaultOpen);
-  const open = isControlled ? controlledOpen : internalOpen;
+  const [open, setOpen] = useControllableState<boolean>(
+    controlledOpen,
+    defaultOpen,
+    onOpenChange,
+  );
   const contentId = useId();
   const contentCallbacksRef = useRef<ModalContentCallbacks>({});
   const [titleId, setTitleId] = useState<string | undefined>(undefined);
   const [descriptionId, setDescriptionId] = useState<string | undefined>(
     undefined,
-  );
-
-  const setOpen = useCallback(
-    (next: boolean) => {
-      if (!isControlled) {
-        setInternalOpen(next);
-      }
-      onOpenChange?.(next);
-    },
-    [isControlled, onOpenChange],
   );
 
   const registerTitle = useCallback((id: string | undefined) => {

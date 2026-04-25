@@ -4,8 +4,9 @@ import {
   useId,
   useMemo,
   useRef,
-  useState,
 } from "react";
+
+import { useControllableState } from "../../hooks";
 
 type UseDropdownRootArgs = {
   defaultOpen?: boolean;
@@ -18,11 +19,13 @@ export function useDropdownRoot({
   open: controlledOpen,
   onOpenChange,
 }: UseDropdownRootArgs) {
-  const isControlled = controlledOpen !== undefined;
   const contentId = useId();
   const triggerRef = useRef<HTMLButtonElement | null>(null);
-  const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen);
-  const open = isControlled ? controlledOpen : uncontrolledOpen;
+  const [open, setOpenBase] = useControllableState<boolean>(
+    controlledOpen,
+    defaultOpen,
+    onOpenChange,
+  );
   // Mirror `open` so setOpen can short-circuit repeat transitions within a
   // single event without a re-render in between. Without this, internal
   // paths that converge on the same close (e.g. a light-dismiss firing
@@ -37,10 +40,9 @@ export function useDropdownRoot({
     (next: boolean) => {
       if (openRef.current === next) return;
       openRef.current = next;
-      if (!isControlled) setUncontrolledOpen(next);
-      onOpenChange?.(next);
+      setOpenBase(next);
     },
-    [isControlled, onOpenChange],
+    [setOpenBase],
   );
 
   const contextValue = useMemo(

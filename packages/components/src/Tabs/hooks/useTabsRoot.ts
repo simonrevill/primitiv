@@ -1,13 +1,12 @@
 import {
   useId,
-  useState,
-  useRef,
   useEffect,
-  useCallback,
   useImperativeHandle,
   useMemo,
   Ref,
 } from "react";
+
+import { useCollection, useControllableState } from "../../hooks";
 
 import type { TabsRootProps, TabsImperativeApi } from "../types";
 
@@ -24,14 +23,18 @@ export function useTabsRoot(
   ref: Ref<TabsImperativeApi>,
 ) {
   const tabsId = useId();
-  const isControlled = value !== undefined;
-  const [internalValue, setInternalValue] = useState(defaultValue);
-  const activeValue = isControlled ? value : internalValue;
-  const triggersRef = useRef<Map<string, HTMLButtonElement>>(new Map());
-  // Tracks the ordered list of registered trigger values as state so that
-  // consumers can re-render when triggers mount/unmount (e.g. to compute
-  // the roving-tabindex home base when no active value is set).
-  const [triggerValues, setTriggerValues] = useState<string[]>([]);
+  // Tabs intentionally does NOT pass onValueChange to useControllableState:
+  // in uncontrolled mode the existing public contract fires only `onChange`
+  // (with the {index, name} payload), not `onValueChange`. Tabs.Trigger
+  // therefore branches on isControlled and calls onValueChange directly in
+  // the controlled path; the hook's setter is the uncontrolled-mode setState.
+  const [activeValue, setActiveValue, isControlled] =
+    useControllableState<string>(value, defaultValue);
+  const {
+    register: registerTrigger,
+    itemsRef: triggersRef,
+    keys: triggerValues,
+  } = useCollection<string, HTMLButtonElement>();
 
   useEffect(() => {
     if (
@@ -47,18 +50,6 @@ export function useTabsRoot(
     }
   }, [activeValue, triggerValues]);
 
-  const registerTrigger = useCallback(
-    (triggerValue: string, element: HTMLButtonElement | null) => {
-      if (element) {
-        triggersRef.current.set(triggerValue, element);
-      } else {
-        triggersRef.current.delete(triggerValue);
-      }
-      setTriggerValues(Array.from(triggersRef.current.keys()));
-    },
-    [],
-  );
-
   // Imperative API
   useImperativeHandle(
     ref,
@@ -71,11 +62,11 @@ export function useTabsRoot(
         if (isControlled) {
           onValueChange?.(newValue);
         } else {
-          setInternalValue(newValue);
+          setActiveValue(newValue);
         }
       },
     }),
-    [isControlled, onValueChange, triggerValues],
+    [isControlled, setActiveValue, onValueChange, triggerValues],
   );
 
   const contextValue = useMemo(
@@ -86,7 +77,7 @@ export function useTabsRoot(
       tabsId,
       activeValue,
       isControlled,
-      setActiveValue: setInternalValue,
+      setActiveValue,
       onValueChange,
       onChange,
       registerTrigger,
@@ -100,6 +91,7 @@ export function useTabsRoot(
       tabsId,
       activeValue,
       isControlled,
+      setActiveValue,
       onValueChange,
       onChange,
       registerTrigger,

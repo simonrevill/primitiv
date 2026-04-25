@@ -1,4 +1,4 @@
-import { ComponentProps, Dispatch, Ref, RefObject, SetStateAction } from "react";
+import { ComponentProps, Ref, RefObject } from "react";
 
 export type TabsOrientation = "horizontal" | "vertical";
 
@@ -46,7 +46,7 @@ export type TabsContextValue = {
   activationMode: TabsActivationMode;
   activeValue: string | undefined;
   isControlled: boolean;
-  setActiveValue: Dispatch<SetStateAction<string | undefined>>;
+  setActiveValue: (next: string) => void;
   onValueChange?: (value: string) => void;
   onChange?: ({ index, name }: TabMetadata) => void;
   tabsId: string;
@@ -81,31 +81,6 @@ export type TabsTriggerProps<T extends HTMLElement = HTMLButtonElement> = Omit<
 export type TabsContentProps = ComponentProps<"div"> & {
   value: string;
 };
-
-export type TabsKeyActionsKey =
-  | "ArrowRight"
-  | "ArrowLeft"
-  | "ArrowDown"
-  | "ArrowUp"
-  | "Home"
-  | "End"
-  | " "
-  | "Enter";
-
-export type TabsKeyActions = {
-  moveForward: () => void;
-  moveBackward: () => void;
-  home: () => void;
-  end: () => void;
-  enter: () => void;
-};
-
-export type KeyToActionMapper = Partial<
-  Record<
-    TabsKeyActionsKey,
-    "moveForward" | "moveBackward" | "home" | "end" | "enter"
-  >
->;
 
 export type TabsImperativeApi = {
   setActiveTab: (value: string) => void;

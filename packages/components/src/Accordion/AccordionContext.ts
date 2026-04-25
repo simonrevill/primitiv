@@ -1,8 +1,12 @@
-import { createContext } from "react";
+import { createStrictContext } from "../utils";
 import { AccordionContextValue, AccordionItemContextValue } from "./types";
 
-export const AccordionContext = createContext<AccordionContextValue | null>(
-  null,
-);
-export const AccordionItemContext =
-  createContext<AccordionItemContextValue | null>(null);
+export const [AccordionContext, useAccordionContext] =
+  createStrictContext<AccordionContextValue>(
+    "AccordionItem must be used within AccordionRoot",
+  );
+
+export const [AccordionItemContext, useAccordionItemContext] =
+  createStrictContext<AccordionItemContextValue>(
+    "Component must be used within AccordionItem",
+  );

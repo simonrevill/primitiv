@@ -1,4 +1,7 @@
 import { useId, useMemo } from "react";
+
+import { deriveId } from "../../utils";
+
 import { useAccordionContext } from "./useAccordionContext";
 
 export function useAccordionItem(value: string | undefined) {
@@ -6,8 +9,8 @@ export function useAccordionItem(value: string | undefined) {
   // Use provided value prop, or fall back to React's useId for stable IDs
   const autoId = useId();
   const itemId = value ?? autoId;
-  const buttonId = `${accordionId}-heading-${itemId}`;
-  const panelId = `${accordionId}-panel-${itemId}`;
+  const buttonId = deriveId(accordionId, "heading", itemId);
+  const panelId = deriveId(accordionId, "panel", itemId);
   const isExpanded = expandedItems.has(itemId);
 
   const contextValue = useMemo(

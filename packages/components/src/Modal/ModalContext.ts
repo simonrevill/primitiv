@@ -1,9 +1,13 @@
-import { createContext } from "react";
+import { createStrictContext } from "../utils";
 
 import { ModalContextValue } from "./types";
 
-export const ModalContext = createContext<ModalContextValue | null>(null);
-ModalContext.displayName = "ModalContext";
+export const [ModalContext, useModalContext] =
+  createStrictContext<ModalContextValue>(
+    "Component must be rendered as a child of Modal.Root",
+    "ModalContext",
+  );
+
 const ModalProvider = ModalContext.Provider;
 
 export { ModalProvider };

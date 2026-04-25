@@ -239,9 +239,11 @@ function DropdownSeparator({
   ...rest
 }: DropdownSeparatorProps) {
   const separatorProps = { ...rest, role: "separator" as const };
+
   if (asChild) {
     return <Slot {...separatorProps}>{children}</Slot>;
   }
+
   return <li {...separatorProps} />;
 }
 

@@ -61,8 +61,14 @@ export type AccordionContextValue = {
   orientation: "vertical" | "horizontal";
   dir: AccordionReadingDirection;
   toggleItem: (itemId: string) => void;
-  registerTrigger: (itemId: string, element: HTMLButtonElement | null) => void;
-  getTriggers: () => HTMLButtonElement[];
+  registerTrigger: (
+    itemId: string,
+    element: HTMLButtonElement | null,
+    disabled?: boolean,
+  ) => void;
+  registeredTriggerItemIds: string[];
+  disabledItemIds: Set<string>;
+  focusTrigger: (itemId: string) => void;
   registerPanel: (itemId: string) => void;
   unregisterPanel: (itemId: string) => void;
 };

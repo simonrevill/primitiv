@@ -1,4 +1,4 @@
-import { ComponentProps, Ref, RefObject } from "react";
+import { ComponentProps, Ref } from "react";
 
 export type TabsOrientation = "horizontal" | "vertical";
 
@@ -50,9 +50,14 @@ export type TabsContextValue = {
   onValueChange?: (value: string) => void;
   onChange?: ({ index, name }: TabMetadata) => void;
   tabsId: string;
-  registerTrigger: (value: string, element: HTMLButtonElement | null) => void;
-  triggersRef: RefObject<Map<string, HTMLButtonElement>>;
+  registerTrigger: (
+    value: string,
+    element: HTMLButtonElement | null,
+    disabled?: boolean,
+  ) => void;
   triggerValues: string[];
+  disabledTriggerValues: Set<string>;
+  focusTrigger: (value: string) => void;
 };
 
 export type TabsListProps = Omit<

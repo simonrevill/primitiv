@@ -23,6 +23,25 @@ describe("getKeyToActionMap", () => {
     });
   });
 
+  describe("both orientations", () => {
+    it("maps all four arrow keys with no RTL inversion", () => {
+      // Arrange & Act
+      const ltr = getKeyToActionMap({ orientation: "both" });
+      const rtl = getKeyToActionMap({ orientation: "both", dir: "rtl" });
+
+      // Assert
+      expect(ltr.ArrowRight).toBe<RovingKeyAction>("next");
+      expect(ltr.ArrowLeft).toBe<RovingKeyAction>("prev");
+      expect(ltr.ArrowDown).toBe<RovingKeyAction>("next");
+      expect(ltr.ArrowUp).toBe<RovingKeyAction>("prev");
+      // RTL only affects horizontal arrows
+      expect(rtl.ArrowRight).toBe<RovingKeyAction>("prev");
+      expect(rtl.ArrowLeft).toBe<RovingKeyAction>("next");
+      expect(rtl.ArrowDown).toBe<RovingKeyAction>("next");
+      expect(rtl.ArrowUp).toBe<RovingKeyAction>("prev");
+    });
+  });
+
   describe("vertical orientation", () => {
     it("maps ArrowDown to next and ArrowUp to prev (RTL has no effect)", () => {
       // Arrange & Act

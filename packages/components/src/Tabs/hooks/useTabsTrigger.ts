@@ -3,10 +3,9 @@ import {
   useEffect,
   useCallback,
   MouseEvent,
-  KeyboardEvent,
 } from "react";
 
-import { getKeyToActionMap, type RovingKeyAction } from "../../utils";
+import { useRovingTabindex } from "../../hooks";
 
 import { TabsTriggerProps } from "../types";
 import { getTriggerAndPanelIds } from "../utils";
@@ -29,8 +28,9 @@ export function useTabsTrigger({
     onChange,
     tabsId,
     registerTrigger,
-    triggersRef,
     triggerValues,
+    disabledTriggerValues,
+    focusTrigger,
   } = useTabsContext();
   const isActive = activeValue === value;
   const { triggerId, panelId } = getTriggerAndPanelIds(tabsId, value);
@@ -43,9 +43,9 @@ export function useTabsTrigger({
   const tabIndex = isActive || (activeValue === undefined && isFirst) ? 0 : -1;
 
   useEffect(() => {
-    registerTrigger(value, buttonRef.current);
+    registerTrigger(value, buttonRef.current, disabled);
     return () => registerTrigger(value, null);
-  }, [value, registerTrigger]);
+  }, [value, disabled, registerTrigger]);
 
   const activateTab = useCallback(
     (newValue: string, index: number) => {
@@ -74,47 +74,29 @@ export function useTabsTrigger({
     onClick?.(e);
   }
 
-  function handleKeyDown(e: KeyboardEvent<HTMLButtonElement>) {
-    const currentIndex = triggerValues.indexOf(value);
-    const totalTabs = triggerValues.length;
-    const action = getKeyToActionMap({
-      orientation,
-      dir,
-      homeEnd: true,
-      activate: true,
-    })[e.key];
-
-    function activateIfEnabled(
-      targetIndex: number,
-      sourceAction?: RovingKeyAction,
-    ) {
-      const targetValue = triggerValues[targetIndex];
-      const targetElement = triggersRef.current.get(targetValue);
-      const isDisabled =
-        targetElement?.getAttribute("aria-disabled") === "true";
-      if (
+  // Tabs deliberately leaves disabled values in `navigable` so arrow keys
+  // *land* on disabled tabs (focus moves there) without activating them —
+  // that's the Tabs-specific keyboard contract, distinct from RadioGroup
+  // and Accordion which both skip disabled siblings entirely.
+  const { handleKeyDown } = useRovingTabindex<string>({
+    orientation,
+    dir,
+    navigable: triggerValues,
+    currentKey: value,
+    includeHomeEnd: true,
+    includeActivate: true,
+    onNavigate: (targetValue, action) => {
+      const isDisabled = disabledTriggerValues.has(targetValue);
+      const shouldActivate =
         !isDisabled &&
         (activationMode === "automatic" ||
-          (activationMode === "manual" && sourceAction === "activate"))
-      ) {
-        activateTab(targetValue, targetIndex);
+          (activationMode === "manual" && action === "activate"));
+      if (shouldActivate) {
+        activateTab(targetValue, triggerValues.indexOf(targetValue));
       }
-      targetElement?.focus();
-    }
-
-    const actions: Record<RovingKeyAction, () => void> = {
-      next: () => activateIfEnabled((currentIndex + 1) % totalTabs),
-      prev: () => activateIfEnabled((currentIndex - 1 + totalTabs) % totalTabs),
-      first: () => activateIfEnabled(0),
-      last: () => activateIfEnabled(totalTabs - 1),
-      activate: () => activateIfEnabled(currentIndex, "activate"),
-    };
-
-    if (action) {
-      e.preventDefault();
-      actions[action]();
-    }
-  }
+      focusTrigger(targetValue);
+    },
+  });
   return {
     buttonRef,
     triggerId,

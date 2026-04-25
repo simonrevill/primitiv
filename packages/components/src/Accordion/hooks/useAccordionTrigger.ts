@@ -1,7 +1,7 @@
-import { useRef, useEffect, MouseEvent, KeyboardEvent } from "react";
+import { useMemo, useRef, useEffect, MouseEvent, KeyboardEvent } from "react";
 
+import { useRovingTabindex } from "../../hooks";
 import { composeRefs } from "../../Slot";
-import { getKeyToActionMap, type RovingKeyAction } from "../../utils";
 
 import { AccordionTriggerProps } from "../types";
 
@@ -16,16 +16,27 @@ export function useAccordionTrigger({
   ...rest
 }: Omit<AccordionTriggerProps, "children">) {
   const { buttonId, panelId, itemId, isExpanded } = useAccordionItemContext();
-  const { toggleItem, registerTrigger, getTriggers, orientation, dir } =
-    useAccordionContext();
+  const {
+    toggleItem,
+    registerTrigger,
+    registeredTriggerItemIds,
+    disabledItemIds,
+    focusTrigger,
+    orientation,
+    dir,
+  } = useAccordionContext();
   const triggerRef = useRef<HTMLButtonElement>(null);
   const composedRef = ref ? composeRefs(triggerRef, ref) : triggerRef;
 
-  // Register/unregister this trigger with the context
+  // Register/unregister this trigger with the context. The disabled flag
+  // is now tracked in registration metadata (via useCollection's value
+  // type) instead of being read from the rendered aria-disabled attribute,
+  // which keeps Accordion consistent with RadioGroup and is the model
+  // useRovingTabindex expects.
   useEffect(() => {
-    registerTrigger(itemId, triggerRef.current);
+    registerTrigger(itemId, triggerRef.current, disabled);
     return () => registerTrigger(itemId, null);
-  }, [itemId, registerTrigger]);
+  }, [itemId, disabled, registerTrigger]);
 
   function handleClick(e: MouseEvent<HTMLButtonElement>) {
     if (disabled) return;
@@ -33,38 +44,32 @@ export function useAccordionTrigger({
     onClick?.(e);
   }
 
+  // Pre-filter disabled triggers out of the navigable list — Accordion's
+  // ARIA contract is that arrow keys skip past disabled triggers (unlike
+  // Tabs, which lands on disabled triggers without activating them).
+  const enabledItemIds = useMemo(
+    () => registeredTriggerItemIds.filter((id) => !disabledItemIds.has(id)),
+    [registeredTriggerItemIds, disabledItemIds],
+  );
+  const { handleKeyDown: rovingKeyDown } = useRovingTabindex<string>({
+    orientation,
+    dir,
+    navigable: enabledItemIds,
+    currentKey: itemId,
+    onNavigate: focusTrigger,
+    includeHomeEnd: true,
+  });
+
   function handleKeyDown(e: KeyboardEvent<HTMLButtonElement>) {
+    // Accordion-specific: Enter / Space toggle the focused item rather than
+    // activate something else, so they're handled here before delegating
+    // arrow / Home / End to the shared hook.
     if ((e.key === "Enter" || e.key === " ") && !disabled) {
       e.preventDefault();
       toggleItem(itemId);
       return;
     }
-
-    const action = getKeyToActionMap({ orientation, dir, homeEnd: true })[
-      e.key
-    ];
-    if (!action) return;
-
-    const enabledTriggers = getTriggers().filter(
-      (t) => t.getAttribute("aria-disabled") !== "true",
-    );
-    if (enabledTriggers.length === 0) return;
-
-    e.preventDefault();
-    const currentIndex = enabledTriggers.indexOf(triggerRef.current!);
-    const handlers: Partial<Record<RovingKeyAction, () => void>> = {
-      next: () =>
-        enabledTriggers[
-          (currentIndex + 1) % enabledTriggers.length
-        ]?.focus(),
-      prev: () =>
-        enabledTriggers[
-          (currentIndex - 1 + enabledTriggers.length) % enabledTriggers.length
-        ]?.focus(),
-      first: () => enabledTriggers[0]?.focus(),
-      last: () => enabledTriggers[enabledTriggers.length - 1]?.focus(),
-    };
-    handlers[action]?.();
+    rovingKeyDown(e);
   }
 
   const triggerProps = {

@@ -1,5 +1,7 @@
 import { useCallback, useRef, useState } from "react";
 
+import { useControllableState } from "../../hooks";
+
 type UseRadioGroupRootArgs = {
   defaultValue?: string;
   value?: string;
@@ -16,19 +18,18 @@ export function useRadioGroupRoot({
   value: controlledValue,
   onValueChange,
 }: UseRadioGroupRootArgs) {
-  const isControlled = controlledValue !== undefined;
-  const [uncontrolledValue, setUncontrolledValue] = useState<
-    string | undefined
-  >(defaultValue);
-  const value = isControlled ? controlledValue : uncontrolledValue;
+  const [value, setValue] = useControllableState<string>(
+    controlledValue,
+    defaultValue,
+    onValueChange,
+  );
 
   const select = useCallback(
     (next: string) => {
       if (value === next) return;
-      if (!isControlled) setUncontrolledValue(next);
-      onValueChange?.(next);
+      setValue(next);
     },
-    [value, isControlled, onValueChange],
+    [value, setValue],
   );
 
   // Track registered item metadata in a ref (for focus handling) and

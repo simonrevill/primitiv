@@ -36,7 +36,7 @@ import {
   DropdownSubTriggerProps,
   DropdownTriggerProps,
 } from "./types";
-import { MENUITEM_SELECTOR, TYPEAHEAD_RESET_MS } from "./constants";
+import { MENUITEM_SELECTOR } from "./constants";
 
 /**
  * The root of a Dropdown menu — owns the open state and provides context to

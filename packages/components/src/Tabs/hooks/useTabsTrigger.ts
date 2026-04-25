@@ -29,8 +29,9 @@ export function useTabsTrigger({
     onChange,
     tabsId,
     registerTrigger,
-    triggersRef,
     triggerValues,
+    disabledTriggerValues,
+    focusTrigger,
   } = useTabsContext();
   const isActive = activeValue === value;
   const { triggerId, panelId } = getTriggerAndPanelIds(tabsId, value);
@@ -43,9 +44,9 @@ export function useTabsTrigger({
   const tabIndex = isActive || (activeValue === undefined && isFirst) ? 0 : -1;
 
   useEffect(() => {
-    registerTrigger(value, buttonRef.current);
+    registerTrigger(value, buttonRef.current, disabled);
     return () => registerTrigger(value, null);
-  }, [value, registerTrigger]);
+  }, [value, disabled, registerTrigger]);
 
   const activateTab = useCallback(
     (newValue: string, index: number) => {
@@ -89,9 +90,7 @@ export function useTabsTrigger({
       sourceAction?: RovingKeyAction,
     ) {
       const targetValue = triggerValues[targetIndex];
-      const targetElement = triggersRef.current.get(targetValue);
-      const isDisabled =
-        targetElement?.getAttribute("aria-disabled") === "true";
+      const isDisabled = disabledTriggerValues.has(targetValue);
       if (
         !isDisabled &&
         (activationMode === "automatic" ||
@@ -99,7 +98,7 @@ export function useTabsTrigger({
       ) {
         activateTab(targetValue, targetIndex);
       }
-      targetElement?.focus();
+      focusTrigger(targetValue);
     }
 
     const actions: Record<RovingKeyAction, () => void> = {

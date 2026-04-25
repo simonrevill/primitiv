@@ -1,4 +1,5 @@
 import {
+  useCallback,
   useId,
   useEffect,
   useImperativeHandle,
@@ -9,6 +10,11 @@ import {
 import { useCollection, useControllableState } from "../../hooks";
 
 import type { TabsRootProps, TabsImperativeApi } from "../types";
+
+type TriggerMeta = {
+  element: HTMLButtonElement;
+  disabled: boolean;
+};
 
 export function useTabsRoot(
   {
@@ -31,10 +37,43 @@ export function useTabsRoot(
   const [activeValue, setActiveValue, isControlled] =
     useControllableState<string>(value, defaultValue);
   const {
-    register: registerTrigger,
+    register: registerTriggerBase,
     itemsRef: triggersRef,
     keys: triggerValues,
-  } = useCollection<string, HTMLButtonElement>();
+  } = useCollection<string, TriggerMeta>();
+
+  const registerTrigger = useCallback(
+    (
+      triggerValue: string,
+      element: HTMLButtonElement | null,
+      disabled = false,
+    ) => {
+      registerTriggerBase(
+        triggerValue,
+        element ? { element, disabled } : null,
+      );
+    },
+    [registerTriggerBase],
+  );
+
+  const disabledTriggerValues = useMemo(
+    () =>
+      new Set(
+        Array.from(triggersRef.current.entries())
+          .filter(([, meta]) => meta.disabled)
+          .map(([v]) => v),
+      ),
+    // triggerValues is a fresh array on every register call, so the memo
+    // re-runs whenever any trigger mounts, unmounts, or toggles disabled.
+    [triggerValues, triggersRef],
+  );
+
+  const focusTrigger = useCallback(
+    (triggerValue: string) => {
+      triggersRef.current.get(triggerValue)?.element.focus();
+    },
+    [triggersRef],
+  );
 
   useEffect(() => {
     if (
@@ -81,8 +120,9 @@ export function useTabsRoot(
       onValueChange,
       onChange,
       registerTrigger,
-      triggersRef,
       triggerValues,
+      disabledTriggerValues,
+      focusTrigger,
     }),
     [
       orientation,
@@ -96,6 +136,8 @@ export function useTabsRoot(
       onChange,
       registerTrigger,
       triggerValues,
+      disabledTriggerValues,
+      focusTrigger,
     ],
   );
 

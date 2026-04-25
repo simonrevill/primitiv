@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef } from "react";
 
+import { useRovingTabindex } from "../hooks";
 import { Slot, composeEventHandlers, composeRefs } from "../Slot";
 
 import { RadioGroupContext } from "./RadioGroupContext";
@@ -107,9 +108,6 @@ function RadioGroupRoot({
 
 RadioGroupRoot.displayName = "RadioGroupRoot";
 
-const NEXT_KEYS = new Set(["ArrowDown", "ArrowRight"]);
-const PREV_KEYS = new Set(["ArrowUp", "ArrowLeft"]);
-
 /**
  * An individual radio option inside a RadioGroup — a native
  * `<button role="radio">` that reports its state, participates in the
@@ -181,19 +179,15 @@ function RadioGroupItem({
     return () => registerItem(value, null);
   }, [value, disabled, registerItem]);
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
-    if (!NEXT_KEYS.has(event.key) && !PREV_KEYS.has(event.key)) return;
-    event.preventDefault();
-    if (enabledValues.length === 0) return;
-    const currentIndex = enabledValues.indexOf(value);
-    if (currentIndex === -1) return;
-    const delta = NEXT_KEYS.has(event.key) ? 1 : -1;
-    const nextIndex =
-      (currentIndex + delta + enabledValues.length) % enabledValues.length;
-    const nextValue = enabledValues[nextIndex];
-    select(nextValue);
-    focusItem(nextValue);
-  };
+  const { handleKeyDown } = useRovingTabindex<string>({
+    orientation: "both",
+    navigable: enabledValues,
+    currentKey: value,
+    onNavigate: (target) => {
+      select(target);
+      focusItem(target);
+    },
+  });
 
   const itemContextValue = useMemo(
     () => ({ checked: isChecked }),

@@ -146,13 +146,17 @@ export function useRovingTabindex<K>({
           targetIndex = total - 1;
           break;
         case "next":
-          // currentIndex === -1 (current key not in navigable, e.g. it is
-          // disabled and the consumer filtered it out) wraps to 0 here.
-          // Matches Accordion's existing modulo-arithmetic behaviour.
-          targetIndex = (currentIndex + 1) % total;
-          break;
         case "prev":
-          targetIndex = (currentIndex - 1 + total) % total;
+          // Bail when the current key isn't in `navigable` — typically
+          // because the consumer filtered out a disabled current item
+          // (RadioGroup's contract: arrow keys do nothing while focus is
+          // on a disabled radio). Home/End above still work regardless,
+          // since they don't depend on a current position.
+          if (currentIndex === -1) return;
+          targetIndex =
+            action === "next"
+              ? (currentIndex + 1) % total
+              : (currentIndex - 1 + total) % total;
           break;
       }
 

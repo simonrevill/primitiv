@@ -157,6 +157,13 @@ DropdownTrigger.displayName = "DropdownTrigger";
  * Typeahead accumulates keystrokes within a 500 ms window; pressing the
  * same character repeatedly cycles through items that share that first
  * letter. Disabled items are skipped during arrow navigation and typeahead.
+ *
+ * Arrow navigation is scoped to the popover that currently holds focus —
+ * a {@link DropdownSubContent | `Dropdown.SubContent`} rendered inside
+ * this menu does not pull its items into the parent's navigation cycle,
+ * so `ArrowDown` past a {@link DropdownSubTrigger | `Dropdown.SubTrigger`}
+ * lands on the next sibling item in the parent rather than getting
+ * stuck on a non-focusable item inside a closed sub-popover.
  */
 function DropdownContent({
   children,
@@ -222,9 +229,18 @@ function DropdownContent({
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLMenuElement>) => {
     const menu = menuRef.current!;
+    // Sub-menus mount their own [popover] inside this menu's subtree, so a
+    // naive querySelectorAll would also pick up items in nested
+    // SubContents — items the user can't focus while the sub is closed
+    // (display:none) and shouldn't reach by arrow key while it's open. Scope
+    // to the popover holding focus, then drop anything that lives in a
+    // deeper popover (a closed sub at this same level).
+    const focused = document.activeElement as HTMLElement | null;
+    const scope =
+      (focused?.closest("[popover]") as HTMLElement | null) ?? menu;
     const items = Array.from(
-      menu.querySelectorAll<HTMLElement>(MENUITEM_SELECTOR),
-    );
+      scope.querySelectorAll<HTMLElement>(MENUITEM_SELECTOR),
+    ).filter((el) => el.closest("[popover]") === scope);
     if (items.length === 0) return;
     const currentIndex = items.indexOf(document.activeElement as HTMLElement);
 

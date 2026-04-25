@@ -177,6 +177,13 @@ Hovering the `SubTrigger` opens the submenu automatically; hovering onto
 a sibling item in the parent menu closes it, mirroring the keyboard
 contract in which focus returning to the parent menu dismisses the sub.
 
+Arrow-key navigation is scoped to the popover that currently holds
+focus. Items inside a `SubContent` aren't pulled into the parent's
+navigation cycle, so `ArrowDown` from a `SubTrigger` lands on the next
+sibling item in the parent menu — not on the first item inside a closed
+submenu, which is unfocusable. While focus lives inside an open
+`SubContent`, `ArrowDown` and `ArrowUp` wrap within that sub's items.
+
 ## Groups and labels
 
 ```tsx

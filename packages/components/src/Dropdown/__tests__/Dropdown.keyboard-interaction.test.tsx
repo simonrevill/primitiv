@@ -182,4 +182,129 @@ describe("Dropdown keyboard interaction", () => {
     // Assert
     expect(rename).toHaveFocus();
   });
+
+  it("skips items inside a closed sub-content popover when ArrowDown moves past a SubTrigger", async () => {
+    // Arrange — the parent Content's items are queried via querySelectorAll,
+    // which by default also matches menuitems inside any descendant
+    // SubContent popover. Those are not focusable while the sub is closed
+    // (display: none), so the user gets stuck on the SubTrigger. Arrow
+    // navigation must scope itself to the active popover.
+    const user = userEvent.setup();
+    render(
+      <Dropdown.Root defaultOpen>
+        <Dropdown.Trigger>File</Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.Item>New</Dropdown.Item>
+          <Dropdown.Sub>
+            <Dropdown.SubTrigger>Open Recent</Dropdown.SubTrigger>
+            <Dropdown.SubContent>
+              <Dropdown.Item>Project A</Dropdown.Item>
+              <Dropdown.Item>Project B</Dropdown.Item>
+            </Dropdown.SubContent>
+          </Dropdown.Sub>
+          <Dropdown.Separator />
+          <Dropdown.CheckboxItem>Show bookmarks</Dropdown.CheckboxItem>
+        </Dropdown.Content>
+      </Dropdown.Root>,
+    );
+    const subTrigger = screen.getByRole("menuitem", {
+      name: "Open Recent",
+      hidden: true,
+    });
+    const showBookmarks = screen.getByRole("menuitemcheckbox", {
+      name: "Show bookmarks",
+      hidden: true,
+    });
+
+    // Act — focus starts on "New" (first item); ArrowDown lands on the
+    // SubTrigger; another ArrowDown must jump past the closed SubContent's
+    // items and land on the next parent-level item.
+    await user.keyboard("{ArrowDown}");
+    expect(subTrigger).toHaveFocus();
+
+    await user.keyboard("{ArrowDown}");
+
+    // Assert
+    expect(showBookmarks).toHaveFocus();
+  });
+
+  it("skips items inside a closed sub-content popover when ArrowUp moves past a SubTrigger", async () => {
+    // Arrange — the inverse of the ArrowDown case: ArrowUp from the item
+    // after the Sub must land on the SubTrigger, not on a sub item.
+    const user = userEvent.setup();
+    render(
+      <Dropdown.Root defaultOpen>
+        <Dropdown.Trigger>File</Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.Sub>
+            <Dropdown.SubTrigger>Open Recent</Dropdown.SubTrigger>
+            <Dropdown.SubContent>
+              <Dropdown.Item>Project A</Dropdown.Item>
+            </Dropdown.SubContent>
+          </Dropdown.Sub>
+          <Dropdown.Item>New</Dropdown.Item>
+        </Dropdown.Content>
+      </Dropdown.Root>,
+    );
+    const subTrigger = screen.getByRole("menuitem", {
+      name: "Open Recent",
+      hidden: true,
+    });
+    const newItem = screen.getByRole("menuitem", {
+      name: "New",
+      hidden: true,
+    });
+
+    // Act — focus starts on the SubTrigger; move down to "New" then back up
+    await user.keyboard("{ArrowDown}");
+    expect(newItem).toHaveFocus();
+
+    await user.keyboard("{ArrowUp}");
+
+    // Assert
+    expect(subTrigger).toHaveFocus();
+  });
+
+  it("scopes ArrowDown navigation to items inside the open SubContent rather than wrapping into the parent menu", async () => {
+    // Arrange — when focus lives inside an open SubContent, ArrowDown must
+    // wrap within the sub's own items and never escape into siblings of
+    // the SubTrigger in the parent menu.
+    const user = userEvent.setup();
+    render(
+      <Dropdown.Root defaultOpen>
+        <Dropdown.Trigger>File</Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.Sub defaultOpen>
+            <Dropdown.SubTrigger>Open Recent</Dropdown.SubTrigger>
+            <Dropdown.SubContent>
+              <Dropdown.Item>Project A</Dropdown.Item>
+              <Dropdown.Item>Project B</Dropdown.Item>
+            </Dropdown.SubContent>
+          </Dropdown.Sub>
+          <Dropdown.Item>New</Dropdown.Item>
+        </Dropdown.Content>
+      </Dropdown.Root>,
+    );
+    const projectA = screen.getByRole("menuitem", {
+      name: "Project A",
+      hidden: true,
+    });
+    const projectB = screen.getByRole("menuitem", {
+      name: "Project B",
+      hidden: true,
+    });
+
+    // Sub auto-focuses its first item on open
+    expect(projectA).toHaveFocus();
+
+    // Act — ArrowDown advances within the sub
+    await user.keyboard("{ArrowDown}");
+    expect(projectB).toHaveFocus();
+
+    // Act — ArrowDown again: wraps within the sub, NOT into "New" in the parent
+    await user.keyboard("{ArrowDown}");
+
+    // Assert
+    expect(projectA).toHaveFocus();
+  });
 });

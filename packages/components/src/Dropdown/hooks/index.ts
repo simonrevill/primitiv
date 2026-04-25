@@ -3,6 +3,7 @@ export { useDropdownContent } from "./useDropdownContent";
 export { useDropdownContext } from "./useDropdownContext";
 export { useDropdownGroup } from "./useDropdownGroup";
 export { useDropdownItem } from "./useDropdownItem";
+export { useDropdownLabel } from "./useDropdownLabel";
 export { useDropdownRoot } from "./useDropdownRoot";
 export { useDropdownSubContext } from "./useDropdownSubContext";
 export { useDropdownTrigger } from "./useDropdownTrigger";

@@ -16,6 +16,7 @@ import {
   useDropdownContext,
   useDropdownGroup,
   useDropdownItem,
+  useDropdownLabel,
   useDropdownRoot,
   useDropdownSubContext,
   useDropdownTrigger,
@@ -297,8 +298,8 @@ function DropdownLabel({
   asChild = false,
   ...rest
 }: DropdownLabelProps) {
-  const group = useContext(DropdownGroupContext);
-  const labelProps = { ...rest, id: id ?? group?.labelId };
+  const { labelProps } = useDropdownLabel({ id, restProps: rest });
+
   if (asChild) {
     return <Slot {...labelProps}>{children}</Slot>;
   }

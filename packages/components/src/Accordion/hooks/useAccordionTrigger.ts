@@ -16,16 +16,27 @@ export function useAccordionTrigger({
   ...rest
 }: Omit<AccordionTriggerProps, "children">) {
   const { buttonId, panelId, itemId, isExpanded } = useAccordionItemContext();
-  const { toggleItem, registerTrigger, getTriggers, orientation, dir } =
-    useAccordionContext();
+  const {
+    toggleItem,
+    registerTrigger,
+    registeredTriggerItemIds,
+    disabledItemIds,
+    focusTrigger,
+    orientation,
+    dir,
+  } = useAccordionContext();
   const triggerRef = useRef<HTMLButtonElement>(null);
   const composedRef = ref ? composeRefs(triggerRef, ref) : triggerRef;
 
-  // Register/unregister this trigger with the context
+  // Register/unregister this trigger with the context. The disabled flag
+  // is now tracked in registration metadata (via useCollection's value
+  // type) instead of being read from the rendered aria-disabled attribute,
+  // which keeps Accordion consistent with RadioGroup and is the model
+  // useRovingTabindex expects.
   useEffect(() => {
-    registerTrigger(itemId, triggerRef.current);
+    registerTrigger(itemId, triggerRef.current, disabled);
     return () => registerTrigger(itemId, null);
-  }, [itemId, registerTrigger]);
+  }, [itemId, disabled, registerTrigger]);
 
   function handleClick(e: MouseEvent<HTMLButtonElement>) {
     if (disabled) return;
@@ -45,24 +56,26 @@ export function useAccordionTrigger({
     ];
     if (!action) return;
 
-    const enabledTriggers = getTriggers().filter(
-      (t) => t.getAttribute("aria-disabled") !== "true",
+    const enabledItemIds = registeredTriggerItemIds.filter(
+      (id) => !disabledItemIds.has(id),
     );
-    if (enabledTriggers.length === 0) return;
+    if (enabledItemIds.length === 0) return;
 
     e.preventDefault();
-    const currentIndex = enabledTriggers.indexOf(triggerRef.current!);
+    const currentIndex = enabledItemIds.indexOf(itemId);
     const handlers: Partial<Record<RovingKeyAction, () => void>> = {
       next: () =>
-        enabledTriggers[
-          (currentIndex + 1) % enabledTriggers.length
-        ]?.focus(),
+        focusTrigger(
+          enabledItemIds[(currentIndex + 1) % enabledItemIds.length],
+        ),
       prev: () =>
-        enabledTriggers[
-          (currentIndex - 1 + enabledTriggers.length) % enabledTriggers.length
-        ]?.focus(),
-      first: () => enabledTriggers[0]?.focus(),
-      last: () => enabledTriggers[enabledTriggers.length - 1]?.focus(),
+        focusTrigger(
+          enabledItemIds[
+            (currentIndex - 1 + enabledItemIds.length) % enabledItemIds.length
+          ],
+        ),
+      first: () => focusTrigger(enabledItemIds[0]),
+      last: () => focusTrigger(enabledItemIds[enabledItemIds.length - 1]),
     };
     handlers[action]?.();
   }

@@ -4,6 +4,11 @@ import { useCollection, useControllableState } from "../../hooks";
 
 import type { AccordionReadingDirection } from "../types";
 
+type TriggerMeta = {
+  element: HTMLButtonElement;
+  disabled: boolean;
+};
+
 export function useAccordionRoot(
   controlledValue: string[] | undefined,
   defaultValue: string | (readonly string[] & string) | undefined,
@@ -16,11 +21,43 @@ export function useAccordionRoot(
   // updateKeysOnCleanup is false so trigger unmounts don't fire setState
   // outside act() after a render-time validation throw.
   const {
-    register: registerTrigger,
+    register: registerTriggerBase,
     itemsRef: triggersRef,
     keys: registeredTriggerItemIds,
-  } = useCollection<string, HTMLButtonElement>({ updateKeysOnCleanup: false });
+  } = useCollection<string, TriggerMeta>({ updateKeysOnCleanup: false });
   const panelsRef = useRef<Set<string>>(new Set());
+
+  const registerTrigger = useCallback(
+    (
+      itemId: string,
+      element: HTMLButtonElement | null,
+      disabled = false,
+    ) => {
+      registerTriggerBase(itemId, element ? { element, disabled } : null);
+    },
+    [registerTriggerBase],
+  );
+
+  const disabledItemIds = useMemo(
+    () =>
+      new Set(
+        Array.from(triggersRef.current.entries())
+          .filter(([, meta]) => meta.disabled)
+          .map(([id]) => id),
+      ),
+    // registeredTriggerItemIds is a fresh array on every register call (new
+    // identity even when the keys are the same), so the memo re-runs whenever
+    // any trigger mounts, unmounts, or toggles disabled — which is exactly
+    // the trigger we want for re-deriving disabledItemIds.
+    [registeredTriggerItemIds, triggersRef],
+  );
+
+  const focusTrigger = useCallback(
+    (itemId: string) => {
+      triggersRef.current.get(itemId)?.element.focus();
+    },
+    [triggersRef],
+  );
 
   // Like Tabs, Accordion's existing public contract is that uncontrolled
   // mode does NOT call onValueChange — only the controlled path notifies the
@@ -81,10 +118,6 @@ export function useAccordionRoot(
     }
   }, [registeredTriggerItemIds]);
 
-  const getTriggers = useCallback(() => {
-    return Array.from(triggersRef.current.values());
-  }, []);
-
   const contextValue = useMemo(
     () => ({
       accordionId,
@@ -93,7 +126,9 @@ export function useAccordionRoot(
       dir,
       toggleItem,
       registerTrigger,
-      getTriggers,
+      registeredTriggerItemIds,
+      disabledItemIds,
+      focusTrigger,
       registerPanel,
       unregisterPanel,
     }),
@@ -104,7 +139,9 @@ export function useAccordionRoot(
       dir,
       toggleItem,
       registerTrigger,
-      getTriggers,
+      registeredTriggerItemIds,
+      disabledItemIds,
+      focusTrigger,
       registerPanel,
       unregisterPanel,
     ],

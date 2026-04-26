@@ -1,6 +1,7 @@
-import { useId, useMemo } from "react";
+import { MouseEvent } from "react";
 
 import { CollapsibleContext, useCollapsibleContext } from "./CollapsibleContext";
+import { useCollapsibleRoot } from "./hooks";
 
 import type {
   CollapsibleRootProps,
@@ -8,22 +9,16 @@ import type {
   CollapsibleContentProps,
 } from "./types";
 
-export function CollapsibleRoot({ children, ...rest }: CollapsibleRootProps) {
-  const collapsibleId = useId();
-  const open = false;
-
-  const contextValue = useMemo(
-    () => ({
-      open,
-      triggerId: `${collapsibleId}-trigger`,
-      contentId: `${collapsibleId}-content`,
-    }),
-    [open, collapsibleId],
-  );
+export function CollapsibleRoot({
+  children,
+  defaultOpen = false,
+  ...rest
+}: CollapsibleRootProps) {
+  const { contextValue } = useCollapsibleRoot(defaultOpen);
 
   return (
     <CollapsibleContext.Provider value={contextValue}>
-      <div data-state={open ? "open" : "closed"} {...rest}>
+      <div data-state={contextValue.open ? "open" : "closed"} {...rest}>
         {children}
       </div>
     </CollapsibleContext.Provider>
@@ -34,9 +29,15 @@ CollapsibleRoot.displayName = "CollapsibleRoot";
 
 export function CollapsibleTrigger({
   children,
+  onClick,
   ...rest
 }: CollapsibleTriggerProps) {
-  const { open, triggerId, contentId } = useCollapsibleContext();
+  const { open, toggle, triggerId, contentId } = useCollapsibleContext();
+
+  function handleClick(e: MouseEvent<HTMLButtonElement>) {
+    toggle();
+    onClick?.(e);
+  }
 
   return (
     <button
@@ -45,6 +46,7 @@ export function CollapsibleTrigger({
       aria-expanded={open}
       aria-controls={contentId}
       data-state={open ? "open" : "closed"}
+      onClick={handleClick}
       {...rest}
     >
       {children}

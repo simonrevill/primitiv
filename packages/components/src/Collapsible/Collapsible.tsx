@@ -1,7 +1,9 @@
-import { MouseEvent } from "react";
+import { Ref } from "react";
+
+import { Slot } from "../Slot";
 
 import { CollapsibleContext, useCollapsibleContext } from "./CollapsibleContext";
-import { useCollapsibleRoot } from "./hooks";
+import { useCollapsibleRoot, useCollapsibleTrigger } from "./hooks";
 
 import type {
   CollapsibleRootProps,
@@ -39,32 +41,30 @@ export function CollapsibleRoot({
 
 CollapsibleRoot.displayName = "CollapsibleRoot";
 
-export function CollapsibleTrigger({
+export function CollapsibleTrigger<
+  T extends HTMLElement = HTMLButtonElement,
+>({
+  ref,
   children,
   onClick,
+  onKeyDown,
+  asChild = false,
   ...rest
-}: CollapsibleTriggerProps) {
-  const { open, disabled, toggle, triggerId, contentId } =
-    useCollapsibleContext();
+}: CollapsibleTriggerProps<T>) {
+  const { triggerProps } = useCollapsibleTrigger({
+    ref: ref as Ref<HTMLButtonElement>,
+    onClick,
+    onKeyDown,
+    asChild,
+    ...rest,
+  });
 
-  function handleClick(e: MouseEvent<HTMLButtonElement>) {
-    if (disabled) return;
-    toggle();
-    onClick?.(e);
+  if (asChild) {
+    return <Slot {...triggerProps}>{children}</Slot>;
   }
 
   return (
-    <button
-      type="button"
-      id={triggerId}
-      aria-expanded={open}
-      aria-controls={contentId}
-      aria-disabled={disabled || undefined}
-      data-disabled={disabled}
-      data-state={open ? "open" : "closed"}
-      onClick={handleClick}
-      {...rest}
-    >
+    <button type="button" {...triggerProps}>
       {children}
     </button>
   );

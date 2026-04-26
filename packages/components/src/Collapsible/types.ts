@@ -1,4 +1,4 @@
-import { ComponentProps, ReactNode } from "react";
+import { ComponentProps, ReactNode, Ref } from "react";
 
 type CollapsibleRootBaseProps = Omit<ComponentProps<"div">, "onChange"> & {
   disabled?: boolean;
@@ -20,8 +20,14 @@ export type CollapsibleRootProps =
   | CollapsibleRootUncontrolledProps
   | CollapsibleRootControlledProps;
 
-export type CollapsibleTriggerProps = ComponentProps<"button"> & {
+export type CollapsibleTriggerProps<
+  T extends HTMLElement = HTMLButtonElement,
+> = Omit<ComponentProps<"button">, "ref"> & {
   children: ReactNode;
+  asChild?: boolean;
+  /** Ref to the rendered element. Defaults to `HTMLButtonElement`; when using
+   * `asChild`, specify the child's element type (e.g. `HTMLAnchorElement`). */
+  ref?: Ref<T>;
 };
 
 export type CollapsibleContentProps = ComponentProps<"div"> & {

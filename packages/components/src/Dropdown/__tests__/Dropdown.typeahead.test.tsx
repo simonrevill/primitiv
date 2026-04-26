@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { Dropdown } from "../Dropdown";
@@ -100,5 +100,34 @@ describe("Dropdown typeahead", () => {
 
     // Assert
     expect(apple).toHaveFocus();
+  });
+
+  it("ignores non-printable keys so they do not pollute the typeahead query", () => {
+    // Arrange
+    render(
+      <Dropdown.Root defaultOpen>
+        <Dropdown.Trigger>Options</Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.Item>Apple</Dropdown.Item>
+          <Dropdown.Item>Banana</Dropdown.Item>
+        </Dropdown.Content>
+      </Dropdown.Root>,
+    );
+    const menu = screen.getByRole("menu", { hidden: true });
+    const banana = screen.getByRole("menuitem", {
+      name: "Banana",
+      hidden: true,
+    });
+
+    // Act — "Tab" is a multi-character event.key (length 3), so the
+    //        typeahead branch must be skipped. If the length guard
+    //        weren't there, the query would accumulate to "tabb" after
+    //        the following "b" press and no item would match.
+    fireEvent.keyDown(menu, { key: "Tab" });
+    fireEvent.keyDown(menu, { key: "b" });
+
+    // Assert — the "Tab" press did not contribute to the typeahead
+    //          query; "b" started a fresh search and matched Banana.
+    expect(banana).toHaveFocus();
   });
 });

@@ -1,6 +1,8 @@
 import { ComponentProps, ReactNode } from "react";
 
-type CollapsibleRootBaseProps = Omit<ComponentProps<"div">, "onChange">;
+type CollapsibleRootBaseProps = Omit<ComponentProps<"div">, "onChange"> & {
+  disabled?: boolean;
+};
 
 type CollapsibleRootUncontrolledProps = CollapsibleRootBaseProps & {
   defaultOpen?: boolean;
@@ -28,6 +30,7 @@ export type CollapsibleContentProps = ComponentProps<"div"> & {
 
 export type CollapsibleContextValue = {
   open: boolean;
+  disabled: boolean;
   toggle: () => void;
   triggerId: string;
   contentId: string;

@@ -6,6 +6,7 @@ export function useCollapsibleRoot(
   controlledOpen: boolean | undefined,
   defaultOpen: boolean,
   onOpenChange: ((open: boolean) => void) | undefined,
+  disabled: boolean,
 ) {
   const collapsibleId = useId();
   const [open, setOpen] = useControllableState<boolean>(
@@ -21,11 +22,12 @@ export function useCollapsibleRoot(
   const contextValue = useMemo(
     () => ({
       open,
+      disabled,
       toggle,
       triggerId: `${collapsibleId}-trigger`,
       contentId: `${collapsibleId}-content`,
     }),
-    [open, toggle, collapsibleId],
+    [open, disabled, toggle, collapsibleId],
   );
 
   return { contextValue };

@@ -1,5 +1,6 @@
 export * from "./Accordion";
 export * from "./Checkbox";
+export * from "./Collapsible";
 export * from "./Divider";
 export * from "./Dropdown";
 export * from "./Modal";

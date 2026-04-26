@@ -26,6 +26,7 @@ export type CollapsibleTriggerProps = ComponentProps<"button"> & {
 
 export type CollapsibleContentProps = ComponentProps<"div"> & {
   children: ReactNode;
+  forceMount?: boolean;
 };
 
 export type CollapsibleContextValue = {

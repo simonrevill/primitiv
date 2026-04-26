@@ -74,6 +74,7 @@ CollapsibleTrigger.displayName = "CollapsibleTrigger";
 
 export function CollapsibleContent({
   children,
+  forceMount = false,
   ...rest
 }: CollapsibleContentProps) {
   const { open, disabled, contentId } = useCollapsibleContext();
@@ -81,7 +82,8 @@ export function CollapsibleContent({
   return (
     <div
       id={contentId}
-      hidden={!open}
+      hidden={forceMount ? undefined : !open}
+      aria-hidden={forceMount && !open ? true : undefined}
       data-state={open ? "open" : "closed"}
       data-disabled={disabled}
       {...rest}

@@ -12,9 +12,15 @@ import type {
 export function CollapsibleRoot({
   children,
   defaultOpen = false,
+  open: controlledOpen,
+  onOpenChange,
   ...rest
 }: CollapsibleRootProps) {
-  const { contextValue } = useCollapsibleRoot(defaultOpen);
+  const { contextValue } = useCollapsibleRoot(
+    controlledOpen,
+    defaultOpen,
+    onOpenChange,
+  );
 
   return (
     <CollapsibleContext.Provider value={contextValue}>

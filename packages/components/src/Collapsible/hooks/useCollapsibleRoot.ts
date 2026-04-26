@@ -1,12 +1,22 @@
-import { useCallback, useId, useMemo, useState } from "react";
+import { useCallback, useId, useMemo } from "react";
 
-export function useCollapsibleRoot(defaultOpen: boolean) {
+import { useControllableState } from "../../hooks";
+
+export function useCollapsibleRoot(
+  controlledOpen: boolean | undefined,
+  defaultOpen: boolean,
+  onOpenChange: ((open: boolean) => void) | undefined,
+) {
   const collapsibleId = useId();
-  const [open, setOpen] = useState(defaultOpen);
+  const [open, setOpen] = useControllableState<boolean>(
+    controlledOpen,
+    defaultOpen,
+    onOpenChange,
+  );
 
   const toggle = useCallback(() => {
-    setOpen((current) => !current);
-  }, []);
+    setOpen(!open);
+  }, [open, setOpen]);
 
   const contextValue = useMemo(
     () => ({

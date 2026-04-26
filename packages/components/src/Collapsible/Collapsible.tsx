@@ -9,6 +9,7 @@ import type {
   CollapsibleRootProps,
   CollapsibleTriggerProps,
   CollapsibleContentProps,
+  CollapsibleTriggerIconProps,
 } from "./types";
 
 export function CollapsibleRoot({
@@ -95,16 +96,37 @@ export function CollapsibleContent({
 
 CollapsibleContent.displayName = "CollapsibleContent";
 
+export function CollapsibleTriggerIcon({
+  children,
+  ...rest
+}: CollapsibleTriggerIconProps) {
+  const { open } = useCollapsibleContext();
+
+  return (
+    <span
+      aria-hidden="true"
+      data-state={open ? "open" : "closed"}
+      {...rest}
+    >
+      {children}
+    </span>
+  );
+}
+
+CollapsibleTriggerIcon.displayName = "CollapsibleTriggerIcon";
+
 type CollapsibleCompound = typeof CollapsibleRoot & {
   Root: typeof CollapsibleRoot;
   Trigger: typeof CollapsibleTrigger;
   Content: typeof CollapsibleContent;
+  TriggerIcon: typeof CollapsibleTriggerIcon;
 };
 
 const CollapsibleCompound: CollapsibleCompound = Object.assign(CollapsibleRoot, {
   Root: CollapsibleRoot,
   Trigger: CollapsibleTrigger,
   Content: CollapsibleContent,
+  TriggerIcon: CollapsibleTriggerIcon,
 });
 
 CollapsibleCompound.displayName = "Collapsible";

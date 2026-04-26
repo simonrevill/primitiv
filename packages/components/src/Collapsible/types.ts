@@ -35,6 +35,10 @@ export type CollapsibleContentProps = ComponentProps<"div"> & {
   forceMount?: boolean;
 };
 
+export type CollapsibleTriggerIconProps = ComponentProps<"span"> & {
+  children: ReactNode;
+};
+
 export type CollapsibleContextValue = {
   open: boolean;
   disabled: boolean;

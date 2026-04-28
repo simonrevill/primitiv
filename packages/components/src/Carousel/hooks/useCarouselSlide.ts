@@ -14,7 +14,7 @@ import { useCarouselContext } from "./useCarouselContext";
  * during a render pass driven by an external state change.
  */
 export function useCarouselSlide() {
-  const { registerSlide, slideKeys } = useCarouselContext();
+  const { registerSlide, slideKeys, currentPage } = useCarouselContext();
   const slideKey = useId();
 
   const slideRef = useCallback(
@@ -26,6 +26,8 @@ export function useCarouselSlide() {
 
   const index = slideKeys.indexOf(slideKey);
   const total = slideKeys.length;
+  const isActive = index >= 0 && index === currentPage;
+  const state: "active" | "inactive" = isActive ? "active" : "inactive";
 
-  return { slideRef, index, total };
+  return { slideRef, index, total, state };
 }

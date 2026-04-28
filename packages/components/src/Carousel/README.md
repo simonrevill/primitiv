@@ -22,11 +22,16 @@ Currently exposes:
   slide knows its zero-based `data-index` and the live `data-total`
   count, even as slides mount and unmount. Each slide is auto-labelled
   `"N of M"` (e.g. `"1 of 3"`); pass `ariaLabel` to override with a more
-  meaningful description (e.g. `"Hand-picked for you"`). Sets a
+  meaningful description (e.g. `"Hand-picked for you"`). Emits
+  `data-state="active" | "inactive"` tracking the active page, plus a
   `data-carousel-slide` CSS hook.
+- **`Carousel.NextTrigger`** — `<button>` that advances the active page
+  by one. Consumer `onClick` runs before the navigation.
+- **`Carousel.PreviousTrigger`** — `<button>` that retreats the active
+  page by one. Consumer `onClick` runs before the navigation.
 
-Sub-components for prev/next triggers, indicators, and auto-rotation
-are added in subsequent cycles.
+Boundary clamping (disabling Prev/Next at the ends), `loop`, indicators,
+and auto-rotation are added in subsequent cycles.
 
 ## Usage
 
@@ -77,6 +82,30 @@ a more meaningful description, pass `ariaLabel`:
 ```
 
 The override remains stable as siblings mount and unmount around it.
+
+### Navigating between slides
+
+`Carousel.NextTrigger` and `Carousel.PreviousTrigger` advance and retreat
+the active page. Each slide's `data-state` flips between `"active"` and
+`"inactive"` so consumer CSS can paint the current slide differently.
+The Root accepts `defaultPage` to seed the initial active slide
+(uncontrolled mode):
+
+```tsx
+<Carousel.Root ariaLabel="Featured products" defaultPage={0}>
+  <Carousel.Viewport>
+    <Carousel.Slide>First</Carousel.Slide>
+    <Carousel.Slide>Second</Carousel.Slide>
+    <Carousel.Slide>Third</Carousel.Slide>
+  </Carousel.Viewport>
+  <Carousel.PreviousTrigger>Previous</Carousel.PreviousTrigger>
+  <Carousel.NextTrigger>Next</Carousel.NextTrigger>
+</Carousel.Root>
+```
+
+Boundary clamping (disabled triggers at the ends) and `loop` are added
+in a later cycle — for now, advancing past the last slide is a no-op
+visually because no slide's `data-state` matches an out-of-range page.
 
 Apply your own scroll-snap CSS via the `data-carousel-viewport` and
 `data-carousel-slide` attributes. The minimal recipe lives in

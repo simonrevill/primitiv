@@ -14,7 +14,12 @@ export type CarouselRootProps = Omit<
   ComponentProps<"section">,
   "aria-label" | "aria-labelledby"
 > &
-  CarouselRootLabelProps;
+  CarouselRootLabelProps & {
+    /** Uncontrolled active page index. Defaults to `0`. The Root owns
+     * and updates the page internally as the consumer interacts with
+     * `Carousel.NextTrigger`, `Carousel.PreviousTrigger`, etc. */
+    defaultPage?: number;
+  };
 
 /**
  * Shape of the context published by `Carousel.Root` to descendants.
@@ -28,6 +33,12 @@ export type CarouselContextValue = {
   /** Ordered list of currently-mounted slide keys. The slide's index is
    * its position in this array; the array's length is the total. */
   slideKeys: string[];
+  /** Zero-based index of the currently-active page. */
+  currentPage: number;
+  /** Advance the active page by one step. */
+  next: () => void;
+  /** Retreat the active page by one step. */
+  previous: () => void;
 };
 
 export type CarouselViewportProps = ComponentProps<"div">;
@@ -39,3 +50,7 @@ export type CarouselSlideProps = Omit<ComponentProps<"div">, "aria-label"> & {
    * with their live index and total in registration order. */
   ariaLabel?: string;
 };
+
+export type CarouselNextTriggerProps = ComponentProps<"button">;
+
+export type CarouselPreviousTriggerProps = ComponentProps<"button">;

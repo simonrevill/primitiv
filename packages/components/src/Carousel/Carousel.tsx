@@ -1,3 +1,5 @@
+import { MouseEvent, useCallback } from "react";
+
 import { CarouselProvider } from "./CarouselContext";
 import {
   useCarouselContext,
@@ -8,6 +10,8 @@ import type {
   CarouselRootProps,
   CarouselViewportProps,
   CarouselSlideProps,
+  CarouselNextTriggerProps,
+  CarouselPreviousTriggerProps,
 } from "./types";
 
 /**
@@ -41,10 +45,11 @@ export function CarouselRoot({
   className = "",
   ariaLabel,
   ariaLabelledBy,
+  defaultPage,
   children,
   ...rest
 }: CarouselRootProps) {
-  const { contextValue } = useCarouselRoot();
+  const { contextValue } = useCarouselRoot({ defaultPage });
 
   return (
     <CarouselProvider value={contextValue}>
@@ -152,7 +157,7 @@ export function CarouselSlide({
   children,
   ...rest
 }: CarouselSlideProps) {
-  const { slideRef, index, total } = useCarouselSlide();
+  const { slideRef, index, total, state } = useCarouselSlide();
   const autoLabel =
     index >= 0 && total > 0 ? `${index + 1} of ${total}` : undefined;
   const label = ariaLabel ?? autoLabel;
@@ -165,6 +170,7 @@ export function CarouselSlide({
       data-carousel-slide=""
       data-index={index}
       data-total={total}
+      data-state={state}
       className={className}
       {...(label !== undefined && { "aria-label": label })}
       {...rest}
@@ -176,10 +182,106 @@ export function CarouselSlide({
 
 CarouselSlide.displayName = "CarouselSlide";
 
+/**
+ * Advances the active page by one. Renders as
+ * `<button type="button">` and dispatches the consumer's `onClick`
+ * before invoking the navigation, so analytics handlers and similar
+ * still fire when the user advances the carousel.
+ *
+ * Boundary clamping (`disabled` on the last page when `loop` is off) is
+ * added in a later cycle; in this cycle the trigger advances naively.
+ *
+ * Must be rendered as a descendant of `Carousel.Root`; rendering it
+ * elsewhere throws a descriptive error.
+ *
+ * @example
+ * ```tsx
+ * <Carousel.NextTrigger>Next</Carousel.NextTrigger>
+ * ```
+ */
+export function CarouselNextTrigger({
+  className = "",
+  onClick,
+  children,
+  ...rest
+}: CarouselNextTriggerProps) {
+  const { next } = useCarouselContext();
+
+  const handleClick = useCallback(
+    (event: MouseEvent<HTMLButtonElement>) => {
+      onClick?.(event);
+      next();
+    },
+    [next, onClick],
+  );
+
+  return (
+    <button
+      type="button"
+      className={className}
+      onClick={handleClick}
+      {...rest}
+    >
+      {children}
+    </button>
+  );
+}
+
+CarouselNextTrigger.displayName = "CarouselNextTrigger";
+
+/**
+ * Retreats the active page by one. Renders as
+ * `<button type="button">` and dispatches the consumer's `onClick`
+ * before invoking the navigation, so analytics handlers and similar
+ * still fire when the user retreats the carousel.
+ *
+ * Boundary clamping (`disabled` on the first page when `loop` is off) is
+ * added in a later cycle; in this cycle the trigger retreats naively.
+ *
+ * Must be rendered as a descendant of `Carousel.Root`; rendering it
+ * elsewhere throws a descriptive error.
+ *
+ * @example
+ * ```tsx
+ * <Carousel.PreviousTrigger>Previous</Carousel.PreviousTrigger>
+ * ```
+ */
+export function CarouselPreviousTrigger({
+  className = "",
+  onClick,
+  children,
+  ...rest
+}: CarouselPreviousTriggerProps) {
+  const { previous } = useCarouselContext();
+
+  const handleClick = useCallback(
+    (event: MouseEvent<HTMLButtonElement>) => {
+      onClick?.(event);
+      previous();
+    },
+    [previous, onClick],
+  );
+
+  return (
+    <button
+      type="button"
+      className={className}
+      onClick={handleClick}
+      {...rest}
+    >
+      {children}
+    </button>
+  );
+}
+
+CarouselPreviousTrigger.displayName = "CarouselPreviousTrigger";
+
 type CarouselCompound = typeof CarouselRoot & {
   Root: typeof CarouselRoot;
   Viewport: typeof CarouselViewport;
   Slide: typeof CarouselSlide;
+  NextTrigger: typeof CarouselNextTrigger;
+  PreviousTrigger: typeof CarouselPreviousTrigger;
 };
 
 /**
@@ -196,6 +298,10 @@ type CarouselCompound = typeof CarouselRoot & {
  *   container that the recommended scroll-snap CSS targets.
  * - {@link CarouselSlide | `Carousel.Slide`} — an individual slide,
  *   self-registering with the Root for live index / total tracking.
+ * - {@link CarouselNextTrigger | `Carousel.NextTrigger`} — advances
+ *   the active page by one.
+ * - {@link CarouselPreviousTrigger | `Carousel.PreviousTrigger`} —
+ *   retreats the active page by one.
  *
  * @example
  * ```tsx
@@ -206,6 +312,8 @@ type CarouselCompound = typeof CarouselRoot & {
  *     <Carousel.Slide>First</Carousel.Slide>
  *     <Carousel.Slide>Second</Carousel.Slide>
  *   </Carousel.Viewport>
+ *   <Carousel.PreviousTrigger>Previous</Carousel.PreviousTrigger>
+ *   <Carousel.NextTrigger>Next</Carousel.NextTrigger>
  * </Carousel.Root>
  * ```
  */
@@ -213,6 +321,8 @@ const CarouselCompound: CarouselCompound = Object.assign(CarouselRoot, {
   Root: CarouselRoot,
   Viewport: CarouselViewport,
   Slide: CarouselSlide,
+  NextTrigger: CarouselNextTrigger,
+  PreviousTrigger: CarouselPreviousTrigger,
 });
 
 CarouselCompound.displayName = "Carousel";

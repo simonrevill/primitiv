@@ -20,8 +20,10 @@ Currently exposes:
 - **`Carousel.Slide`** — an individual slide. Renders a `<div role="group"
   aria-roledescription="slide">` and self-registers with the Root so each
   slide knows its zero-based `data-index` and the live `data-total`
-  count, even as slides mount and unmount. Sets a `data-carousel-slide`
-  CSS hook.
+  count, even as slides mount and unmount. Each slide is auto-labelled
+  `"N of M"` (e.g. `"1 of 3"`); pass `ariaLabel` to override with a more
+  meaningful description (e.g. `"Hand-picked for you"`). Sets a
+  `data-carousel-slide` CSS hook.
 
 Sub-components for prev/next triggers, indicators, and auto-rotation
 are added in subsequent cycles.
@@ -65,6 +67,16 @@ Each `Carousel.Slide` self-registers with the Root, so every slide
 exposes its own `data-index="0"`, `data-index="1"`, … and a live
 `data-total` reflecting the current slide count. Add or remove slides at
 runtime and the indices and totals update automatically.
+
+Slides are also auto-labelled `"N of M"` (e.g. `"1 of 3"`) — the format
+the WAI-ARIA Carousel APG example uses. To override the auto-label with
+a more meaningful description, pass `ariaLabel`:
+
+```tsx
+<Carousel.Slide ariaLabel="Hand-picked for you">…</Carousel.Slide>
+```
+
+The override remains stable as siblings mount and unmount around it.
 
 Apply your own scroll-snap CSS via the `data-carousel-viewport` and
 `data-carousel-slide` attributes. The minimal recipe lives in

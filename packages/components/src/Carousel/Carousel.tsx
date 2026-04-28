@@ -117,6 +117,13 @@ CarouselViewport.displayName = "CarouselViewport";
  * `data-total` count. Slides may be added or removed at runtime; the
  * indices and totals update automatically.
  *
+ * **Auto-labelling.** Each slide is labelled `"N of M"` (e.g. `"1 of 3"`)
+ * using its live index and the live total — the format the WAI-ARIA
+ * Carousel APG example uses, and what most screen readers expect. Pass
+ * {@link CarouselSlideProps.ariaLabel | `ariaLabel`} to override the
+ * auto-label with a more meaningful description (e.g.
+ * `"Hand-picked for you"`).
+ *
  * **Styling hooks.**
  * - `data-carousel-slide` — CSS-targeting attribute (recommended scroll-snap
  *   recipe targets `[data-carousel-slide]`).
@@ -126,20 +133,29 @@ CarouselViewport.displayName = "CarouselViewport";
  * Must be rendered as a descendant of `Carousel.Root`; rendering it
  * elsewhere throws a descriptive error.
  *
- * @example
+ * @example Auto-labelled
  * ```tsx
  * <Carousel.Viewport>
  *   <Carousel.Slide>First slide</Carousel.Slide>
  *   <Carousel.Slide>Second slide</Carousel.Slide>
  * </Carousel.Viewport>
  * ```
+ *
+ * @example Override the auto-label
+ * ```tsx
+ * <Carousel.Slide ariaLabel="Hand-picked for you">…</Carousel.Slide>
+ * ```
  */
 export function CarouselSlide({
   className = "",
+  ariaLabel,
   children,
   ...rest
 }: CarouselSlideProps) {
   const { slideRef, index, total } = useCarouselSlide();
+  const autoLabel =
+    index >= 0 && total > 0 ? `${index + 1} of ${total}` : undefined;
+  const label = ariaLabel ?? autoLabel;
 
   return (
     <div
@@ -150,6 +166,7 @@ export function CarouselSlide({
       data-index={index}
       data-total={total}
       className={className}
+      {...(label !== undefined && { "aria-label": label })}
       {...rest}
     >
       {children}

@@ -32,4 +32,10 @@ export type CarouselContextValue = {
 
 export type CarouselViewportProps = ComponentProps<"div">;
 
-export type CarouselSlideProps = ComponentProps<"div">;
+export type CarouselSlideProps = Omit<ComponentProps<"div">, "aria-label"> & {
+  /** Override the auto-generated `"N of M"` `aria-label`. Use this when
+   * the slide has a more meaningful description than its position
+   * (e.g. `"Hand-picked for you"`). When omitted, slides are labelled
+   * with their live index and total in registration order. */
+  ariaLabel?: string;
+};

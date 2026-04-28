@@ -148,8 +148,164 @@ describe("Carousel basic rendering tests", () => {
     });
   });
 
+  describe("Carousel.Slide", () => {
+    it("should render the Carousel.Slide component inside the viewport", () => {
+      render(
+        <Carousel.Root ariaLabel="Featured products">
+          <Carousel.Viewport>
+            <Carousel.Slide data-testid="slide" />
+          </Carousel.Viewport>
+        </Carousel.Root>,
+      );
+
+      expect(screen.getByTestId("slide")).toBeVisible();
+    });
+
+    it('should render with role="group" so assistive tech treats each slide as a discrete group', () => {
+      render(
+        <Carousel.Root ariaLabel="Featured products">
+          <Carousel.Viewport>
+            <Carousel.Slide data-testid="slide" />
+          </Carousel.Viewport>
+        </Carousel.Root>,
+      );
+
+      expect(screen.getByTestId("slide")).toHaveAttribute("role", "group");
+    });
+
+    it('should render with aria-roledescription="slide" per the WAI-ARIA Carousel pattern', () => {
+      render(
+        <Carousel.Root ariaLabel="Featured products">
+          <Carousel.Viewport>
+            <Carousel.Slide data-testid="slide" />
+          </Carousel.Viewport>
+        </Carousel.Root>,
+      );
+
+      expect(screen.getByTestId("slide")).toHaveAttribute(
+        "aria-roledescription",
+        "slide",
+      );
+    });
+
+    it("should set a data-carousel-slide attribute as a CSS-targeting hook", () => {
+      render(
+        <Carousel.Root ariaLabel="Featured products">
+          <Carousel.Viewport>
+            <Carousel.Slide data-testid="slide" />
+          </Carousel.Viewport>
+        </Carousel.Root>,
+      );
+
+      expect(screen.getByTestId("slide")).toHaveAttribute(
+        "data-carousel-slide",
+        "",
+      );
+    });
+
+    it("should render children inside the slide", () => {
+      render(
+        <Carousel.Root ariaLabel="Featured products">
+          <Carousel.Viewport>
+            <Carousel.Slide>
+              <p>Slide content</p>
+            </Carousel.Slide>
+          </Carousel.Viewport>
+        </Carousel.Root>,
+      );
+
+      expect(screen.getByText("Slide content")).toBeVisible();
+    });
+
+    it("should accept a className prop", () => {
+      const testClass = "custom-slide";
+      render(
+        <Carousel.Root ariaLabel="Featured products">
+          <Carousel.Viewport>
+            <Carousel.Slide className={testClass} data-testid="slide" />
+          </Carousel.Viewport>
+        </Carousel.Root>,
+      );
+
+      expect(screen.getByTestId("slide")).toHaveAttribute("class", testClass);
+    });
+
+    it("should apply a className of empty string by default when not specified", () => {
+      render(
+        <Carousel.Root ariaLabel="Featured products">
+          <Carousel.Viewport>
+            <Carousel.Slide data-testid="slide" />
+          </Carousel.Viewport>
+        </Carousel.Root>,
+      );
+
+      expect(screen.getByTestId("slide")).toHaveAttribute("class", "");
+    });
+
+    it("should expose its zero-based registration position as data-index", () => {
+      render(
+        <Carousel.Root ariaLabel="Featured products">
+          <Carousel.Viewport>
+            <Carousel.Slide data-testid="slide-0" />
+            <Carousel.Slide data-testid="slide-1" />
+            <Carousel.Slide data-testid="slide-2" />
+          </Carousel.Viewport>
+        </Carousel.Root>,
+      );
+
+      expect(screen.getByTestId("slide-0")).toHaveAttribute("data-index", "0");
+      expect(screen.getByTestId("slide-1")).toHaveAttribute("data-index", "1");
+      expect(screen.getByTestId("slide-2")).toHaveAttribute("data-index", "2");
+    });
+
+    it("should expose the total registered slide count as data-total on every slide", () => {
+      render(
+        <Carousel.Root ariaLabel="Featured products">
+          <Carousel.Viewport>
+            <Carousel.Slide data-testid="slide-0" />
+            <Carousel.Slide data-testid="slide-1" />
+            <Carousel.Slide data-testid="slide-2" />
+          </Carousel.Viewport>
+        </Carousel.Root>,
+      );
+
+      ["slide-0", "slide-1", "slide-2"].forEach((id) => {
+        expect(screen.getByTestId(id)).toHaveAttribute("data-total", "3");
+      });
+    });
+
+    it("should update data-index and data-total when slides are unmounted", () => {
+      const { rerender } = render(
+        <Carousel.Root ariaLabel="Featured products">
+          <Carousel.Viewport>
+            <Carousel.Slide data-testid="slide-0" />
+            <Carousel.Slide data-testid="slide-1" />
+            <Carousel.Slide data-testid="slide-2" />
+          </Carousel.Viewport>
+        </Carousel.Root>,
+      );
+
+      rerender(
+        <Carousel.Root ariaLabel="Featured products">
+          <Carousel.Viewport>
+            <Carousel.Slide data-testid="slide-0" />
+            <Carousel.Slide data-testid="slide-2" />
+          </Carousel.Viewport>
+        </Carousel.Root>,
+      );
+
+      expect(screen.getByTestId("slide-0")).toHaveAttribute("data-index", "0");
+      expect(screen.getByTestId("slide-2")).toHaveAttribute("data-index", "1");
+      expect(screen.getByTestId("slide-0")).toHaveAttribute("data-total", "2");
+      expect(screen.getByTestId("slide-2")).toHaveAttribute("data-total", "2");
+    });
+  });
+
   describe("context errors", () => {
-    it.each([["Carousel.Viewport", () => <Carousel.Viewport />]] as const)(
+    it.each([
+      ["Carousel.Viewport", () => <Carousel.Viewport />],
+      ["Carousel.Slide", () => <Carousel.Slide />],
+    ] as const)(
       "should throw an error when %s is used outside Carousel.Root",
       (_, ComponentRenderer) => {
         expect(() => {

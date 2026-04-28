@@ -19,6 +19,7 @@ import { Tabs } from "@primitiv/components";
 | Component                                 | Description                                             |
 | ----------------------------------------- | ------------------------------------------------------- |
 | [Accordion](src/Accordion/README.md)      | WAI-ARIA Accordion pattern — collapsible sections with keyboard navigation, controlled/uncontrolled state, multiple mode, and `asChild` composition |
+| [Carousel](src/Carousel/README.md)        | WAI-ARIA Carousel pattern — compound component built on native CSS scroll-snap with swipe support, keyboard navigation, slide indicators, optional auto-rotation with WCAG 2.2.2 pause behaviour, and `asChild` composition |
 | [Checkbox](src/Checkbox/README.md)        | WAI-ARIA Checkbox pattern — native `<button role="checkbox">` with tri-state (`"indeterminate"` / `aria-checked="mixed"`), controlled/uncontrolled state, `Indicator` slot, and `asChild` composition |
 | [Divider](src/Divider/README.md)          | WAI-ARIA separator role — horizontal or vertical content separator, with semantic and decorative use |
 | [Dropdown](src/Dropdown/README.md)        | WAI-ARIA Menu Button / Menu pattern — native HTML `popover` compound component with nested submenus, checkbox and radio items, `ItemIndicator` icon slot, groups and labels, keyboard navigation, typeahead, disabled-item skipping, `onSelect` escape hatch, and `asChild` composition |

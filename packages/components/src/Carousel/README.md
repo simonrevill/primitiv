@@ -88,8 +88,11 @@ The override remains stable as siblings mount and unmount around it.
 `Carousel.NextTrigger` and `Carousel.PreviousTrigger` advance and retreat
 the active page. Each slide's `data-state` flips between `"active"` and
 `"inactive"` so consumer CSS can paint the current slide differently.
-The Root accepts `defaultPage` to seed the initial active slide
-(uncontrolled mode):
+
+#### Uncontrolled
+
+Pass `defaultPage` (or omit it for `0`); the Root owns the active page
+internally:
 
 ```tsx
 <Carousel.Root ariaLabel="Featured products" defaultPage={0}>
@@ -102,6 +105,31 @@ The Root accepts `defaultPage` to seed the initial active slide
   <Carousel.NextTrigger>Next</Carousel.NextTrigger>
 </Carousel.Root>
 ```
+
+#### Controlled
+
+Pass `page` and `onPageChange` together to lift state into the parent.
+The Root defers every state change back through the callback — clicks
+on `NextTrigger` / `PreviousTrigger` invoke `onPageChange` with the
+proposed page; the visual reflects whatever `page` value the parent
+re-renders with. Useful for syncing two carousels (e.g. a thumbnail
+strip), persisting the active page to a URL, or reacting to deep links.
+
+```tsx
+const [page, setPage] = useState(0);
+
+<Carousel.Root
+  ariaLabel="Featured products"
+  page={page}
+  onPageChange={setPage}
+>
+  …
+</Carousel.Root>;
+```
+
+The discriminated union on the props type rejects mixed shapes (e.g.
+both `defaultPage` and `page`, or `page` without `onPageChange`) at
+compile time.
 
 Boundary clamping (disabled triggers at the ends) and `loop` are added
 in a later cycle — for now, advancing past the last slide is a no-op

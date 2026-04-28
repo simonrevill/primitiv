@@ -22,17 +22,38 @@ import type {
  *
  * Every carousel must have an accessible name. Pass exactly one of:
  *
- * - {@link CarouselRootProps.ariaLabel | `ariaLabel`} — a short
- *   human-readable description (e.g. `"Featured products"`).
- * - {@link CarouselRootProps.ariaLabelledBy | `ariaLabelledBy`} — the
- *   `id` of an existing heading or label element.
+ * - `ariaLabel` — a short human-readable description (e.g.
+ *   `"Featured products"`).
+ * - `ariaLabelledBy` — the `id` of an existing heading or label element.
  *
  * The discriminated union on the props type rejects both-or-neither at
  * compile time.
  *
- * @example Labelled inline
+ * Supports two **page-state modes**, statically discriminated at the type
+ * level so only one of the two shapes is accepted by TypeScript:
+ *
+ * - **Uncontrolled** — pass `defaultPage` (or omit it and start at `0`).
+ *   The component owns and updates the active page internally.
+ * - **Controlled** — pass `page` *and* `onPageChange` together. The
+ *   parent owns the active page; the component defers every state
+ *   change back through the callback.
+ *
+ * @example Labelled inline, uncontrolled
  * ```tsx
- * <Carousel.Root ariaLabel="Featured products">…</Carousel.Root>
+ * <Carousel.Root ariaLabel="Featured products" defaultPage={0}>…</Carousel.Root>
+ * ```
+ *
+ * @example Controlled
+ * ```tsx
+ * const [page, setPage] = useState(0);
+ *
+ * <Carousel.Root
+ *   ariaLabel="Featured products"
+ *   page={page}
+ *   onPageChange={setPage}
+ * >
+ *   …
+ * </Carousel.Root>
  * ```
  *
  * @example Labelled by an existing heading
@@ -46,10 +67,16 @@ export function CarouselRoot({
   ariaLabel,
   ariaLabelledBy,
   defaultPage,
+  page,
+  onPageChange,
   children,
   ...rest
 }: CarouselRootProps) {
-  const { contextValue } = useCarouselRoot({ defaultPage });
+  const { contextValue } = useCarouselRoot({
+    defaultPage,
+    page,
+    onPageChange,
+  });
 
   return (
     <CarouselProvider value={contextValue}>

@@ -1,6 +1,17 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 
-import type { CarouselContextValue, CarouselRootProps } from "../types";
+import type { CarouselContextValue } from "../types";
+
+type UseCarouselRootProps = {
+  /** Uncontrolled seed for the active page. Defaults to `0`. */
+  defaultPage?: number;
+  /** Controlled active page. When provided, the hook is in controlled
+   * mode and defers all state changes back through `onPageChange`. */
+  page?: number;
+  /** Required when `page` is provided. Invoked with the next page
+   * value the Root would like to advance to. */
+  onPageChange?: (page: number) => void;
+};
 
 /**
  * Owns the Root-side state for a Carousel: the slide registration map,
@@ -9,20 +20,28 @@ import type { CarouselContextValue, CarouselRootProps } from "../types";
  * Slide keys are tracked as `useState` so registration and unregistration
  * trigger a re-render — descendants that depend on slide order, count, or
  * the active page (e.g. each `Carousel.Slide`'s `data-index` /
- * `data-total` / `data-state`) update automatically when slides mount and
- * unmount.
+ * `data-total` / `data-state`) update automatically when slides mount
+ * and unmount.
  *
- * The active page is uncontrolled: callers seed it with `defaultPage`
- * (defaults to `0`); the hook owns updates internally via the `next` and
- * `previous` callbacks exposed on the context.
+ * The active page supports two modes, statically discriminated at the
+ * `CarouselRootProps` level:
+ *
+ * - **Uncontrolled** — pass `defaultPage` (or omit it for `0`); the hook
+ *   owns updates internally via the `next` / `previous` callbacks.
+ * - **Controlled** — pass `page` and `onPageChange`; the hook defers
+ *   every change back through `onPageChange` and reads the live value
+ *   from the `page` prop on every render.
  */
 export function useCarouselRoot({
   defaultPage = 0,
-}: Pick<CarouselRootProps, "defaultPage"> = {}) {
+  page,
+  onPageChange,
+}: UseCarouselRootProps = {}) {
   const slidesRef = useRef<Map<string, HTMLDivElement>>(new Map());
   const [slideKeys, setSlideKeys] = useState<string[]>([]);
   const [internalPage, setInternalPage] = useState(defaultPage);
-  const currentPage = internalPage;
+  const isControlled = page !== undefined;
+  const currentPage = isControlled ? page : internalPage;
 
   const registerSlide = useCallback(
     (key: string, element: HTMLDivElement | null) => {
@@ -37,12 +56,20 @@ export function useCarouselRoot({
   );
 
   const next = useCallback(() => {
-    setInternalPage((page) => page + 1);
-  }, []);
+    if (isControlled) {
+      onPageChange?.(currentPage + 1);
+    } else {
+      setInternalPage((p) => p + 1);
+    }
+  }, [isControlled, onPageChange, currentPage]);
 
   const previous = useCallback(() => {
-    setInternalPage((page) => page - 1);
-  }, []);
+    if (isControlled) {
+      onPageChange?.(currentPage - 1);
+    } else {
+      setInternalPage((p) => p - 1);
+    }
+  }, [isControlled, onPageChange, currentPage]);
 
   const contextValue = useMemo<CarouselContextValue>(
     () => ({ registerSlide, slideKeys, currentPage, next, previous }),

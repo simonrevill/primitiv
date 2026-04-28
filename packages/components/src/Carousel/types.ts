@@ -10,16 +10,47 @@ export type CarouselRootLabelProps =
   | { ariaLabel: string; ariaLabelledBy?: never }
   | { ariaLabel?: never; ariaLabelledBy: string };
 
+/**
+ * Uncontrolled page state — the Root owns the active page internally,
+ * optionally seeded by `defaultPage`. The discriminated union below
+ * rejects passing `page` or `onPageChange` alongside it.
+ */
+export type UncontrolledCarouselPageProps = {
+  /** Uncontrolled active page index. Defaults to `0`. */
+  defaultPage?: number;
+  page?: never;
+  onPageChange?: never;
+};
+
+/**
+ * Controlled page state — the parent owns the active page; the Root
+ * defers every state change back through `onPageChange`. Both props
+ * must be supplied together.
+ */
+export type ControlledCarouselPageProps = {
+  /** Controlled active page index. */
+  page: number;
+  /** Callback invoked when the active page should change (e.g. when the
+   * user clicks `Carousel.NextTrigger` or `Carousel.PreviousTrigger`).
+   * The callback is responsible for re-rendering with the new `page`. */
+  onPageChange: (page: number) => void;
+  defaultPage?: never;
+};
+
+/**
+ * Discriminated state union — TypeScript rejects mixed shapes (e.g.
+ * `defaultPage` + `page`, or `page` without `onPageChange`).
+ */
+export type CarouselRootPageStateProps =
+  | UncontrolledCarouselPageProps
+  | ControlledCarouselPageProps;
+
 export type CarouselRootProps = Omit<
   ComponentProps<"section">,
   "aria-label" | "aria-labelledby"
 > &
-  CarouselRootLabelProps & {
-    /** Uncontrolled active page index. Defaults to `0`. The Root owns
-     * and updates the page internally as the consumer interacts with
-     * `Carousel.NextTrigger`, `Carousel.PreviousTrigger`, etc. */
-    defaultPage?: number;
-  };
+  CarouselRootLabelProps &
+  CarouselRootPageStateProps;
 
 /**
  * Shape of the context published by `Carousel.Root` to descendants.

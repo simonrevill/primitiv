@@ -15,3 +15,12 @@ export type CarouselRootProps = Omit<
   "aria-label" | "aria-labelledby"
 > &
   CarouselRootLabelProps;
+
+/**
+ * Shape of the context published by `Carousel.Root` to descendants.
+ * Currently a presence marker — fields are added as future cycles
+ * introduce shared state (active page, slide registration, autoplay).
+ */
+export type CarouselContextValue = Record<string, never>;
+
+export type CarouselViewportProps = ComponentProps<"div">;

@@ -1,11 +1,13 @@
-import { useMemo } from "react";
-
 import { CarouselProvider } from "./CarouselContext";
-import { useCarouselContext } from "./hooks";
+import {
+  useCarouselContext,
+  useCarouselRoot,
+  useCarouselSlide,
+} from "./hooks";
 import type {
   CarouselRootProps,
-  CarouselContextValue,
   CarouselViewportProps,
+  CarouselSlideProps,
 } from "./types";
 
 /**
@@ -42,7 +44,7 @@ export function CarouselRoot({
   children,
   ...rest
 }: CarouselRootProps) {
-  const contextValue = useMemo<CarouselContextValue>(() => ({}), []);
+  const { contextValue } = useCarouselRoot();
 
   return (
     <CarouselProvider value={contextValue}>
@@ -102,9 +104,65 @@ export function CarouselViewport({
 
 CarouselViewport.displayName = "CarouselViewport";
 
+/**
+ * An individual slide. Renders a `<div>` with `role="group"` and
+ * `aria-roledescription="slide"` per the WAI-ARIA Carousel pattern, so
+ * assistive technology announces each slide as a discrete group rather
+ * than a generic region.
+ *
+ * **Self-registration.** On mount, every slide registers itself with
+ * `Carousel.Root` via a callback ref. The Root maintains an ordered list
+ * of registered slide keys, which is how the slide knows its own
+ * zero-based `data-index` and how every slide receives the live
+ * `data-total` count. Slides may be added or removed at runtime; the
+ * indices and totals update automatically.
+ *
+ * **Styling hooks.**
+ * - `data-carousel-slide` — CSS-targeting attribute (recommended scroll-snap
+ *   recipe targets `[data-carousel-slide]`).
+ * - `data-index="N"` — the slide's zero-based position in registration order.
+ * - `data-total="N"` — the live total slide count.
+ *
+ * Must be rendered as a descendant of `Carousel.Root`; rendering it
+ * elsewhere throws a descriptive error.
+ *
+ * @example
+ * ```tsx
+ * <Carousel.Viewport>
+ *   <Carousel.Slide>First slide</Carousel.Slide>
+ *   <Carousel.Slide>Second slide</Carousel.Slide>
+ * </Carousel.Viewport>
+ * ```
+ */
+export function CarouselSlide({
+  className = "",
+  children,
+  ...rest
+}: CarouselSlideProps) {
+  const { slideRef, index, total } = useCarouselSlide();
+
+  return (
+    <div
+      ref={slideRef}
+      role="group"
+      aria-roledescription="slide"
+      data-carousel-slide=""
+      data-index={index}
+      data-total={total}
+      className={className}
+      {...rest}
+    >
+      {children}
+    </div>
+  );
+}
+
+CarouselSlide.displayName = "CarouselSlide";
+
 type CarouselCompound = typeof CarouselRoot & {
   Root: typeof CarouselRoot;
   Viewport: typeof CarouselViewport;
+  Slide: typeof CarouselSlide;
 };
 
 /**
@@ -119,19 +177,25 @@ type CarouselCompound = typeof CarouselRoot & {
  *   that wraps the entire widget.
  * - {@link CarouselViewport | `Carousel.Viewport`} — the slide
  *   container that the recommended scroll-snap CSS targets.
+ * - {@link CarouselSlide | `Carousel.Slide`} — an individual slide,
+ *   self-registering with the Root for live index / total tracking.
  *
  * @example
  * ```tsx
  * import { Carousel } from "@primitiv/components";
  *
  * <Carousel.Root ariaLabel="Featured products">
- *   <Carousel.Viewport>…</Carousel.Viewport>
+ *   <Carousel.Viewport>
+ *     <Carousel.Slide>First</Carousel.Slide>
+ *     <Carousel.Slide>Second</Carousel.Slide>
+ *   </Carousel.Viewport>
  * </Carousel.Root>
  * ```
  */
 const CarouselCompound: CarouselCompound = Object.assign(CarouselRoot, {
   Root: CarouselRoot,
   Viewport: CarouselViewport,
+  Slide: CarouselSlide,
 });
 
 CarouselCompound.displayName = "Carousel";

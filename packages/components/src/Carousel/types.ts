@@ -18,9 +18,18 @@ export type CarouselRootProps = Omit<
 
 /**
  * Shape of the context published by `Carousel.Root` to descendants.
- * Currently a presence marker — fields are added as future cycles
- * introduce shared state (active page, slide registration, autoplay).
+ * Fields are added as future cycles introduce shared state (active
+ * page, autoplay, etc.).
  */
-export type CarouselContextValue = Record<string, never>;
+export type CarouselContextValue = {
+  /** Self-registers a slide. Called as a callback ref by `Carousel.Slide`
+   * with the rendered DOM node on mount and `null` on unmount. */
+  registerSlide: (key: string, element: HTMLDivElement | null) => void;
+  /** Ordered list of currently-mounted slide keys. The slide's index is
+   * its position in this array; the array's length is the total. */
+  slideKeys: string[];
+};
 
 export type CarouselViewportProps = ComponentProps<"div">;
+
+export type CarouselSlideProps = ComponentProps<"div">;

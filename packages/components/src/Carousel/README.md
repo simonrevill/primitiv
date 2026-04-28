@@ -17,9 +17,14 @@ Currently exposes:
   a `data-carousel-viewport` attribute the recommended scroll-snap CSS
   targets. Must be rendered as a descendant of `Carousel.Root`; rendering
   it elsewhere throws a descriptive error.
+- **`Carousel.Slide`** — an individual slide. Renders a `<div role="group"
+  aria-roledescription="slide">` and self-registers with the Root so each
+  slide knows its zero-based `data-index` and the live `data-total`
+  count, even as slides mount and unmount. Sets a `data-carousel-slide`
+  CSS hook.
 
-Sub-components for slides, prev/next triggers, indicators, and
-auto-rotation are added in subsequent cycles.
+Sub-components for prev/next triggers, indicators, and auto-rotation
+are added in subsequent cycles.
 
 ## Usage
 
@@ -49,12 +54,19 @@ Slides go inside `Carousel.Viewport`:
 ```tsx
 <Carousel.Root ariaLabel="Featured products">
   <Carousel.Viewport>
-    {/* Carousel.Slide children — added in upcoming cycles */}
+    <Carousel.Slide>First slide</Carousel.Slide>
+    <Carousel.Slide>Second slide</Carousel.Slide>
+    <Carousel.Slide>Third slide</Carousel.Slide>
   </Carousel.Viewport>
 </Carousel.Root>
 ```
 
-Apply your own scroll-snap CSS via the `data-carousel-viewport`
-attribute. The minimal recipe lives in
+Each `Carousel.Slide` self-registers with the Root, so every slide
+exposes its own `data-index="0"`, `data-index="1"`, … and a live
+`data-total` reflecting the current slide count. Add or remove slides at
+runtime and the indices and totals update automatically.
+
+Apply your own scroll-snap CSS via the `data-carousel-viewport` and
+`data-carousel-slide` attributes. The minimal recipe lives in
 [the package README's recommended-CSS section](../../README.md) and will
 be expanded here once additional sub-components ship.

@@ -69,6 +69,7 @@ export function CarouselRoot({
   defaultPage,
   page,
   onPageChange,
+  loop,
   children,
   ...rest
 }: CarouselRootProps) {
@@ -76,6 +77,7 @@ export function CarouselRoot({
     defaultPage,
     page,
     onPageChange,
+    loop,
   });
 
   return (
@@ -215,8 +217,13 @@ CarouselSlide.displayName = "CarouselSlide";
  * before invoking the navigation, so analytics handlers and similar
  * still fire when the user advances the carousel.
  *
- * Boundary clamping (`disabled` on the last page when `loop` is off) is
- * added in a later cycle; in this cycle the trigger advances naively.
+ * **Boundary clamping.** When `loop` is `false` on `Carousel.Root` (the
+ * default), the trigger is `disabled` once the active page reaches the
+ * last slide; the click is also a no-op at boundaries because `next()`
+ * short-circuits when there's nowhere to go. The button is always
+ * disabled when there are zero or one slides registered. Consumer-
+ * supplied `disabled={true}` is also honoured (it OR's with the
+ * boundary check).
  *
  * Must be rendered as a descendant of `Carousel.Root`; rendering it
  * elsewhere throws a descriptive error.
@@ -229,10 +236,12 @@ CarouselSlide.displayName = "CarouselSlide";
 export function CarouselNextTrigger({
   className = "",
   onClick,
+  disabled,
   children,
   ...rest
 }: CarouselNextTriggerProps) {
-  const { next } = useCarouselContext();
+  const { next, canGoNext } = useCarouselContext();
+  const isDisabled = disabled === true || !canGoNext;
 
   const handleClick = useCallback(
     (event: MouseEvent<HTMLButtonElement>) => {
@@ -247,6 +256,7 @@ export function CarouselNextTrigger({
       type="button"
       className={className}
       onClick={handleClick}
+      disabled={isDisabled}
       {...rest}
     >
       {children}
@@ -262,8 +272,12 @@ CarouselNextTrigger.displayName = "CarouselNextTrigger";
  * before invoking the navigation, so analytics handlers and similar
  * still fire when the user retreats the carousel.
  *
- * Boundary clamping (`disabled` on the first page when `loop` is off) is
- * added in a later cycle; in this cycle the trigger retreats naively.
+ * **Boundary clamping.** When `loop` is `false` on `Carousel.Root` (the
+ * default), the trigger is `disabled` while the active page is the
+ * first slide; the click is also a no-op at boundaries because
+ * `previous()` short-circuits when there's nowhere to go. The button is
+ * always disabled when there are zero or one slides registered.
+ * Consumer-supplied `disabled={true}` is also honoured.
  *
  * Must be rendered as a descendant of `Carousel.Root`; rendering it
  * elsewhere throws a descriptive error.
@@ -276,10 +290,12 @@ CarouselNextTrigger.displayName = "CarouselNextTrigger";
 export function CarouselPreviousTrigger({
   className = "",
   onClick,
+  disabled,
   children,
   ...rest
 }: CarouselPreviousTriggerProps) {
-  const { previous } = useCarouselContext();
+  const { previous, canGoPrevious } = useCarouselContext();
+  const isDisabled = disabled === true || !canGoPrevious;
 
   const handleClick = useCallback(
     (event: MouseEvent<HTMLButtonElement>) => {
@@ -294,6 +310,7 @@ export function CarouselPreviousTrigger({
       type="button"
       className={className}
       onClick={handleClick}
+      disabled={isDisabled}
       {...rest}
     >
       {children}

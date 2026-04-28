@@ -26,12 +26,16 @@ Currently exposes:
   `data-state="active" | "inactive"` tracking the active page, plus a
   `data-carousel-slide` CSS hook.
 - **`Carousel.NextTrigger`** — `<button>` that advances the active page
-  by one. Consumer `onClick` runs before the navigation.
+  by one. `disabled` at the last page when `loop` is `false`, and
+  whenever zero or one slides are registered. Consumer `onClick` runs
+  before the navigation; consumer-supplied `disabled={true}` is honoured
+  alongside the boundary check.
 - **`Carousel.PreviousTrigger`** — `<button>` that retreats the active
-  page by one. Consumer `onClick` runs before the navigation.
+  page by one. `disabled` at the first page when `loop` is `false`,
+  with the same zero/one-slide and consumer-`disabled` semantics as
+  `NextTrigger`.
 
-Boundary clamping (disabling Prev/Next at the ends), `loop`, indicators,
-and auto-rotation are added in subsequent cycles.
+Indicators and auto-rotation are added in subsequent cycles.
 
 ## Usage
 
@@ -131,9 +135,33 @@ The discriminated union on the props type rejects mixed shapes (e.g.
 both `defaultPage` and `page`, or `page` without `onPageChange`) at
 compile time.
 
-Boundary clamping (disabled triggers at the ends) and `loop` are added
-in a later cycle — for now, advancing past the last slide is a no-op
-visually because no slide's `data-state` matches an out-of-range page.
+### Boundary behaviour and looping
+
+By default, the prev/next triggers clamp at the ends:
+`Carousel.PreviousTrigger` is `disabled` at the first slide,
+`Carousel.NextTrigger` at the last. Both are also `disabled` when zero
+or one slides are registered, since there's nowhere to navigate.
+
+Pass `loop` to wrap navigation around the ends — clicking
+`Carousel.PreviousTrigger` at the first slide jumps to the last, and
+clicking `Carousel.NextTrigger` at the last jumps to the first. With
+`loop`, the triggers are never auto-disabled at boundaries.
+
+```tsx
+<Carousel.Root ariaLabel="Featured products" loop>
+  <Carousel.Viewport>
+    <Carousel.Slide>First</Carousel.Slide>
+    <Carousel.Slide>Second</Carousel.Slide>
+    <Carousel.Slide>Third</Carousel.Slide>
+  </Carousel.Viewport>
+  <Carousel.PreviousTrigger>Previous</Carousel.PreviousTrigger>
+  <Carousel.NextTrigger>Next</Carousel.NextTrigger>
+</Carousel.Root>
+```
+
+Consumer-supplied `disabled={true}` on either trigger is honoured
+regardless of boundary state — useful for momentarily freezing
+navigation while another part of the UI takes over.
 
 Apply your own scroll-snap CSS via the `data-carousel-viewport` and
 `data-carousel-slide` attributes. The minimal recipe lives in

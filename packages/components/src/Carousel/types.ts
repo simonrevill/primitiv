@@ -50,7 +50,14 @@ export type CarouselRootProps = Omit<
   "aria-label" | "aria-labelledby"
 > &
   CarouselRootLabelProps &
-  CarouselRootPageStateProps;
+  CarouselRootPageStateProps & {
+    /** When `true`, advancing past the last slide wraps to the first
+     * (and vice versa) and `Carousel.NextTrigger` /
+     * `Carousel.PreviousTrigger` are never auto-disabled at the ends.
+     * When `false` (default), the triggers clamp at boundaries: Prev is
+     * disabled at the first slide, Next at the last. */
+    loop?: boolean;
+  };
 
 /**
  * Shape of the context published by `Carousel.Root` to descendants.
@@ -66,9 +73,17 @@ export type CarouselContextValue = {
   slideKeys: string[];
   /** Zero-based index of the currently-active page. */
   currentPage: number;
-  /** Advance the active page by one step. */
+  /** `true` when there is a forward navigation target (a slide ahead, or
+   * `loop` is enabled and at least one slide is registered). Drives the
+   * `disabled` attribute on `Carousel.NextTrigger` and short-circuits
+   * `next()` when there's nowhere to go. */
+  canGoNext: boolean;
+  /** `true` when there is a backward navigation target. Drives the
+   * `disabled` attribute on `Carousel.PreviousTrigger`. */
+  canGoPrevious: boolean;
+  /** Advance the active page by one step. No-op when `!canGoNext`. */
   next: () => void;
-  /** Retreat the active page by one step. */
+  /** Retreat the active page by one step. No-op when `!canGoPrevious`. */
   previous: () => void;
 };
 

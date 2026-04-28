@@ -301,6 +301,105 @@ describe("Carousel basic rendering tests", () => {
     });
   });
 
+  describe("Carousel.Slide aria-label", () => {
+    it('should auto-generate an aria-label of "N of M" using the slide\'s index and the live total', () => {
+      render(
+        <Carousel.Root ariaLabel="Featured products">
+          <Carousel.Viewport>
+            <Carousel.Slide data-testid="slide-0" />
+            <Carousel.Slide data-testid="slide-1" />
+            <Carousel.Slide data-testid="slide-2" />
+          </Carousel.Viewport>
+        </Carousel.Root>,
+      );
+
+      expect(screen.getByTestId("slide-0")).toHaveAttribute(
+        "aria-label",
+        "1 of 3",
+      );
+      expect(screen.getByTestId("slide-1")).toHaveAttribute(
+        "aria-label",
+        "2 of 3",
+      );
+      expect(screen.getByTestId("slide-2")).toHaveAttribute(
+        "aria-label",
+        "3 of 3",
+      );
+    });
+
+    it("should update the auto-generated aria-label when slides are added or removed at runtime", () => {
+      const { rerender } = render(
+        <Carousel.Root ariaLabel="Featured products">
+          <Carousel.Viewport>
+            <Carousel.Slide data-testid="slide-0" />
+            <Carousel.Slide data-testid="slide-1" />
+            <Carousel.Slide data-testid="slide-2" />
+          </Carousel.Viewport>
+        </Carousel.Root>,
+      );
+
+      rerender(
+        <Carousel.Root ariaLabel="Featured products">
+          <Carousel.Viewport>
+            <Carousel.Slide data-testid="slide-0" />
+            <Carousel.Slide data-testid="slide-2" />
+          </Carousel.Viewport>
+        </Carousel.Root>,
+      );
+
+      expect(screen.getByTestId("slide-0")).toHaveAttribute(
+        "aria-label",
+        "1 of 2",
+      );
+      expect(screen.getByTestId("slide-2")).toHaveAttribute(
+        "aria-label",
+        "2 of 2",
+      );
+    });
+
+    it("should let the consumer override the auto-generated aria-label via the ariaLabel prop", () => {
+      const customLabel = "Hand-picked for you";
+      render(
+        <Carousel.Root ariaLabel="Featured products">
+          <Carousel.Viewport>
+            <Carousel.Slide ariaLabel={customLabel} data-testid="slide" />
+          </Carousel.Viewport>
+        </Carousel.Root>,
+      );
+
+      expect(screen.getByTestId("slide")).toHaveAttribute(
+        "aria-label",
+        customLabel,
+      );
+    });
+
+    it("should keep ariaLabel stable as siblings mount and unmount around it", () => {
+      const customLabel = "Hand-picked for you";
+      const { rerender } = render(
+        <Carousel.Root ariaLabel="Featured products">
+          <Carousel.Viewport>
+            <Carousel.Slide data-testid="slide-0" />
+            <Carousel.Slide ariaLabel={customLabel} data-testid="slide-1" />
+            <Carousel.Slide data-testid="slide-2" />
+          </Carousel.Viewport>
+        </Carousel.Root>,
+      );
+
+      rerender(
+        <Carousel.Root ariaLabel="Featured products">
+          <Carousel.Viewport>
+            <Carousel.Slide ariaLabel={customLabel} data-testid="slide-1" />
+          </Carousel.Viewport>
+        </Carousel.Root>,
+      );
+
+      expect(screen.getByTestId("slide-1")).toHaveAttribute(
+        "aria-label",
+        customLabel,
+      );
+    });
+  });
+
   describe("context errors", () => {
     it.each([
       ["Carousel.Viewport", () => <Carousel.Viewport />],

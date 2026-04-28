@@ -301,6 +301,139 @@ describe("Carousel basic rendering tests", () => {
     });
   });
 
+  describe("Carousel.Slide data-state", () => {
+    it('should mark the slide at the active page with data-state="active" and the rest as "inactive"', () => {
+      render(
+        <Carousel.Root ariaLabel="Featured products">
+          <Carousel.Viewport>
+            <Carousel.Slide data-testid="slide-0" />
+            <Carousel.Slide data-testid="slide-1" />
+            <Carousel.Slide data-testid="slide-2" />
+          </Carousel.Viewport>
+        </Carousel.Root>,
+      );
+
+      expect(screen.getByTestId("slide-0")).toHaveAttribute(
+        "data-state",
+        "active",
+      );
+      expect(screen.getByTestId("slide-1")).toHaveAttribute(
+        "data-state",
+        "inactive",
+      );
+      expect(screen.getByTestId("slide-2")).toHaveAttribute(
+        "data-state",
+        "inactive",
+      );
+    });
+  });
+
+  describe("Carousel.NextTrigger", () => {
+    it("should render the Carousel.NextTrigger component inside Carousel.Root", () => {
+      render(
+        <Carousel.Root ariaLabel="Featured products">
+          <Carousel.NextTrigger>Next</Carousel.NextTrigger>
+        </Carousel.Root>,
+      );
+
+      expect(screen.getByRole("button", { name: "Next" })).toBeVisible();
+    });
+
+    it('should render with type="button"', () => {
+      render(
+        <Carousel.Root ariaLabel="Featured products">
+          <Carousel.NextTrigger>Next</Carousel.NextTrigger>
+        </Carousel.Root>,
+      );
+
+      expect(screen.getByRole("button", { name: "Next" })).toHaveAttribute(
+        "type",
+        "button",
+      );
+    });
+
+    it("should accept a className prop", () => {
+      const testClass = "custom-next";
+      render(
+        <Carousel.Root ariaLabel="Featured products">
+          <Carousel.NextTrigger className={testClass}>Next</Carousel.NextTrigger>
+        </Carousel.Root>,
+      );
+
+      expect(screen.getByRole("button", { name: "Next" })).toHaveAttribute(
+        "class",
+        testClass,
+      );
+    });
+
+    it("should apply a className of empty string by default when not specified", () => {
+      render(
+        <Carousel.Root ariaLabel="Featured products">
+          <Carousel.NextTrigger>Next</Carousel.NextTrigger>
+        </Carousel.Root>,
+      );
+
+      expect(screen.getByRole("button", { name: "Next" })).toHaveAttribute(
+        "class",
+        "",
+      );
+    });
+  });
+
+  describe("Carousel.PreviousTrigger", () => {
+    it("should render the Carousel.PreviousTrigger component inside Carousel.Root", () => {
+      render(
+        <Carousel.Root ariaLabel="Featured products">
+          <Carousel.PreviousTrigger>Previous</Carousel.PreviousTrigger>
+        </Carousel.Root>,
+      );
+
+      expect(screen.getByRole("button", { name: "Previous" })).toBeVisible();
+    });
+
+    it('should render with type="button"', () => {
+      render(
+        <Carousel.Root ariaLabel="Featured products">
+          <Carousel.PreviousTrigger>Previous</Carousel.PreviousTrigger>
+        </Carousel.Root>,
+      );
+
+      expect(screen.getByRole("button", { name: "Previous" })).toHaveAttribute(
+        "type",
+        "button",
+      );
+    });
+
+    it("should accept a className prop", () => {
+      const testClass = "custom-prev";
+      render(
+        <Carousel.Root ariaLabel="Featured products">
+          <Carousel.PreviousTrigger className={testClass}>
+            Previous
+          </Carousel.PreviousTrigger>
+        </Carousel.Root>,
+      );
+
+      expect(screen.getByRole("button", { name: "Previous" })).toHaveAttribute(
+        "class",
+        testClass,
+      );
+    });
+
+    it("should apply a className of empty string by default when not specified", () => {
+      render(
+        <Carousel.Root ariaLabel="Featured products">
+          <Carousel.PreviousTrigger>Previous</Carousel.PreviousTrigger>
+        </Carousel.Root>,
+      );
+
+      expect(screen.getByRole("button", { name: "Previous" })).toHaveAttribute(
+        "class",
+        "",
+      );
+    });
+  });
+
   describe("Carousel.Slide aria-label", () => {
     it('should auto-generate an aria-label of "N of M" using the slide\'s index and the live total', () => {
       render(
@@ -404,6 +537,8 @@ describe("Carousel basic rendering tests", () => {
     it.each([
       ["Carousel.Viewport", () => <Carousel.Viewport />],
       ["Carousel.Slide", () => <Carousel.Slide />],
+      ["Carousel.NextTrigger", () => <Carousel.NextTrigger />],
+      ["Carousel.PreviousTrigger", () => <Carousel.PreviousTrigger />],
     ] as const)(
       "should throw an error when %s is used outside Carousel.Root",
       (_, ComponentRenderer) => {

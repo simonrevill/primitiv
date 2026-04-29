@@ -381,10 +381,16 @@ CarouselIndicatorGroup.displayName = "CarouselIndicatorGroup";
  * `index` (zero-based) when clicked. Auto-labelled `"Slide N"` (where
  * `N = index + 1`) so the page-position is announced to assistive tech.
  *
- * **Styling hooks.** `data-carousel-indicator` is set on the rendered
- * element. The active-vs-inactive state hook (`data-state`) and the
- * `aria-disabled` indicator that the active dot carries per the APG are
- * added in cycle 10.
+ * **Active-state ARIA.** The indicator at `currentPage` carries
+ * `aria-disabled="true"` per the WAI-ARIA Carousel APG — a soft disable
+ * that tells screen readers "you're already on this slide" without
+ * removing it from the focus order. Non-active indicators carry
+ * `aria-disabled="false"`. Both states also flip `data-state` between
+ * `"active"` and `"inactive"` so consumer CSS can paint the active dot.
+ *
+ * **Styling hooks.**
+ * - `data-carousel-indicator` — CSS-targeting attribute.
+ * - `data-state="active" | "inactive"` — tracks the current page.
  *
  * Must be rendered as a descendant of `Carousel.Root`; rendering it
  * elsewhere throws a descriptive error.
@@ -401,7 +407,8 @@ export function CarouselIndicator({
   children,
   ...rest
 }: CarouselIndicatorProps) {
-  const { goTo } = useCarouselContext();
+  const { goTo, currentPage } = useCarouselContext();
+  const isActive = index === currentPage;
 
   const handleClick = useCallback(
     (event: MouseEvent<HTMLButtonElement>) => {
@@ -416,7 +423,9 @@ export function CarouselIndicator({
       type="button"
       className={className}
       aria-label={`Slide ${index + 1}`}
+      aria-disabled={isActive}
       data-carousel-indicator=""
+      data-state={isActive ? "active" : "inactive"}
       onClick={handleClick}
       {...rest}
     >

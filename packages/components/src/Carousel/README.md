@@ -40,9 +40,11 @@ Currently exposes:
   both-or-neither at compile time.
 - **`Carousel.Indicator`** — individual `<button>` dot. `index` prop
   targets a zero-based page; clicking jumps to it. Auto-labelled
-  `"Slide N"`. Sets a `data-carousel-indicator` CSS hook. The active-
-  state ARIA contract (`aria-disabled`, `data-state`) is added in a
-  subsequent cycle.
+  `"Slide N"`. The dot at the current page carries
+  `aria-disabled="true"` (a soft disable per the WAI-ARIA Carousel
+  APG); all dots emit `data-state="active" | "inactive"` and a
+  `data-carousel-indicator` CSS hook so consumer styles can paint the
+  active dot.
 - **`Carousel.Indicators`** — convenience wrapper that auto-renders
   one `Carousel.Indicator` per registered slide. Reuses the same
   discriminated `label` / `ariaLabelledBy` shape as `IndicatorGroup`.
@@ -191,8 +193,17 @@ prop targets a zero-based page; clicking jumps to it.
 </Carousel.IndicatorGroup>
 ```
 
-Indicators are auto-labelled `"Slide N"` (1-indexed). Style them via
-the `data-carousel-indicator` attribute.
+Indicators are auto-labelled `"Slide N"` (1-indexed). The dot at the
+current page carries `aria-disabled="true"` per the WAI-ARIA APG and
+`data-state="active"`; non-active dots carry `aria-disabled="false"`
+and `data-state="inactive"`. Style them via the
+`data-carousel-indicator` attribute and the `data-state` hook:
+
+```css
+[data-carousel-indicator][data-state="active"] {
+  background: black;
+}
+```
 
 ### Indicator dots (auto-rendered)
 

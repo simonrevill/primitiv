@@ -1,5 +1,4 @@
-import { act, render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 
 import { Carousel } from "..";
 
@@ -228,10 +227,7 @@ describe("Carousel autoplay timer", () => {
     );
   });
 
-  it("should stop the timer when playing flips to false", async () => {
-    const user = userEvent.setup({
-      advanceTimers: (ms) => vi.advanceTimersByTime(ms),
-    });
+  it("should stop the timer when playing flips to false", () => {
     render(
       <Carousel.Root ariaLabel="Featured products" autoplay defaultPlaying>
         <Carousel.Viewport>
@@ -251,8 +247,12 @@ describe("Carousel autoplay timer", () => {
       "active",
     );
 
-    // User pauses — timer must not fire any further ticks.
-    await user.click(screen.getByRole("button"));
+    // User pauses via the play/pause trigger — timer must not fire any
+    // further ticks. fireEvent is used here because userEvent's async
+    // machinery interacts poorly with vitest fake timers.
+    act(() => {
+      fireEvent.click(screen.getByRole("button"));
+    });
 
     act(() => {
       vi.advanceTimersByTime(60_000);

@@ -77,6 +77,7 @@ export function CarouselRoot({
   defaultPlaying,
   playing,
   onPlayingChange,
+  autoplay,
   children,
   ...rest
 }: CarouselRootProps) {
@@ -88,6 +89,7 @@ export function CarouselRoot({
     defaultPlaying,
     playing,
     onPlayingChange,
+    autoplay,
   });
 
   return (

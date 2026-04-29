@@ -77,6 +77,15 @@ export type CarouselRootPlayingStateProps =
   | UncontrolledCarouselPlayingProps
   | ControlledCarouselPlayingProps;
 
+/**
+ * Autoplay configuration. Pass `true` for the default 4000ms cadence,
+ * `false` (default) to disable autoplay entirely, or `{ delay: N }` to
+ * tune the interval. The active page advances on each tick while
+ * `playing` is `true`; the timer stops at the last slide when `loop`
+ * is `false` and wraps when `loop` is `true`.
+ */
+export type CarouselAutoplay = boolean | { delay: number };
+
 export type CarouselRootProps = Omit<
   ComponentProps<"section">,
   "aria-label" | "aria-labelledby"
@@ -90,6 +99,8 @@ export type CarouselRootProps = Omit<
      * When `false` (default), the triggers clamp at boundaries: Prev is
      * disabled at the first slide, Next at the last. */
     loop?: boolean;
+    /** Autoplay configuration — see {@link CarouselAutoplay}. */
+    autoplay?: CarouselAutoplay;
   };
 
 /**

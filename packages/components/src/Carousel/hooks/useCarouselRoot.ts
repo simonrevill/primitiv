@@ -1,6 +1,19 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import type { CarouselContextValue } from "../types";
+import type { CarouselAutoplay, CarouselContextValue } from "../types";
+
+const DEFAULT_AUTOPLAY_DELAY_MS = 4000;
+
+function resolveAutoplay(autoplay: CarouselAutoplay | undefined): {
+  enabled: boolean;
+  delay: number;
+} {
+  if (autoplay === true)
+    return { enabled: true, delay: DEFAULT_AUTOPLAY_DELAY_MS };
+  if (autoplay && typeof autoplay === "object")
+    return { enabled: true, delay: autoplay.delay };
+  return { enabled: false, delay: DEFAULT_AUTOPLAY_DELAY_MS };
+}
 
 type UseCarouselRootProps = {
   /** Uncontrolled seed for the active page. Defaults to `0`. */
@@ -23,6 +36,8 @@ type UseCarouselRootProps = {
   /** Required when `playing` is provided. Invoked with the proposed
    * next playing value. */
   onPlayingChange?: (playing: boolean) => void;
+  /** Autoplay configuration — see {@link CarouselAutoplay}. */
+  autoplay?: CarouselAutoplay;
 };
 
 /**
@@ -58,7 +73,10 @@ export function useCarouselRoot({
   defaultPlaying = false,
   playing,
   onPlayingChange,
+  autoplay,
 }: UseCarouselRootProps = {}) {
+  const { enabled: autoplayEnabled, delay: autoplayDelay } =
+    resolveAutoplay(autoplay);
   const slidesRef = useRef<Map<string, HTMLDivElement>>(new Map());
   const [slideKeys, setSlideKeys] = useState<string[]>([]);
   const [internalPage, setInternalPage] = useState(defaultPage);
@@ -121,6 +139,18 @@ export function useCarouselRoot({
     },
     [isControlled, onPageChange],
   );
+
+  // Autoplay timer. Schedules a single setTimeout per active page; when
+  // next() runs it bumps currentPage, which retriggers the effect with
+  // a fresh timer. canGoNext gates the schedule so loop=false stops at
+  // the last slide and loop=true wraps via next()'s modular arithmetic.
+  useEffect(() => {
+    if (!autoplayEnabled || !currentPlaying || !canGoNext) return;
+    const id = setTimeout(() => {
+      next();
+    }, autoplayDelay);
+    return () => clearTimeout(id);
+  }, [autoplayEnabled, currentPlaying, canGoNext, autoplayDelay, next]);
 
   const togglePlaying = useCallback(() => {
     const next = !currentPlaying;

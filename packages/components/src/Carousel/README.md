@@ -57,8 +57,9 @@ Currently exposes:
   passes `{ playing }` to a function `children` render prop so
   consumers can swap icons or labels per state.
 
-The autoplay timer that advances the page when `playing` is `true` is
-added in a subsequent cycle.
+Pass `autoplay` on `Carousel.Root` to advance the active page on a
+timer while `playing` is `true`. Hover/focus pause behaviour and the
+`aria-live` flip on the viewport are added in subsequent cycles.
 
 ## Usage
 
@@ -249,8 +250,35 @@ The trigger is auto-labelled `"Start automatic slide show"` (paused)
 or `"Stop automatic slide show"` (playing) for assistive tech, and
 emits `data-state="playing" | "paused"` for consumer CSS.
 
-The autoplay timer that actually advances the active page when
-`playing=true` lands in a subsequent cycle.
+### Autoplay timer
+
+Pass `autoplay` on `Carousel.Root` to advance the active page on a
+timer while `playing` is `true`:
+
+```tsx
+// Default 4000ms cadence
+<Carousel.Root ariaLabel="Featured products" autoplay defaultPlaying>
+  …
+</Carousel.Root>
+
+// Custom delay
+<Carousel.Root
+  ariaLabel="Featured products"
+  autoplay={{ delay: 6000 }}
+  defaultPlaying
+>
+  …
+</Carousel.Root>
+```
+
+The timer reads from the live `playing` flag and the active page —
+toggling pause via `Carousel.PlayPauseTrigger` (or via the controlled
+`onPlayingChange`) cancels the next tick. With `loop={false}` (the
+default), the timer stops once the active page reaches the last slide;
+with `loop={true}` it wraps to the first.
+
+Hover/focus pause behaviour (WCAG 2.2.2) and the `aria-live` flip on
+the viewport land in subsequent cycles.
 
 ### Indicator dots (auto-rendered)
 

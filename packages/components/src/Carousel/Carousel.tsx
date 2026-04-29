@@ -80,6 +80,7 @@ export function CarouselRoot({
   autoplay,
   slidesPerPage,
   translations,
+  ids,
   children,
   ...rest
 }: CarouselRootProps) {
@@ -94,6 +95,7 @@ export function CarouselRoot({
     autoplay,
     slidesPerPage,
     translations,
+    ids,
   });
 
   return (
@@ -104,6 +106,9 @@ export function CarouselRoot({
         {...(ariaLabel !== undefined && { "aria-label": ariaLabel })}
         {...(ariaLabelledBy !== undefined && {
           "aria-labelledby": ariaLabelledBy,
+        })}
+        {...(contextValue.ids.root !== undefined && {
+          id: contextValue.ids.root,
         })}
         {...rootHandlers}
         {...rest}
@@ -150,13 +155,14 @@ export function CarouselViewport({
   children,
   ...rest
 }: CarouselViewportProps) {
-  const { isAutoRotating } = useCarouselContext();
+  const { isAutoRotating, ids } = useCarouselContext();
 
   return (
     <div
       data-carousel-viewport=""
       className={className}
       aria-live={isAutoRotating ? "off" : "polite"}
+      {...(ids.viewport !== undefined && { id: ids.viewport })}
       {...rest}
     >
       {children}
@@ -271,7 +277,7 @@ export function CarouselNextTrigger({
   children,
   ...rest
 }: CarouselNextTriggerProps) {
-  const { next, canGoNext } = useCarouselContext();
+  const { next, canGoNext, ids } = useCarouselContext();
   const isDisabled = disabled === true || !canGoNext;
 
   const handleClick = useCallback(
@@ -288,6 +294,7 @@ export function CarouselNextTrigger({
       className={className}
       onClick={handleClick}
       disabled={isDisabled}
+      {...(ids.nextTrigger !== undefined && { id: ids.nextTrigger })}
       {...rest}
     >
       {children}
@@ -325,7 +332,7 @@ export function CarouselPreviousTrigger({
   children,
   ...rest
 }: CarouselPreviousTriggerProps) {
-  const { previous, canGoPrevious } = useCarouselContext();
+  const { previous, canGoPrevious, ids } = useCarouselContext();
   const isDisabled = disabled === true || !canGoPrevious;
 
   const handleClick = useCallback(
@@ -342,6 +349,7 @@ export function CarouselPreviousTrigger({
       className={className}
       onClick={handleClick}
       disabled={isDisabled}
+      {...(ids.previousTrigger !== undefined && { id: ids.previousTrigger })}
       {...rest}
     >
       {children}
@@ -385,7 +393,7 @@ export function CarouselIndicatorGroup({
   children,
   ...rest
 }: CarouselIndicatorGroupProps) {
-  useCarouselContext();
+  const { ids } = useCarouselContext();
 
   return (
     <div
@@ -395,6 +403,7 @@ export function CarouselIndicatorGroup({
       {...(ariaLabelledBy !== undefined && {
         "aria-labelledby": ariaLabelledBy,
       })}
+      {...(ids.indicatorGroup !== undefined && { id: ids.indicatorGroup })}
       {...rest}
     >
       {children}
@@ -526,7 +535,7 @@ export function CarouselPlayPauseTrigger({
   children,
   ...rest
 }: CarouselPlayPauseTriggerProps) {
-  const { playing, togglePlaying, translations } = useCarouselContext();
+  const { playing, togglePlaying, translations, ids } = useCarouselContext();
 
   const handleClick = useCallback(
     (event: MouseEvent<HTMLButtonElement>) => {
@@ -546,6 +555,7 @@ export function CarouselPlayPauseTrigger({
       aria-label={playing ? translations.stopSlideshow : translations.startSlideshow}
       data-state={playing ? "playing" : "paused"}
       onClick={handleClick}
+      {...(ids.playPauseTrigger !== undefined && { id: ids.playPauseTrigger })}
       {...rest}
     >
       {renderedChildren}

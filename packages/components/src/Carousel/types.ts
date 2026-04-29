@@ -87,6 +87,22 @@ export type CarouselRootPlayingStateProps =
 export type CarouselAutoplay = boolean | { delay: number };
 
 /**
+ * Pin DOM `id`s on the rendered sub-components for SSR / hydration
+ * stability or for external `aria-controls` references. Any keys you
+ * omit leave the corresponding element unidentified (or with whatever
+ * the consumer attaches to that sub-component directly via its own
+ * `id` prop, which always wins).
+ */
+export type CarouselIds = {
+  root?: string;
+  viewport?: string;
+  previousTrigger?: string;
+  nextTrigger?: string;
+  playPauseTrigger?: string;
+  indicatorGroup?: string;
+};
+
+/**
  * Override the default user-visible strings the component owns —
  * intended for internationalisation. Any keys you omit fall back to
  * the English defaults.
@@ -132,6 +148,10 @@ export type CarouselRootProps = Omit<
     /** Override the default user-visible strings the component owns —
      * see {@link CarouselTranslations}. Useful for i18n. */
     translations?: CarouselTranslations;
+    /** Pin DOM `id`s on the rendered sub-components — see
+     * {@link CarouselIds}. Useful for SSR hydration stability and
+     * external `aria-controls` linkage. */
+    ids?: CarouselIds;
   };
 
 /**
@@ -180,6 +200,10 @@ export type CarouselContextValue = {
   /** Translations merged with English defaults — every field is
    * present, even if the consumer passed only a subset. */
   translations: Required<CarouselTranslations>;
+  /** Custom DOM ids — every field optional. Sub-components apply
+   * their respective entry via spread, so consumer-supplied `id`
+   * props on the sub-component still win. */
+  ids: CarouselIds;
 };
 
 export type CarouselViewportProps = ComponentProps<"div">;

@@ -159,6 +159,33 @@ The discriminated union on the props type rejects mixed shapes (e.g.
 both `defaultPage` and `page`, or `page` without `onPageChange`) at
 compile time.
 
+### Custom DOM ids
+
+For SSR / hydration stability or external `aria-controls` linkage,
+pin DOM `id`s on the rendered sub-components via the `ids` bag on
+`Carousel.Root`:
+
+```tsx
+<Carousel.Root
+  ariaLabel="Featured products"
+  ids={{
+    root: "promo-carousel",
+    viewport: "promo-viewport",
+    previousTrigger: "promo-prev",
+    nextTrigger: "promo-next",
+    playPauseTrigger: "promo-play-pause",
+    indicatorGroup: "promo-indicators",
+  }}
+>
+  …
+</Carousel.Root>
+```
+
+Any keys you omit leave the corresponding element unidentified. A
+direct `id` prop on a sub-component (e.g.
+`<Carousel.NextTrigger id="…">`) wins over `ids.*` because it spreads
+last.
+
 ### Internationalisation
 
 The component owns four user-visible strings: each slide's auto-

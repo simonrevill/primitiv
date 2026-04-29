@@ -10,8 +10,11 @@ import {
 import type {
   CarouselAutoplay,
   CarouselContextValue,
+  CarouselIds,
   CarouselTranslations,
 } from "../types";
+
+const EMPTY_IDS: CarouselIds = {};
 
 const DEFAULT_AUTOPLAY_DELAY_MS = 4000;
 
@@ -61,6 +64,9 @@ type UseCarouselRootProps = {
   /** Override the default user-visible strings — see
    * {@link CarouselTranslations}. */
   translations?: CarouselTranslations;
+  /** Custom DOM ids for the rendered sub-components — see
+   * {@link CarouselIds}. */
+  ids?: CarouselIds;
 };
 
 /**
@@ -99,6 +105,7 @@ export function useCarouselRoot({
   autoplay,
   slidesPerPage = 1,
   translations,
+  ids = EMPTY_IDS,
 }: UseCarouselRootProps = {}) {
   const { enabled: autoplayEnabled, delay: autoplayDelay } =
     resolveAutoplay(autoplay);
@@ -275,6 +282,7 @@ export function useCarouselRoot({
       togglePlaying,
       isAutoRotating,
       translations: resolvedTranslations,
+      ids,
     }),
     [
       registerSlide,
@@ -291,6 +299,7 @@ export function useCarouselRoot({
       togglePlaying,
       isAutoRotating,
       resolvedTranslations,
+      ids,
     ],
   );
 

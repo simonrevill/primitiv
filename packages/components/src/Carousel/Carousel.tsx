@@ -15,6 +15,7 @@ import type {
   CarouselIndicatorGroupProps,
   CarouselIndicatorProps,
   CarouselIndicatorsProps,
+  CarouselPlayPauseTriggerProps,
 } from "./types";
 
 /**
@@ -73,6 +74,9 @@ export function CarouselRoot({
   page,
   onPageChange,
   loop,
+  defaultPlaying,
+  playing,
+  onPlayingChange,
   children,
   ...rest
 }: CarouselRootProps) {
@@ -81,6 +85,9 @@ export function CarouselRoot({
     page,
     onPageChange,
     loop,
+    defaultPlaying,
+    playing,
+    onPlayingChange,
   });
 
   return (
@@ -470,6 +477,65 @@ export function CarouselIndicators(props: CarouselIndicatorsProps) {
 
 CarouselIndicators.displayName = "CarouselIndicators";
 
+/**
+ * A `<button>` that toggles the carousel's `playing` flag. Renders the
+ * accessible name dictated by the WAI-ARIA Carousel APG by default —
+ * `"Start automatic slide show"` when paused, `"Stop automatic slide
+ * show"` when playing — and exposes the live `playing` flag both as a
+ * `data-state="playing" | "paused"` styling hook and to a function
+ * `children` render prop, so consumers can swap icons or labels per
+ * state without re-implementing the toggle:
+ *
+ * ```tsx
+ * <Carousel.PlayPauseTrigger>
+ *   {({ playing }) => (playing ? <PauseIcon /> : <PlayIcon />)}
+ * </Carousel.PlayPauseTrigger>
+ * ```
+ *
+ * Static children also work — useful when you want a single icon and
+ * style it via `[data-state]` selectors.
+ *
+ * Must be rendered as a descendant of `Carousel.Root`; rendering it
+ * elsewhere throws a descriptive error. The autoplay timer that
+ * advances the page when `playing` flips to `true` lands in cycle 12.
+ */
+export function CarouselPlayPauseTrigger({
+  className = "",
+  onClick,
+  children,
+  ...rest
+}: CarouselPlayPauseTriggerProps) {
+  const { playing, togglePlaying } = useCarouselContext();
+
+  const handleClick = useCallback(
+    (event: MouseEvent<HTMLButtonElement>) => {
+      onClick?.(event);
+      togglePlaying();
+    },
+    [onClick, togglePlaying],
+  );
+
+  const renderedChildren =
+    typeof children === "function" ? children({ playing }) : children;
+
+  return (
+    <button
+      type="button"
+      className={className}
+      aria-label={
+        playing ? "Stop automatic slide show" : "Start automatic slide show"
+      }
+      data-state={playing ? "playing" : "paused"}
+      onClick={handleClick}
+      {...rest}
+    >
+      {renderedChildren}
+    </button>
+  );
+}
+
+CarouselPlayPauseTrigger.displayName = "CarouselPlayPauseTrigger";
+
 type CarouselCompound = typeof CarouselRoot & {
   Root: typeof CarouselRoot;
   Viewport: typeof CarouselViewport;
@@ -479,6 +545,7 @@ type CarouselCompound = typeof CarouselRoot & {
   IndicatorGroup: typeof CarouselIndicatorGroup;
   Indicator: typeof CarouselIndicator;
   Indicators: typeof CarouselIndicators;
+  PlayPauseTrigger: typeof CarouselPlayPauseTrigger;
 };
 
 /**
@@ -530,6 +597,7 @@ const CarouselCompound: CarouselCompound = Object.assign(CarouselRoot, {
   IndicatorGroup: CarouselIndicatorGroup,
   Indicator: CarouselIndicator,
   Indicators: CarouselIndicators,
+  PlayPauseTrigger: CarouselPlayPauseTrigger,
 });
 
 CarouselCompound.displayName = "Carousel";

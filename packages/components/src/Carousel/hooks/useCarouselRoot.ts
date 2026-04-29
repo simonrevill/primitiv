@@ -15,6 +15,14 @@ type UseCarouselRootProps = {
    * `next()` is a no-op at the last page and `previous()` is a no-op
    * at the first. */
   loop?: boolean;
+  /** Uncontrolled seed for the playing flag. Defaults to `false`. */
+  defaultPlaying?: boolean;
+  /** Controlled playing flag. When provided, the hook is in controlled
+   * mode and defers all state changes back through `onPlayingChange`. */
+  playing?: boolean;
+  /** Required when `playing` is provided. Invoked with the proposed
+   * next playing value. */
+  onPlayingChange?: (playing: boolean) => void;
 };
 
 /**
@@ -47,6 +55,9 @@ export function useCarouselRoot({
   page,
   onPageChange,
   loop = false,
+  defaultPlaying = false,
+  playing,
+  onPlayingChange,
 }: UseCarouselRootProps = {}) {
   const slidesRef = useRef<Map<string, HTMLDivElement>>(new Map());
   const [slideKeys, setSlideKeys] = useState<string[]>([]);
@@ -54,6 +65,10 @@ export function useCarouselRoot({
   const isControlled = page !== undefined;
   const currentPage = isControlled ? page : internalPage;
   const total = slideKeys.length;
+
+  const [internalPlaying, setInternalPlaying] = useState(defaultPlaying);
+  const isPlayingControlled = playing !== undefined;
+  const currentPlaying = isPlayingControlled ? playing : internalPlaying;
 
   // Boundary derivation: navigation requires at least one slide. With
   // loop, every position has a forward and backward target. Without,
@@ -107,6 +122,15 @@ export function useCarouselRoot({
     [isControlled, onPageChange],
   );
 
+  const togglePlaying = useCallback(() => {
+    const next = !currentPlaying;
+    if (isPlayingControlled) {
+      onPlayingChange?.(next);
+    } else {
+      setInternalPlaying(next);
+    }
+  }, [currentPlaying, isPlayingControlled, onPlayingChange]);
+
   const contextValue = useMemo<CarouselContextValue>(
     () => ({
       registerSlide,
@@ -117,6 +141,8 @@ export function useCarouselRoot({
       next,
       previous,
       goTo,
+      playing: currentPlaying,
+      togglePlaying,
     }),
     [
       registerSlide,
@@ -127,6 +153,8 @@ export function useCarouselRoot({
       next,
       previous,
       goTo,
+      currentPlaying,
+      togglePlaying,
     ],
   );
 

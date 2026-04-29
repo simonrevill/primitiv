@@ -1,4 +1,4 @@
-import { ComponentProps } from "react";
+import { ComponentProps, ReactNode } from "react";
 
 /**
  * Discriminated label shape for `Carousel.Root` — exactly one of
@@ -45,12 +45,45 @@ export type CarouselRootPageStateProps =
   | UncontrolledCarouselPageProps
   | ControlledCarouselPageProps;
 
+/**
+ * Uncontrolled playing state — the Root owns the "playing" flag
+ * internally, optionally seeded by `defaultPlaying`.
+ */
+export type UncontrolledCarouselPlayingProps = {
+  /** Uncontrolled initial playing flag. Defaults to `false`. */
+  defaultPlaying?: boolean;
+  playing?: never;
+  onPlayingChange?: never;
+};
+
+/**
+ * Controlled playing state — the parent owns the "playing" flag; the
+ * Root defers every change back through `onPlayingChange`. Both props
+ * must be supplied together.
+ */
+export type ControlledCarouselPlayingProps = {
+  /** Controlled playing flag. */
+  playing: boolean;
+  /** Callback invoked when the playing flag should toggle. The callback
+   * is responsible for re-rendering with the new `playing` value. */
+  onPlayingChange: (playing: boolean) => void;
+  defaultPlaying?: never;
+};
+
+/**
+ * Discriminated playing-state union — mirrors the page-state pattern.
+ */
+export type CarouselRootPlayingStateProps =
+  | UncontrolledCarouselPlayingProps
+  | ControlledCarouselPlayingProps;
+
 export type CarouselRootProps = Omit<
   ComponentProps<"section">,
   "aria-label" | "aria-labelledby"
 > &
   CarouselRootLabelProps &
-  CarouselRootPageStateProps & {
+  CarouselRootPageStateProps &
+  CarouselRootPlayingStateProps & {
     /** When `true`, advancing past the last slide wraps to the first
      * (and vice versa) and `Carousel.NextTrigger` /
      * `Carousel.PreviousTrigger` are never auto-disabled at the ends.
@@ -88,6 +121,10 @@ export type CarouselContextValue = {
   /** Jump directly to `target` (zero-based page index). Used by
    * `Carousel.Indicator` to dispatch click-to-jump. */
   goTo: (target: number) => void;
+  /** Whether autoplay is currently in the "playing" state. */
+  playing: boolean;
+  /** Toggles `playing`. Used by `Carousel.PlayPauseTrigger`. */
+  togglePlaying: () => void;
 };
 
 export type CarouselViewportProps = ComponentProps<"div">;
@@ -139,3 +176,19 @@ export type CarouselIndicatorsProps = Omit<
     | { label: string; ariaLabelledBy?: never }
     | { label?: never; ariaLabelledBy: string }
   );
+
+/**
+ * Render-prop or static children supported by
+ * `Carousel.PlayPauseTrigger`. The function form receives the live
+ * `playing` flag so consumers can swap icons / labels per state.
+ */
+export type CarouselPlayPauseTriggerChildren =
+  | ReactNode
+  | ((state: { playing: boolean }) => ReactNode);
+
+export type CarouselPlayPauseTriggerProps = Omit<
+  ComponentProps<"button">,
+  "children"
+> & {
+  children?: CarouselPlayPauseTriggerChildren;
+};

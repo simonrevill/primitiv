@@ -50,8 +50,15 @@ Currently exposes:
   discriminated `label` / `ariaLabelledBy` shape as `IndicatorGroup`.
   For custom indicator content, drop down to `IndicatorGroup` +
   `Indicator`.
+- **`Carousel.PlayPauseTrigger`** — `<button>` that toggles the
+  `playing` flag on Root. Auto-labels itself `"Start automatic slide
+  show"` / `"Stop automatic slide show"` per the WAI-ARIA Carousel
+  APG, exposes a `data-state="playing" | "paused"` styling hook, and
+  passes `{ playing }` to a function `children` render prop so
+  consumers can swap icons or labels per state.
 
-Auto-rotation is added in subsequent cycles.
+The autoplay timer that advances the page when `playing` is `true` is
+added in a subsequent cycle.
 
 ## Usage
 
@@ -204,6 +211,46 @@ and `data-state="inactive"`. Style them via the
   background: black;
 }
 ```
+
+### Play / pause control
+
+`Carousel.PlayPauseTrigger` toggles a `playing` flag on the Root. The
+flag has the same controlled / uncontrolled split as `page`:
+
+```tsx
+// Uncontrolled
+<Carousel.Root ariaLabel="Featured products" defaultPlaying={false}>
+  <Carousel.PlayPauseTrigger />
+</Carousel.Root>
+
+// Controlled
+const [playing, setPlaying] = useState(false);
+<Carousel.Root
+  ariaLabel="Featured products"
+  playing={playing}
+  onPlayingChange={setPlaying}
+>
+  <Carousel.PlayPauseTrigger />
+</Carousel.Root>
+```
+
+The discriminated union rejects mixed shapes (e.g. `defaultPlaying` +
+`playing`, or `playing` without `onPlayingChange`) at compile time.
+
+Pass a function as `children` to swap icons or labels per state:
+
+```tsx
+<Carousel.PlayPauseTrigger>
+  {({ playing }) => (playing ? <PauseIcon /> : <PlayIcon />)}
+</Carousel.PlayPauseTrigger>
+```
+
+The trigger is auto-labelled `"Start automatic slide show"` (paused)
+or `"Stop automatic slide show"` (playing) for assistive tech, and
+emits `data-state="playing" | "paused"` for consumer CSS.
+
+The autoplay timer that actually advances the active page when
+`playing=true` lands in a subsequent cycle.
 
 ### Indicator dots (auto-rendered)
 

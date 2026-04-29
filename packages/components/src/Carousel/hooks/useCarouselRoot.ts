@@ -102,7 +102,17 @@ export function useCarouselRoot({
   // still inside.
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
-  const suspended = hovered || focused;
+
+  // Per the WAI-ARIA APG carousel example: when the user explicitly
+  // resumes the slideshow via PlayPauseTrigger, the hover/focus pause
+  // is suspended for the lifetime of that playing session — otherwise
+  // they'd fight a pause every time the pointer was already over the
+  // carousel. The ref is set inside togglePlaying() on a false→true
+  // transition and reset by the effect below when playing flips back
+  // to false. External (non-trigger) playing changes don't set it.
+  const userInitiatedPlayRef = useRef(false);
+  const suspended =
+    (hovered || focused) && !userInitiatedPlayRef.current;
 
   // Boundary derivation: navigation requires at least one slide. With
   // loop, every position has a forward and backward target. Without,
@@ -201,12 +211,24 @@ export function useCarouselRoot({
 
   const togglePlaying = useCallback(() => {
     const next = !currentPlaying;
+    if (next) {
+      userInitiatedPlayRef.current = true;
+    }
     if (isPlayingControlled) {
       onPlayingChange?.(next);
     } else {
       setInternalPlaying(next);
     }
   }, [currentPlaying, isPlayingControlled, onPlayingChange]);
+
+  // Reset the user-initiated flag when the playing session ends, so a
+  // subsequent external (non-trigger) flip to playing=true doesn't
+  // inherit the bypass.
+  useEffect(() => {
+    if (!currentPlaying) {
+      userInitiatedPlayRef.current = false;
+    }
+  }, [currentPlaying]);
 
   const contextValue = useMemo<CarouselContextValue>(
     () => ({

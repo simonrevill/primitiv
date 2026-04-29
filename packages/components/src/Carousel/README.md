@@ -286,6 +286,16 @@ carousel entirely. The `playing` flag is unaffected — it stays
 `true` while suspended, so toggling pause-resume via
 `PlayPauseTrigger` continues to behave as the consumer expects.
 
+**User-initiated play overrides the hover/focus pause.** Per the
+WAI-ARIA Carousel APG example, when the user explicitly clicks
+`PlayPauseTrigger` to start the slideshow, the hover/focus pause is
+suspended for the lifetime of that playing session — otherwise the
+user would fight a pause every time their pointer was already over
+the carousel when they pressed play. The override resets when
+`playing` flips back to `false` (via another click, or via an
+external state change), so a subsequent play that's *not* user-
+initiated falls back to the standard WCAG pause.
+
 The `aria-live` flip on the viewport during auto-rotation is added in
 a subsequent cycle.
 

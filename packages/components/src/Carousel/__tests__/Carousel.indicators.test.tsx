@@ -253,6 +253,151 @@ describe("Carousel.Indicator", () => {
   });
 });
 
+describe("Carousel.Indicators (auto-rendered)", () => {
+  it("should render exactly one indicator button per registered slide", () => {
+    render(
+      <Carousel.Root ariaLabel="Featured products">
+        <Carousel.Viewport>
+          <Carousel.Slide />
+          <Carousel.Slide />
+          <Carousel.Slide />
+        </Carousel.Viewport>
+        <Carousel.Indicators label="Choose slide" />
+      </Carousel.Root>,
+    );
+
+    expect(
+      screen.getAllByRole("button", { name: /^Slide \d+$/ }),
+    ).toHaveLength(3);
+  });
+
+  it("should render no indicators when there are no slides registered", () => {
+    render(
+      <Carousel.Root ariaLabel="Featured products">
+        <Carousel.Indicators label="Choose slide" />
+      </Carousel.Root>,
+    );
+
+    expect(
+      screen.queryAllByRole("button", { name: /^Slide \d+$/ }),
+    ).toHaveLength(0);
+  });
+
+  it("should update the rendered indicator count when slides mount or unmount", () => {
+    const { rerender } = render(
+      <Carousel.Root ariaLabel="Featured products">
+        <Carousel.Viewport>
+          <Carousel.Slide />
+          <Carousel.Slide />
+          <Carousel.Slide />
+        </Carousel.Viewport>
+        <Carousel.Indicators label="Choose slide" />
+      </Carousel.Root>,
+    );
+
+    expect(
+      screen.getAllByRole("button", { name: /^Slide \d+$/ }),
+    ).toHaveLength(3);
+
+    rerender(
+      <Carousel.Root ariaLabel="Featured products">
+        <Carousel.Viewport>
+          <Carousel.Slide />
+          <Carousel.Slide />
+        </Carousel.Viewport>
+        <Carousel.Indicators label="Choose slide" />
+      </Carousel.Root>,
+    );
+
+    expect(
+      screen.getAllByRole("button", { name: /^Slide \d+$/ }),
+    ).toHaveLength(2);
+  });
+
+  it("should label each auto-rendered indicator as 'Slide N' with N matching its 1-indexed position", () => {
+    render(
+      <Carousel.Root ariaLabel="Featured products">
+        <Carousel.Viewport>
+          <Carousel.Slide />
+          <Carousel.Slide />
+          <Carousel.Slide />
+        </Carousel.Viewport>
+        <Carousel.Indicators label="Choose slide" />
+      </Carousel.Root>,
+    );
+
+    expect(screen.getByRole("button", { name: "Slide 1" })).toBeVisible();
+    expect(screen.getByRole("button", { name: "Slide 2" })).toBeVisible();
+    expect(screen.getByRole("button", { name: "Slide 3" })).toBeVisible();
+  });
+
+  it("should expose the provided label as the wrapping group's aria-label", () => {
+    render(
+      <Carousel.Root ariaLabel="Featured products">
+        <Carousel.Viewport>
+          <Carousel.Slide />
+        </Carousel.Viewport>
+        <Carousel.Indicators label="Choose slide" />
+      </Carousel.Root>,
+    );
+
+    expect(screen.getByRole("group", { name: "Choose slide" })).toBeVisible();
+  });
+
+  it("should accept ariaLabelledBy as an alternative to label", () => {
+    const labelId = "indicator-heading";
+    render(
+      <Carousel.Root ariaLabel="Featured products">
+        <h3 id={labelId}>Choose slide</h3>
+        <Carousel.Viewport>
+          <Carousel.Slide />
+        </Carousel.Viewport>
+        <Carousel.Indicators ariaLabelledBy={labelId} />
+      </Carousel.Root>,
+    );
+
+    expect(screen.getByRole("group", { name: "Choose slide" })).toHaveAttribute(
+      "aria-labelledby",
+      labelId,
+    );
+  });
+
+  it("should jump to the targeted page when an auto-rendered indicator is clicked", async () => {
+    const user = userEvent.setup();
+    render(
+      <Carousel.Root ariaLabel="Featured products">
+        <Carousel.Viewport>
+          <Carousel.Slide data-testid="slide-0" />
+          <Carousel.Slide data-testid="slide-1" />
+          <Carousel.Slide data-testid="slide-2" />
+        </Carousel.Viewport>
+        <Carousel.Indicators label="Choose slide" />
+      </Carousel.Root>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Slide 3" }));
+
+    expect(screen.getByTestId("slide-2")).toHaveAttribute(
+      "data-state",
+      "active",
+    );
+  });
+
+  it("should accept a className prop on the wrapping group", () => {
+    const testClass = "indicator-row";
+    render(
+      <Carousel.Root ariaLabel="Featured products">
+        <Carousel.Indicators label="Choose slide" className={testClass} />
+      </Carousel.Root>,
+    );
+
+    expect(screen.getByRole("group", { name: "Choose slide" })).toHaveAttribute(
+      "class",
+      testClass,
+    );
+  });
+});
+
 describe("Indicator context errors", () => {
   it.each([
     [
@@ -260,6 +405,10 @@ describe("Indicator context errors", () => {
       () => <Carousel.IndicatorGroup label="Choose slide" />,
     ],
     ["Carousel.Indicator", () => <Carousel.Indicator index={0} />],
+    [
+      "Carousel.Indicators",
+      () => <Carousel.Indicators label="Choose slide" />,
+    ],
   ] as const)(
     "should throw an error when %s is used outside Carousel.Root",
     (_, ComponentRenderer) => {

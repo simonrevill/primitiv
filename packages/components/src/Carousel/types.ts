@@ -101,6 +101,12 @@ export type CarouselRootProps = Omit<
     loop?: boolean;
     /** Autoplay configuration — see {@link CarouselAutoplay}. */
     autoplay?: CarouselAutoplay;
+    /** Number of slides visible per page. Defaults to `1`. With values
+     * greater than `1`, slides are grouped into pages of that size for
+     * navigation purposes: indicators auto-render per page, boundary
+     * clamp moves to the last page, and `Carousel.NextTrigger` /
+     * `Carousel.PreviousTrigger` advance one page at a time. */
+    slidesPerPage?: number;
   };
 
 /**
@@ -115,6 +121,11 @@ export type CarouselContextValue = {
   /** Ordered list of currently-mounted slide keys. The slide's index is
    * its position in this array; the array's length is the total. */
   slideKeys: string[];
+  /** Number of slides visible per page (default `1`). */
+  slidesPerPage: number;
+  /** `ceil(slideKeys.length / slidesPerPage)` — drives indicator count
+   * and the boundary clamp on the prev/next triggers. */
+  totalPages: number;
   /** Zero-based index of the currently-active page. */
   currentPage: number;
   /** `true` when there is a forward navigation target (a slide ahead, or

@@ -159,6 +159,44 @@ The discriminated union on the props type rejects mixed shapes (e.g.
 both `defaultPage` and `page`, or `page` without `onPageChange`) at
 compile time.
 
+### Multi-slide pages
+
+Pass `slidesPerPage` (default `1`) to make several slides visible per
+page — the "image carousel" / "property cards" pattern. Slides
+group into pages of that size for navigation:
+
+```tsx
+<Carousel.Root ariaLabel="Featured products" slidesPerPage={3}>
+  <Carousel.Viewport>
+    <Carousel.Slide>1</Carousel.Slide>
+    <Carousel.Slide>2</Carousel.Slide>
+    <Carousel.Slide>3</Carousel.Slide>
+    <Carousel.Slide>4</Carousel.Slide>
+    <Carousel.Slide>5</Carousel.Slide>
+  </Carousel.Viewport>
+  <Carousel.PreviousTrigger>Previous</Carousel.PreviousTrigger>
+  <Carousel.Indicators label="Choose page" />
+  <Carousel.NextTrigger>Next</Carousel.NextTrigger>
+</Carousel.Root>
+```
+
+With `slidesPerPage={3}` and 5 slides:
+
+- Total pages = `ceil(5 / 3) === 2`. `Carousel.Indicators` renders 2
+  dots.
+- Page 0 contains slides 0–2; page 1 contains the remaining 3, 4 (a
+  partial last page).
+- Each slide on the active page emits `data-state="active"`; slides
+  on other pages emit `"inactive"`.
+- `Carousel.NextTrigger` advances one page per click; the boundary
+  clamp is at the last page (so with `loop={false}`, Next is
+  disabled while page 1 is active).
+- `loop={true}` wraps at page boundaries.
+
+The slide-level `aria-label="N of M"` continues to count individual
+slides (so a 5-slide carousel announces "1 of 5", "2 of 5", … even
+when grouped into 3-per-page).
+
 ### Boundary behaviour and looping
 
 By default, the prev/next triggers clamp at the ends:

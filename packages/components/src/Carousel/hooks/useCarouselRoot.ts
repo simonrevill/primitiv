@@ -45,6 +45,8 @@ type UseCarouselRootProps = {
   onPlayingChange?: (playing: boolean) => void;
   /** Autoplay configuration — see {@link CarouselAutoplay}. */
   autoplay?: CarouselAutoplay;
+  /** Number of slides visible per page. Defaults to `1`. */
+  slidesPerPage?: number;
 };
 
 /**
@@ -81,6 +83,7 @@ export function useCarouselRoot({
   playing,
   onPlayingChange,
   autoplay,
+  slidesPerPage = 1,
 }: UseCarouselRootProps = {}) {
   const { enabled: autoplayEnabled, delay: autoplayDelay } =
     resolveAutoplay(autoplay);
@@ -90,6 +93,9 @@ export function useCarouselRoot({
   const isControlled = page !== undefined;
   const currentPage = isControlled ? page : internalPage;
   const total = slideKeys.length;
+  // ceil(total / slidesPerPage) — but Math.ceil(0 / N) === 0 so the
+  // empty-slide-list case still gives totalPages === 0.
+  const totalPages = Math.ceil(total / slidesPerPage);
 
   const [internalPlaying, setInternalPlaying] = useState(defaultPlaying);
   const isPlayingControlled = playing !== undefined;
@@ -114,11 +120,12 @@ export function useCarouselRoot({
   const suspended =
     (hovered || focused) && !userInitiatedPlayRef.current;
 
-  // Boundary derivation: navigation requires at least one slide. With
+  // Boundary derivation: navigation requires at least one page. With
   // loop, every position has a forward and backward target. Without,
-  // the ends clamp.
-  const canGoPrevious = total > 0 && (loop || currentPage > 0);
-  const canGoNext = total > 0 && (loop || currentPage < total - 1);
+  // the ends clamp at the last page (which, with slidesPerPage > 1,
+  // is generally before the last slide).
+  const canGoPrevious = totalPages > 0 && (loop || currentPage > 0);
+  const canGoNext = totalPages > 0 && (loop || currentPage < totalPages - 1);
 
   const registerSlide = useCallback(
     (key: string, element: HTMLDivElement | null) => {
@@ -138,22 +145,22 @@ export function useCarouselRoot({
   // never fires at boundaries. Guards become reachable (and necessary)
   // once the imperative API or autoplay land; they're added then.
   const next = useCallback(() => {
-    const target = (currentPage + 1) % total;
+    const target = (currentPage + 1) % totalPages;
     if (isControlled) {
       onPageChange?.(target);
     } else {
       setInternalPage(target);
     }
-  }, [currentPage, total, isControlled, onPageChange]);
+  }, [currentPage, totalPages, isControlled, onPageChange]);
 
   const previous = useCallback(() => {
-    const target = (currentPage - 1 + total) % total;
+    const target = (currentPage - 1 + totalPages) % totalPages;
     if (isControlled) {
       onPageChange?.(target);
     } else {
       setInternalPage(target);
     }
-  }, [currentPage, total, isControlled, onPageChange]);
+  }, [currentPage, totalPages, isControlled, onPageChange]);
 
   const goTo = useCallback(
     (target: number) => {
@@ -236,6 +243,8 @@ export function useCarouselRoot({
     () => ({
       registerSlide,
       slideKeys,
+      slidesPerPage,
+      totalPages,
       currentPage,
       canGoNext,
       canGoPrevious,
@@ -249,6 +258,8 @@ export function useCarouselRoot({
     [
       registerSlide,
       slideKeys,
+      slidesPerPage,
+      totalPages,
       currentPage,
       canGoNext,
       canGoPrevious,

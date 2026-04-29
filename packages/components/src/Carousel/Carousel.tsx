@@ -78,6 +78,7 @@ export function CarouselRoot({
   playing,
   onPlayingChange,
   autoplay,
+  slidesPerPage,
   children,
   ...rest
 }: CarouselRootProps) {
@@ -90,6 +91,7 @@ export function CarouselRoot({
     playing,
     onPlayingChange,
     autoplay,
+    slidesPerPage,
   });
 
   return (
@@ -478,12 +480,12 @@ CarouselIndicator.displayName = "CarouselIndicator";
  * ```
  */
 export function CarouselIndicators(props: CarouselIndicatorsProps) {
-  const { slideKeys } = useCarouselContext();
+  const { totalPages } = useCarouselContext();
 
   return (
     <CarouselIndicatorGroup {...props}>
-      {slideKeys.map((slideKey, index) => (
-        <CarouselIndicator key={slideKey} index={index} />
+      {Array.from({ length: totalPages }, (_, index) => (
+        <CarouselIndicator key={index} index={index} />
       ))}
     </CarouselIndicatorGroup>
   );

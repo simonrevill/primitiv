@@ -269,6 +269,7 @@ export function useCarouselRoot({
   const contextValue = useMemo<CarouselContextValue>(
     () => ({
       registerSlide,
+      slidesRef,
       slideKeys,
       slidesPerPage,
       totalPages,
@@ -286,6 +287,7 @@ export function useCarouselRoot({
     }),
     [
       registerSlide,
+      slidesRef,
       slideKeys,
       slidesPerPage,
       totalPages,

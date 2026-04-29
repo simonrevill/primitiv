@@ -159,6 +159,18 @@ The discriminated union on the props type rejects mixed shapes (e.g.
 both `defaultPage` and `page`, or `page` without `onPageChange`) at
 compile time.
 
+### Programmatic scroll sync
+
+When the active page changes for any reason (`Carousel.NextTrigger` /
+`Carousel.PreviousTrigger` click, indicator click, autoplay tick),
+the viewport calls `scrollTo` so the visual surface tracks React
+state. The scroll target is derived from the first slide of the new
+page via `getBoundingClientRect`, so consumer CSS owns slide width
+and gap. Default `behavior` is `"smooth"`.
+
+The user-driven scroll path (touch swipe / wheel drag updating the
+active page on `scrollsnapchange`) lands in a subsequent cycle.
+
 ### Custom DOM ids
 
 For SSR / hydration stability or external `aria-controls` linkage,

@@ -5,6 +5,7 @@ import {
   useCarouselContext,
   useCarouselRoot,
   useCarouselSlide,
+  useCarouselViewport,
 } from "./hooks";
 import type {
   CarouselRootProps,
@@ -156,9 +157,11 @@ export function CarouselViewport({
   ...rest
 }: CarouselViewportProps) {
   const { isAutoRotating, ids } = useCarouselContext();
+  const { viewportRef } = useCarouselViewport();
 
   return (
     <div
+      ref={viewportRef}
       data-carousel-viewport=""
       className={className}
       aria-live={isAutoRotating ? "off" : "polite"}

@@ -1,4 +1,4 @@
-import { ComponentProps, ReactNode } from "react";
+import { ComponentProps, ReactNode, RefObject } from "react";
 
 /**
  * Discriminated label shape for `Carousel.Root` — exactly one of
@@ -163,6 +163,10 @@ export type CarouselContextValue = {
   /** Self-registers a slide. Called as a callback ref by `Carousel.Slide`
    * with the rendered DOM node on mount and `null` on unmount. */
   registerSlide: (key: string, element: HTMLDivElement | null) => void;
+  /** Live map from slide key to rendered DOM node. Used by the
+   * Viewport to read `getBoundingClientRect` on the first slide of
+   * the target page when programmatically scrolling. */
+  slidesRef: RefObject<Map<string, HTMLDivElement>>;
   /** Ordered list of currently-mounted slide keys. The slide's index is
    * its position in this array; the array's length is the total. */
   slideKeys: string[];

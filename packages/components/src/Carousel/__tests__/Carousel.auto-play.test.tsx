@@ -530,6 +530,81 @@ describe("Carousel autoplay timer", () => {
     );
   });
 
+  it("should default the Viewport's aria-live to 'polite' when autoplay is not enabled", () => {
+    render(
+      <Carousel.Root ariaLabel="Featured products">
+        <Carousel.Viewport data-testid="viewport" />
+      </Carousel.Root>,
+    );
+
+    expect(screen.getByTestId("viewport")).toHaveAttribute(
+      "aria-live",
+      "polite",
+    );
+  });
+
+  it("should set the Viewport's aria-live to 'off' while autoplay is enabled and playing is true", () => {
+    render(
+      <Carousel.Root ariaLabel="Featured products" autoplay defaultPlaying>
+        <Carousel.Viewport data-testid="viewport" />
+      </Carousel.Root>,
+    );
+
+    expect(screen.getByTestId("viewport")).toHaveAttribute("aria-live", "off");
+  });
+
+  it("should keep the Viewport's aria-live as 'polite' when autoplay is enabled but playing is false", () => {
+    render(
+      <Carousel.Root ariaLabel="Featured products" autoplay>
+        <Carousel.Viewport data-testid="viewport" />
+      </Carousel.Root>,
+    );
+
+    expect(screen.getByTestId("viewport")).toHaveAttribute(
+      "aria-live",
+      "polite",
+    );
+  });
+
+  it("should flip the Viewport's aria-live as playing toggles via PlayPauseTrigger", () => {
+    render(
+      <Carousel.Root ariaLabel="Featured products" autoplay>
+        <Carousel.Viewport data-testid="viewport" />
+        <Carousel.PlayPauseTrigger />
+      </Carousel.Root>,
+    );
+
+    const viewport = screen.getByTestId("viewport");
+    expect(viewport).toHaveAttribute("aria-live", "polite");
+
+    act(() => {
+      fireEvent.click(screen.getByRole("button"));
+    });
+    expect(viewport).toHaveAttribute("aria-live", "off");
+
+    act(() => {
+      fireEvent.click(screen.getByRole("button"));
+    });
+    expect(viewport).toHaveAttribute("aria-live", "polite");
+  });
+
+  it("should keep the Viewport's aria-live as 'polite' when autoplay={false} even if playing is true", () => {
+    render(
+      <Carousel.Root
+        ariaLabel="Featured products"
+        autoplay={false}
+        defaultPlaying
+      >
+        <Carousel.Viewport data-testid="viewport" />
+      </Carousel.Root>,
+    );
+
+    expect(screen.getByTestId("viewport")).toHaveAttribute(
+      "aria-live",
+      "polite",
+    );
+  });
+
   it("should stop the timer when playing flips to false", () => {
     render(
       <Carousel.Root ariaLabel="Featured products" autoplay defaultPlaying>

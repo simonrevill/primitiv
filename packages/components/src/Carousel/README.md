@@ -277,8 +277,17 @@ toggling pause via `Carousel.PlayPauseTrigger` (or via the controlled
 default), the timer stops once the active page reaches the last slide;
 with `loop={true}` it wraps to the first.
 
-Hover/focus pause behaviour (WCAG 2.2.2) and the `aria-live` flip on
-the viewport land in subsequent cycles.
+The timer also pauses automatically while the user is hovering the
+Root or has focus on a descendant element, per WCAG 2.2.2 (Pause,
+Stop, Hide). Focus moving between descendants of the Root (e.g.
+tabbing from `Previous` to `Next`) keeps the pause active; the timer
+only resumes once the pointer leaves and focus has moved out of the
+carousel entirely. The `playing` flag is unaffected — it stays
+`true` while suspended, so toggling pause-resume via
+`PlayPauseTrigger` continues to behave as the consumer expects.
+
+The `aria-live` flip on the viewport during auto-rotation is added in
+a subsequent cycle.
 
 ### Indicator dots (auto-rendered)
 

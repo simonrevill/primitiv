@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  FocusEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import type { CarouselAutoplay, CarouselContextValue } from "../types";
 
@@ -88,6 +95,15 @@ export function useCarouselRoot({
   const isPlayingControlled = playing !== undefined;
   const currentPlaying = isPlayingControlled ? playing : internalPlaying;
 
+  // Tracked separately so a focus move between two descendants of the
+  // Root (e.g. tabbing from Prev to Next) doesn't release the pause —
+  // mouseLeave only fires when the pointer exits the Root's outer
+  // boundary, and onBlur's relatedTarget tells us whether focus is
+  // still inside.
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const suspended = hovered || focused;
+
   // Boundary derivation: navigation requires at least one slide. With
   // loop, every position has a forward and backward target. Without,
   // the ends clamp.
@@ -144,13 +160,44 @@ export function useCarouselRoot({
   // next() runs it bumps currentPage, which retriggers the effect with
   // a fresh timer. canGoNext gates the schedule so loop=false stops at
   // the last slide and loop=true wraps via next()'s modular arithmetic.
+  // The suspended flag pauses the timer while the user is hovering or
+  // has focus inside the Root, per WCAG 2.2.2.
   useEffect(() => {
-    if (!autoplayEnabled || !currentPlaying || !canGoNext) return;
+    if (!autoplayEnabled || !currentPlaying || !canGoNext || suspended) {
+      return;
+    }
     const id = setTimeout(() => {
       next();
     }, autoplayDelay);
     return () => clearTimeout(id);
-  }, [autoplayEnabled, currentPlaying, canGoNext, autoplayDelay, next]);
+  }, [
+    autoplayEnabled,
+    currentPlaying,
+    canGoNext,
+    suspended,
+    autoplayDelay,
+    next,
+  ]);
+
+  // Handlers spread onto the Root <section>. mouseEnter / mouseLeave
+  // fire once at the outer boundary (they don't bubble through inner
+  // hovers). onFocus / onBlur in React do bubble; relatedTarget on
+  // onBlur tells us whether focus is moving to another descendant —
+  // in which case we keep `focused` true.
+  const onMouseEnter = useCallback(() => setHovered(true), []);
+  const onMouseLeave = useCallback(() => setHovered(false), []);
+  const onFocus = useCallback(() => setFocused(true), []);
+  const onBlur = useCallback((event: FocusEvent<HTMLElement>) => {
+    const next = event.relatedTarget;
+    if (!next || !event.currentTarget.contains(next)) {
+      setFocused(false);
+    }
+  }, []);
+
+  const rootHandlers = useMemo(
+    () => ({ onMouseEnter, onMouseLeave, onFocus, onBlur }),
+    [onMouseEnter, onMouseLeave, onFocus, onBlur],
+  );
 
   const togglePlaying = useCallback(() => {
     const next = !currentPlaying;
@@ -188,5 +235,5 @@ export function useCarouselRoot({
     ],
   );
 
-  return { contextValue };
+  return { contextValue, rootHandlers };
 }

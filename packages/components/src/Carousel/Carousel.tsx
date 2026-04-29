@@ -81,7 +81,7 @@ export function CarouselRoot({
   children,
   ...rest
 }: CarouselRootProps) {
-  const { contextValue } = useCarouselRoot({
+  const { contextValue, rootHandlers } = useCarouselRoot({
     defaultPage,
     page,
     onPageChange,
@@ -101,6 +101,7 @@ export function CarouselRoot({
         {...(ariaLabelledBy !== undefined && {
           "aria-labelledby": ariaLabelledBy,
         })}
+        {...rootHandlers}
         {...rest}
       >
         {children}

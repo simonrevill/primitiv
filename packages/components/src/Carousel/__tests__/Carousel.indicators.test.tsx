@@ -398,6 +398,146 @@ describe("Carousel.Indicators (auto-rendered)", () => {
   });
 });
 
+describe("Carousel.Indicator active state", () => {
+  it('should mark the indicator at the current page with aria-disabled="true"', () => {
+    render(
+      <Carousel.Root ariaLabel="Featured products" defaultPage={1}>
+        <Carousel.Viewport>
+          <Carousel.Slide />
+          <Carousel.Slide />
+          <Carousel.Slide />
+        </Carousel.Viewport>
+        <Carousel.IndicatorGroup label="Choose slide">
+          <Carousel.Indicator index={0} />
+          <Carousel.Indicator index={1} />
+          <Carousel.Indicator index={2} />
+        </Carousel.IndicatorGroup>
+      </Carousel.Root>,
+    );
+
+    expect(screen.getByRole("button", { name: "Slide 2" })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+  });
+
+  it('should mark non-active indicators with aria-disabled="false"', () => {
+    render(
+      <Carousel.Root ariaLabel="Featured products" defaultPage={1}>
+        <Carousel.Viewport>
+          <Carousel.Slide />
+          <Carousel.Slide />
+          <Carousel.Slide />
+        </Carousel.Viewport>
+        <Carousel.IndicatorGroup label="Choose slide">
+          <Carousel.Indicator index={0} />
+          <Carousel.Indicator index={1} />
+          <Carousel.Indicator index={2} />
+        </Carousel.IndicatorGroup>
+      </Carousel.Root>,
+    );
+
+    expect(screen.getByRole("button", { name: "Slide 1" })).toHaveAttribute(
+      "aria-disabled",
+      "false",
+    );
+    expect(screen.getByRole("button", { name: "Slide 3" })).toHaveAttribute(
+      "aria-disabled",
+      "false",
+    );
+  });
+
+  it('should set data-state="active" on the indicator at the current page and "inactive" on the others', () => {
+    render(
+      <Carousel.Root ariaLabel="Featured products" defaultPage={2}>
+        <Carousel.Viewport>
+          <Carousel.Slide />
+          <Carousel.Slide />
+          <Carousel.Slide />
+        </Carousel.Viewport>
+        <Carousel.IndicatorGroup label="Choose slide">
+          <Carousel.Indicator index={0} />
+          <Carousel.Indicator index={1} />
+          <Carousel.Indicator index={2} />
+        </Carousel.IndicatorGroup>
+      </Carousel.Root>,
+    );
+
+    expect(screen.getByRole("button", { name: "Slide 1" })).toHaveAttribute(
+      "data-state",
+      "inactive",
+    );
+    expect(screen.getByRole("button", { name: "Slide 2" })).toHaveAttribute(
+      "data-state",
+      "inactive",
+    );
+    expect(screen.getByRole("button", { name: "Slide 3" })).toHaveAttribute(
+      "data-state",
+      "active",
+    );
+  });
+
+  it("should follow the active page across navigation, flipping aria-disabled and data-state on the right indicators", async () => {
+    const user = userEvent.setup();
+    render(
+      <Carousel.Root ariaLabel="Featured products">
+        <Carousel.Viewport>
+          <Carousel.Slide />
+          <Carousel.Slide />
+          <Carousel.Slide />
+        </Carousel.Viewport>
+        <Carousel.NextTrigger>Next</Carousel.NextTrigger>
+        <Carousel.IndicatorGroup label="Choose slide">
+          <Carousel.Indicator index={0} />
+          <Carousel.Indicator index={1} />
+          <Carousel.Indicator index={2} />
+        </Carousel.IndicatorGroup>
+      </Carousel.Root>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Next" }));
+
+    expect(screen.getByRole("button", { name: "Slide 1" })).toHaveAttribute(
+      "data-state",
+      "inactive",
+    );
+    expect(screen.getByRole("button", { name: "Slide 1" })).toHaveAttribute(
+      "aria-disabled",
+      "false",
+    );
+    expect(screen.getByRole("button", { name: "Slide 2" })).toHaveAttribute(
+      "data-state",
+      "active",
+    );
+    expect(screen.getByRole("button", { name: "Slide 2" })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+  });
+
+  it("should propagate the active state to indicators rendered by Carousel.Indicators", () => {
+    render(
+      <Carousel.Root ariaLabel="Featured products" defaultPage={1}>
+        <Carousel.Viewport>
+          <Carousel.Slide />
+          <Carousel.Slide />
+          <Carousel.Slide />
+        </Carousel.Viewport>
+        <Carousel.Indicators label="Choose slide" />
+      </Carousel.Root>,
+    );
+
+    expect(screen.getByRole("button", { name: "Slide 2" })).toHaveAttribute(
+      "data-state",
+      "active",
+    );
+    expect(screen.getByRole("button", { name: "Slide 2" })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+  });
+});
+
 describe("Indicator context errors", () => {
   it.each([
     [

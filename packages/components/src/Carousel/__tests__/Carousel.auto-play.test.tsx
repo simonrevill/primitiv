@@ -408,6 +408,128 @@ describe("Carousel autoplay timer", () => {
     );
   });
 
+  it("should ignore hover-pause after the user explicitly resumes via PlayPauseTrigger", () => {
+    render(
+      <Carousel.Root
+        ariaLabel="Featured products"
+        autoplay
+        data-testid="carousel-root"
+      >
+        <Carousel.Viewport>
+          <Carousel.Slide data-testid="slide-0" />
+          <Carousel.Slide data-testid="slide-1" />
+          <Carousel.Slide data-testid="slide-2" />
+        </Carousel.Viewport>
+        <Carousel.PlayPauseTrigger />
+      </Carousel.Root>,
+    );
+
+    const root = screen.getByTestId("carousel-root");
+    const button = screen.getByRole("button");
+
+    // Pointer is already on the carousel when the user explicitly
+    // starts the slideshow — the WAI-ARIA APG example dismisses the
+    // hover-pause for this playing session.
+    act(() => {
+      fireEvent.mouseEnter(root);
+    });
+    act(() => {
+      fireEvent.click(button);
+    });
+
+    act(() => {
+      vi.advanceTimersByTime(4000);
+    });
+
+    expect(screen.getByTestId("slide-1")).toHaveAttribute(
+      "data-state",
+      "active",
+    );
+  });
+
+  it("should ignore focus-pause after the user explicitly resumes via PlayPauseTrigger", () => {
+    render(
+      <Carousel.Root ariaLabel="Featured products" autoplay>
+        <Carousel.Viewport>
+          <Carousel.Slide data-testid="slide-0" />
+          <Carousel.Slide data-testid="slide-1" />
+        </Carousel.Viewport>
+        <Carousel.PlayPauseTrigger />
+      </Carousel.Root>,
+    );
+
+    const button = screen.getByRole("button");
+
+    // Focusing the play/pause trigger before click already moves focus
+    // inside the Root.
+    act(() => {
+      fireEvent.focus(button);
+      fireEvent.click(button);
+    });
+
+    act(() => {
+      vi.advanceTimersByTime(4000);
+    });
+
+    expect(screen.getByTestId("slide-1")).toHaveAttribute(
+      "data-state",
+      "active",
+    );
+  });
+
+  it("should re-engage hover-pause after the user pauses and then resumes a second time", () => {
+    render(
+      <Carousel.Root
+        ariaLabel="Featured products"
+        autoplay
+        data-testid="carousel-root"
+      >
+        <Carousel.Viewport>
+          <Carousel.Slide data-testid="slide-0" />
+          <Carousel.Slide data-testid="slide-1" />
+          <Carousel.Slide data-testid="slide-2" />
+        </Carousel.Viewport>
+        <Carousel.PlayPauseTrigger />
+      </Carousel.Root>,
+    );
+
+    const root = screen.getByTestId("carousel-root");
+    const button = screen.getByRole("button");
+
+    // First user-initiated play with hover already engaged.
+    act(() => {
+      fireEvent.mouseEnter(root);
+      fireEvent.click(button);
+    });
+    act(() => {
+      vi.advanceTimersByTime(4000);
+    });
+    expect(screen.getByTestId("slide-1")).toHaveAttribute(
+      "data-state",
+      "active",
+    );
+
+    // User pauses — flag should reset.
+    act(() => {
+      fireEvent.click(button);
+    });
+
+    // User starts playing again, still hovered. The flag must have been
+    // reset by the pause so the next play is also "user-initiated" and
+    // bypasses hover-pause for this fresh session.
+    act(() => {
+      fireEvent.click(button);
+    });
+    act(() => {
+      vi.advanceTimersByTime(4000);
+    });
+
+    expect(screen.getByTestId("slide-2")).toHaveAttribute(
+      "data-state",
+      "active",
+    );
+  });
+
   it("should stop the timer when playing flips to false", () => {
     render(
       <Carousel.Root ariaLabel="Featured products" autoplay defaultPlaying>

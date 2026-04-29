@@ -86,6 +86,28 @@ export type CarouselRootPlayingStateProps =
  */
 export type CarouselAutoplay = boolean | { delay: number };
 
+/**
+ * Override the default user-visible strings the component owns —
+ * intended for internationalisation. Any keys you omit fall back to
+ * the English defaults.
+ */
+export type CarouselTranslations = {
+  /** Format used for the auto-generated slide aria-label. Receives
+   * 1-indexed `index` and the live `total`. Default:
+   * `({ index, total }) => "${index} of ${total}"`. */
+  slideLabel?: (params: { index: number; total: number }) => string;
+  /** Format used for the auto-generated indicator aria-label. Receives
+   * the 1-indexed page position. Default:
+   * `({ index }) => "Slide ${index}"`. */
+  indicatorLabel?: (params: { index: number }) => string;
+  /** Accessible name for `Carousel.PlayPauseTrigger` while paused.
+   * Default: `"Start automatic slide show"`. */
+  startSlideshow?: string;
+  /** Accessible name for `Carousel.PlayPauseTrigger` while playing.
+   * Default: `"Stop automatic slide show"`. */
+  stopSlideshow?: string;
+};
+
 export type CarouselRootProps = Omit<
   ComponentProps<"section">,
   "aria-label" | "aria-labelledby"
@@ -107,6 +129,9 @@ export type CarouselRootProps = Omit<
      * clamp moves to the last page, and `Carousel.NextTrigger` /
      * `Carousel.PreviousTrigger` advance one page at a time. */
     slidesPerPage?: number;
+    /** Override the default user-visible strings the component owns —
+     * see {@link CarouselTranslations}. Useful for i18n. */
+    translations?: CarouselTranslations;
   };
 
 /**
@@ -152,6 +177,9 @@ export type CarouselContextValue = {
    * flip ("off" while auto-rotating, "polite" otherwise) so screen
    * readers don't get spammed by every tick. */
   isAutoRotating: boolean;
+  /** Translations merged with English defaults — every field is
+   * present, even if the consumer passed only a subset. */
+  translations: Required<CarouselTranslations>;
 };
 
 export type CarouselViewportProps = ComponentProps<"div">;

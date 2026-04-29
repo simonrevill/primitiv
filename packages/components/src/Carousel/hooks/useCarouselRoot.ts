@@ -7,9 +7,20 @@ import {
   useState,
 } from "react";
 
-import type { CarouselAutoplay, CarouselContextValue } from "../types";
+import type {
+  CarouselAutoplay,
+  CarouselContextValue,
+  CarouselTranslations,
+} from "../types";
 
 const DEFAULT_AUTOPLAY_DELAY_MS = 4000;
+
+const DEFAULT_TRANSLATIONS: Required<CarouselTranslations> = {
+  slideLabel: ({ index, total }) => `${index} of ${total}`,
+  indicatorLabel: ({ index }) => `Slide ${index}`,
+  startSlideshow: "Start automatic slide show",
+  stopSlideshow: "Stop automatic slide show",
+};
 
 function resolveAutoplay(autoplay: CarouselAutoplay | undefined): {
   enabled: boolean;
@@ -47,6 +58,9 @@ type UseCarouselRootProps = {
   autoplay?: CarouselAutoplay;
   /** Number of slides visible per page. Defaults to `1`. */
   slidesPerPage?: number;
+  /** Override the default user-visible strings — see
+   * {@link CarouselTranslations}. */
+  translations?: CarouselTranslations;
 };
 
 /**
@@ -84,6 +98,7 @@ export function useCarouselRoot({
   onPlayingChange,
   autoplay,
   slidesPerPage = 1,
+  translations,
 }: UseCarouselRootProps = {}) {
   const { enabled: autoplayEnabled, delay: autoplayDelay } =
     resolveAutoplay(autoplay);
@@ -239,6 +254,11 @@ export function useCarouselRoot({
 
   const isAutoRotating = autoplayEnabled && currentPlaying;
 
+  const resolvedTranslations = useMemo<Required<CarouselTranslations>>(
+    () => ({ ...DEFAULT_TRANSLATIONS, ...translations }),
+    [translations],
+  );
+
   const contextValue = useMemo<CarouselContextValue>(
     () => ({
       registerSlide,
@@ -254,6 +274,7 @@ export function useCarouselRoot({
       playing: currentPlaying,
       togglePlaying,
       isAutoRotating,
+      translations: resolvedTranslations,
     }),
     [
       registerSlide,
@@ -269,6 +290,7 @@ export function useCarouselRoot({
       currentPlaying,
       togglePlaying,
       isAutoRotating,
+      resolvedTranslations,
     ],
   );
 

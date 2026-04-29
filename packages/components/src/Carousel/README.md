@@ -159,6 +159,37 @@ The discriminated union on the props type rejects mixed shapes (e.g.
 both `defaultPage` and `page`, or `page` without `onPageChange`) at
 compile time.
 
+### Internationalisation
+
+The component owns four user-visible strings: each slide's auto-
+generated `aria-label` (`"N of M"`), each indicator's auto-generated
+`aria-label` (`"Slide N"`), and the two `Carousel.PlayPauseTrigger`
+accessible names (`"Start automatic slide show"` and
+`"Stop automatic slide show"`). Override any subset of them via the
+`translations` prop on `Carousel.Root`:
+
+```tsx
+<Carousel.Root
+  ariaLabel="Produits en vedette"
+  translations={{
+    slideLabel: ({ index, total }) => `${index} sur ${total}`,
+    indicatorLabel: ({ index }) => `Diapositive ${index}`,
+    startSlideshow: "Démarrer le diaporama",
+    stopSlideshow: "Arrêter le diaporama",
+  }}
+>
+  …
+</Carousel.Root>
+```
+
+`slideLabel` and `indicatorLabel` are functions (they receive
+position info), the slideshow names are plain strings. Any keys you
+omit fall back to the English defaults. Per-slide `ariaLabel`
+overrides on `Carousel.Slide` still take precedence over
+`translations.slideLabel`, so a single slide can carry a
+domain-meaningful label (e.g. `"Hand-picked for you"`) without
+losing the localised `"N of M"` format on the others.
+
 ### Multi-slide pages
 
 Pass `slidesPerPage` (default `1`) to make several slides visible per

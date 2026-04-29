@@ -79,6 +79,7 @@ export function CarouselRoot({
   onPlayingChange,
   autoplay,
   slidesPerPage,
+  translations,
   children,
   ...rest
 }: CarouselRootProps) {
@@ -92,6 +93,7 @@ export function CarouselRoot({
     onPlayingChange,
     autoplay,
     slidesPerPage,
+    translations,
   });
 
   return (
@@ -213,8 +215,11 @@ export function CarouselSlide({
   ...rest
 }: CarouselSlideProps) {
   const { slideRef, index, total, state } = useCarouselSlide();
+  const { translations } = useCarouselContext();
   const autoLabel =
-    index >= 0 && total > 0 ? `${index + 1} of ${total}` : undefined;
+    index >= 0 && total > 0
+      ? translations.slideLabel({ index: index + 1, total })
+      : undefined;
   const label = ariaLabel ?? autoLabel;
 
   return (
@@ -430,7 +435,7 @@ export function CarouselIndicator({
   children,
   ...rest
 }: CarouselIndicatorProps) {
-  const { goTo, currentPage } = useCarouselContext();
+  const { goTo, currentPage, translations } = useCarouselContext();
   const isActive = index === currentPage;
 
   const handleClick = useCallback(
@@ -445,7 +450,7 @@ export function CarouselIndicator({
     <button
       type="button"
       className={className}
-      aria-label={`Slide ${index + 1}`}
+      aria-label={translations.indicatorLabel({ index: index + 1 })}
       aria-disabled={isActive}
       data-carousel-indicator=""
       data-state={isActive ? "active" : "inactive"}
@@ -521,7 +526,7 @@ export function CarouselPlayPauseTrigger({
   children,
   ...rest
 }: CarouselPlayPauseTriggerProps) {
-  const { playing, togglePlaying } = useCarouselContext();
+  const { playing, togglePlaying, translations } = useCarouselContext();
 
   const handleClick = useCallback(
     (event: MouseEvent<HTMLButtonElement>) => {
@@ -538,9 +543,7 @@ export function CarouselPlayPauseTrigger({
     <button
       type="button"
       className={className}
-      aria-label={
-        playing ? "Stop automatic slide show" : "Start automatic slide show"
-      }
+      aria-label={playing ? translations.stopSlideshow : translations.startSlideshow}
       data-state={playing ? "playing" : "paused"}
       onClick={handleClick}
       {...rest}

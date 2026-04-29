@@ -14,6 +14,7 @@ import type {
   CarouselPreviousTriggerProps,
   CarouselIndicatorGroupProps,
   CarouselIndicatorProps,
+  CarouselIndicatorsProps,
 } from "./types";
 
 /**
@@ -426,6 +427,40 @@ export function CarouselIndicator({
 
 CarouselIndicator.displayName = "CarouselIndicator";
 
+/**
+ * Convenience wrapper that auto-renders one `Carousel.Indicator` per
+ * registered slide — the "dots between Prev and Next" you'd reach for
+ * in 90% of carousels. Internally renders a `Carousel.IndicatorGroup`
+ * containing one `Carousel.Indicator` per entry in the slide-key list,
+ * keyed by the slide's stable `useId` so React doesn't shuffle the
+ * dots when slides mount or unmount in the middle of the range.
+ *
+ * For full control over indicator content (e.g. dots that show
+ * thumbnail previews on hover), drop down to
+ * `Carousel.IndicatorGroup` + `Carousel.Indicator` instead.
+ *
+ * Must be rendered as a descendant of `Carousel.Root`; rendering it
+ * elsewhere throws a descriptive error.
+ *
+ * @example
+ * ```tsx
+ * <Carousel.Indicators label="Choose slide" />
+ * ```
+ */
+export function CarouselIndicators(props: CarouselIndicatorsProps) {
+  const { slideKeys } = useCarouselContext();
+
+  return (
+    <CarouselIndicatorGroup {...props}>
+      {slideKeys.map((slideKey, index) => (
+        <CarouselIndicator key={slideKey} index={index} />
+      ))}
+    </CarouselIndicatorGroup>
+  );
+}
+
+CarouselIndicators.displayName = "CarouselIndicators";
+
 type CarouselCompound = typeof CarouselRoot & {
   Root: typeof CarouselRoot;
   Viewport: typeof CarouselViewport;
@@ -434,6 +469,7 @@ type CarouselCompound = typeof CarouselRoot & {
   PreviousTrigger: typeof CarouselPreviousTrigger;
   IndicatorGroup: typeof CarouselIndicatorGroup;
   Indicator: typeof CarouselIndicator;
+  Indicators: typeof CarouselIndicators;
 };
 
 /**
@@ -458,6 +494,8 @@ type CarouselCompound = typeof CarouselRoot & {
  *   labelled `<div role="group">` for consumer-mapped dot indicators.
  * - {@link CarouselIndicator | `Carousel.Indicator`} — an individual
  *   `<button>` that jumps to a target page when clicked.
+ * - {@link CarouselIndicators | `Carousel.Indicators`} — convenience
+ *   wrapper that auto-renders one indicator per registered slide.
  *
  * @example
  * ```tsx
@@ -469,10 +507,7 @@ type CarouselCompound = typeof CarouselRoot & {
  *     <Carousel.Slide>Second</Carousel.Slide>
  *   </Carousel.Viewport>
  *   <Carousel.PreviousTrigger>Previous</Carousel.PreviousTrigger>
- *   <Carousel.IndicatorGroup label="Choose slide">
- *     <Carousel.Indicator index={0} />
- *     <Carousel.Indicator index={1} />
- *   </Carousel.IndicatorGroup>
+ *   <Carousel.Indicators label="Choose slide" />
  *   <Carousel.NextTrigger>Next</Carousel.NextTrigger>
  * </Carousel.Root>
  * ```
@@ -485,6 +520,7 @@ const CarouselCompound: CarouselCompound = Object.assign(CarouselRoot, {
   PreviousTrigger: CarouselPreviousTrigger,
   IndicatorGroup: CarouselIndicatorGroup,
   Indicator: CarouselIndicator,
+  Indicators: CarouselIndicators,
 });
 
 CarouselCompound.displayName = "Carousel";

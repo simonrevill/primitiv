@@ -43,9 +43,13 @@ Currently exposes:
   `"Slide N"`. Sets a `data-carousel-indicator` CSS hook. The active-
   state ARIA contract (`aria-disabled`, `data-state`) is added in a
   subsequent cycle.
+- **`Carousel.Indicators`** — convenience wrapper that auto-renders
+  one `Carousel.Indicator` per registered slide. Reuses the same
+  discriminated `label` / `ariaLabelledBy` shape as `IndicatorGroup`.
+  For custom indicator content, drop down to `IndicatorGroup` +
+  `Indicator`.
 
-The auto-rendered `Carousel.Indicators` (one dot per page) and
-auto-rotation are added in subsequent cycles.
+Auto-rotation is added in subsequent cycles.
 
 ## Usage
 
@@ -190,9 +194,28 @@ prop targets a zero-based page; clicking jumps to it.
 Indicators are auto-labelled `"Slide N"` (1-indexed). Style them via
 the `data-carousel-indicator` attribute.
 
-For the common case of one auto-rendered dot per page, the
-`Carousel.Indicators` convenience wrapper is added in a subsequent
-cycle.
+### Indicator dots (auto-rendered)
+
+For the common case of one dot per slide with auto-generated labels,
+use `Carousel.Indicators` — it reads the live slide count from
+context and renders the right number of dots without any mapping
+boilerplate:
+
+```tsx
+<Carousel.Root ariaLabel="Featured products">
+  <Carousel.Viewport>
+    <Carousel.Slide>1</Carousel.Slide>
+    <Carousel.Slide>2</Carousel.Slide>
+    <Carousel.Slide>3</Carousel.Slide>
+  </Carousel.Viewport>
+  <Carousel.Indicators label="Choose slide" />
+</Carousel.Root>
+```
+
+The dot count tracks slide count automatically — add or remove a
+slide and the indicator row updates on the next render. For custom
+indicator content (thumbnails, numbers, mixed icons), drop down to
+the manual `IndicatorGroup` + `Indicator` API above.
 
 Apply your own scroll-snap CSS via the `data-carousel-viewport` and
 `data-carousel-slide` attributes. The minimal recipe lives in

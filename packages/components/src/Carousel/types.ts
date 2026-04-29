@@ -123,3 +123,19 @@ export type CarouselIndicatorProps = ComponentProps<"button"> & {
   /** Zero-based page this indicator targets. Clicking jumps to it. */
   index: number;
 };
+
+/**
+ * Convenience wrapper that auto-renders one `Carousel.Indicator` per
+ * registered slide. Reuses the same discriminated label shape as
+ * `Carousel.IndicatorGroup`. `children` is reserved (the auto-mapped
+ * indicators take that slot) — drop down to `Carousel.IndicatorGroup`
+ * + `Carousel.Indicator` if you need custom indicator content.
+ */
+export type CarouselIndicatorsProps = Omit<
+  ComponentProps<"div">,
+  "label" | "aria-labelledby" | "children"
+> &
+  (
+    | { label: string; ariaLabelledBy?: never }
+    | { label?: never; ariaLabelledBy: string }
+  );

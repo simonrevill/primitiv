@@ -296,8 +296,13 @@ the carousel when they pressed play. The override resets when
 external state change), so a subsequent play that's *not* user-
 initiated falls back to the standard WCAG pause.
 
-The `aria-live` flip on the viewport during auto-rotation is added in
-a subsequent cycle.
+**Viewport live region.** `Carousel.Viewport` is also the live region
+for slide changes. Its `aria-live` defaults to `"polite"` so paged
+manual navigation is announced to assistive tech, and flips to
+`"off"` while autoplay is actively rotating (`autoplay` enabled and
+`playing=true`) so screen readers aren't spammed with every tick.
+The flip is reactive — pausing via `PlayPauseTrigger` returns the
+viewport to `"polite"` for the duration of the pause.
 
 ### Indicator dots (auto-rendered)
 

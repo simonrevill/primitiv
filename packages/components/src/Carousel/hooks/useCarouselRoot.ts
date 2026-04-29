@@ -230,6 +230,8 @@ export function useCarouselRoot({
     }
   }, [currentPlaying]);
 
+  const isAutoRotating = autoplayEnabled && currentPlaying;
+
   const contextValue = useMemo<CarouselContextValue>(
     () => ({
       registerSlide,
@@ -242,6 +244,7 @@ export function useCarouselRoot({
       goTo,
       playing: currentPlaying,
       togglePlaying,
+      isAutoRotating,
     }),
     [
       registerSlide,
@@ -254,6 +257,7 @@ export function useCarouselRoot({
       goTo,
       currentPlaying,
       togglePlaying,
+      isAutoRotating,
     ],
   );
 

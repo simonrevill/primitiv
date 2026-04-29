@@ -122,6 +122,12 @@ CarouselRoot.displayName = "CarouselRoot";
  * rendering it elsewhere throws a descriptive error so misuse surfaces
  * during development rather than as silent ARIA breakage.
  *
+ * **Live region.** The viewport is also the live region for slide
+ * changes: `aria-live="polite"` so paged navigation is announced to
+ * assistive tech, flipping to `aria-live="off"` while autoplay is
+ * actively rotating so screen readers don't get spammed with every
+ * tick.
+ *
  * **Styling hooks.** `data-carousel-viewport` is set on the rendered
  * element. The component ships no styles — apply your own scroll-snap
  * recipe via this attribute.
@@ -140,10 +146,15 @@ export function CarouselViewport({
   children,
   ...rest
 }: CarouselViewportProps) {
-  useCarouselContext();
+  const { isAutoRotating } = useCarouselContext();
 
   return (
-    <div data-carousel-viewport="" className={className} {...rest}>
+    <div
+      data-carousel-viewport=""
+      className={className}
+      aria-live={isAutoRotating ? "off" : "polite"}
+      {...rest}
+    >
       {children}
     </div>
   );

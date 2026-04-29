@@ -227,6 +227,187 @@ describe("Carousel autoplay timer", () => {
     );
   });
 
+  it("should pause the timer while the Root is hovered, then resume on mouseleave", () => {
+    render(
+      <Carousel.Root
+        ariaLabel="Featured products"
+        autoplay
+        defaultPlaying
+        data-testid="carousel-root"
+      >
+        <Carousel.Viewport>
+          <Carousel.Slide data-testid="slide-0" />
+          <Carousel.Slide data-testid="slide-1" />
+          <Carousel.Slide data-testid="slide-2" />
+        </Carousel.Viewport>
+      </Carousel.Root>,
+    );
+
+    const root = screen.getByTestId("carousel-root");
+    act(() => {
+      fireEvent.mouseEnter(root);
+    });
+
+    // Hovered: timer paused, no advance.
+    act(() => {
+      vi.advanceTimersByTime(60_000);
+    });
+    expect(screen.getByTestId("slide-0")).toHaveAttribute(
+      "data-state",
+      "active",
+    );
+
+    // Mouseleave resumes — first tick fires after the resolved delay.
+    act(() => {
+      fireEvent.mouseLeave(root);
+    });
+    act(() => {
+      vi.advanceTimersByTime(4000);
+    });
+    expect(screen.getByTestId("slide-1")).toHaveAttribute(
+      "data-state",
+      "active",
+    );
+  });
+
+  it("should pause the timer while focus is inside the Root, then resume on focus leaving", () => {
+    render(
+      <Carousel.Root
+        ariaLabel="Featured products"
+        autoplay
+        defaultPlaying
+        data-testid="carousel-root"
+      >
+        <Carousel.Viewport>
+          <Carousel.Slide data-testid="slide-0" />
+          <Carousel.Slide data-testid="slide-1" />
+        </Carousel.Viewport>
+        <Carousel.NextTrigger>Next</Carousel.NextTrigger>
+      </Carousel.Root>,
+    );
+
+    const button = screen.getByRole("button", { name: "Next" });
+    act(() => {
+      fireEvent.focus(button);
+    });
+
+    act(() => {
+      vi.advanceTimersByTime(60_000);
+    });
+    expect(screen.getByTestId("slide-0")).toHaveAttribute(
+      "data-state",
+      "active",
+    );
+
+    // Blur out of the carousel entirely (no relatedTarget within Root).
+    act(() => {
+      fireEvent.blur(button, { relatedTarget: document.body });
+    });
+    act(() => {
+      vi.advanceTimersByTime(4000);
+    });
+    expect(screen.getByTestId("slide-1")).toHaveAttribute(
+      "data-state",
+      "active",
+    );
+  });
+
+  it("should stay paused if focus moves between descendants of the Root", () => {
+    render(
+      <Carousel.Root
+        ariaLabel="Featured products"
+        autoplay
+        defaultPlaying
+        data-testid="carousel-root"
+      >
+        <Carousel.Viewport>
+          <Carousel.Slide data-testid="slide-0" />
+          <Carousel.Slide data-testid="slide-1" />
+        </Carousel.Viewport>
+        <Carousel.PreviousTrigger>Previous</Carousel.PreviousTrigger>
+        <Carousel.NextTrigger>Next</Carousel.NextTrigger>
+      </Carousel.Root>,
+    );
+
+    const prev = screen.getByRole("button", { name: "Previous" });
+    const next = screen.getByRole("button", { name: "Next" });
+    act(() => {
+      fireEvent.focus(next);
+    });
+
+    // Move focus from Next to Prev — both inside Root, so still paused.
+    act(() => {
+      fireEvent.blur(next, { relatedTarget: prev });
+      fireEvent.focus(prev);
+    });
+
+    act(() => {
+      vi.advanceTimersByTime(60_000);
+    });
+    expect(screen.getByTestId("slide-0")).toHaveAttribute(
+      "data-state",
+      "active",
+    );
+  });
+
+  it("should remain paused while either hover or focus is present, and resume only after both are gone", () => {
+    render(
+      <Carousel.Root
+        ariaLabel="Featured products"
+        autoplay
+        defaultPlaying
+        data-testid="carousel-root"
+      >
+        <Carousel.Viewport>
+          <Carousel.Slide data-testid="slide-0" />
+          <Carousel.Slide data-testid="slide-1" />
+        </Carousel.Viewport>
+        <Carousel.NextTrigger>Next</Carousel.NextTrigger>
+      </Carousel.Root>,
+    );
+
+    const root = screen.getByTestId("carousel-root");
+    const button = screen.getByRole("button", { name: "Next" });
+
+    act(() => {
+      fireEvent.mouseEnter(root);
+      fireEvent.focus(button);
+    });
+
+    // Both engaged: paused.
+    act(() => {
+      vi.advanceTimersByTime(60_000);
+    });
+    expect(screen.getByTestId("slide-0")).toHaveAttribute(
+      "data-state",
+      "active",
+    );
+
+    // Lose hover but keep focus: still paused.
+    act(() => {
+      fireEvent.mouseLeave(root);
+    });
+    act(() => {
+      vi.advanceTimersByTime(60_000);
+    });
+    expect(screen.getByTestId("slide-0")).toHaveAttribute(
+      "data-state",
+      "active",
+    );
+
+    // Lose focus too: resumes.
+    act(() => {
+      fireEvent.blur(button, { relatedTarget: document.body });
+    });
+    act(() => {
+      vi.advanceTimersByTime(4000);
+    });
+    expect(screen.getByTestId("slide-1")).toHaveAttribute(
+      "data-state",
+      "active",
+    );
+  });
+
   it("should stop the timer when playing flips to false", () => {
     render(
       <Carousel.Root ariaLabel="Featured products" autoplay defaultPlaying>

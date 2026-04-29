@@ -12,6 +12,8 @@ import type {
   CarouselSlideProps,
   CarouselNextTriggerProps,
   CarouselPreviousTriggerProps,
+  CarouselIndicatorGroupProps,
+  CarouselIndicatorProps,
 } from "./types";
 
 /**
@@ -320,12 +322,118 @@ export function CarouselPreviousTrigger({
 
 CarouselPreviousTrigger.displayName = "CarouselPreviousTrigger";
 
+/**
+ * A `<div role="group">` wrapping consumer-mapped `Carousel.Indicator`
+ * dots. Use this when you want manual control over how the dots are
+ * rendered (e.g. mixing custom content into each one). For the common
+ * case of one auto-rendered dot per page, prefer `Carousel.Indicators`.
+ *
+ * Every group must have an accessible name. Pass exactly one of:
+ *
+ * - `label` — a short human-readable description of the picker (e.g.
+ *   `"Choose slide"`).
+ * - `ariaLabelledBy` — the `id` of an existing heading or label element.
+ *
+ * The discriminated union on the props type rejects both-or-neither at
+ * compile time.
+ *
+ * Must be rendered as a descendant of `Carousel.Root`; rendering it
+ * elsewhere throws a descriptive error.
+ *
+ * @example
+ * ```tsx
+ * <Carousel.IndicatorGroup label="Choose slide">
+ *   <Carousel.Indicator index={0} />
+ *   <Carousel.Indicator index={1} />
+ *   <Carousel.Indicator index={2} />
+ * </Carousel.IndicatorGroup>
+ * ```
+ */
+export function CarouselIndicatorGroup({
+  className = "",
+  label,
+  ariaLabelledBy,
+  children,
+  ...rest
+}: CarouselIndicatorGroupProps) {
+  useCarouselContext();
+
+  return (
+    <div
+      role="group"
+      className={className}
+      {...(label !== undefined && { "aria-label": label })}
+      {...(ariaLabelledBy !== undefined && {
+        "aria-labelledby": ariaLabelledBy,
+      })}
+      {...rest}
+    >
+      {children}
+    </div>
+  );
+}
+
+CarouselIndicatorGroup.displayName = "CarouselIndicatorGroup";
+
+/**
+ * An individual indicator dot — a `<button>` that jumps to the page at
+ * `index` (zero-based) when clicked. Auto-labelled `"Slide N"` (where
+ * `N = index + 1`) so the page-position is announced to assistive tech.
+ *
+ * **Styling hooks.** `data-carousel-indicator` is set on the rendered
+ * element. The active-vs-inactive state hook (`data-state`) and the
+ * `aria-disabled` indicator that the active dot carries per the APG are
+ * added in cycle 10.
+ *
+ * Must be rendered as a descendant of `Carousel.Root`; rendering it
+ * elsewhere throws a descriptive error.
+ *
+ * @example
+ * ```tsx
+ * <Carousel.Indicator index={0} />
+ * ```
+ */
+export function CarouselIndicator({
+  className = "",
+  index,
+  onClick,
+  children,
+  ...rest
+}: CarouselIndicatorProps) {
+  const { goTo } = useCarouselContext();
+
+  const handleClick = useCallback(
+    (event: MouseEvent<HTMLButtonElement>) => {
+      onClick?.(event);
+      goTo(index);
+    },
+    [goTo, index, onClick],
+  );
+
+  return (
+    <button
+      type="button"
+      className={className}
+      aria-label={`Slide ${index + 1}`}
+      data-carousel-indicator=""
+      onClick={handleClick}
+      {...rest}
+    >
+      {children}
+    </button>
+  );
+}
+
+CarouselIndicator.displayName = "CarouselIndicator";
+
 type CarouselCompound = typeof CarouselRoot & {
   Root: typeof CarouselRoot;
   Viewport: typeof CarouselViewport;
   Slide: typeof CarouselSlide;
   NextTrigger: typeof CarouselNextTrigger;
   PreviousTrigger: typeof CarouselPreviousTrigger;
+  IndicatorGroup: typeof CarouselIndicatorGroup;
+  Indicator: typeof CarouselIndicator;
 };
 
 /**
@@ -346,6 +454,10 @@ type CarouselCompound = typeof CarouselRoot & {
  *   the active page by one.
  * - {@link CarouselPreviousTrigger | `Carousel.PreviousTrigger`} —
  *   retreats the active page by one.
+ * - {@link CarouselIndicatorGroup | `Carousel.IndicatorGroup`} — a
+ *   labelled `<div role="group">` for consumer-mapped dot indicators.
+ * - {@link CarouselIndicator | `Carousel.Indicator`} — an individual
+ *   `<button>` that jumps to a target page when clicked.
  *
  * @example
  * ```tsx
@@ -357,6 +469,10 @@ type CarouselCompound = typeof CarouselRoot & {
  *     <Carousel.Slide>Second</Carousel.Slide>
  *   </Carousel.Viewport>
  *   <Carousel.PreviousTrigger>Previous</Carousel.PreviousTrigger>
+ *   <Carousel.IndicatorGroup label="Choose slide">
+ *     <Carousel.Indicator index={0} />
+ *     <Carousel.Indicator index={1} />
+ *   </Carousel.IndicatorGroup>
  *   <Carousel.NextTrigger>Next</Carousel.NextTrigger>
  * </Carousel.Root>
  * ```
@@ -367,6 +483,8 @@ const CarouselCompound: CarouselCompound = Object.assign(CarouselRoot, {
   Slide: CarouselSlide,
   NextTrigger: CarouselNextTrigger,
   PreviousTrigger: CarouselPreviousTrigger,
+  IndicatorGroup: CarouselIndicatorGroup,
+  Indicator: CarouselIndicator,
 });
 
 CarouselCompound.displayName = "Carousel";

@@ -85,6 +85,9 @@ export type CarouselContextValue = {
   next: () => void;
   /** Retreat the active page by one step. No-op when `!canGoPrevious`. */
   previous: () => void;
+  /** Jump directly to `target` (zero-based page index). Used by
+   * `Carousel.Indicator` to dispatch click-to-jump. */
+  goTo: (target: number) => void;
 };
 
 export type CarouselViewportProps = ComponentProps<"div">;
@@ -100,3 +103,23 @@ export type CarouselSlideProps = Omit<ComponentProps<"div">, "aria-label"> & {
 export type CarouselNextTriggerProps = ComponentProps<"button">;
 
 export type CarouselPreviousTriggerProps = ComponentProps<"button">;
+
+/**
+ * Discriminated label shape for `Carousel.IndicatorGroup` — exactly one
+ * of `label` (becomes `aria-label`) or `ariaLabelledBy` (points at an
+ * external label element) must be supplied. TypeScript rejects
+ * both-or-neither at compile time.
+ */
+export type CarouselIndicatorGroupProps = Omit<
+  ComponentProps<"div">,
+  "label" | "aria-labelledby"
+> &
+  (
+    | { label: string; ariaLabelledBy?: never }
+    | { label?: never; ariaLabelledBy: string }
+  );
+
+export type CarouselIndicatorProps = ComponentProps<"button"> & {
+  /** Zero-based page this indicator targets. Clicking jumps to it. */
+  index: number;
+};

@@ -96,6 +96,17 @@ export function useCarouselRoot({
     }
   }, [currentPage, total, isControlled, onPageChange]);
 
+  const goTo = useCallback(
+    (target: number) => {
+      if (isControlled) {
+        onPageChange?.(target);
+      } else {
+        setInternalPage(target);
+      }
+    },
+    [isControlled, onPageChange],
+  );
+
   const contextValue = useMemo<CarouselContextValue>(
     () => ({
       registerSlide,
@@ -105,6 +116,7 @@ export function useCarouselRoot({
       canGoPrevious,
       next,
       previous,
+      goTo,
     }),
     [
       registerSlide,
@@ -114,6 +126,7 @@ export function useCarouselRoot({
       canGoPrevious,
       next,
       previous,
+      goTo,
     ],
   );
 

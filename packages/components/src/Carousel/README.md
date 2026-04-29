@@ -34,8 +34,18 @@ Currently exposes:
   page by one. `disabled` at the first page when `loop` is `false`,
   with the same zero/one-slide and consumer-`disabled` semantics as
   `NextTrigger`.
+- **`Carousel.IndicatorGroup`** — labelled `<div role="group">`
+  wrapping consumer-mapped indicator dots. Pass `label` (becomes
+  `aria-label`) or `ariaLabelledBy`; the discriminated union rejects
+  both-or-neither at compile time.
+- **`Carousel.Indicator`** — individual `<button>` dot. `index` prop
+  targets a zero-based page; clicking jumps to it. Auto-labelled
+  `"Slide N"`. Sets a `data-carousel-indicator` CSS hook. The active-
+  state ARIA contract (`aria-disabled`, `data-state`) is added in a
+  subsequent cycle.
 
-Indicators and auto-rotation are added in subsequent cycles.
+The auto-rendered `Carousel.Indicators` (one dot per page) and
+auto-rotation are added in subsequent cycles.
 
 ## Usage
 
@@ -162,6 +172,27 @@ clicking `Carousel.NextTrigger` at the last jumps to the first. With
 Consumer-supplied `disabled={true}` on either trigger is honoured
 regardless of boundary state — useful for momentarily freezing
 navigation while another part of the UI takes over.
+
+### Indicator dots (manual)
+
+For full control over indicator content, map them yourself with
+`Carousel.IndicatorGroup` + `Carousel.Indicator`. Each dot's `index`
+prop targets a zero-based page; clicking jumps to it.
+
+```tsx
+<Carousel.IndicatorGroup label="Choose slide">
+  <Carousel.Indicator index={0} />
+  <Carousel.Indicator index={1} />
+  <Carousel.Indicator index={2} />
+</Carousel.IndicatorGroup>
+```
+
+Indicators are auto-labelled `"Slide N"` (1-indexed). Style them via
+the `data-carousel-indicator` attribute.
+
+For the common case of one auto-rendered dot per page, the
+`Carousel.Indicators` convenience wrapper is added in a subsequent
+cycle.
 
 Apply your own scroll-snap CSS via the `data-carousel-viewport` and
 `data-carousel-slide` attributes. The minimal recipe lives in

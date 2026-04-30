@@ -1,0 +1,128 @@
+import { render, screen } from "@testing-library/react";
+
+import { Carousel } from "..";
+
+function fireScrollSnapChange(
+  viewport: HTMLElement,
+  snapTarget: HTMLElement,
+) {
+  const event = new Event("scrollsnapchange", { bubbles: false });
+  Object.defineProperty(event, "snapTargetInline", {
+    value: snapTarget,
+    writable: false,
+  });
+  viewport.dispatchEvent(event);
+}
+
+describe("Carousel scroll sync (user-driven via scrollsnapchange)", () => {
+  it("should update the active page when the viewport reports a new snap target", () => {
+    render(
+      <Carousel.Root ariaLabel="Featured products">
+        <Carousel.Viewport data-testid="viewport">
+          <Carousel.Slide data-testid="slide-0" />
+          <Carousel.Slide data-testid="slide-1" />
+          <Carousel.Slide data-testid="slide-2" />
+        </Carousel.Viewport>
+      </Carousel.Root>,
+    );
+
+    fireScrollSnapChange(
+      screen.getByTestId("viewport"),
+      screen.getByTestId("slide-1"),
+    );
+
+    expect(screen.getByTestId("slide-1")).toHaveAttribute(
+      "data-state",
+      "active",
+    );
+  });
+
+  it("should derive the page index from floor(slideIndex / slidesPerPage) when slidesPerPage > 1", () => {
+    render(
+      <Carousel.Root ariaLabel="Featured products" slidesPerPage={2}>
+        <Carousel.Viewport data-testid="viewport">
+          <Carousel.Slide data-testid="slide-0" />
+          <Carousel.Slide data-testid="slide-1" />
+          <Carousel.Slide data-testid="slide-2" />
+          <Carousel.Slide data-testid="slide-3" />
+        </Carousel.Viewport>
+      </Carousel.Root>,
+    );
+
+    // Snap target is slide 3 → page = floor(3/2) = 1.
+    fireScrollSnapChange(
+      screen.getByTestId("viewport"),
+      screen.getByTestId("slide-3"),
+    );
+
+    expect(screen.getByTestId("slide-2")).toHaveAttribute(
+      "data-state",
+      "active",
+    );
+    expect(screen.getByTestId("slide-3")).toHaveAttribute(
+      "data-state",
+      "active",
+    );
+  });
+
+  it("should call onPageChange in controlled mode when the user swipes", () => {
+    const onPageChange = vi.fn();
+    render(
+      <Carousel.Root
+        ariaLabel="Featured products"
+        page={0}
+        onPageChange={onPageChange}
+      >
+        <Carousel.Viewport data-testid="viewport">
+          <Carousel.Slide data-testid="slide-0" />
+          <Carousel.Slide data-testid="slide-1" />
+        </Carousel.Viewport>
+      </Carousel.Root>,
+    );
+
+    fireScrollSnapChange(
+      screen.getByTestId("viewport"),
+      screen.getByTestId("slide-1"),
+    );
+
+    expect(onPageChange).toHaveBeenCalledTimes(1);
+    expect(onPageChange).toHaveBeenCalledWith(1);
+  });
+
+  it("should not invoke onPageChange when the snap target is on the already-active page, but should fire it when the page genuinely changes", () => {
+    const onPageChange = vi.fn();
+    function Parent() {
+      // Stay on page 0 regardless of scroll events to keep the test
+      // observable across both dispatch arms.
+      return (
+        <Carousel.Root
+          ariaLabel="Featured products"
+          page={0}
+          onPageChange={onPageChange}
+        >
+          <Carousel.Viewport data-testid="viewport">
+            <Carousel.Slide data-testid="slide-0" />
+            <Carousel.Slide data-testid="slide-1" />
+          </Carousel.Viewport>
+        </Carousel.Root>
+      );
+    }
+
+    render(<Parent />);
+
+    // Snap to slide-0 on already-active page 0 → no callback.
+    fireScrollSnapChange(
+      screen.getByTestId("viewport"),
+      screen.getByTestId("slide-0"),
+    );
+    expect(onPageChange).not.toHaveBeenCalled();
+
+    // Snap to slide-1 → callback fires with the new page.
+    fireScrollSnapChange(
+      screen.getByTestId("viewport"),
+      screen.getByTestId("slide-1"),
+    );
+    expect(onPageChange).toHaveBeenCalledTimes(1);
+    expect(onPageChange).toHaveBeenCalledWith(1);
+  });
+});

@@ -1,5 +1,6 @@
 import { MouseEvent, useCallback } from "react";
 
+import { Slot } from "../Slot";
 import { CarouselProvider } from "./CarouselContext";
 import {
   useCarouselContext,
@@ -279,6 +280,7 @@ export function CarouselNextTrigger({
   className = "",
   onClick,
   disabled,
+  asChild = false,
   children,
   ...rest
 }: CarouselNextTriggerProps) {
@@ -288,20 +290,31 @@ export function CarouselNextTrigger({
   const handleClick = useCallback(
     (event: MouseEvent<HTMLButtonElement>) => {
       onClick?.(event);
+      // Guard runs in addition to the HTML disabled attribute on the
+      // default <button> path. With asChild on a non-button element
+      // there's no native disabled to block the click, so this is the
+      // only barrier.
+      if (isDisabled) return;
       next();
     },
-    [next, onClick],
+    [next, onClick, isDisabled],
   );
 
+  const triggerProps = {
+    className,
+    onClick: handleClick,
+    disabled: isDisabled,
+    "aria-disabled": isDisabled,
+    ...(ids.nextTrigger !== undefined && { id: ids.nextTrigger }),
+    ...rest,
+  };
+
+  if (asChild) {
+    return <Slot {...triggerProps}>{children}</Slot>;
+  }
+
   return (
-    <button
-      type="button"
-      className={className}
-      onClick={handleClick}
-      disabled={isDisabled}
-      {...(ids.nextTrigger !== undefined && { id: ids.nextTrigger })}
-      {...rest}
-    >
+    <button type="button" {...triggerProps}>
       {children}
     </button>
   );
@@ -334,6 +347,7 @@ export function CarouselPreviousTrigger({
   className = "",
   onClick,
   disabled,
+  asChild = false,
   children,
   ...rest
 }: CarouselPreviousTriggerProps) {
@@ -343,20 +357,27 @@ export function CarouselPreviousTrigger({
   const handleClick = useCallback(
     (event: MouseEvent<HTMLButtonElement>) => {
       onClick?.(event);
+      if (isDisabled) return;
       previous();
     },
-    [previous, onClick],
+    [previous, onClick, isDisabled],
   );
 
+  const triggerProps = {
+    className,
+    onClick: handleClick,
+    disabled: isDisabled,
+    "aria-disabled": isDisabled,
+    ...(ids.previousTrigger !== undefined && { id: ids.previousTrigger }),
+    ...rest,
+  };
+
+  if (asChild) {
+    return <Slot {...triggerProps}>{children}</Slot>;
+  }
+
   return (
-    <button
-      type="button"
-      className={className}
-      onClick={handleClick}
-      disabled={isDisabled}
-      {...(ids.previousTrigger !== undefined && { id: ids.previousTrigger })}
-      {...rest}
-    >
+    <button type="button" {...triggerProps}>
       {children}
     </button>
   );
@@ -446,6 +467,7 @@ export function CarouselIndicator({
   className = "",
   index,
   onClick,
+  asChild = false,
   children,
   ...rest
 }: CarouselIndicatorProps) {
@@ -460,17 +482,22 @@ export function CarouselIndicator({
     [goTo, index, onClick],
   );
 
+  const indicatorProps = {
+    className,
+    "aria-label": translations.indicatorLabel({ index: index + 1 }),
+    "aria-disabled": isActive,
+    "data-carousel-indicator": "",
+    "data-state": isActive ? "active" : "inactive",
+    onClick: handleClick,
+    ...rest,
+  };
+
+  if (asChild) {
+    return <Slot {...indicatorProps}>{children}</Slot>;
+  }
+
   return (
-    <button
-      type="button"
-      className={className}
-      aria-label={translations.indicatorLabel({ index: index + 1 })}
-      aria-disabled={isActive}
-      data-carousel-indicator=""
-      data-state={isActive ? "active" : "inactive"}
-      onClick={handleClick}
-      {...rest}
-    >
+    <button type="button" {...indicatorProps}>
       {children}
     </button>
   );
@@ -537,6 +564,7 @@ CarouselIndicators.displayName = "CarouselIndicators";
 export function CarouselPlayPauseTrigger({
   className = "",
   onClick,
+  asChild = false,
   children,
   ...rest
 }: CarouselPlayPauseTriggerProps) {
@@ -553,16 +581,23 @@ export function CarouselPlayPauseTrigger({
   const renderedChildren =
     typeof children === "function" ? children({ playing }) : children;
 
+  const triggerProps = {
+    className,
+    "aria-label": playing
+      ? translations.stopSlideshow
+      : translations.startSlideshow,
+    "data-state": playing ? "playing" : "paused",
+    onClick: handleClick,
+    ...(ids.playPauseTrigger !== undefined && { id: ids.playPauseTrigger }),
+    ...rest,
+  };
+
+  if (asChild) {
+    return <Slot {...triggerProps}>{renderedChildren}</Slot>;
+  }
+
   return (
-    <button
-      type="button"
-      className={className}
-      aria-label={playing ? translations.stopSlideshow : translations.startSlideshow}
-      data-state={playing ? "playing" : "paused"}
-      onClick={handleClick}
-      {...(ids.playPauseTrigger !== undefined && { id: ids.playPauseTrigger })}
-      {...rest}
-    >
+    <button type="button" {...triggerProps}>
       {renderedChildren}
     </button>
   );

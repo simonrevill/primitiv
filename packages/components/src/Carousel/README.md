@@ -159,6 +159,27 @@ The discriminated union on the props type rejects mixed shapes (e.g.
 both `defaultPage` and `page`, or `page` without `onPageChange`) at
 compile time.
 
+### `asChild` composition
+
+`Carousel.NextTrigger`, `Carousel.PreviousTrigger`,
+`Carousel.PlayPauseTrigger`, and `Carousel.Indicator` all accept an
+`asChild` prop. When set, the trigger renders the consumer's child
+element via the in-tree `Slot` (instead of its default `<button>`)
+and merges every trigger prop — `onClick`, `aria-label`,
+`aria-disabled`, `data-state`, custom `id`, etc. — onto it. Useful
+for routing links and other elements that need trigger semantics:
+
+```tsx
+<Carousel.NextTrigger asChild>
+  <a href="/products?page=2">Next</a>
+</Carousel.NextTrigger>
+```
+
+Because `<a>` and other non-button elements don't honour the HTML
+`disabled` attribute, the prev/next triggers also short-circuit
+their click handler when boundary clamping says "no further" — so
+asChild on a non-button still respects `loop={false}` boundaries.
+
 ### Transition modes
 
 `Carousel.Root` accepts a `transition` prop that controls how the

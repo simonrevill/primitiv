@@ -239,9 +239,17 @@ export type CarouselSlideProps = Omit<ComponentProps<"div">, "aria-label"> & {
   ariaLabel?: string;
 };
 
-export type CarouselNextTriggerProps = ComponentProps<"button">;
+export type CarouselNextTriggerProps = ComponentProps<"button"> & {
+  /** Render the child element instead of the default `<button>`. All
+   * trigger props (onClick, disabled, ids.nextTrigger, …) are merged
+   * onto the child via `Slot`. The child must accept a `ref`. */
+  asChild?: boolean;
+};
 
-export type CarouselPreviousTriggerProps = ComponentProps<"button">;
+export type CarouselPreviousTriggerProps = ComponentProps<"button"> & {
+  /** See `CarouselNextTriggerProps.asChild`. */
+  asChild?: boolean;
+};
 
 /**
  * Discriminated label shape for `Carousel.IndicatorGroup` — exactly one
@@ -261,6 +269,11 @@ export type CarouselIndicatorGroupProps = Omit<
 export type CarouselIndicatorProps = ComponentProps<"button"> & {
   /** Zero-based page this indicator targets. Clicking jumps to it. */
   index: number;
+  /** Render the child element instead of the default `<button>`.
+   * Trigger props (onClick, aria-label, aria-disabled, data-state)
+   * are merged onto the child via `Slot`. The child must accept a
+   * `ref`. */
+  asChild?: boolean;
 };
 
 /**
@@ -293,4 +306,8 @@ export type CarouselPlayPauseTriggerProps = Omit<
   "children"
 > & {
   children?: CarouselPlayPauseTriggerChildren;
+  /** Render the child element instead of the default `<button>`.
+   * The child must accept a `ref`. The render-prop form of `children`
+   * is not supported under `asChild`; pass a single element instead. */
+  asChild?: boolean;
 };

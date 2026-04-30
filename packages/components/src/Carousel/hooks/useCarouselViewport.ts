@@ -22,8 +22,14 @@ import { useCarouselContext } from "./useCarouselContext";
  * for browsers without scrollsnapchange ships in a later cycle.
  */
 export function useCarouselViewport() {
-  const { slidesRef, slideKeys, slidesPerPage, currentPage, goTo } =
-    useCarouselContext();
+  const {
+    slidesRef,
+    slideKeys,
+    slidesPerPage,
+    currentPage,
+    goTo,
+    transition,
+  } = useCarouselContext();
   const internalRef = useRef<HTMLDivElement>(null);
 
   // Callback ref so the consumer can compose their own ref with ours
@@ -34,6 +40,9 @@ export function useCarouselViewport() {
   }, []);
 
   useEffect(() => {
+    // transition="none" hands the visual to consumer CSS; we don't
+    // touch viewport.scrollTo at all in that mode.
+    if (transition !== "slide") return;
     const firstSlideIndex = currentPage * slidesPerPage;
     const firstSlideKey = slideKeys[firstSlideIndex];
     // No slides registered yet, or page out of range: nothing to scroll to.
@@ -52,12 +61,13 @@ export function useCarouselViewport() {
       viewport.scrollLeft + (slideRect.left - viewportRect.left);
 
     viewport.scrollTo({ left: targetScrollLeft, behavior: "smooth" });
-  }, [currentPage, slidesPerPage, slideKeys, slidesRef]);
+  }, [transition, currentPage, slidesPerPage, slideKeys, slidesRef]);
 
   // User-driven scroll → state. Listen for scrollsnapchange and update
   // currentPage from the snapped slide's index. The viewport ref is
   // guaranteed populated post-commit (callback ref runs first).
   useEffect(() => {
+    if (transition !== "slide") return;
     const viewport = internalRef.current!;
 
     const handler = (event: Event) => {
@@ -78,7 +88,7 @@ export function useCarouselViewport() {
 
     viewport.addEventListener("scrollsnapchange", handler);
     return () => viewport.removeEventListener("scrollsnapchange", handler);
-  }, [slideKeys, slidesRef, slidesPerPage, currentPage, goTo]);
+  }, [transition, slideKeys, slidesRef, slidesPerPage, currentPage, goTo]);
 
   return { viewportRef };
 }

@@ -82,6 +82,7 @@ export function CarouselRoot({
   slidesPerPage,
   translations,
   ids,
+  transition,
   children,
   ...rest
 }: CarouselRootProps) {
@@ -97,6 +98,7 @@ export function CarouselRoot({
     slidesPerPage,
     translations,
     ids,
+    transition,
   });
 
   return (

@@ -11,6 +11,7 @@ import type {
   CarouselAutoplay,
   CarouselContextValue,
   CarouselIds,
+  CarouselTransition,
   CarouselTranslations,
 } from "../types";
 
@@ -67,6 +68,8 @@ type UseCarouselRootProps = {
   /** Custom DOM ids for the rendered sub-components — see
    * {@link CarouselIds}. */
   ids?: CarouselIds;
+  /** Visual transition mode — see {@link CarouselTransition}. */
+  transition?: CarouselTransition;
 };
 
 /**
@@ -106,6 +109,7 @@ export function useCarouselRoot({
   slidesPerPage = 1,
   translations,
   ids = EMPTY_IDS,
+  transition = "slide",
 }: UseCarouselRootProps = {}) {
   const { enabled: autoplayEnabled, delay: autoplayDelay } =
     resolveAutoplay(autoplay);
@@ -284,6 +288,7 @@ export function useCarouselRoot({
       isAutoRotating,
       translations: resolvedTranslations,
       ids,
+      transition,
     }),
     [
       registerSlide,
@@ -302,6 +307,7 @@ export function useCarouselRoot({
       isAutoRotating,
       resolvedTranslations,
       ids,
+      transition,
     ],
   );
 

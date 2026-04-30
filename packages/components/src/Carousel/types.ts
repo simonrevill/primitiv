@@ -87,6 +87,20 @@ export type CarouselRootPlayingStateProps =
 export type CarouselAutoplay = boolean | { delay: number };
 
 /**
+ * Visual transition mode for the viewport.
+ *
+ * - `"slide"` (default) — relies on native CSS scroll-snap; the
+ *   Viewport scrolls programmatically when the page changes and
+ *   listens for `scrollsnapchange` to update React state when the
+ *   user swipes.
+ * - `"none"` — the Viewport installs no scroll wiring at all.
+ *   Consumer CSS owns the visual transition (e.g. crossfade,
+ *   dissolve) via the `data-state` hook on each slide, which still
+ *   flips with the active page.
+ */
+export type CarouselTransition = "slide" | "none";
+
+/**
  * Pin DOM `id`s on the rendered sub-components for SSR / hydration
  * stability or for external `aria-controls` references. Any keys you
  * omit leave the corresponding element unidentified (or with whatever
@@ -139,6 +153,9 @@ export type CarouselRootProps = Omit<
     loop?: boolean;
     /** Autoplay configuration — see {@link CarouselAutoplay}. */
     autoplay?: CarouselAutoplay;
+    /** Visual transition mode — see {@link CarouselTransition}.
+     * Defaults to `"slide"`. */
+    transition?: CarouselTransition;
     /** Number of slides visible per page. Defaults to `1`. With values
      * greater than `1`, slides are grouped into pages of that size for
      * navigation purposes: indicators auto-render per page, boundary
@@ -208,6 +225,8 @@ export type CarouselContextValue = {
    * their respective entry via spread, so consumer-supplied `id`
    * props on the sub-component still win. */
   ids: CarouselIds;
+  /** Resolved visual transition mode (defaults to `"slide"`). */
+  transition: CarouselTransition;
 };
 
 export type CarouselViewportProps = ComponentProps<"div">;

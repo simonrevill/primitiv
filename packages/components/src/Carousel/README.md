@@ -159,6 +159,32 @@ The discriminated union on the props type rejects mixed shapes (e.g.
 both `defaultPage` and `page`, or `page` without `onPageChange`) at
 compile time.
 
+### Transition modes
+
+`Carousel.Root` accepts a `transition` prop that controls how the
+viewport handles slide changes visually.
+
+- `transition="slide"` (default) — relies on native CSS scroll-snap.
+  The Viewport scrolls programmatically when the page changes and
+  listens for `scrollsnapchange` so user swipes update React state.
+- `transition="none"` — the Viewport installs no scroll wiring at
+  all. Consumer CSS owns the visual via the `data-state="active" |
+  "inactive"` hook on each slide, which still flips with the active
+  page. This is the entry point for crossfade, dissolve, zoom, or
+  any CSS-only transition pattern:
+
+```css
+[data-carousel-slide] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 400ms;
+}
+[data-carousel-slide][data-state="active"] {
+  opacity: 1;
+}
+```
+
 ### Programmatic scroll sync
 
 When the active page changes for any reason (`Carousel.NextTrigger` /

@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 
 import { Carousel } from "..";
 
@@ -11,7 +11,9 @@ function fireScrollSnapChange(
     value: snapTarget,
     writable: false,
   });
-  viewport.dispatchEvent(event);
+  act(() => {
+    viewport.dispatchEvent(event);
+  });
 }
 
 describe("Carousel scroll sync (user-driven via scrollsnapchange)", () => {
@@ -87,6 +89,30 @@ describe("Carousel scroll sync (user-driven via scrollsnapchange)", () => {
 
     expect(onPageChange).toHaveBeenCalledTimes(1);
     expect(onPageChange).toHaveBeenCalledWith(1);
+  });
+
+  it("should ignore scrollsnapchange events whose snap target is not a registered slide", () => {
+    const onPageChange = vi.fn();
+    render(
+      <Carousel.Root
+        ariaLabel="Featured products"
+        page={0}
+        onPageChange={onPageChange}
+      >
+        <Carousel.Viewport data-testid="viewport">
+          <Carousel.Slide data-testid="slide-0" />
+          <Carousel.Slide data-testid="slide-1" />
+        </Carousel.Viewport>
+      </Carousel.Root>,
+    );
+
+    const viewport = screen.getByTestId("viewport");
+    // Snap target is the viewport itself (a stand-in for any non-slide
+    // element a consumer might wrap inside). The handler must bail
+    // without dispatching a page change.
+    fireScrollSnapChange(viewport, viewport);
+
+    expect(onPageChange).not.toHaveBeenCalled();
   });
 
   it("should not invoke onPageChange when the snap target is on the already-active page, but should fire it when the page genuinely changes", () => {

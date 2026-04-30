@@ -168,8 +168,15 @@ state. The scroll target is derived from the first slide of the new
 page via `getBoundingClientRect`, so consumer CSS owns slide width
 and gap. Default `behavior` is `"smooth"`.
 
-The user-driven scroll path (touch swipe / wheel drag updating the
-active page on `scrollsnapchange`) lands in a subsequent cycle.
+The reverse path is also wired: when the user swipes the viewport,
+the browser fires `scrollsnapchange` with the snapped slide as the
+target. The Viewport listens for that event, computes
+`floor(slideIndex / slidesPerPage)`, and calls `goTo` so React state
+follows the user's scroll. `onPageChange` is only invoked when the
+page genuinely changes, so a snap that lands back on the active page
+doesn't dispatch a spurious callback. The IntersectionObserver
+fallback for browsers without `scrollsnapchange` lands in a follow-up
+cycle.
 
 ### Custom DOM ids
 

@@ -227,6 +227,9 @@ export type CarouselContextValue = {
   ids: CarouselIds;
   /** Resolved visual transition mode (defaults to `"slide"`). */
   transition: CarouselTransition;
+  /** Bumped by `refresh()` to force the viewport's scroll-align
+   * effect to re-run without a page change. */
+  refreshTick: number;
 };
 
 export type CarouselViewportProps = ComponentProps<"div">;
@@ -294,6 +297,20 @@ export type CarouselImperativeApi = {
   play: () => void;
   /** Set `playing` to `false`. */
   pause: () => void;
+  /** Re-issue the viewport's scrollTo for the current page. Call when
+   * external layout changes (window resize, container reflow) leave
+   * the scroll position misaligned with React state. */
+  refresh: () => void;
+  /** Live progress snapshot: the active page, the total page count,
+   * and a normalised `value` in `[0, 1]` (0 when there's at most one
+   * page). */
+  getProgress: () => { page: number; totalPages: number; value: number };
+};
+
+export type CarouselProgress = {
+  page: number;
+  totalPages: number;
+  value: number;
 };
 
 /**

@@ -29,6 +29,7 @@ export function useCarouselViewport() {
     currentPage,
     goTo,
     transition,
+    refreshTick,
   } = useCarouselContext();
   const internalRef = useRef<HTMLDivElement>(null);
 
@@ -61,7 +62,14 @@ export function useCarouselViewport() {
       viewport.scrollLeft + (slideRect.left - viewportRect.left);
 
     viewport.scrollTo({ left: targetScrollLeft, behavior: "smooth" });
-  }, [transition, currentPage, slidesPerPage, slideKeys, slidesRef]);
+  }, [
+    transition,
+    currentPage,
+    slidesPerPage,
+    slideKeys,
+    slidesRef,
+    refreshTick,
+  ]);
 
   // User-driven scroll → state. Listen for scrollsnapchange and update
   // currentPage from the snapped slide's index. The viewport ref is

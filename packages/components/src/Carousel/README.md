@@ -176,7 +176,16 @@ carouselRef.current?.previous();
 carouselRef.current?.goTo(2);
 carouselRef.current?.play();
 carouselRef.current?.pause();
+carouselRef.current?.refresh();
+const { page, totalPages, value } = carouselRef.current!.getProgress();
 ```
+
+`refresh()` re-issues the viewport's `scrollTo` for the current
+page — useful when external layout changes (window resize, container
+reflow, dynamic content) leave the scroll position misaligned with
+React state. `getProgress()` returns a normalised
+`value` in `[0, 1]` (`0` when there's at most one page) plus the
+live `page` and `totalPages`, intended for custom progress bars.
 
 Every method routes through the same internal state machine the
 trigger components use, so controlled-mode `onPageChange` /

@@ -270,10 +270,22 @@ export function useCarouselRoot(
     else play();
   }, [currentPlaying, play, pause]);
 
+  const [refreshTick, setRefreshTick] = useState(0);
+  const refresh = useCallback(() => setRefreshTick((t) => t + 1), []);
+
+  const getProgress = useCallback(
+    () => ({
+      page: currentPage,
+      totalPages,
+      value: totalPages > 1 ? currentPage / (totalPages - 1) : 0,
+    }),
+    [currentPage, totalPages],
+  );
+
   useImperativeHandle(
     imperativeRef,
-    () => ({ next, previous, goTo, play, pause }),
-    [next, previous, goTo, play, pause],
+    () => ({ next, previous, goTo, play, pause, refresh, getProgress }),
+    [next, previous, goTo, play, pause, refresh, getProgress],
   );
 
   // Reset the user-initiated flag when the playing session ends, so a
@@ -311,6 +323,7 @@ export function useCarouselRoot(
       translations: resolvedTranslations,
       ids,
       transition,
+      refreshTick,
     }),
     [
       registerSlide,
@@ -330,6 +343,7 @@ export function useCarouselRoot(
       resolvedTranslations,
       ids,
       transition,
+      refreshTick,
     ],
   );
 

@@ -159,6 +159,57 @@ The discriminated union on the props type rejects mixed shapes (e.g.
 both `defaultPage` and `page`, or `page` without `onPageChange`) at
 compile time.
 
+### Lightbox composition (with `Modal`)
+
+Two `Carousel.Root`s sharing a controlled `page` stay in sync — pair
+a thumbnail strip with a fullscreen viewer mounted inside the
+in-tree `Modal`. Gate the inner carousel's `playing` flag on the
+modal's `open` so autoplay only runs while the modal is visible:
+
+```tsx
+const [page, setPage] = useState(0);
+const [open, setOpen] = useState(false);
+
+<>
+  <Carousel.Root
+    ariaLabel="Featured products — thumbnails"
+    page={page}
+    onPageChange={setPage}
+    slidesPerPage={3}
+  >
+    <Carousel.Viewport>
+      <Carousel.Slide>…</Carousel.Slide>
+      …
+    </Carousel.Viewport>
+  </Carousel.Root>
+
+  <Modal.Root open={open} onOpenChange={setOpen}>
+    <Modal.Trigger>Open lightbox</Modal.Trigger>
+    <Modal.Portal>
+      <Modal.Content>
+        <Carousel.Root
+          ariaLabel="Featured products — fullscreen"
+          page={page}
+          onPageChange={setPage}
+          autoplay
+          playing={open}
+          onPlayingChange={() => {}}
+        >
+          <Carousel.Viewport>
+            <Carousel.Slide>…</Carousel.Slide>
+            …
+          </Carousel.Viewport>
+          <Carousel.Indicators label="Choose slide" />
+        </Carousel.Root>
+      </Modal.Content>
+    </Modal.Portal>
+  </Modal.Root>
+</>
+```
+
+`Carousel.Root` doesn't focus anything on mount, so the `Modal`'s
+focus management isn't disturbed when the inner carousel mounts.
+
 ### Imperative API
 
 For programmatic control from outside the component (e.g. a global

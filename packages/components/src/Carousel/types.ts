@@ -277,6 +277,26 @@ export type CarouselIndicatorProps = ComponentProps<"button"> & {
 };
 
 /**
+ * Imperative handle exposed via `ref` on `Carousel.Root`. Routes
+ * through the same internal state machine the trigger components
+ * use, so controlled-mode `onPageChange` / `onPlayingChange` still
+ * fire as if the user had clicked.
+ */
+export type CarouselImperativeApi = {
+  /** Advance the active page by one (wraps with `loop`, clamps without). */
+  next: () => void;
+  /** Retreat the active page by one (wraps with `loop`, clamps without). */
+  previous: () => void;
+  /** Jump directly to `target` (zero-based page index). */
+  goTo: (target: number) => void;
+  /** Set `playing` to `true`. Dismisses the hover/focus pause for the
+   * lifetime of the resulting playing session. */
+  play: () => void;
+  /** Set `playing` to `false`. */
+  pause: () => void;
+};
+
+/**
  * Convenience wrapper that auto-renders one `Carousel.Indicator` per
  * registered slide. Reuses the same discriminated label shape as
  * `Carousel.IndicatorGroup`. `children` is reserved (the auto-mapped

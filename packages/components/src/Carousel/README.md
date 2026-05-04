@@ -159,6 +159,32 @@ The discriminated union on the props type rejects mixed shapes (e.g.
 both `defaultPage` and `page`, or `page` without `onPageChange`) at
 compile time.
 
+### Imperative API
+
+For programmatic control from outside the component (e.g. a global
+keyboard shortcut, a "skip to last slide" button elsewhere on the
+page, or restoring a remembered position on mount), `Carousel.Root`
+exposes an imperative handle via `ref`:
+
+```tsx
+const carouselRef = useRef<CarouselImperativeApi>(null);
+
+<Carousel.Root ref={carouselRef} ariaLabel="Featured products">…</Carousel.Root>;
+
+carouselRef.current?.next();
+carouselRef.current?.previous();
+carouselRef.current?.goTo(2);
+carouselRef.current?.play();
+carouselRef.current?.pause();
+```
+
+Every method routes through the same internal state machine the
+trigger components use, so controlled-mode `onPageChange` /
+`onPlayingChange` callbacks fire just as if the user had clicked.
+`play()` also dismisses the hover/focus pause for the lifetime of
+that playing session, matching the WAI-ARIA APG semantics for
+user-initiated play.
+
 ### `asChild` composition
 
 `Carousel.NextTrigger`, `Carousel.PreviousTrigger`,

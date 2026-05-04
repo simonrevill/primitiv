@@ -1,7 +1,9 @@
 import {
   FocusEvent,
+  Ref,
   useCallback,
   useEffect,
+  useImperativeHandle,
   useMemo,
   useRef,
   useState,
@@ -11,6 +13,7 @@ import type {
   CarouselAutoplay,
   CarouselContextValue,
   CarouselIds,
+  CarouselImperativeApi,
   CarouselTransition,
   CarouselTranslations,
 } from "../types";
@@ -97,20 +100,23 @@ type UseCarouselRootProps = {
  * the published context drive the `disabled` attribute on the prev/next
  * triggers.
  */
-export function useCarouselRoot({
-  defaultPage = 0,
-  page,
-  onPageChange,
-  loop = false,
-  defaultPlaying = false,
-  playing,
-  onPlayingChange,
-  autoplay,
-  slidesPerPage = 1,
-  translations,
-  ids = EMPTY_IDS,
-  transition = "slide",
-}: UseCarouselRootProps = {}) {
+export function useCarouselRoot(
+  {
+    defaultPage = 0,
+    page,
+    onPageChange,
+    loop = false,
+    defaultPlaying = false,
+    playing,
+    onPlayingChange,
+    autoplay,
+    slidesPerPage = 1,
+    translations,
+    ids = EMPTY_IDS,
+    transition = "slide",
+  }: UseCarouselRootProps = {},
+  imperativeRef?: Ref<CarouselImperativeApi>,
+) {
   const { enabled: autoplayEnabled, delay: autoplayDelay } =
     resolveAutoplay(autoplay);
   const slidesRef = useRef<Map<string, HTMLDivElement>>(new Map());
@@ -242,17 +248,33 @@ export function useCarouselRoot({
     [onMouseEnter, onMouseLeave, onFocus, onBlur],
   );
 
-  const togglePlaying = useCallback(() => {
-    const next = !currentPlaying;
-    if (next) {
-      userInitiatedPlayRef.current = true;
-    }
+  const play = useCallback(() => {
+    userInitiatedPlayRef.current = true;
     if (isPlayingControlled) {
-      onPlayingChange?.(next);
+      onPlayingChange?.(true);
     } else {
-      setInternalPlaying(next);
+      setInternalPlaying(true);
     }
-  }, [currentPlaying, isPlayingControlled, onPlayingChange]);
+  }, [isPlayingControlled, onPlayingChange]);
+
+  const pause = useCallback(() => {
+    if (isPlayingControlled) {
+      onPlayingChange?.(false);
+    } else {
+      setInternalPlaying(false);
+    }
+  }, [isPlayingControlled, onPlayingChange]);
+
+  const togglePlaying = useCallback(() => {
+    if (currentPlaying) pause();
+    else play();
+  }, [currentPlaying, play, pause]);
+
+  useImperativeHandle(
+    imperativeRef,
+    () => ({ next, previous, goTo, play, pause }),
+    [next, previous, goTo, play, pause],
+  );
 
   // Reset the user-initiated flag when the playing session ends, so a
   // subsequent external (non-trigger) flip to playing=true doesn't

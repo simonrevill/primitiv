@@ -1,4 +1,4 @@
-import { MouseEvent, useCallback } from "react";
+import { forwardRef, MouseEvent, useCallback } from "react";
 
 import { Slot } from "../Slot";
 import { CarouselProvider } from "./CarouselContext";
@@ -9,6 +9,7 @@ import {
   useCarouselViewport,
 } from "./hooks";
 import type {
+  CarouselImperativeApi,
   CarouselRootProps,
   CarouselViewportProps,
   CarouselSlideProps,
@@ -68,26 +69,14 @@ import type {
  * <Carousel.Root ariaLabelledBy="promos">…</Carousel.Root>
  * ```
  */
-export function CarouselRoot({
-  className = "",
-  ariaLabel,
-  ariaLabelledBy,
-  defaultPage,
-  page,
-  onPageChange,
-  loop,
-  defaultPlaying,
-  playing,
-  onPlayingChange,
-  autoplay,
-  slidesPerPage,
-  translations,
-  ids,
-  transition,
-  children,
-  ...rest
-}: CarouselRootProps) {
-  const { contextValue, rootHandlers } = useCarouselRoot({
+export const CarouselRoot = forwardRef<
+  CarouselImperativeApi,
+  CarouselRootProps
+>(function CarouselRoot(
+  {
+    className = "",
+    ariaLabel,
+    ariaLabelledBy,
     defaultPage,
     page,
     onPageChange,
@@ -100,7 +89,28 @@ export function CarouselRoot({
     translations,
     ids,
     transition,
-  });
+    children,
+    ...rest
+  },
+  imperativeRef,
+) {
+  const { contextValue, rootHandlers } = useCarouselRoot(
+    {
+      defaultPage,
+      page,
+      onPageChange,
+      loop,
+      defaultPlaying,
+      playing,
+      onPlayingChange,
+      autoplay,
+      slidesPerPage,
+      translations,
+      ids,
+      transition,
+    },
+    imperativeRef,
+  );
 
   return (
     <CarouselProvider value={contextValue}>
@@ -121,7 +131,7 @@ export function CarouselRoot({
       </section>
     </CarouselProvider>
   );
-}
+});
 
 CarouselRoot.displayName = "CarouselRoot";
 

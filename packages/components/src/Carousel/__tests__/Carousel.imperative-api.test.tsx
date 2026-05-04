@@ -106,6 +106,38 @@ describe("Carousel imperative API", () => {
     );
   });
 
+  it("should route imperative pause() through onPlayingChange in controlled mode", () => {
+    const onPlayingChange = vi.fn();
+    function Parent() {
+      const ref = useRef<CarouselImperativeApi>(null);
+      return (
+        <>
+          <button
+            type="button"
+            onClick={() => ref.current?.pause()}
+            data-testid="external-pause"
+          >
+            Pause
+          </button>
+          <Carousel.Root
+            ref={ref}
+            ariaLabel="Featured products"
+            playing={true}
+            onPlayingChange={onPlayingChange}
+          />
+        </>
+      );
+    }
+
+    render(<Parent />);
+
+    act(() => {
+      screen.getByTestId("external-pause").click();
+    });
+
+    expect(onPlayingChange).toHaveBeenCalledWith(false);
+  });
+
   it("should route imperative goTo through onPageChange in controlled mode without mutating internal state", () => {
     const onPageChange = vi.fn();
     function Parent() {

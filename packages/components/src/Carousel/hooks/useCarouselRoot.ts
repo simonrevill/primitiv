@@ -1,5 +1,6 @@
 import {
   FocusEvent,
+  PointerEvent,
   Ref,
   useCallback,
   useEffect,
@@ -140,6 +141,11 @@ export function useCarouselRoot(
   // still inside.
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
+  // Touch is tracked separately because mouseenter doesn't always
+  // fire on touch devices, and pointerdown/up are filtered to
+  // pointerType === "touch" so mouse interaction stays on the
+  // hover-pause path.
+  const [touchActive, setTouchActive] = useState(false);
 
   // Per the WAI-ARIA APG carousel example: when the user explicitly
   // resumes the slideshow via PlayPauseTrigger, the hover/focus pause
@@ -150,7 +156,7 @@ export function useCarouselRoot(
   // to false. External (non-trigger) playing changes don't set it.
   const userInitiatedPlayRef = useRef(false);
   const suspended =
-    (hovered || focused) && !userInitiatedPlayRef.current;
+    (hovered || focused || touchActive) && !userInitiatedPlayRef.current;
 
   // Boundary derivation: navigation requires at least one page. With
   // loop, every position has a forward and backward target. Without,
@@ -242,10 +248,34 @@ export function useCarouselRoot(
       setFocused(false);
     }
   }, []);
+  const onPointerDown = useCallback((event: PointerEvent<HTMLElement>) => {
+    if (event.pointerType === "touch") setTouchActive(true);
+  }, []);
+  // pointerup / pointercancel always release the suspension — only
+  // pointerdown is gated on pointerType, so a non-touch release is a
+  // no-op anyway (touchActive was already false).
+  const onPointerUp = useCallback(() => setTouchActive(false), []);
+  const onPointerCancel = useCallback(() => setTouchActive(false), []);
 
   const rootHandlers = useMemo(
-    () => ({ onMouseEnter, onMouseLeave, onFocus, onBlur }),
-    [onMouseEnter, onMouseLeave, onFocus, onBlur],
+    () => ({
+      onMouseEnter,
+      onMouseLeave,
+      onFocus,
+      onBlur,
+      onPointerDown,
+      onPointerUp,
+      onPointerCancel,
+    }),
+    [
+      onMouseEnter,
+      onMouseLeave,
+      onFocus,
+      onBlur,
+      onPointerDown,
+      onPointerUp,
+      onPointerCancel,
+    ],
   );
 
   const play = useCallback(() => {

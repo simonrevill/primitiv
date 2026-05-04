@@ -542,6 +542,12 @@ carousel entirely. The `playing` flag is unaffected — it stays
 `true` while suspended, so toggling pause-resume via
 `PlayPauseTrigger` continues to behave as the consumer expects.
 
+Touch gestures pause the timer too: `pointerdown` with
+`pointerType === "touch"` sets the suspension flag, and any
+`pointerup` or `pointercancel` releases it. Mouse / pen
+`pointerdown` is filtered out so the existing hover/focus path
+keeps owning non-touch interaction without double-suspension.
+
 **User-initiated play overrides the hover/focus pause.** Per the
 WAI-ARIA Carousel APG example, when the user explicitly clicks
 `PlayPauseTrigger` to start the slideshow, the hover/focus pause is

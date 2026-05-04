@@ -578,7 +578,14 @@ export function CarouselPlayPauseTrigger({
   children,
   ...rest
 }: CarouselPlayPauseTriggerProps) {
-  const { playing, togglePlaying, translations, ids } = useCarouselContext();
+  const { playing, togglePlaying, translations, ids, autoplayEnabled } =
+    useCarouselContext();
+
+  if (!autoplayEnabled) {
+    throw new Error(
+      "Carousel.PlayPauseTrigger requires autoplay to be enabled on Carousel.Root",
+    );
+  }
 
   const handleClick = useCallback(
     (event: MouseEvent<HTMLButtonElement>) => {

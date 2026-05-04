@@ -7,7 +7,7 @@ describe("Carousel.NextTrigger asChild", () => {
   it("should render the supplied child element and route the click through to the page-advance handler", async () => {
     const user = userEvent.setup();
     render(
-      <Carousel.Root ariaLabel="Featured products">
+      <Carousel.Root ariaLabel="Featured products" autoplay>
         <Carousel.Viewport>
           <Carousel.Slide data-testid="slide-0" />
           <Carousel.Slide data-testid="slide-1" />
@@ -90,7 +90,7 @@ describe("Carousel.PreviousTrigger asChild", () => {
   it("should respect the boundary clamp at the first slide when asChild is on a non-button", async () => {
     const user = userEvent.setup();
     render(
-      <Carousel.Root ariaLabel="Featured products">
+      <Carousel.Root ariaLabel="Featured products" autoplay>
         <Carousel.Viewport>
           <Carousel.Slide data-testid="slide-0" />
           <Carousel.Slide data-testid="slide-1" />
@@ -116,7 +116,7 @@ describe("Carousel.PlayPauseTrigger asChild", () => {
   it("should render the supplied child element and route the click through to togglePlaying", async () => {
     const user = userEvent.setup();
     render(
-      <Carousel.Root ariaLabel="Featured products">
+      <Carousel.Root ariaLabel="Featured products" autoplay>
         <Carousel.PlayPauseTrigger asChild>
           <span role="button" tabIndex={0} data-testid="play-pause">
             ▶
@@ -145,7 +145,7 @@ describe("Carousel.Indicator asChild", () => {
   it("should render the supplied child element and route the click through to goTo", async () => {
     const user = userEvent.setup();
     render(
-      <Carousel.Root ariaLabel="Featured products">
+      <Carousel.Root ariaLabel="Featured products" autoplay>
         <Carousel.Viewport>
           <Carousel.Slide data-testid="slide-0" />
           <Carousel.Slide data-testid="slide-1" />

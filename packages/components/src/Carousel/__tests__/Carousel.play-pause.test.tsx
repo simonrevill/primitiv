@@ -7,7 +7,7 @@ import { Carousel } from "..";
 describe("Carousel.PlayPauseTrigger basic shape", () => {
   it("should render the PlayPauseTrigger as <button type='button'>", () => {
     render(
-      <Carousel.Root ariaLabel="Featured products">
+      <Carousel.Root ariaLabel="Featured products" autoplay>
         <Carousel.PlayPauseTrigger />
       </Carousel.Root>,
     );
@@ -20,7 +20,7 @@ describe("Carousel.PlayPauseTrigger basic shape", () => {
   it("should accept a className prop", () => {
     const testClass = "custom-play-pause";
     render(
-      <Carousel.Root ariaLabel="Featured products">
+      <Carousel.Root ariaLabel="Featured products" autoplay>
         <Carousel.PlayPauseTrigger className={testClass} />
       </Carousel.Root>,
     );
@@ -30,7 +30,7 @@ describe("Carousel.PlayPauseTrigger basic shape", () => {
 
   it("should apply a className of empty string by default when not specified", () => {
     render(
-      <Carousel.Root ariaLabel="Featured products">
+      <Carousel.Root ariaLabel="Featured products" autoplay>
         <Carousel.PlayPauseTrigger />
       </Carousel.Root>,
     );
@@ -48,7 +48,7 @@ describe("Carousel.PlayPauseTrigger basic shape", () => {
 describe("Carousel.PlayPauseTrigger uncontrolled playing state", () => {
   it("should default to playing=false (paused) and announce 'Start automatic slide show'", () => {
     render(
-      <Carousel.Root ariaLabel="Featured products">
+      <Carousel.Root ariaLabel="Featured products" autoplay>
         <Carousel.PlayPauseTrigger />
       </Carousel.Root>,
     );
@@ -60,7 +60,7 @@ describe("Carousel.PlayPauseTrigger uncontrolled playing state", () => {
 
   it("should accept defaultPlaying={true} to seed the initial playing state", () => {
     render(
-      <Carousel.Root ariaLabel="Featured products" defaultPlaying>
+      <Carousel.Root ariaLabel="Featured products" autoplay defaultPlaying>
         <Carousel.PlayPauseTrigger />
       </Carousel.Root>,
     );
@@ -73,7 +73,7 @@ describe("Carousel.PlayPauseTrigger uncontrolled playing state", () => {
   it("should toggle playing when the trigger is clicked", async () => {
     const user = userEvent.setup();
     render(
-      <Carousel.Root ariaLabel="Featured products">
+      <Carousel.Root ariaLabel="Featured products" autoplay>
         <Carousel.PlayPauseTrigger />
       </Carousel.Root>,
     );
@@ -99,6 +99,7 @@ describe("Carousel.PlayPauseTrigger controlled playing state", () => {
     render(
       <Carousel.Root
         ariaLabel="Featured products"
+        autoplay
         playing
         onPlayingChange={() => {}}
       >
@@ -117,6 +118,7 @@ describe("Carousel.PlayPauseTrigger controlled playing state", () => {
     render(
       <Carousel.Root
         ariaLabel="Featured products"
+        autoplay
         playing={false}
         onPlayingChange={onPlayingChange}
       >
@@ -146,6 +148,7 @@ describe("Carousel.PlayPauseTrigger controlled playing state", () => {
           </button>
           <Carousel.Root
             ariaLabel="Featured products"
+            autoplay
             playing={playing}
             onPlayingChange={setPlaying}
           >
@@ -168,7 +171,7 @@ describe("Carousel.PlayPauseTrigger controlled playing state", () => {
 describe("Carousel.PlayPauseTrigger render-prop children", () => {
   it("should pass { playing } to a function child and render its return value", () => {
     render(
-      <Carousel.Root ariaLabel="Featured products">
+      <Carousel.Root ariaLabel="Featured products" autoplay>
         <Carousel.PlayPauseTrigger>
           {({ playing }) => (playing ? "Pause slideshow" : "Start slideshow")}
         </Carousel.PlayPauseTrigger>
@@ -181,7 +184,7 @@ describe("Carousel.PlayPauseTrigger render-prop children", () => {
   it("should re-render the function child when playing flips", async () => {
     const user = userEvent.setup();
     render(
-      <Carousel.Root ariaLabel="Featured products">
+      <Carousel.Root ariaLabel="Featured products" autoplay>
         <Carousel.PlayPauseTrigger>
           {({ playing }) => (playing ? "Pause slideshow" : "Start slideshow")}
         </Carousel.PlayPauseTrigger>
@@ -195,7 +198,7 @@ describe("Carousel.PlayPauseTrigger render-prop children", () => {
 
   it("should render static children unchanged when no function is provided", () => {
     render(
-      <Carousel.Root ariaLabel="Featured products">
+      <Carousel.Root ariaLabel="Featured products" autoplay>
         <Carousel.PlayPauseTrigger>
           <span data-testid="play-pause-icon" />
         </Carousel.PlayPauseTrigger>
@@ -209,7 +212,7 @@ describe("Carousel.PlayPauseTrigger render-prop children", () => {
 describe("Carousel.PlayPauseTrigger styling hooks", () => {
   it('should emit data-state="paused" when not playing', () => {
     render(
-      <Carousel.Root ariaLabel="Featured products">
+      <Carousel.Root ariaLabel="Featured products" autoplay>
         <Carousel.PlayPauseTrigger />
       </Carousel.Root>,
     );
@@ -219,7 +222,7 @@ describe("Carousel.PlayPauseTrigger styling hooks", () => {
 
   it('should emit data-state="playing" when playing', () => {
     render(
-      <Carousel.Root ariaLabel="Featured products" defaultPlaying>
+      <Carousel.Root ariaLabel="Featured products" autoplay defaultPlaying>
         <Carousel.PlayPauseTrigger />
       </Carousel.Root>,
     );

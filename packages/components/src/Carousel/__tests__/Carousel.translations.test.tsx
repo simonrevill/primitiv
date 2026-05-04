@@ -79,6 +79,7 @@ describe("Carousel translations", () => {
     render(
       <Carousel.Root
         ariaLabel="Featured products"
+        autoplay
         translations={{ startSlideshow: "Démarrer le diaporama" }}
       >
         <Carousel.PlayPauseTrigger />
@@ -94,6 +95,7 @@ describe("Carousel translations", () => {
     render(
       <Carousel.Root
         ariaLabel="Featured products"
+        autoplay
         defaultPlaying
         translations={{ stopSlideshow: "Arrêter le diaporama" }}
       >
@@ -110,6 +112,7 @@ describe("Carousel translations", () => {
     render(
       <Carousel.Root
         ariaLabel="Featured products"
+        autoplay
         translations={{ startSlideshow: "Démarrer" }}
       >
         <Carousel.Viewport>

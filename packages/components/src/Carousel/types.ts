@@ -213,6 +213,10 @@ export type CarouselContextValue = {
   playing: boolean;
   /** Toggles `playing`. Used by `Carousel.PlayPauseTrigger`. */
   togglePlaying: () => void;
+  /** `true` when the consumer enabled autoplay (regardless of the
+   * `playing` flag). Used by `Carousel.PlayPauseTrigger` to validate
+   * its own configuration. */
+  autoplayEnabled: boolean;
   /** `true` when autoplay is enabled AND `playing` is `true` — i.e. the
    * timer could fire any moment. Drives the Viewport's `aria-live`
    * flip ("off" while auto-rotating, "polite" otherwise) so screen

@@ -63,6 +63,7 @@ describe("Carousel custom ids", () => {
     render(
       <Carousel.Root
         ariaLabel="Featured products"
+        autoplay
         ids={{ playPauseTrigger: "play-pause-btn" }}
       >
         <Carousel.PlayPauseTrigger />

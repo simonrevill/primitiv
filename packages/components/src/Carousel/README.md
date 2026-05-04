@@ -159,6 +159,14 @@ The discriminated union on the props type rejects mixed shapes (e.g.
 both `defaultPage` and `page`, or `page` without `onPageChange`) at
 compile time.
 
+### Runtime validation
+
+`Carousel.PlayPauseTrigger` rendered under a Root with `autoplay`
+disabled (omitted, or `autoplay={false}`) throws on mount —
+toggling `playing` is meaningless when no autoplay timer is wired,
+and the throw surfaces the misuse during development rather than
+shipping a no-op control to users.
+
 ### Lightbox composition (with `Modal`)
 
 Two `Carousel.Root`s sharing a controlled `page` stay in sync — pair

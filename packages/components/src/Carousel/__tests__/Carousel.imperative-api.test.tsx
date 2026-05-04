@@ -14,7 +14,7 @@ function ImperativeFixture({
   "ariaLabel" | "children" | "ref"
 >) {
   return (
-    <Carousel.Root ref={apiRef} ariaLabel="Featured products" {...rootProps}>
+    <Carousel.Root ref={apiRef} ariaLabel="Featured products" autoplay {...rootProps}>
       <Carousel.Viewport>
         <Carousel.Slide data-testid="slide-0" />
         <Carousel.Slide data-testid="slide-1" />
@@ -122,6 +122,7 @@ describe("Carousel imperative API", () => {
           <Carousel.Root
             ref={ref}
             ariaLabel="Featured products"
+            autoplay
             playing={true}
             onPlayingChange={onPlayingChange}
           />

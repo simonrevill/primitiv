@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import { useCarouselContext } from "./useCarouselContext";
 
@@ -40,6 +40,16 @@ export function useCarouselViewport() {
     internalRef.current = node;
   }, []);
 
+  // Read prefers-reduced-motion once on mount; choose scrollTo
+  // behavior accordingly so we don't fight the OS-level setting.
+  const scrollBehavior = useMemo<ScrollBehavior>(
+    () =>
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+        ? "instant"
+        : "smooth",
+    [],
+  );
+
   useEffect(() => {
     // transition="none" hands the visual to consumer CSS; we don't
     // touch viewport.scrollTo at all in that mode.
@@ -61,7 +71,7 @@ export function useCarouselViewport() {
     const targetScrollLeft =
       viewport.scrollLeft + (slideRect.left - viewportRect.left);
 
-    viewport.scrollTo({ left: targetScrollLeft, behavior: "smooth" });
+    viewport.scrollTo({ left: targetScrollLeft, behavior: scrollBehavior });
   }, [
     transition,
     currentPage,
@@ -69,6 +79,7 @@ export function useCarouselViewport() {
     slideKeys,
     slidesRef,
     refreshTick,
+    scrollBehavior,
   ]);
 
   // User-driven scroll → state. Listen for scrollsnapchange and update

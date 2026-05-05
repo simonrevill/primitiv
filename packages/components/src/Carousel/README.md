@@ -300,6 +300,15 @@ viewport handles slide changes visually.
 }
 ```
 
+### Reduced motion
+
+The Viewport's programmatic `scrollTo` reads
+`window.matchMedia("(prefers-reduced-motion: reduce)")` once on
+mount. When the user has reduced motion enabled at the OS level,
+page changes use `behavior: "instant"` instead of `"smooth"` so the
+carousel doesn't fight that preference. Touch-driven scrolling is
+unaffected — the browser owns that animation.
+
 ### Programmatic scroll sync
 
 When the active page changes for any reason (`Carousel.NextTrigger` /

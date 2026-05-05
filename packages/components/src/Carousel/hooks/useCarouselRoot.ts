@@ -208,26 +208,38 @@ export function useCarouselRoot(
   // never fires at boundaries. Guards become reachable (and necessary)
   // once the imperative API or autoplay land; they're added then.
   const isProgrammaticScrollRef = useRef(false);
+  // Only set when next()/previous() crosses the loop boundary — the
+  // Viewport reads it to scroll into the edge clone (slide-0 from the
+  // right / slide-N from the left) instead of the long backwards scroll
+  // a regular wrap would produce. Stays null for every non-boundary
+  // navigation including imperative goTo.
+  const pendingWrapRef = useRef<"forward" | "backward" | null>(null);
 
   const next = useCallback(() => {
     isProgrammaticScrollRef.current = true;
+    if (loop && totalPages > 1 && currentPage === totalPages - 1) {
+      pendingWrapRef.current = "forward";
+    }
     const target = (currentPage + 1) % totalPages;
     if (isControlled) {
       onPageChange?.(target);
     } else {
       setInternalPage(target);
     }
-  }, [currentPage, totalPages, isControlled, onPageChange]);
+  }, [currentPage, totalPages, isControlled, onPageChange, loop]);
 
   const previous = useCallback(() => {
     isProgrammaticScrollRef.current = true;
+    if (loop && totalPages > 1 && currentPage === 0) {
+      pendingWrapRef.current = "backward";
+    }
     const target = (currentPage - 1 + totalPages) % totalPages;
     if (isControlled) {
       onPageChange?.(target);
     } else {
       setInternalPage(target);
     }
-  }, [currentPage, totalPages, isControlled, onPageChange]);
+  }, [currentPage, totalPages, isControlled, onPageChange, loop]);
 
   const goTo = useCallback(
     (target: number) => {
@@ -412,6 +424,7 @@ export function useCarouselRoot(
       visibleSlideIndicesRef,
       setSlideInView,
       isProgrammaticScrollRef,
+      pendingWrapRef,
     }),
     [
       registerSlide,

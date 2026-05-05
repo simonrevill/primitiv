@@ -265,6 +265,15 @@ export type CarouselContextValue = {
    * IntersectionObserver callback checks this flag before calling `goTo`
    * so that IO entries firing mid-animation cannot undo the navigation. */
   isProgrammaticScrollRef: RefObject<boolean>;
+  /** Set by `next()` / `previous()` to `"forward"` or `"backward"` only
+   * when the call crosses the loop boundary (Next on the last page or
+   * Previous on the first page with `loop` enabled). The Viewport hook
+   * reads this to redirect the smooth scroll into the matching edge
+   * clone — slide-0 appears to slide in from the right (or slide-N
+   * from the left) — instead of scrolling backwards across the entire
+   * carousel to the real target. `null` for every non-wrap navigation,
+   * including imperative `goTo(arbitrary)` jumps. */
+  pendingWrapRef: RefObject<"forward" | "backward" | null>;
 };
 
 export type CarouselViewportProps = ComponentProps<"div">;

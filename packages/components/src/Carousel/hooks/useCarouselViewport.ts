@@ -34,6 +34,7 @@ export function useCarouselViewport() {
     visibleSlideIndicesRef,
     setSlideInView,
     isProgrammaticScrollRef,
+    pendingWrapRef,
   } = useCarouselContext();
   const internalRef = useRef<HTMLDivElement>(null);
   // Set to true by the scrollsnapchange handler and the IntersectionObserver
@@ -80,9 +81,31 @@ export function useCarouselViewport() {
     }
 
     const viewport = internalRef.current!;
-    const slideEl = slidesRef.current!.get(firstSlideKey)!;
 
-    const slideRect = slideEl.getBoundingClientRect();
+    // Loop boundary wrap: instead of the long backwards scroll a
+    // regular wrap would produce, redirect into the matching edge
+    // clone so the new page appears to slide in from the natural
+    // direction. The clone's position-attribute query is stable
+    // because the Viewport injects exactly slidesPerPage clones at
+    // each end and the first one is always adjacent to the page we're
+    // wrapping to.
+    const wrapDirection = pendingWrapRef.current;
+    pendingWrapRef.current = null;
+
+    let targetEl: Element;
+    if (wrapDirection === "forward") {
+      targetEl = viewport.querySelector(
+        '[data-carousel-slide-clone="trailing"]',
+      )!;
+    } else if (wrapDirection === "backward") {
+      targetEl = viewport.querySelector(
+        '[data-carousel-slide-clone="leading"]',
+      )!;
+    } else {
+      targetEl = slidesRef.current!.get(firstSlideKey)!;
+    }
+
+    const slideRect = targetEl.getBoundingClientRect();
     const viewportRect = viewport.getBoundingClientRect();
     const targetScrollLeft =
       viewport.scrollLeft + (slideRect.left - viewportRect.left);

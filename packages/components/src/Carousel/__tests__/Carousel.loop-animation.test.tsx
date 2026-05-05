@@ -52,4 +52,18 @@ describe("Carousel loop wrap clones", () => {
       container.querySelector("[data-carousel-slide-clone]"),
     ).toBeNull();
   });
+
+  it("should render slidesPerPage clones at each end so the wrap scroll has a full visible window to land on", () => {
+    const { container } = renderWithSlides(
+      { loop: true, slidesPerPage: 2 },
+      4,
+    );
+
+    expect(
+      container.querySelectorAll('[data-carousel-slide-clone="leading"]'),
+    ).toHaveLength(2);
+    expect(
+      container.querySelectorAll('[data-carousel-slide-clone="trailing"]'),
+    ).toHaveLength(2);
+  });
 });

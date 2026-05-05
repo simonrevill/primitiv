@@ -181,15 +181,16 @@ export function CarouselViewport({
   children,
   ...rest
 }: CarouselViewportProps) {
-  const { isAutoRotating, ids, loop, transition } = useCarouselContext();
+  const { isAutoRotating, ids, loop, transition, slidesPerPage } =
+    useCarouselContext();
   const { viewportRef } = useCarouselViewport();
 
   const renderedChildren = useMemo(() => {
     // transition='none' hands the visual to consumer CSS — there's no
     // wrap-scroll to host, so clones would only add aria-hidden noise.
     if (!loop || transition !== "slide") return children;
-    return injectLoopClones(children);
-  }, [children, loop, transition]);
+    return injectLoopClones(children, slidesPerPage);
+  }, [children, loop, transition, slidesPerPage]);
 
   return (
     <div
@@ -278,7 +279,10 @@ function isSlideElement(
   );
 }
 
-function injectLoopClones(children: ReactNode): ReactNode {
+function injectLoopClones(
+  children: ReactNode,
+  slidesPerPage: number,
+): ReactNode {
   const items = Children.toArray(children);
   const slides: ReactElement<SlideElementProps>[] = [];
   const others: ReactNode[] = [];
@@ -290,29 +294,37 @@ function injectLoopClones(children: ReactNode): ReactNode {
   // so clones would only add aria-hidden noise.
   if (slides.length <= 1) return children;
 
-  const trailing = (
-    <CarouselCloneSlide
-      key="__primitiv-clone-trailing-0"
-      position="trailing"
-      className={slides[0].props.className}
-      style={slides[0].props.style}
-    >
-      {slides[0].props.children}
-    </CarouselCloneSlide>
-  );
-  const last = slides[slides.length - 1];
-  const leading = (
-    <CarouselCloneSlide
-      key="__primitiv-clone-leading-0"
-      position="leading"
-      className={last.props.className}
-      style={last.props.style}
-    >
-      {last.props.children}
-    </CarouselCloneSlide>
-  );
+  // The wrap scroll lands on a full visible window, so each end needs
+  // slidesPerPage clones. Clamp to the slide count so a 3-slide,
+  // slidesPerPage=4 carousel doesn't ask for more clones than exist.
+  const cloneCount = Math.min(slidesPerPage, slides.length);
 
-  return [leading, ...slides, trailing, ...others];
+  const trailing = slides
+    .slice(0, cloneCount)
+    .map((slide, i) => (
+      <CarouselCloneSlide
+        key={`__primitiv-clone-trailing-${i}`}
+        position="trailing"
+        className={slide.props.className}
+        style={slide.props.style}
+      >
+        {slide.props.children}
+      </CarouselCloneSlide>
+    ));
+  const leading = slides
+    .slice(slides.length - cloneCount)
+    .map((slide, i) => (
+      <CarouselCloneSlide
+        key={`__primitiv-clone-leading-${i}`}
+        position="leading"
+        className={slide.props.className}
+        style={slide.props.style}
+      >
+        {slide.props.children}
+      </CarouselCloneSlide>
+    ));
+
+  return [...leading, ...slides, ...trailing, ...others];
 }
 
 /**

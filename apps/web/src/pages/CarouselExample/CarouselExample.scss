@@ -9,6 +9,7 @@
   /* Hide native scrollbars on mobile while keeping scroll behaviour. */
   scrollbar-width: none;
 }
+
 [data-carousel-viewport]::-webkit-scrollbar {
   display: none;
 }

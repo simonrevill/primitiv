@@ -325,3 +325,65 @@ describe("Carousel loop wrap manual swipe onto a clone", () => {
     });
   });
 });
+
+function mockReducedMotion(matches: boolean) {
+  window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+    matches: query.includes("prefers-reduced-motion") ? matches : false,
+    media: query,
+    onchange: null,
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  }));
+}
+
+describe("Carousel loop wrap respects prefers-reduced-motion", () => {
+  afterEach(() => {
+    // @ts-expect-error: restore by deletion so other suites get jsdom default.
+    delete window.matchMedia;
+  });
+
+  it("should bypass the clone hop and scroll directly to real slide-0 on a forward wrap when prefers-reduced-motion is reduce", async () => {
+    mockReducedMotion(true);
+    const user = userEvent.setup();
+    const { container } = render(
+      <Carousel.Root ariaLabel="Featured products" loop defaultPage={2}>
+        <Carousel.Viewport data-testid="viewport">
+          <Carousel.Slide data-testid="slide-0" />
+          <Carousel.Slide data-testid="slide-1" />
+          <Carousel.Slide data-testid="slide-2" />
+        </Carousel.Viewport>
+        <Carousel.NextTrigger>Next</Carousel.NextTrigger>
+      </Carousel.Root>,
+    );
+
+    const viewport = screen.getByTestId("viewport");
+    viewport.scrollLeft = 200;
+    mockRect(viewport, 0);
+    mockRect(screen.getByTestId("slide-0"), -200);
+    mockRect(screen.getByTestId("slide-1"), -100);
+    mockRect(screen.getByTestId("slide-2"), 0);
+    mockRect(
+      container.querySelector('[data-carousel-slide-clone="trailing"]')!,
+      300,
+    );
+
+    const scrollToSpy = vi.spyOn(viewport, "scrollTo");
+
+    await user.click(screen.getByRole("button", { name: "Next" }));
+
+    // No clone hop — the animation would be instant either way, so the
+    // round-trip clone→real snap adds nothing.
+    expect(scrollToSpy).not.toHaveBeenCalledWith({
+      left: 500,
+      behavior: "instant",
+    });
+    // Instead, the wrap goes directly to real slide-0 with instant.
+    expect(scrollToSpy).toHaveBeenCalledWith({
+      left: 0,
+      behavior: "instant",
+    });
+  });
+});

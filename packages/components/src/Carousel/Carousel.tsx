@@ -1,4 +1,14 @@
-import { forwardRef, MouseEvent, useCallback } from "react";
+import {
+  Children,
+  CSSProperties,
+  forwardRef,
+  isValidElement,
+  MouseEvent,
+  ReactElement,
+  ReactNode,
+  useCallback,
+  useMemo,
+} from "react";
 
 import { Slot } from "../Slot";
 import { CarouselProvider } from "./CarouselContext";
@@ -171,8 +181,13 @@ export function CarouselViewport({
   children,
   ...rest
 }: CarouselViewportProps) {
-  const { isAutoRotating, ids } = useCarouselContext();
+  const { isAutoRotating, ids, loop } = useCarouselContext();
   const { viewportRef } = useCarouselViewport();
+
+  const renderedChildren = useMemo(() => {
+    if (!loop) return children;
+    return injectLoopClones(children);
+  }, [children, loop]);
 
   return (
     <div
@@ -183,12 +198,118 @@ export function CarouselViewport({
       {...(ids.viewport !== undefined && { id: ids.viewport })}
       {...rest}
     >
-      {children}
+      {renderedChildren}
     </div>
   );
 }
 
 CarouselViewport.displayName = "CarouselViewport";
+
+/**
+ * Brand applied to `CarouselSlide` so the Viewport can detect slide
+ * elements among its children for the loop-wrap clone pass without
+ * coupling to function identity (which doesn't survive HMR or alias
+ * imports). Consumer-wrapped slides won't carry the brand and so are
+ * left untouched — the wrap animation then degrades to today's
+ * long-scroll for those cases.
+ */
+const CAROUSEL_SLIDE_TYPE: unique symbol = Symbol.for(
+  "primitiv.carousel.slide",
+);
+
+type CloneSlideProps = {
+  position: "leading" | "trailing";
+  className?: string;
+  style?: CSSProperties;
+  children?: ReactNode;
+};
+
+/**
+ * Internal — never exported. Renders an aria-hidden, inert copy of a
+ * slide's *content* at the leading or trailing edge of the slide list
+ * so the wrap animation has somewhere to scroll *into*. Skips
+ * `useCarouselSlide` deliberately: clones must not register into
+ * `slidesRef`/`slideKeys`, so page math, IntersectionObserver, and
+ * indicator counts stay derived from the real slides only.
+ */
+function CarouselCloneSlide({
+  position,
+  className = "",
+  style,
+  children,
+}: CloneSlideProps) {
+  return (
+    <div
+      role="group"
+      aria-roledescription="slide"
+      aria-hidden="true"
+      // Boolean form is supported in React 19 and emits the correct
+      // empty-string attribute on the DOM, which excludes the subtree
+      // from focus, hit-testing, and the AT tree.
+      inert
+      data-carousel-slide=""
+      data-carousel-slide-clone={position}
+      className={className}
+      style={style}
+    >
+      {children}
+    </div>
+  );
+}
+
+CarouselCloneSlide.displayName = "CarouselCloneSlide";
+
+type SlideElementProps = {
+  className?: string;
+  style?: CSSProperties;
+  children?: ReactNode;
+};
+
+function isSlideElement(
+  node: ReactNode,
+): node is ReactElement<SlideElementProps> {
+  return (
+    isValidElement(node) &&
+    typeof node.type === "function" &&
+    (node.type as { [CAROUSEL_SLIDE_TYPE]?: true })[CAROUSEL_SLIDE_TYPE] ===
+      true
+  );
+}
+
+function injectLoopClones(children: ReactNode): ReactNode {
+  const items = Children.toArray(children);
+  const slides: ReactElement<SlideElementProps>[] = [];
+  const others: ReactNode[] = [];
+  for (const item of items) {
+    if (isSlideElement(item)) slides.push(item);
+    else others.push(item);
+  }
+  if (slides.length === 0) return children;
+
+  const trailing = (
+    <CarouselCloneSlide
+      key="__primitiv-clone-trailing-0"
+      position="trailing"
+      className={slides[0].props.className}
+      style={slides[0].props.style}
+    >
+      {slides[0].props.children}
+    </CarouselCloneSlide>
+  );
+  const last = slides[slides.length - 1];
+  const leading = (
+    <CarouselCloneSlide
+      key="__primitiv-clone-leading-0"
+      position="leading"
+      className={last.props.className}
+      style={last.props.style}
+    >
+      {last.props.children}
+    </CarouselCloneSlide>
+  );
+
+  return [leading, ...slides, trailing, ...others];
+}
 
 /**
  * An individual slide. Renders a `<div>` with `role="group"` and
@@ -265,6 +386,11 @@ export function CarouselSlide({
 }
 
 CarouselSlide.displayName = "CarouselSlide";
+
+// Brand for the Viewport's loop-wrap clone pass — see CAROUSEL_SLIDE_TYPE.
+(CarouselSlide as unknown as { [CAROUSEL_SLIDE_TYPE]: true })[
+  CAROUSEL_SLIDE_TYPE
+] = true;
 
 /**
  * Advances the active page by one. Renders as

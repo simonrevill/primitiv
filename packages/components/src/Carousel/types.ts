@@ -244,6 +244,12 @@ export type CarouselContextValue = {
   ids: CarouselIds;
   /** Resolved visual transition mode (defaults to `"slide"`). */
   transition: CarouselTransition;
+  /** `true` when the consumer enabled `loop` on `Carousel.Root`. The
+   * Viewport reads this to decide whether to render the aria-hidden
+   * edge clones used by the wrap animation, and Prev/Next read it to
+   * decide whether a boundary press is a wrap (and so should drive the
+   * clone-and-jump path) or just clamps. */
+  loop: boolean;
   /** Bumped by `refresh()` to force the viewport's scroll-align
    * effect to re-run without a page change. */
   refreshTick: number;

@@ -169,11 +169,35 @@ export function useCarouselViewport() {
 
       // findIndex returns -1 when the snap target isn't one of our
       // registered slides — e.g. a consumer-wrapped element inside the
-      // viewport. In that case there's no page to derive, so bail.
+      // viewport, or one of the loop-wrap clones.
       const slideIndex = slideKeys.findIndex(
         (key) => slidesRef.current!.get(key) === target,
       );
-      if (slideIndex < 0) return;
+      if (slideIndex < 0) {
+        // Trailing clone: the user swiped past slide-N. Re-anchor the
+        // viewport to real slide-0 with an instant scroll so they're
+        // not stuck on a clone position, then dispatch the wrap goTo.
+        const cloneType =
+          target instanceof HTMLElement
+            ? target.dataset.carouselSlideClone
+            : undefined;
+        if (cloneType === "trailing") {
+          const realFirstKey = slideKeys[0];
+          if (!realFirstKey) return;
+          const viewport = internalRef.current!;
+          const realSlide = slidesRef.current!.get(realFirstKey)!;
+          const realRect = realSlide.getBoundingClientRect();
+          const viewportRect = viewport.getBoundingClientRect();
+          viewport.scrollTo({
+            left:
+              viewport.scrollLeft + (realRect.left - viewportRect.left),
+            behavior: "instant",
+          });
+          isUserScrollRef.current = true;
+          goTo(0);
+        }
+        return;
+      }
 
       const targetPage = Math.floor(slideIndex / effectiveSlidesPerMove);
       if (targetPage !== currentPage) {

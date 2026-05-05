@@ -89,7 +89,13 @@ export function useCarouselViewport() {
     // direction. Capturing the direction here lets the scrollend
     // callback know whether to follow up with a silent snap to the
     // real slide once the animation settles.
-    const wrapDirection = pendingWrapRef.current;
+    //
+    // Reduced motion bypasses the clone hop: when scrollBehavior is
+    // already "instant" there's no smooth animation to host, so the
+    // round-trip clone→real snap would be two no-op scrolls instead
+    // of one. Drop the wrap intent and fall through to the real slide.
+    const wrapDirection =
+      scrollBehavior === "instant" ? null : pendingWrapRef.current;
     pendingWrapRef.current = null;
 
     let targetEl: Element;

@@ -633,7 +633,60 @@ slide and the indicator row updates on the next render. For custom
 indicator content (thumbnails, numbers, mixed icons), drop down to
 the manual `IndicatorGroup` + `Indicator` API above.
 
-Apply your own scroll-snap CSS via the `data-carousel-viewport` and
-`data-carousel-slide` attributes. The minimal recipe lives in
-[the package README's recommended-CSS section](../../README.md) and will
-be expanded here once additional sub-components ship.
+## Recommended CSS
+
+The component ships zero styles. The recipe below is the minimum
+needed to get a working horizontal carousel with snap-aligned slides,
+dot indicators, and sane mobile behaviour. Drop it into your stylesheet
+and target the `data-carousel-*` attributes:
+
+```css
+[data-carousel-viewport] {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  /* Prevent vertical page scroll from "rubber-banding" into the
+     carousel and vice-versa on iOS. */
+  overscroll-behavior-x: contain;
+  /* Hide native scrollbars on mobile while keeping scroll behaviour. */
+  scrollbar-width: none;
+}
+[data-carousel-viewport]::-webkit-scrollbar {
+  display: none;
+}
+
+[data-carousel-slide] {
+  flex: 0 0 100%;
+  scroll-snap-align: start;
+  /* Stop the OS picking up images for drag/save during a swipe. */
+  -webkit-user-drag: none;
+}
+
+/* WCAG 2.5.8: 24×24 minimum hit area; 44×44 recommended for comfort
+   on phones. The visible dot stays small via ::before so the button's
+   hit area can be larger than its visual footprint. */
+[data-carousel-indicator] {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-grid;
+  place-items: center;
+}
+[data-carousel-indicator]::before {
+  content: "";
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: lightgray;
+}
+[data-carousel-indicator][data-state="active"]::before {
+  background: black;
+}
+```
+
+For multi-slide pages (`slidesPerPage={3}`, etc.), tune the slide's
+`flex-basis` to share the viewport — e.g. `calc(100% / 3)` for three
+slides per page, plus a `gap` on the viewport for the inter-slide
+spacing. For a crossfade transition, use `transition="none"` on
+`Carousel.Root` and style the slides absolute-positioned with an
+opacity transition keyed off `[data-carousel-slide][data-state="active"]`.

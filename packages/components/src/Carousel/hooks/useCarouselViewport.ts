@@ -85,10 +85,9 @@ export function useCarouselViewport() {
     // Loop boundary wrap: instead of the long backwards scroll a
     // regular wrap would produce, redirect into the matching edge
     // clone so the new page appears to slide in from the natural
-    // direction. The clone's position-attribute query is stable
-    // because the Viewport injects exactly slidesPerPage clones at
-    // each end and the first one is always adjacent to the page we're
-    // wrapping to.
+    // direction. Capturing the direction here lets the scrollend
+    // callback know whether to follow up with a silent snap to the
+    // real slide once the animation settles.
     const wrapDirection = pendingWrapRef.current;
     pendingWrapRef.current = null;
 
@@ -117,8 +116,26 @@ export function useCarouselViewport() {
     // is a fallback for environments (jsdom, older Safari) that don't fire
     // it. The timeout is longer than any typical smooth-scroll duration so
     // real-browser IO entries that fire mid-animation are still suppressed.
+    // The `cleared` guard makes the body idempotent — real browsers fire
+    // scrollend AND the setTimeout fallback later, but the wrap-snap must
+    // only happen once.
+    let cleared = false;
     const clearFlag = () => {
+      if (cleared) return;
+      cleared = true;
       isProgrammaticScrollRef.current = false;
+      if (wrapDirection !== null) {
+        // Silent snap from the clone we just scrolled into back to the
+        // matching real slide so scrollLeft re-enters the normal range.
+        // `instant` skips scroll-behavior: smooth, so the user only ever
+        // sees the smooth animation into the clone — never this re-anchor.
+        const realEl = slidesRef.current!.get(firstSlideKey)!;
+        const realRect = realEl.getBoundingClientRect();
+        const realViewportRect = viewport.getBoundingClientRect();
+        const realTarget =
+          viewport.scrollLeft + (realRect.left - realViewportRect.left);
+        viewport.scrollTo({ left: realTarget, behavior: "instant" });
+      }
     };
     viewport.addEventListener("scrollend", clearFlag, { once: true });
     const timeoutId = setTimeout(() => {

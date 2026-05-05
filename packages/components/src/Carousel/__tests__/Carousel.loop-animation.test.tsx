@@ -36,4 +36,20 @@ describe("Carousel loop wrap clones", () => {
     expect(leading).toHaveAttribute("aria-hidden", "true");
     expect(trailing).toHaveAttribute("aria-hidden", "true");
   });
+
+  it("should not render clones when transition='none' (consumer owns the visual)", () => {
+    const { container } = renderWithSlides({ loop: true, transition: "none" });
+
+    expect(
+      container.querySelector("[data-carousel-slide-clone]"),
+    ).toBeNull();
+  });
+
+  it("should not render clones when there is only one slide (nothing to wrap to)", () => {
+    const { container } = renderWithSlides({ loop: true }, 1);
+
+    expect(
+      container.querySelector("[data-carousel-slide-clone]"),
+    ).toBeNull();
+  });
 });

@@ -17,6 +17,17 @@ function mockRect(element: Element, left: number) {
   } as DOMRect);
 }
 
+function fireScrollSnapChange(viewport: HTMLElement, snapTarget: HTMLElement) {
+  const event = new Event("scrollsnapchange", { bubbles: false });
+  Object.defineProperty(event, "snapTargetInline", {
+    value: snapTarget,
+    writable: false,
+  });
+  act(() => {
+    viewport.dispatchEvent(event);
+  });
+}
+
 function renderWithSlides(
   rootProps: Omit<
     React.ComponentProps<typeof Carousel.Root>,
@@ -226,6 +237,50 @@ describe("Carousel loop wrap backward scroll", () => {
     // target = scrollLeft (0) + (slide-2.left (200) - viewport.left (0)) = 200.
     expect(scrollToSpy).toHaveBeenCalledWith({
       left: 200,
+      behavior: "instant",
+    });
+  });
+});
+
+describe("Carousel loop wrap manual swipe onto a clone", () => {
+  it("should advance to page 0 and instant-snap to real slide-0 when the user swipes past slide-N onto the trailing clone", () => {
+    const onPageChange = vi.fn();
+    const { container } = render(
+      <Carousel.Root
+        ariaLabel="Featured products"
+        loop
+        page={2}
+        onPageChange={onPageChange}
+      >
+        <Carousel.Viewport data-testid="viewport">
+          <Carousel.Slide data-testid="slide-0" />
+          <Carousel.Slide data-testid="slide-1" />
+          <Carousel.Slide data-testid="slide-2" />
+        </Carousel.Viewport>
+      </Carousel.Root>,
+    );
+
+    const viewport = screen.getByTestId("viewport");
+    viewport.scrollLeft = 600;
+    mockRect(viewport, 0);
+    mockRect(screen.getByTestId("slide-0"), -600);
+    mockRect(screen.getByTestId("slide-1"), -300);
+    mockRect(screen.getByTestId("slide-2"), 0);
+    const trailing = container.querySelector(
+      '[data-carousel-slide-clone="trailing"]',
+    )! as HTMLElement;
+    mockRect(trailing, 300);
+
+    const scrollToSpy = vi.spyOn(viewport, "scrollTo");
+
+    // The browser's CSS scroll-snap landed the user on the trailing
+    // clone after they swiped past slide-2.
+    fireScrollSnapChange(viewport, trailing);
+
+    expect(onPageChange).toHaveBeenCalledWith(0);
+    // Re-anchor: target = scrollLeft (600) + (slide-0.left (-600) - viewport.left (0)) = 0.
+    expect(scrollToSpy).toHaveBeenCalledWith({
+      left: 0,
       behavior: "instant",
     });
   });

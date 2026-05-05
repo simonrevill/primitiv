@@ -181,13 +181,15 @@ export function CarouselViewport({
   children,
   ...rest
 }: CarouselViewportProps) {
-  const { isAutoRotating, ids, loop } = useCarouselContext();
+  const { isAutoRotating, ids, loop, transition } = useCarouselContext();
   const { viewportRef } = useCarouselViewport();
 
   const renderedChildren = useMemo(() => {
-    if (!loop) return children;
+    // transition='none' hands the visual to consumer CSS — there's no
+    // wrap-scroll to host, so clones would only add aria-hidden noise.
+    if (!loop || transition !== "slide") return children;
     return injectLoopClones(children);
-  }, [children, loop]);
+  }, [children, loop, transition]);
 
   return (
     <div
@@ -284,7 +286,9 @@ function injectLoopClones(children: ReactNode): ReactNode {
     if (isSlideElement(item)) slides.push(item);
     else others.push(item);
   }
-  if (slides.length === 0) return children;
+  // One slide (or none) — there is nowhere for the wrap scroll to land,
+  // so clones would only add aria-hidden noise.
+  if (slides.length <= 1) return children;
 
   const trailing = (
     <CarouselCloneSlide

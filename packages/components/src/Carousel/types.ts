@@ -253,6 +253,12 @@ export type CarouselContextValue = {
   visibleSlideIndicesRef: RefObject<Set<number>>;
   /** Used by the Viewport hook to record visibility transitions. */
   setSlideInView: (slideIndex: number, inView: boolean) => void;
+  /** Set to `true` by `next()` and `previous()` the moment programmatic
+   * navigation begins, and cleared by the Viewport hook once the scroll
+   * animation settles (`scrollend` or a timeout fallback). The
+   * IntersectionObserver callback checks this flag before calling `goTo`
+   * so that IO entries firing mid-animation cannot undo the navigation. */
+  isProgrammaticScrollRef: RefObject<boolean>;
 };
 
 export type CarouselViewportProps = ComponentProps<"div">;

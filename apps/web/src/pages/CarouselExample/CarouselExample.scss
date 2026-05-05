@@ -1,0 +1,41 @@
+[data-carousel-viewport] {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  /* Prevent vertical page scroll from "rubber-banding" into the
+     carousel and vice-versa on iOS. */
+  overscroll-behavior-x: contain;
+  /* Hide native scrollbars on mobile while keeping scroll behaviour. */
+  scrollbar-width: none;
+}
+[data-carousel-viewport]::-webkit-scrollbar {
+  display: none;
+}
+
+[data-carousel-slide] {
+  flex: 0 0 100%;
+  scroll-snap-align: start;
+  /* Stop the OS picking up images for drag/save during a swipe. */
+  -webkit-user-drag: none;
+}
+
+/* WCAG 2.5.8: 24×24 minimum hit area; 44×44 recommended for comfort
+   on phones. The visible dot stays small via ::before so the button's
+   hit area can be larger than its visual footprint. */
+[data-carousel-indicator] {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-grid;
+  place-items: center;
+}
+[data-carousel-indicator]::before {
+  content: "";
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: lightgray;
+}
+[data-carousel-indicator][data-state="active"]::before {
+  background: black;
+}

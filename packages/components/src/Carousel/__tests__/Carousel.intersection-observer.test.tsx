@@ -1,5 +1,6 @@
-import { useRef } from "react";
+import { RefObject, useRef } from "react";
 import { act, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 import { Carousel } from "..";
 import type { CarouselImperativeApi } from "..";
@@ -7,7 +8,10 @@ import { MockIntersectionObserver } from "../../test/intersectionObserverPolyfil
 
 describe("Carousel IntersectionObserver fallback + isInView", () => {
   it("isInView(slideIndex) should reflect the observer's last reported intersection state", () => {
-    const ref = { current: null } as React.RefObject<CarouselImperativeApi>;
+    const ref = {
+      current: null,
+    } as unknown as RefObject<CarouselImperativeApi>;
+
     render(
       <Carousel.Root ref={ref} ariaLabel="Featured products">
         <Carousel.Viewport>
@@ -144,6 +148,54 @@ describe("Carousel IntersectionObserver fallback + isInView", () => {
     expect(screen.getByTestId("slide-3")).toHaveAttribute(
       "data-state",
       "active",
+    );
+  });
+
+  it("should not let an IO callback reset the page while a programmatic scroll is in flight", async () => {
+    // Regression test: clicking NextTrigger calls next() which sets
+    // internalPage to 1 and triggers a scrollTo. If the IO callback fires
+    // before the scroll settles (slide-0 still ≥0.6 visible), the callback
+    // must not call goTo(0) and undo the navigation.
+    const user = userEvent.setup();
+    render(
+      <Carousel.Root ariaLabel="Featured products">
+        <Carousel.Viewport>
+          <Carousel.Slide data-testid="slide-0" />
+          <Carousel.Slide data-testid="slide-1" />
+          <Carousel.Slide data-testid="slide-2" />
+        </Carousel.Viewport>
+        <Carousel.NextTrigger>Next</Carousel.NextTrigger>
+      </Carousel.Root>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Next" }));
+
+    // Simulate the IO callback firing mid-scroll: slide-0 still highly
+    // visible because the smooth-scroll animation hasn't finished yet.
+    const io = MockIntersectionObserver.latest!;
+    act(() => {
+      io.fire([
+        {
+          target: screen.getByTestId("slide-0"),
+          isIntersecting: true,
+          intersectionRatio: 0.9,
+        },
+        {
+          target: screen.getByTestId("slide-1"),
+          isIntersecting: false,
+          intersectionRatio: 0.1,
+        },
+      ]);
+    });
+
+    // The page must remain at 1, not be reset to 0.
+    expect(screen.getByTestId("slide-1")).toHaveAttribute(
+      "data-state",
+      "active",
+    );
+    expect(screen.getByTestId("slide-0")).toHaveAttribute(
+      "data-state",
+      "inactive",
     );
   });
 });

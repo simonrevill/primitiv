@@ -207,7 +207,10 @@ export function useCarouselRoot(
   // attribute when canGoNext / canGoPrevious is false, so the click
   // never fires at boundaries. Guards become reachable (and necessary)
   // once the imperative API or autoplay land; they're added then.
+  const isProgrammaticScrollRef = useRef(false);
+
   const next = useCallback(() => {
+    isProgrammaticScrollRef.current = true;
     const target = (currentPage + 1) % totalPages;
     if (isControlled) {
       onPageChange?.(target);
@@ -217,6 +220,7 @@ export function useCarouselRoot(
   }, [currentPage, totalPages, isControlled, onPageChange]);
 
   const previous = useCallback(() => {
+    isProgrammaticScrollRef.current = true;
     const target = (currentPage - 1 + totalPages) % totalPages;
     if (isControlled) {
       onPageChange?.(target);
@@ -406,6 +410,7 @@ export function useCarouselRoot(
       refreshTick,
       visibleSlideIndicesRef,
       setSlideInView,
+      isProgrammaticScrollRef,
     }),
     [
       registerSlide,

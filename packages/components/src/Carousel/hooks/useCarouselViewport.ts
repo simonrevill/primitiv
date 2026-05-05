@@ -33,6 +33,7 @@ export function useCarouselViewport() {
     refreshTick,
     visibleSlideIndicesRef,
     setSlideInView,
+    isProgrammaticScrollRef,
   } = useCarouselContext();
   const internalRef = useRef<HTMLDivElement>(null);
 
@@ -75,6 +76,24 @@ export function useCarouselViewport() {
       viewport.scrollLeft + (slideRect.left - viewportRect.left);
 
     viewport.scrollTo({ left: targetScrollLeft, behavior: scrollBehavior });
+
+    // Clear the programmatic-scroll guard once the animation settles.
+    // `scrollend` is the reliable signal in real browsers; the setTimeout
+    // is a fallback for environments (jsdom, older Safari) that don't fire
+    // it. The timeout is longer than any typical smooth-scroll duration so
+    // real-browser IO entries that fire mid-animation are still suppressed.
+    const clearFlag = () => {
+      isProgrammaticScrollRef.current = false;
+    };
+    viewport.addEventListener("scrollend", clearFlag, { once: true });
+    const timeoutId = setTimeout(() => {
+      viewport.removeEventListener("scrollend", clearFlag);
+      clearFlag();
+    }, 600);
+    return () => {
+      clearTimeout(timeoutId);
+      viewport.removeEventListener("scrollend", clearFlag);
+    };
   }, [
     transition,
     currentPage,
@@ -147,7 +166,12 @@ export function useCarouselViewport() {
         if (visible.size === 0) return;
         const firstVisible = Math.min(...visible);
         const targetPage = Math.floor(firstVisible / effectiveSlidesPerMove);
-        if (targetPage !== currentPage) goTo(targetPage);
+        // Guard: if a programmatic scroll is in flight (e.g. user clicked
+        // NextTrigger and the smooth-scroll animation hasn't settled), the
+        // IO may still see the old slide as ≥0.6 visible. Calling goTo
+        // here would undo the navigation, so skip until the flag clears.
+        if (targetPage !== currentPage && !isProgrammaticScrollRef.current)
+          goTo(targetPage);
       },
       { threshold: 0.6 },
     );

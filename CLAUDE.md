@@ -144,6 +144,38 @@ _Haiku 4.5 (quick fixes & syntax)_
 When in doubt, default to Sonnet — it handles most tasks well and iterates
 quickly. Reserve Opus for genuinely architectural decisions.
 
+## Working efficiency under TDD
+
+The strict TDD discipline (red commit + green commit + tests + JSDoc + README
+per cycle) is non-negotiable, but the wrapping ceremony around each cycle is.
+Keep these defaults to avoid burning tokens on overhead:
+
+- **Commit messages: subject + 1 sentence body, max.** The git log is for
+  scanning. Implementation notes belong in JSDoc and the cycle's tests, not
+  the commit body. The session-id footer line is still required.
+- **No per-cycle TodoWrite list.** Every cycle is the same four-step shape
+  (write red, commit red, write green, commit + push green). Tracking it as a
+  todo list adds noise without adding clarity.
+- **One test run per green check.** `pnpm vitest run src/<Component>` is
+  enough. Skip the redundant full-suite + `--coverage` runs unless you have a
+  specific reason to suspect a coverage gap or a regression in another
+  component. If you want a final check before commit, do one full
+  `pnpm vitest run --coverage`.
+- **One- or two-sentence end-of-cycle summary.** What changed, what's next.
+  Don't restate the implementation; the diff is the source of truth.
+- **Brief next-cycle teasers.** "Cycle N next is X. Continue?" — not a
+  paragraph.
+- **Read with `offset` / `limit`.** When jumping into a known region of a
+  large file, don't pull the whole thing.
+- **Share fixtures across tests.** Helper render functions (e.g.
+  `renderWithSlides({ ... }, count)`) cut the boilerplate that piles up across
+  many similar test cases. Mirror what `Carousel.prev-next.test.tsx` does.
+
+These defaults can be overridden when a cycle genuinely needs more — a tricky
+race condition might justify a longer commit body explaining the reasoning,
+and a coverage-gap investigation legitimately needs the coverage report. But
+the overhead should be a deliberate choice each time, not a default.
+
 ## Architecture — the shape we landed on
 
 Four refactoring steps were executed in order C → D → A → B. They

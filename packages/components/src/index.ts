@@ -1,4 +1,5 @@
 export * from "./Accordion";
+export * from "./Carousel";
 export * from "./Checkbox";
 export * from "./Collapsible";
 export * from "./Divider";

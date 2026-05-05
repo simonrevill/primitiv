@@ -284,4 +284,44 @@ describe("Carousel loop wrap manual swipe onto a clone", () => {
       behavior: "instant",
     });
   });
+
+  it("should retreat to the last page and instant-snap to real slide-N when the user swipes before slide-0 onto the leading clone", () => {
+    const onPageChange = vi.fn();
+    const { container } = render(
+      <Carousel.Root
+        ariaLabel="Featured products"
+        loop
+        page={0}
+        onPageChange={onPageChange}
+      >
+        <Carousel.Viewport data-testid="viewport">
+          <Carousel.Slide data-testid="slide-0" />
+          <Carousel.Slide data-testid="slide-1" />
+          <Carousel.Slide data-testid="slide-2" />
+        </Carousel.Viewport>
+      </Carousel.Root>,
+    );
+
+    const viewport = screen.getByTestId("viewport");
+    viewport.scrollLeft = 0;
+    mockRect(viewport, 0);
+    mockRect(screen.getByTestId("slide-0"), 0);
+    mockRect(screen.getByTestId("slide-1"), 100);
+    mockRect(screen.getByTestId("slide-2"), 200);
+    const leading = container.querySelector(
+      '[data-carousel-slide-clone="leading"]',
+    )! as HTMLElement;
+    mockRect(leading, -300);
+
+    const scrollToSpy = vi.spyOn(viewport, "scrollTo");
+
+    fireScrollSnapChange(viewport, leading);
+
+    expect(onPageChange).toHaveBeenCalledWith(2);
+    // Re-anchor: target = scrollLeft (0) + (slide-2.left (200) - viewport.left (0)) = 200.
+    expect(scrollToSpy).toHaveBeenCalledWith({
+      left: 200,
+      behavior: "instant",
+    });
+  });
 });

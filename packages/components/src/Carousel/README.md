@@ -4,8 +4,25 @@ Headless, accessible **Carousel** built on native CSS scroll-snap. Implements
 the [WAI-ARIA Carousel pattern](https://www.w3.org/WAI/ARIA/apg/patterns/carousel/),
 ships zero styles, and is fully composable.
 
-The component is being developed iteratively under strict TDD. This README
-documents the surface that exists today and grows as the component does.
+The component is built incrementally under strict TDD. This README
+documents the surface that exists today.
+
+## Known limitations
+
+- **IntersectionObserver fallback for `scrollsnapchange`.** The
+  user-driven scroll-to-state path uses the modern
+  [`scrollsnapchange`](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Scroll_snap/Using_scroll_snap_events)
+  event. Browsers without it (older Safari / Firefox prior to the
+  standard's universal rollout) will see clicks-and-keyboard
+  navigation work fine, but their swipe gestures won't drive the
+  React `page` state. `isInView(slideIndex)` on the imperative
+  handle is also not yet exposed — it relies on the same observer.
+- **Numeric `slidesPerMove`.** `slidesPerPage` works today (with
+  the implicit `slidesPerMove="auto"` advancing one full page per
+  click). Advancing by an arbitrary slide count per click (e.g.
+  `slidesPerMove={1}` while `slidesPerPage={3}`) requires a
+  state-model refactor — the active "page" stops being a clean
+  index and becomes a derived snap point. Deferred.
 
 ## Status
 

@@ -27,4 +27,52 @@ describe("Carousel error handling", () => {
     );
   });
 
+  it("should throw when controlled page is greater than or equal to totalPages", () => {
+    expect(() => {
+      render(
+        <Carousel.Root
+          ariaLabel="Featured products"
+          page={5}
+          onPageChange={() => {}}
+        >
+          <Carousel.Viewport>
+            <Carousel.Slide />
+            <Carousel.Slide />
+            <Carousel.Slide />
+          </Carousel.Viewport>
+        </Carousel.Root>,
+      );
+    }).toThrow(/page index 5 is out of range/);
+  });
+
+  it("should throw when controlled page is negative", () => {
+    expect(() => {
+      render(
+        <Carousel.Root
+          ariaLabel="Featured products"
+          page={-1}
+          onPageChange={() => {}}
+        >
+          <Carousel.Viewport>
+            <Carousel.Slide />
+            <Carousel.Slide />
+          </Carousel.Viewport>
+        </Carousel.Root>,
+      );
+    }).toThrow(/page index -1 is out of range/);
+  });
+
+  it("should throw when defaultPage is out of range relative to the registered slides", () => {
+    expect(() => {
+      render(
+        <Carousel.Root ariaLabel="Featured products" defaultPage={5}>
+          <Carousel.Viewport>
+            <Carousel.Slide />
+            <Carousel.Slide />
+            <Carousel.Slide />
+          </Carousel.Viewport>
+        </Carousel.Root>,
+      );
+    }).toThrow(/page index 5 is out of range/);
+  });
 });

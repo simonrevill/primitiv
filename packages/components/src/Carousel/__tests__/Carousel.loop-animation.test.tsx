@@ -175,3 +175,58 @@ describe("Carousel loop wrap forward scroll", () => {
     });
   });
 });
+
+describe("Carousel loop wrap backward scroll", () => {
+  it("should smooth-scroll to the leading clone, then instant-snap to real slide-N when previous() wraps from the first page", async () => {
+    const user = userEvent.setup();
+    const { container } = render(
+      <Carousel.Root ariaLabel="Featured products" loop>
+        <Carousel.Viewport data-testid="viewport">
+          <Carousel.Slide data-testid="slide-0" />
+          <Carousel.Slide data-testid="slide-1" />
+          <Carousel.Slide data-testid="slide-2" />
+        </Carousel.Viewport>
+        <Carousel.PreviousTrigger>Previous</Carousel.PreviousTrigger>
+      </Carousel.Root>,
+    );
+
+    const viewport = screen.getByTestId("viewport");
+    viewport.scrollLeft = 0;
+
+    mockRect(viewport, 0);
+    // Real slide-2 is the wrap target; sits to the right of the
+    // current viewport position, so a regular wrap would scroll
+    // forwards — wrong direction for "previous".
+    mockRect(screen.getByTestId("slide-0"), 0);
+    mockRect(screen.getByTestId("slide-1"), 100);
+    mockRect(screen.getByTestId("slide-2"), 200);
+    // Leading clone sits to the LEFT of slide-0, exactly where slide-N
+    // would visually appear if we wrapped backward from slide-0.
+    mockRect(
+      container.querySelector('[data-carousel-slide-clone="leading"]')!,
+      -300,
+    );
+
+    const scrollToSpy = vi.spyOn(viewport, "scrollTo");
+
+    await user.click(screen.getByRole("button", { name: "Previous" }));
+
+    // Smooth scroll to leading clone position:
+    // target = scrollLeft (0) + (clone.left (-300) - viewport.left (0)) = -300.
+    expect(scrollToSpy).toHaveBeenCalledWith({
+      left: -300,
+      behavior: "smooth",
+    });
+
+    act(() => {
+      viewport.dispatchEvent(new Event("scrollend"));
+    });
+
+    // Instant snap to real slide-2:
+    // target = scrollLeft (0) + (slide-2.left (200) - viewport.left (0)) = 200.
+    expect(scrollToSpy).toHaveBeenCalledWith({
+      left: 200,
+      behavior: "instant",
+    });
+  });
+});

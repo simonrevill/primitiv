@@ -27,6 +27,7 @@ export function useCarouselViewport() {
     slideKeys,
     slidesPerPage,
     effectiveSlidesPerMove,
+    totalPages,
     currentPage,
     goTo,
     transition,
@@ -174,28 +175,30 @@ export function useCarouselViewport() {
         (key) => slidesRef.current!.get(key) === target,
       );
       if (slideIndex < 0) {
-        // Trailing clone: the user swiped past slide-N. Re-anchor the
-        // viewport to real slide-0 with an instant scroll so they're
-        // not stuck on a clone position, then dispatch the wrap goTo.
+        // Trailing/leading clone: the user swiped past the slide list
+        // edge. Re-anchor the viewport to the real wrap-target slide
+        // with an instant scroll so they're not stuck on a clone
+        // position, then dispatch the wrap goTo.
         const cloneType =
           target instanceof HTMLElement
             ? target.dataset.carouselSlideClone
             : undefined;
-        if (cloneType === "trailing") {
-          const realFirstKey = slideKeys[0];
-          if (!realFirstKey) return;
-          const viewport = internalRef.current!;
-          const realSlide = slidesRef.current!.get(realFirstKey)!;
-          const realRect = realSlide.getBoundingClientRect();
-          const viewportRect = viewport.getBoundingClientRect();
-          viewport.scrollTo({
-            left:
-              viewport.scrollLeft + (realRect.left - viewportRect.left),
-            behavior: "instant",
-          });
-          isUserScrollRef.current = true;
-          goTo(0);
-        }
+        if (cloneType !== "trailing" && cloneType !== "leading") return;
+
+        const wrapPage = cloneType === "trailing" ? 0 : totalPages - 1;
+        const realKey = slideKeys[wrapPage * effectiveSlidesPerMove];
+        if (!realKey) return;
+
+        const viewport = internalRef.current!;
+        const realSlide = slidesRef.current!.get(realKey)!;
+        const realRect = realSlide.getBoundingClientRect();
+        const viewportRect = viewport.getBoundingClientRect();
+        viewport.scrollTo({
+          left: viewport.scrollLeft + (realRect.left - viewportRect.left),
+          behavior: "instant",
+        });
+        isUserScrollRef.current = true;
+        goTo(wrapPage);
         return;
       }
 
@@ -213,6 +216,7 @@ export function useCarouselViewport() {
     slideKeys,
     slidesRef,
     effectiveSlidesPerMove,
+    totalPages,
     currentPage,
     goTo,
   ]);

@@ -130,6 +130,15 @@ export function useCarouselRoot(
   // empty-slide-list case still gives totalPages === 0.
   const totalPages = Math.ceil(total / slidesPerPage);
 
+  // Once slides have registered, an out-of-range page is a consumer
+  // mistake that would otherwise ship silently as a no-op carousel —
+  // throw with the live values to surface it during development.
+  if (totalPages > 0 && (currentPage < 0 || currentPage >= totalPages)) {
+    throw new Error(
+      `Carousel: page index ${currentPage} is out of range (totalPages: ${totalPages})`,
+    );
+  }
+
   const [internalPlaying, setInternalPlaying] = useState(defaultPlaying);
   const isPlayingControlled = playing !== undefined;
   const currentPlaying = isPlayingControlled ? playing : internalPlaying;

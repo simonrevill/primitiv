@@ -167,6 +167,13 @@ toggling `playing` is meaningless when no autoplay timer is wired,
 and the throw surfaces the misuse during development rather than
 shipping a no-op control to users.
 
+`Carousel.Root` also throws once slides have registered if the
+active `page` (controlled or `defaultPage`-seeded) is negative or
+greater than or equal to the live `totalPages` —
+otherwise the carousel would render with no active slide. The throw
+is gated on `totalPages > 0` so transient zero-slide initial-render
+states don't false-alarm.
+
 ### Lightbox composition (with `Modal`)
 
 Two `Carousel.Root`s sharing a controlled `page` stay in sync — pair

@@ -26,6 +26,7 @@ export function useCarouselViewport() {
     slidesRef,
     slideKeys,
     slidesPerPage,
+    effectiveSlidesPerMove,
     currentPage,
     goTo,
     transition,
@@ -56,7 +57,7 @@ export function useCarouselViewport() {
     // transition="none" hands the visual to consumer CSS; we don't
     // touch viewport.scrollTo at all in that mode.
     if (transition !== "slide") return;
-    const firstSlideIndex = currentPage * slidesPerPage;
+    const firstSlideIndex = currentPage * effectiveSlidesPerMove;
     const firstSlideKey = slideKeys[firstSlideIndex];
     // No slides registered yet, or page out of range: nothing to scroll to.
     if (!firstSlideKey) return;
@@ -77,7 +78,7 @@ export function useCarouselViewport() {
   }, [
     transition,
     currentPage,
-    slidesPerPage,
+    effectiveSlidesPerMove,
     slideKeys,
     slidesRef,
     refreshTick,
@@ -103,13 +104,20 @@ export function useCarouselViewport() {
       );
       if (slideIndex < 0) return;
 
-      const targetPage = Math.floor(slideIndex / slidesPerPage);
+      const targetPage = Math.floor(slideIndex / effectiveSlidesPerMove);
       if (targetPage !== currentPage) goTo(targetPage);
     };
 
     viewport.addEventListener("scrollsnapchange", handler);
     return () => viewport.removeEventListener("scrollsnapchange", handler);
-  }, [transition, slideKeys, slidesRef, slidesPerPage, currentPage, goTo]);
+  }, [
+    transition,
+    slideKeys,
+    slidesRef,
+    effectiveSlidesPerMove,
+    currentPage,
+    goTo,
+  ]);
 
   // IntersectionObserver fallback for browsers without scrollsnapchange,
   // and the source of truth for isInView() on the imperative API. The
@@ -138,7 +146,7 @@ export function useCarouselViewport() {
         const visible = visibleSlideIndicesRef.current;
         if (visible.size === 0) return;
         const firstVisible = Math.min(...visible);
-        const targetPage = Math.floor(firstVisible / slidesPerPage);
+        const targetPage = Math.floor(firstVisible / effectiveSlidesPerMove);
         if (targetPage !== currentPage) goTo(targetPage);
       },
       { threshold: 0.6 },
@@ -153,7 +161,7 @@ export function useCarouselViewport() {
     transition,
     slideKeys,
     slidesRef,
-    slidesPerPage,
+    effectiveSlidesPerMove,
     currentPage,
     goTo,
     setSlideInView,

@@ -7,15 +7,6 @@ ships zero styles, and is fully composable.
 The component is built incrementally under strict TDD. This README
 documents the surface that exists today.
 
-## Known limitations
-
-- **Numeric `slidesPerMove`.** `slidesPerPage` works today (with
-  the implicit `slidesPerMove="auto"` advancing one full page per
-  click). Advancing by an arbitrary slide count per click (e.g.
-  `slidesPerMove={1}` while `slidesPerPage={3}`) requires a
-  state-model refactor — the active "page" stops being a clean
-  index and becomes a derived snap point. Deferred.
-
 ## Status
 
 Currently exposes:
@@ -408,11 +399,12 @@ overrides on `Carousel.Slide` still take precedence over
 domain-meaningful label (e.g. `"Hand-picked for you"`) without
 losing the localised `"N of M"` format on the others.
 
-### Multi-slide pages
+### Multi-slide pages and partial page advance
 
 Pass `slidesPerPage` (default `1`) to make several slides visible per
-page — the "image carousel" / "property cards" pattern. Slides
-group into pages of that size for navigation:
+page — the "image carousel" / "property cards" pattern. By default,
+`Carousel.NextTrigger` / `Carousel.PreviousTrigger` advance one
+full page at a time (`slidesPerMove="auto"`):
 
 ```tsx
 <Carousel.Root ariaLabel="Featured products" slidesPerPage={3}>
@@ -445,6 +437,27 @@ With `slidesPerPage={3}` and 5 slides:
 The slide-level `aria-label="N of M"` continues to count individual
 slides (so a 5-slide carousel announces "1 of 5", "2 of 5", … even
 when grouped into 3-per-page).
+
+Pass a numeric `slidesPerMove` to advance the visible window by an
+arbitrary slide count per click instead of a full page:
+
+```tsx
+<Carousel.Root
+  ariaLabel="Featured products"
+  slidesPerPage={3}
+  slidesPerMove={1}
+>
+  …
+</Carousel.Root>
+```
+
+With `slidesPerPage=3`, `slidesPerMove=1`, and 5 slides, the active
+window slides one slide at a time — pages show `[0,1,2]`, `[1,2,3]`,
+`[2,3,4]`, so `Carousel.Indicators` renders 3 dots and the boundary
+clamp respects the last full window. The indicator count formula is
+`floor((total - slidesPerPage) / slidesPerMove) + 1` (vs.
+`ceil(total / slidesPerPage)` for `"auto"`), so the visible window
+always stays full in numeric mode.
 
 ### Boundary behaviour and looping
 

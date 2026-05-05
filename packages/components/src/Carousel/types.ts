@@ -162,6 +162,12 @@ export type CarouselRootProps = Omit<
      * clamp moves to the last page, and `Carousel.NextTrigger` /
      * `Carousel.PreviousTrigger` advance one page at a time. */
     slidesPerPage?: number;
+    /** Number of slides advanced by `Carousel.NextTrigger` /
+     * `Carousel.PreviousTrigger`. `"auto"` (default) advances one
+     * full page at a time (= `slidesPerPage`); a number advances
+     * exactly that many slides per click and pages are computed so
+     * the visible window always stays full. */
+    slidesPerMove?: number | "auto";
     /** Override the default user-visible strings the component owns —
      * see {@link CarouselTranslations}. Useful for i18n. */
     translations?: CarouselTranslations;
@@ -189,8 +195,15 @@ export type CarouselContextValue = {
   slideKeys: string[];
   /** Number of slides visible per page (default `1`). */
   slidesPerPage: number;
-  /** `ceil(slideKeys.length / slidesPerPage)` — drives indicator count
-   * and the boundary clamp on the prev/next triggers. */
+  /** Resolved slides advanced per Prev/Next click — equal to
+   * `slidesPerPage` when the consumer left `slidesPerMove="auto"`,
+   * else the numeric value. */
+  effectiveSlidesPerMove: number;
+  /** Live total page count — `ceil(total / slidesPerPage)` in `"auto"`
+   * mode (partial last page allowed), else
+   * `floor((total - slidesPerPage) / effectiveSlidesPerMove) + 1`
+   * (always full-windowed). Drives indicator count and boundary
+   * clamp. */
   totalPages: number;
   /** Zero-based index of the currently-active page. */
   currentPage: number;

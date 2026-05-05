@@ -66,6 +66,9 @@ type UseCarouselRootProps = {
   autoplay?: CarouselAutoplay;
   /** Number of slides visible per page. Defaults to `1`. */
   slidesPerPage?: number;
+  /** Slides advanced per Prev/Next click — `"auto"` (default) is
+   * `slidesPerPage`. */
+  slidesPerMove?: number | "auto";
   /** Override the default user-visible strings — see
    * {@link CarouselTranslations}. */
   translations?: CarouselTranslations;
@@ -112,6 +115,7 @@ export function useCarouselRoot(
     onPlayingChange,
     autoplay,
     slidesPerPage = 1,
+    slidesPerMove = "auto",
     translations,
     ids = EMPTY_IDS,
     transition = "slide",
@@ -126,9 +130,21 @@ export function useCarouselRoot(
   const isControlled = page !== undefined;
   const currentPage = isControlled ? page : internalPage;
   const total = slideKeys.length;
-  // ceil(total / slidesPerPage) — but Math.ceil(0 / N) === 0 so the
-  // empty-slide-list case still gives totalPages === 0.
-  const totalPages = Math.ceil(total / slidesPerPage);
+  const effectiveSlidesPerMove =
+    slidesPerMove === "auto" ? slidesPerPage : slidesPerMove;
+  // "auto" mode keeps the existing ceil(total / slidesPerPage) formula
+  // and accepts a partial last page; numeric mode uses
+  // floor((total - slidesPerPage) / slidesPerMove) + 1 so the active
+  // window is always full. Math.ceil(0 / N) === 0 so the empty-slide
+  // case still gives totalPages === 0.
+  const totalPages =
+    total === 0
+      ? 0
+      : total <= slidesPerPage
+        ? 1
+        : slidesPerMove === "auto"
+          ? Math.ceil(total / slidesPerPage)
+          : Math.floor((total - slidesPerPage) / effectiveSlidesPerMove) + 1;
 
   // Once slides have registered, an out-of-range page is a consumer
   // mistake that would otherwise ship silently as a no-op carousel —
@@ -372,6 +388,7 @@ export function useCarouselRoot(
       slidesRef,
       slideKeys,
       slidesPerPage,
+      effectiveSlidesPerMove,
       totalPages,
       currentPage,
       canGoNext,
@@ -395,6 +412,7 @@ export function useCarouselRoot(
       slidesRef,
       slideKeys,
       slidesPerPage,
+      effectiveSlidesPerMove,
       totalPages,
       currentPage,
       canGoNext,

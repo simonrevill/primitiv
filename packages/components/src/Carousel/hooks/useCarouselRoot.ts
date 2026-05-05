@@ -230,16 +230,13 @@ export function useCarouselRoot(
 
   const previous = useCallback(() => {
     isProgrammaticScrollRef.current = true;
-    if (loop && totalPages > 1 && currentPage === 0) {
-      pendingWrapRef.current = "backward";
-    }
     const target = (currentPage - 1 + totalPages) % totalPages;
     if (isControlled) {
       onPageChange?.(target);
     } else {
       setInternalPage(target);
     }
-  }, [currentPage, totalPages, isControlled, onPageChange, loop]);
+  }, [currentPage, totalPages, isControlled, onPageChange]);
 
   const goTo = useCallback(
     (target: number) => {

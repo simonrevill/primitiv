@@ -2,10 +2,7 @@ import { act, render, screen } from "@testing-library/react";
 
 import { Carousel } from "..";
 
-function fireScrollSnapChange(
-  viewport: HTMLElement,
-  snapTarget: HTMLElement,
-) {
+function fireScrollSnapChange(viewport: HTMLElement, snapTarget: HTMLElement) {
   const event = new Event("scrollsnapchange", { bubbles: false });
   Object.defineProperty(event, "snapTargetInline", {
     value: snapTarget,
@@ -150,5 +147,29 @@ describe("Carousel scroll sync (user-driven via scrollsnapchange)", () => {
     );
     expect(onPageChange).toHaveBeenCalledTimes(1);
     expect(onPageChange).toHaveBeenCalledWith(1);
+  });
+
+  it("should not call scrollTo on the viewport after a user-driven scrollsnapchange", () => {
+    // Regression: when the user swipes, the browser's CSS scroll-snap
+    // already positions the viewport. The scrollsnapchange event updates
+    // React state, which re-runs the scroll effect. If the effect calls
+    // scrollTo here, two scroll animations fight and the result is janky.
+    // The scroll effect must be a no-op for user-initiated page changes.
+    render(
+      <Carousel.Root ariaLabel="Featured products">
+        <Carousel.Viewport data-testid="viewport">
+          <Carousel.Slide data-testid="slide-0" />
+          <Carousel.Slide data-testid="slide-1" />
+          <Carousel.Slide data-testid="slide-2" />
+        </Carousel.Viewport>
+      </Carousel.Root>,
+    );
+
+    const viewport = screen.getByTestId("viewport");
+    const scrollToSpy = vi.spyOn(viewport, "scrollTo");
+
+    fireScrollSnapChange(viewport, screen.getByTestId("slide-1"));
+
+    expect(scrollToSpy).not.toHaveBeenCalled();
   });
 });

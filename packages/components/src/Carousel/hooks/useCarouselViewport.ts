@@ -36,6 +36,11 @@ export function useCarouselViewport() {
     isProgrammaticScrollRef,
   } = useCarouselContext();
   const internalRef = useRef<HTMLDivElement>(null);
+  // Set to true by the scrollsnapchange handler and the IntersectionObserver
+  // callback before they call goTo(), so the scroll effect knows the page
+  // change originated from a user scroll (CSS snap already positioned the
+  // viewport) and must not call scrollTo() again.
+  const isUserScrollRef = useRef(false);
 
   // Callback ref so the consumer can compose their own ref with ours
   // via `composeRefs` later (cycle 22 introduces asChild). For now,
@@ -67,6 +72,13 @@ export function useCarouselViewport() {
     // here — the effect runs post-commit (after callback refs fire) and
     // any key in slideKeys was just registered into slidesRef in
     // lockstep by useCarouselRoot.registerSlide.
+    // A user swipe via CSS scroll-snap has already positioned the viewport;
+    // calling scrollTo on top would start a second animation and cause jank.
+    if (isUserScrollRef.current) {
+      isUserScrollRef.current = false;
+      return;
+    }
+
     const viewport = internalRef.current!;
     const slideEl = slidesRef.current!.get(firstSlideKey)!;
 
@@ -124,7 +136,10 @@ export function useCarouselViewport() {
       if (slideIndex < 0) return;
 
       const targetPage = Math.floor(slideIndex / effectiveSlidesPerMove);
-      if (targetPage !== currentPage) goTo(targetPage);
+      if (targetPage !== currentPage) {
+        isUserScrollRef.current = true;
+        goTo(targetPage);
+      }
     };
 
     viewport.addEventListener("scrollsnapchange", handler);
@@ -170,8 +185,10 @@ export function useCarouselViewport() {
         // NextTrigger and the smooth-scroll animation hasn't settled), the
         // IO may still see the old slide as ≥0.6 visible. Calling goTo
         // here would undo the navigation, so skip until the flag clears.
-        if (targetPage !== currentPage && !isProgrammaticScrollRef.current)
+        if (targetPage !== currentPage && !isProgrammaticScrollRef.current) {
+          isUserScrollRef.current = true;
           goTo(targetPage);
+        }
       },
       { threshold: 0.6 },
     );

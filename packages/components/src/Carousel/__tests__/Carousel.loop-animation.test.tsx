@@ -1,6 +1,21 @@
-import { render } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 import { Carousel } from "..";
+
+function mockRect(element: Element, left: number) {
+  vi.spyOn(element, "getBoundingClientRect").mockReturnValue({
+    left,
+    top: 0,
+    right: left + 300,
+    bottom: 100,
+    width: 300,
+    height: 100,
+    x: left,
+    y: 0,
+    toJSON: () => ({}),
+  } as DOMRect);
+}
 
 function renderWithSlides(
   rootProps: Omit<
@@ -65,5 +80,52 @@ describe("Carousel loop wrap clones", () => {
     expect(
       container.querySelectorAll('[data-carousel-slide-clone="trailing"]'),
     ).toHaveLength(2);
+  });
+});
+
+describe("Carousel loop wrap forward scroll", () => {
+  it("should smooth-scroll to the trailing clone position when next() wraps from the last page", async () => {
+    const user = userEvent.setup();
+    const { container } = render(
+      <Carousel.Root ariaLabel="Featured products" loop defaultPage={2}>
+        <Carousel.Viewport data-testid="viewport">
+          <Carousel.Slide data-testid="slide-0" />
+          <Carousel.Slide data-testid="slide-1" />
+          <Carousel.Slide data-testid="slide-2" />
+        </Carousel.Viewport>
+        <Carousel.NextTrigger>Next</Carousel.NextTrigger>
+      </Carousel.Root>,
+    );
+
+    const viewport = screen.getByTestId("viewport");
+    viewport.scrollLeft = 200;
+
+    // Real slides — these are NOT what the wrap should scroll to. Slide-0
+    // sits to the left of the current position, so a regular scroll
+    // would aim for the negative side and yield left=0 (the current bug).
+    mockRect(viewport, 0);
+    mockRect(screen.getByTestId("slide-0"), -200);
+    mockRect(screen.getByTestId("slide-1"), -100);
+    mockRect(screen.getByTestId("slide-2"), 0);
+
+    // Trailing clone is positioned just to the right of slide-2, exactly
+    // where slide-0 would visually appear if we wrapped forward without
+    // a long backwards scroll.
+    const trailing = container.querySelector(
+      '[data-carousel-slide-clone="trailing"]',
+    )!;
+    mockRect(trailing, 300);
+
+    const scrollToSpy = vi.spyOn(viewport, "scrollTo");
+
+    await user.click(screen.getByRole("button", { name: "Next" }));
+
+    // target = scrollLeft (200) + (clone.left (300) - viewport.left (0))
+    //        = 500. Crucially NOT 0, which is what the regular scroll
+    //        path produces and which causes the long backwards scroll.
+    expect(scrollToSpy).toHaveBeenCalledWith({
+      left: 500,
+      behavior: "smooth",
+    });
   });
 });

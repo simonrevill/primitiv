@@ -30,6 +30,8 @@ export function useCarouselViewport() {
     goTo,
     transition,
     refreshTick,
+    visibleSlideIndicesRef,
+    setSlideInView,
   } = useCarouselContext();
   const internalRef = useRef<HTMLDivElement>(null);
 
@@ -108,6 +110,55 @@ export function useCarouselViewport() {
     viewport.addEventListener("scrollsnapchange", handler);
     return () => viewport.removeEventListener("scrollsnapchange", handler);
   }, [transition, slideKeys, slidesRef, slidesPerPage, currentPage, goTo]);
+
+  // IntersectionObserver fallback for browsers without scrollsnapchange,
+  // and the source of truth for isInView() on the imperative API. The
+  // observer fires whenever a slide crosses the 0.6 visibility
+  // threshold; the lowest-index visible slide derives the active page.
+  useEffect(() => {
+    if (transition !== "slide") return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        // Both lookups (slideKeys.findIndex → registered key, and the
+        // slidesRef get → element) are guaranteed to resolve: the
+        // observer only observes elements registered into slidesRef
+        // alongside their slideKey, and is disconnected on cleanup
+        // before slides can unmount.
+        for (const entry of entries) {
+          const idx = slideKeys.findIndex(
+            (key) => slidesRef.current!.get(key) === entry.target,
+          );
+          setSlideInView(
+            idx,
+            entry.isIntersecting && entry.intersectionRatio >= 0.6,
+          );
+        }
+
+        const visible = visibleSlideIndicesRef.current;
+        if (visible.size === 0) return;
+        const firstVisible = Math.min(...visible);
+        const targetPage = Math.floor(firstVisible / slidesPerPage);
+        if (targetPage !== currentPage) goTo(targetPage);
+      },
+      { threshold: 0.6 },
+    );
+
+    for (const key of slideKeys) {
+      observer.observe(slidesRef.current!.get(key)!);
+    }
+
+    return () => observer.disconnect();
+  }, [
+    transition,
+    slideKeys,
+    slidesRef,
+    slidesPerPage,
+    currentPage,
+    goTo,
+    setSlideInView,
+    visibleSlideIndicesRef,
+  ]);
 
   return { viewportRef };
 }

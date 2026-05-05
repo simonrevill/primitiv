@@ -321,10 +321,33 @@ export function useCarouselRoot(
     [currentPage, totalPages],
   );
 
+  // Visibility tracking is a ref (not state) because callers read on
+  // demand via isInView() and the IO callback in useCarouselViewport
+  // mutates many entries per tick — re-rendering on each addition
+  // would be wasteful and unnecessary.
+  const visibleSlideIndicesRef = useRef<Set<number>>(new Set());
+  const setSlideInView = useCallback((slideIndex: number, inView: boolean) => {
+    if (inView) visibleSlideIndicesRef.current.add(slideIndex);
+    else visibleSlideIndicesRef.current.delete(slideIndex);
+  }, []);
+  const isInView = useCallback(
+    (slideIndex: number) => visibleSlideIndicesRef.current.has(slideIndex),
+    [],
+  );
+
   useImperativeHandle(
     imperativeRef,
-    () => ({ next, previous, goTo, play, pause, refresh, getProgress }),
-    [next, previous, goTo, play, pause, refresh, getProgress],
+    () => ({
+      next,
+      previous,
+      goTo,
+      play,
+      pause,
+      refresh,
+      getProgress,
+      isInView,
+    }),
+    [next, previous, goTo, play, pause, refresh, getProgress, isInView],
   );
 
   // Reset the user-initiated flag when the playing session ends, so a
@@ -364,6 +387,8 @@ export function useCarouselRoot(
       ids,
       transition,
       refreshTick,
+      visibleSlideIndicesRef,
+      setSlideInView,
     }),
     [
       registerSlide,
@@ -385,6 +410,7 @@ export function useCarouselRoot(
       ids,
       transition,
       refreshTick,
+      setSlideInView,
     ],
   );
 

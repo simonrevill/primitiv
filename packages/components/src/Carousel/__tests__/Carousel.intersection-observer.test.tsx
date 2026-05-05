@@ -79,6 +79,40 @@ describe("Carousel IntersectionObserver fallback + isInView", () => {
     );
   });
 
+  it("should not change the page when no observed slides cross the visibility threshold", () => {
+    const onPageChange = vi.fn();
+    render(
+      <Carousel.Root
+        ariaLabel="Featured products"
+        page={0}
+        onPageChange={onPageChange}
+      >
+        <Carousel.Viewport>
+          <Carousel.Slide data-testid="slide-0" />
+          <Carousel.Slide data-testid="slide-1" />
+        </Carousel.Viewport>
+      </Carousel.Root>,
+    );
+
+    const io = MockIntersectionObserver.latest!;
+    act(() => {
+      io.fire([
+        {
+          target: screen.getByTestId("slide-0"),
+          isIntersecting: false,
+          intersectionRatio: 0.2,
+        },
+        {
+          target: screen.getByTestId("slide-1"),
+          isIntersecting: false,
+          intersectionRatio: 0.1,
+        },
+      ]);
+    });
+
+    expect(onPageChange).not.toHaveBeenCalled();
+  });
+
   it("should derive the page index from floor(slideIndex / slidesPerPage) when slidesPerPage > 1", () => {
     render(
       <Carousel.Root ariaLabel="Featured products" slidesPerPage={2}>

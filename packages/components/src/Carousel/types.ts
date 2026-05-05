@@ -234,6 +234,12 @@ export type CarouselContextValue = {
   /** Bumped by `refresh()` to force the viewport's scroll-align
    * effect to re-run without a page change. */
   refreshTick: number;
+  /** Live set of slide indices currently visible per IntersectionObserver
+   * (≥ 60% intersection). Mutated by the Viewport hook and read by
+   * the imperative `isInView`. */
+  visibleSlideIndicesRef: RefObject<Set<number>>;
+  /** Used by the Viewport hook to record visibility transitions. */
+  setSlideInView: (slideIndex: number, inView: boolean) => void;
 };
 
 export type CarouselViewportProps = ComponentProps<"div">;
@@ -309,6 +315,10 @@ export type CarouselImperativeApi = {
    * and a normalised `value` in `[0, 1]` (0 when there's at most one
    * page). */
   getProgress: () => { page: number; totalPages: number; value: number };
+  /** Reports whether the slide at the zero-based index is currently
+   * visible in the viewport (per IntersectionObserver, ≥ 60%
+   * intersection). Useful for lazy-loading slide content. */
+  isInView: (slideIndex: number) => boolean;
 };
 
 export type CarouselProgress = {

@@ -193,7 +193,6 @@ export function useCarouselViewport() {
 
         const wrapPage = cloneType === "trailing" ? 0 : totalPages - 1;
         const realKey = slideKeys[wrapPage * effectiveSlidesPerMove];
-        if (!realKey) return;
 
         const viewport = internalRef.current!;
         const realSlide = slidesRef.current!.get(realKey)!;

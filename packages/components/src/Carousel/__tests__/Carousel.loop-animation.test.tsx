@@ -1,4 +1,4 @@
-import { act, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { Carousel } from "..";
@@ -385,5 +385,104 @@ describe("Carousel loop wrap respects prefers-reduced-motion", () => {
       left: 0,
       behavior: "instant",
     });
+  });
+});
+
+describe("Carousel loop wrap edge cases", () => {
+  it("should preserve non-slide children rendered inside the Viewport when injecting clones", () => {
+    const { container } = render(
+      <Carousel.Root ariaLabel="Featured products" loop>
+        <Carousel.Viewport>
+          <Carousel.Slide data-testid="slide-0" />
+          <Carousel.Slide data-testid="slide-1" />
+          <span data-testid="non-slide">caption</span>
+        </Carousel.Viewport>
+      </Carousel.Root>,
+    );
+
+    expect(screen.getByTestId("non-slide")).toHaveTextContent("caption");
+    expect(
+      container.querySelectorAll('[data-carousel-slide-clone]'),
+    ).toHaveLength(2);
+  });
+
+  it("should ignore scrollsnapchange events whose snapTargetInline is missing", () => {
+    const onPageChange = vi.fn();
+    render(
+      <Carousel.Root
+        ariaLabel="Featured products"
+        loop
+        page={0}
+        onPageChange={onPageChange}
+      >
+        <Carousel.Viewport data-testid="viewport">
+          <Carousel.Slide data-testid="slide-0" />
+          <Carousel.Slide data-testid="slide-1" />
+        </Carousel.Viewport>
+      </Carousel.Root>,
+    );
+
+    const viewport = screen.getByTestId("viewport");
+    const scrollToSpy = vi.spyOn(viewport, "scrollTo");
+
+    // Some browsers fire scrollsnapchange with no snapTargetInline at
+    // all (e.g. when the snap target is removed mid-animation). The
+    // handler must bail without throwing.
+    act(() => {
+      viewport.dispatchEvent(new Event("scrollsnapchange"));
+    });
+
+    expect(onPageChange).not.toHaveBeenCalled();
+    expect(scrollToSpy).not.toHaveBeenCalled();
+  });
+
+  it("should not double-fire the wrap re-anchor when scrollend AND the timeout fallback both trigger", () => {
+    vi.useFakeTimers();
+    try {
+      const { container } = render(
+        <Carousel.Root ariaLabel="Featured products" loop defaultPage={2}>
+          <Carousel.Viewport data-testid="viewport">
+            <Carousel.Slide data-testid="slide-0" />
+            <Carousel.Slide data-testid="slide-1" />
+            <Carousel.Slide data-testid="slide-2" />
+          </Carousel.Viewport>
+          <Carousel.NextTrigger>Next</Carousel.NextTrigger>
+        </Carousel.Root>,
+      );
+
+      const viewport = screen.getByTestId("viewport");
+      viewport.scrollLeft = 200;
+      mockRect(viewport, 0);
+      mockRect(screen.getByTestId("slide-0"), -200);
+      mockRect(screen.getByTestId("slide-1"), -100);
+      mockRect(screen.getByTestId("slide-2"), 0);
+      mockRect(
+        container.querySelector('[data-carousel-slide-clone="trailing"]')!,
+        300,
+      );
+
+      const scrollToSpy = vi.spyOn(viewport, "scrollTo");
+
+      // fireEvent stays synchronous so vi.useFakeTimers doesn't fight
+      // userEvent's pointer-event scheduling.
+      fireEvent.click(screen.getByRole("button", { name: "Next" }));
+
+      // Real browsers fire scrollend AND the 600ms setTimeout fallback;
+      // both call clearFlag, so the wrap re-anchor must only run once.
+      act(() => {
+        viewport.dispatchEvent(new Event("scrollend"));
+      });
+      act(() => {
+        vi.advanceTimersByTime(600);
+      });
+
+      const instantCalls = scrollToSpy.mock.calls.filter(
+        ([opts]) =>
+          (opts as ScrollToOptions | undefined)?.behavior === "instant",
+      );
+      expect(instantCalls).toHaveLength(1);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

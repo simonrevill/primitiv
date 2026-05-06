@@ -149,7 +149,22 @@ export type CarouselRootProps = Omit<
      * (and vice versa) and `Carousel.NextTrigger` /
      * `Carousel.PreviousTrigger` are never auto-disabled at the ends.
      * When `false` (default), the triggers clamp at boundaries: Prev is
-     * disabled at the first slide, Next at the last. */
+     * disabled at the first slide, Next at the last.
+     *
+     * **Wrap animation.** When `loop` is enabled with the default
+     * `transition="slide"`, `Carousel.Viewport` injects aria-hidden
+     * `inert` clones at each end (one per `slidesPerPage`) so that
+     * pressing Next on the last slide animates slide 0 sliding *in
+     * from the right* — and Prev on the first slide animates slide N
+     * *in from the left* — rather than scrolling the entire carousel
+     * back to the wrap target. Once the smooth scroll settles, the
+     * Viewport silently snaps `scrollLeft` to the real slide so the
+     * scroll position re-enters the normal range. The clones are
+     * targetable via the `data-carousel-slide-clone="leading"|"trailing"`
+     * styling hook if you need to suppress, restyle, or override their
+     * presentation. Imperative `goTo(arbitrary)` jumps and
+     * `Carousel.Indicator` clicks bypass this animation — those reads
+     * as "jump to that page" and the long scroll is the right cue. */
     loop?: boolean;
     /** Autoplay configuration — see {@link CarouselAutoplay}. */
     autoplay?: CarouselAutoplay;

@@ -167,6 +167,17 @@ CarouselRoot.displayName = "CarouselRoot";
  * element. The component ships no styles — apply your own scroll-snap
  * recipe via this attribute.
  *
+ * **Loop-wrap clones.** When `loop` is enabled on `Carousel.Root` (and
+ * `transition` is the default `"slide"` with at least two slides),
+ * the Viewport injects aria-hidden `inert` clones of the first and
+ * last `slidesPerPage` slides at the trailing and leading ends of the
+ * slide list. The clones don't register into `slidesRef` so page
+ * math, indicator counts, and the IntersectionObserver are unaffected.
+ * They exist purely so the wrap scroll has somewhere natural to land
+ * — slide 0 entering from the right rather than the carousel
+ * scrolling backwards across its full width. Targetable via
+ * `data-carousel-slide-clone="leading"|"trailing"`.
+ *
  * @example
  * ```tsx
  * <Carousel.Root ariaLabel="Featured products">

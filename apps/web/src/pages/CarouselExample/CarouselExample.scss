@@ -15,7 +15,7 @@
 }
 
 [data-carousel-slide] {
-  flex: 0 0 100%;
+  flex: 0 0 calc(100% / 3);
   scroll-snap-align: start;
   /* Stop the OS picking up images for drag/save during a swipe. */
   -webkit-user-drag: none;
@@ -25,8 +25,8 @@
    on phones. The visible dot stays small via ::before so the button's
    hit area can be larger than its visual footprint. */
 [data-carousel-indicator] {
-  min-width: 44px;
-  min-height: 44px;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
   display: inline-grid;
   place-items: center;
 }

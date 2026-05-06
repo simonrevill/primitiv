@@ -7,7 +7,6 @@ export function CarouselExample() {
     <Carousel.Root
       className="carousel"
       ariaLabel="Featured products"
-      slidesPerMove={3}
       slidesPerPage={3}
       loop
     >

@@ -487,6 +487,48 @@ Consumer-supplied `disabled={true}` on either trigger is honoured
 regardless of boundary state — useful for momentarily freezing
 navigation while another part of the UI takes over.
 
+#### Wrap animation
+
+When `loop` is enabled with the default `transition="slide"`, pressing
+Next on the last slide animates slide 0 sliding **in from the right**
+— and pressing Previous on the first slide animates slide N **in from
+the left** — rather than the viewport scrolling backwards across its
+full width to the wrap target.
+
+Under the hood, `Carousel.Viewport` injects aria-hidden `inert` clones
+of the first and last `slidesPerPage` slides at the trailing and
+leading ends of the slide list. The wrap scroll lands smoothly on the
+matching clone; once the animation settles, the Viewport silently
+snaps `scrollLeft` to the real slide so the position re-enters the
+normal range. The clones don't register into the slide list — page
+math, indicator counts, the IntersectionObserver, and `slideKeys` all
+stay derived from the real slides. They're targetable via
+`data-carousel-slide-clone="leading"|"trailing"` if you need to
+suppress, restyle, or override their presentation:
+
+```css
+/* Hide the clones if your layout doesn't want the visible buffer. */
+[data-carousel-slide-clone] { visibility: hidden; }
+```
+
+Caveats and asymmetries:
+
+- `prefers-reduced-motion: reduce` skips the clone hop entirely — the
+  wrap snaps directly to the real slide with `behavior: "instant"`.
+- Imperative `goTo(arbitrary)` jumps and `Carousel.Indicator` clicks
+  bypass this animation. Those reads as "jump to that page" and the
+  long scroll communicates progress; only `next()` / `previous()`
+  crossing the boundary use the clone path.
+- Manual swipes that overshoot onto a clone (e.g. flicking past the
+  last slide) are detected via `scrollsnapchange`: the Viewport
+  instant-snaps to the matching real slide and dispatches the wrap
+  page change so React state catches up in the same frame.
+- Consumer components that wrap `Carousel.Slide` (e.g. a custom
+  `<MyFeaturedSlide>` that returns a `Carousel.Slide`) are not
+  detected by the clone pass and gracefully degrade to the long
+  backwards scroll. If the wrap animation matters, use
+  `Carousel.Slide` directly.
+
 ### Indicator dots (manual)
 
 For full control over indicator content, map them yourself with

@@ -27,6 +27,7 @@ export function useCarouselViewport() {
     slideKeys,
     slidesPerPage,
     effectiveSlidesPerMove,
+    totalPages,
     currentPage,
     goTo,
     transition,
@@ -34,6 +35,7 @@ export function useCarouselViewport() {
     visibleSlideIndicesRef,
     setSlideInView,
     isProgrammaticScrollRef,
+    pendingWrapRef,
   } = useCarouselContext();
   const internalRef = useRef<HTMLDivElement>(null);
   // Set to true by the scrollsnapchange handler and the IntersectionObserver
@@ -80,9 +82,36 @@ export function useCarouselViewport() {
     }
 
     const viewport = internalRef.current!;
-    const slideEl = slidesRef.current!.get(firstSlideKey)!;
 
-    const slideRect = slideEl.getBoundingClientRect();
+    // Loop boundary wrap: instead of the long backwards scroll a
+    // regular wrap would produce, redirect into the matching edge
+    // clone so the new page appears to slide in from the natural
+    // direction. Capturing the direction here lets the scrollend
+    // callback know whether to follow up with a silent snap to the
+    // real slide once the animation settles.
+    //
+    // Reduced motion bypasses the clone hop: when scrollBehavior is
+    // already "instant" there's no smooth animation to host, so the
+    // round-trip clone→real snap would be two no-op scrolls instead
+    // of one. Drop the wrap intent and fall through to the real slide.
+    const wrapDirection =
+      scrollBehavior === "instant" ? null : pendingWrapRef.current;
+    pendingWrapRef.current = null;
+
+    let targetEl: Element;
+    if (wrapDirection === "forward") {
+      targetEl = viewport.querySelector(
+        '[data-carousel-slide-clone="trailing"]',
+      )!;
+    } else if (wrapDirection === "backward") {
+      targetEl = viewport.querySelector(
+        '[data-carousel-slide-clone="leading"]',
+      )!;
+    } else {
+      targetEl = slidesRef.current!.get(firstSlideKey)!;
+    }
+
+    const slideRect = targetEl.getBoundingClientRect();
     const viewportRect = viewport.getBoundingClientRect();
     const targetScrollLeft =
       viewport.scrollLeft + (slideRect.left - viewportRect.left);
@@ -94,8 +123,26 @@ export function useCarouselViewport() {
     // is a fallback for environments (jsdom, older Safari) that don't fire
     // it. The timeout is longer than any typical smooth-scroll duration so
     // real-browser IO entries that fire mid-animation are still suppressed.
+    // The `cleared` guard makes the body idempotent — real browsers fire
+    // scrollend AND the setTimeout fallback later, but the wrap-snap must
+    // only happen once.
+    let cleared = false;
     const clearFlag = () => {
+      if (cleared) return;
+      cleared = true;
       isProgrammaticScrollRef.current = false;
+      if (wrapDirection !== null) {
+        // Silent snap from the clone we just scrolled into back to the
+        // matching real slide so scrollLeft re-enters the normal range.
+        // `instant` skips scroll-behavior: smooth, so the user only ever
+        // sees the smooth animation into the clone — never this re-anchor.
+        const realEl = slidesRef.current!.get(firstSlideKey)!;
+        const realRect = realEl.getBoundingClientRect();
+        const realViewportRect = viewport.getBoundingClientRect();
+        const realTarget =
+          viewport.scrollLeft + (realRect.left - realViewportRect.left);
+        viewport.scrollTo({ left: realTarget, behavior: "instant" });
+      }
     };
     viewport.addEventListener("scrollend", clearFlag, { once: true });
     const timeoutId = setTimeout(() => {
@@ -129,11 +176,36 @@ export function useCarouselViewport() {
 
       // findIndex returns -1 when the snap target isn't one of our
       // registered slides — e.g. a consumer-wrapped element inside the
-      // viewport. In that case there's no page to derive, so bail.
+      // viewport, or one of the loop-wrap clones.
       const slideIndex = slideKeys.findIndex(
         (key) => slidesRef.current!.get(key) === target,
       );
-      if (slideIndex < 0) return;
+      if (slideIndex < 0) {
+        // Trailing/leading clone: the user swiped past the slide list
+        // edge. Re-anchor the viewport to the real wrap-target slide
+        // with an instant scroll so they're not stuck on a clone
+        // position, then dispatch the wrap goTo.
+        const cloneType =
+          target instanceof HTMLElement
+            ? target.dataset.carouselSlideClone
+            : undefined;
+        if (cloneType !== "trailing" && cloneType !== "leading") return;
+
+        const wrapPage = cloneType === "trailing" ? 0 : totalPages - 1;
+        const realKey = slideKeys[wrapPage * effectiveSlidesPerMove];
+
+        const viewport = internalRef.current!;
+        const realSlide = slidesRef.current!.get(realKey)!;
+        const realRect = realSlide.getBoundingClientRect();
+        const viewportRect = viewport.getBoundingClientRect();
+        viewport.scrollTo({
+          left: viewport.scrollLeft + (realRect.left - viewportRect.left),
+          behavior: "instant",
+        });
+        isUserScrollRef.current = true;
+        goTo(wrapPage);
+        return;
+      }
 
       const targetPage = Math.floor(slideIndex / effectiveSlidesPerMove);
       if (targetPage !== currentPage) {
@@ -149,6 +221,7 @@ export function useCarouselViewport() {
     slideKeys,
     slidesRef,
     effectiveSlidesPerMove,
+    totalPages,
     currentPage,
     goTo,
   ]);

@@ -354,10 +354,10 @@ export function useCarouselViewport() {
       if (event.target !== event.currentTarget) return;
       if (event.key === "ArrowRight") {
         event.preventDefault();
-        next();
+        if (canGoNext) next();
       } else if (event.key === "ArrowLeft") {
         event.preventDefault();
-        previous();
+        if (canGoPrevious) previous();
       } else if (event.key === "Home") {
         event.preventDefault();
         goTo(0);
@@ -366,7 +366,7 @@ export function useCarouselViewport() {
         goTo(totalPages - 1);
       }
     },
-    [next, previous, goTo, totalPages],
+    [canGoNext, canGoPrevious, next, previous, goTo, totalPages],
   );
 
   return { viewportRef, onKeyDown };

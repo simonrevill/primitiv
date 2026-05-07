@@ -178,6 +178,22 @@ CarouselRoot.displayName = "CarouselRoot";
  * scrolling backwards across its full width. Targetable via
  * `data-carousel-slide-clone="leading"|"trailing"`.
  *
+ * **Keyboard navigation.** The Viewport is in the tab order
+ * (`tabIndex={0}`) so keyboard users can reach the rotation control
+ * without first tabbing through every slide's interactive content.
+ * With the Viewport focused:
+ *
+ * - `ArrowRight` advances by one page (same as `Carousel.NextTrigger`).
+ * - `ArrowLeft` retreats by one page (same as `Carousel.PreviousTrigger`).
+ * - `Home` jumps to the first page.
+ * - `End` jumps to the last page.
+ *
+ * Arrow keys clamp at the boundaries when `loop` is `false` and wrap
+ * through the loop-wrap clones when `loop` is `true`, mirroring the
+ * trigger buttons. Keypresses are only intercepted when the Viewport
+ * itself is the focus target — focus inside a slide (e.g. on a link
+ * or form control) keeps its native arrow-key semantics.
+ *
  * @example
  * ```tsx
  * <Carousel.Root ariaLabel="Featured products">

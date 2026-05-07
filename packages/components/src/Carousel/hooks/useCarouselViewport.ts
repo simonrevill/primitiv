@@ -35,6 +35,15 @@ import { useCarouselContext } from "./useCarouselContext";
  * the initial-mount layout settling on the leading clone) and
  * driving a page change here would set `isUserScrollRef` sticky-true
  * and short-circuit the next legitimate navigation.
+ *
+ * **Keyboard → state.** Returns an `onKeyDown` handler that wires the
+ * WAI-ARIA Carousel pattern arrow keys (`ArrowRight` / `ArrowLeft` for
+ * next / previous) plus `Home` / `End` (first / last) onto the same
+ * imperative API the trigger buttons call, so smooth scroll and
+ * loop-wrap animation match the click path. The handler only fires
+ * when the Viewport itself is the focus target — focus inside a slide
+ * keeps its native arrow-key semantics — and respects `canGoNext` /
+ * `canGoPrevious` so it clamps at the ends when `loop` is `false`.
  */
 export function useCarouselViewport() {
   const {

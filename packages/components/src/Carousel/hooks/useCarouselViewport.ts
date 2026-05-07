@@ -354,19 +354,19 @@ export function useCarouselViewport() {
       if (event.target !== event.currentTarget) return;
       if (event.key === "ArrowRight") {
         event.preventDefault();
-        if (canGoNext) next();
+        next();
       } else if (event.key === "ArrowLeft") {
         event.preventDefault();
-        if (canGoPrevious) previous();
+        previous();
       } else if (event.key === "Home") {
         event.preventDefault();
-        if (totalPages > 0) goTo(0);
+        goTo(0);
       } else if (event.key === "End") {
         event.preventDefault();
-        if (totalPages > 0) goTo(totalPages - 1);
+        goTo(totalPages - 1);
       }
     },
-    [canGoNext, canGoPrevious, next, previous, goTo, totalPages],
+    [next, previous, goTo, totalPages],
   );
 
   return { viewportRef, onKeyDown };

@@ -93,6 +93,39 @@ describe("Carousel keyboard navigation", () => {
     );
   });
 
+  it("should clamp at the boundaries when arrow keys are pressed without loop", async () => {
+    function Fixture({ start }: { start: number }) {
+      return (
+        <Carousel.Root ariaLabel="Featured products" defaultPage={start}>
+          <Carousel.Viewport data-testid="viewport">
+            <Carousel.Slide data-testid="slide-0" />
+            <Carousel.Slide data-testid="slide-1" />
+            <Carousel.Slide data-testid="slide-2" />
+          </Carousel.Viewport>
+        </Carousel.Root>
+      );
+    }
+
+    const user = userEvent.setup();
+
+    const { unmount } = render(<Fixture start={2} />);
+    await user.tab();
+    await user.keyboard("{ArrowRight}");
+    expect(screen.getByTestId("slide-2")).toHaveAttribute(
+      "data-state",
+      "active",
+    );
+    unmount();
+
+    render(<Fixture start={0} />);
+    await user.tab();
+    await user.keyboard("{ArrowLeft}");
+    expect(screen.getByTestId("slide-0")).toHaveAttribute(
+      "data-state",
+      "active",
+    );
+  });
+
   it("should leave focus inside a slide alone — arrow keys don't navigate when a child element is the focus target", async () => {
     const onPageChange = vi.fn();
     const user = userEvent.setup();

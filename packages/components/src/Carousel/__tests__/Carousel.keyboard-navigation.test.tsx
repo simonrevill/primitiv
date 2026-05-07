@@ -50,4 +50,25 @@ describe("Carousel keyboard navigation", () => {
       "active",
     );
   });
+
+  it("should jump to the first page when Home is pressed with the viewport focused", async () => {
+    const user = userEvent.setup();
+    render(
+      <Carousel.Root ariaLabel="Featured products" defaultPage={2}>
+        <Carousel.Viewport data-testid="viewport">
+          <Carousel.Slide data-testid="slide-0" />
+          <Carousel.Slide data-testid="slide-1" />
+          <Carousel.Slide data-testid="slide-2" />
+        </Carousel.Viewport>
+      </Carousel.Root>,
+    );
+
+    await user.tab();
+    await user.keyboard("{Home}");
+
+    expect(screen.getByTestId("slide-0")).toHaveAttribute(
+      "data-state",
+      "active",
+    );
+  });
 });

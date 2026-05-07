@@ -1,42 +1,66 @@
-[data-carousel-viewport] {
+.carousel {
   display: flex;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
-  /* Prevent vertical page scroll from "rubber-banding" into the
-     carousel and vice-versa on iOS. */
-  overscroll-behavior-x: contain;
-  /* Hide native scrollbars on mobile while keeping scroll behaviour. */
-  scrollbar-width: none;
-}
+  flex-direction: column;
+  gap: 1rem;
 
-[data-carousel-viewport]::-webkit-scrollbar {
-  display: none;
-}
+  &__viewport {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    /* Prevent vertical page scroll from "rubber-banding" into the
+       carousel and vice-versa on iOS. */
+    overscroll-behavior-x: contain;
+    /* Hide native scrollbars on mobile while keeping scroll behaviour. */
+    scrollbar-width: none;
+    gap: 1rem;
+  }
 
-[data-carousel-slide] {
-  flex: 0 0 calc(100% / 3);
-  scroll-snap-align: start;
-  /* Stop the OS picking up images for drag/save during a swipe. */
-  -webkit-user-drag: none;
-}
+  &__viewport::-webkit-scrollbar {
+    display: none;
+  }
 
-/* WCAG 2.5.8: 24×24 minimum hit area; 44×44 recommended for comfort
-   on phones. The visible dot stays small via ::before so the button's
-   hit area can be larger than its visual footprint. */
-[data-carousel-indicator] {
-  min-width: 2.75rem;
-  min-height: 2.75rem;
-  display: inline-grid;
-  place-items: center;
-}
-[data-carousel-indicator]::before {
-  content: "";
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: 50%;
-  background: lightgray;
-}
-[data-carousel-indicator][data-state="active"]::before {
-  background: black;
+  &__slide {
+    // flex: 0 0 calc(100% / 3);
+    flex: 0 0 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    scroll-snap-align: start;
+    /* Stop the OS picking up images for drag/save during a swipe. */
+    -webkit-user-drag: none;
+  }
+
+  &__image {
+    width: 25rem;
+    height: auto;
+  }
+
+  &__controls {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  &__indicator-group {
+    /* WCAG 2.5.8: 24×24 minimum hit area; 44×44 recommended for comfort
+       on phones. The visible dot stays small via ::before so the button's
+       hit area can be larger than its visual footprint. */
+    [data-carousel-indicator] {
+      min-width: 2.75rem;
+      min-height: 2.75rem;
+      display: inline-grid;
+      place-items: center;
+    }
+    [data-carousel-indicator]::before {
+      content: "";
+      width: 0.5rem;
+      height: 0.5rem;
+      border-radius: 50%;
+      background: lightgray;
+    }
+    [data-carousel-indicator][data-state="active"]::before {
+      background: black;
+    }
+  }
 }

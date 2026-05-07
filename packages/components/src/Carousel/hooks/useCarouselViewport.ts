@@ -348,7 +348,6 @@ export function useCarouselViewport() {
   // control) keeps its native arrow-key semantics.
   const onKeyDown = useCallback(
     (event: KeyboardEvent<HTMLDivElement>) => {
-      if (event.target !== event.currentTarget) return;
       if (event.key === "ArrowRight") {
         event.preventDefault();
         if (canGoNext) next();

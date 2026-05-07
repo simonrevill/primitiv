@@ -92,4 +92,34 @@ describe("Carousel keyboard navigation", () => {
       "active",
     );
   });
+
+  it("should leave focus inside a slide alone — arrow keys don't navigate when a child element is the focus target", async () => {
+    const onPageChange = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <Carousel.Root
+        ariaLabel="Featured products"
+        page={0}
+        onPageChange={onPageChange}
+      >
+        <Carousel.Viewport data-testid="viewport">
+          <Carousel.Slide>
+            <button data-testid="slide-link">Open</button>
+          </Carousel.Slide>
+          <Carousel.Slide data-testid="slide-1" />
+        </Carousel.Viewport>
+      </Carousel.Root>,
+    );
+
+    // Tab past the Viewport onto the link inside slide-0.
+    await user.tab();
+    await user.tab();
+    expect(screen.getByTestId("slide-link")).toHaveFocus();
+
+    // ArrowRight while a slide-internal control has focus must keep its
+    // native semantics rather than steal the keypress for navigation.
+    await user.keyboard("{ArrowRight}");
+
+    expect(onPageChange).not.toHaveBeenCalled();
+  });
 });

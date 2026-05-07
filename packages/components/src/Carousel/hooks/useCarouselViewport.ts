@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { KeyboardEvent, useCallback, useEffect, useMemo, useRef } from "react";
 
 import { useCarouselContext } from "./useCarouselContext";
 
@@ -45,6 +45,8 @@ export function useCarouselViewport() {
     totalPages,
     currentPage,
     goTo,
+    next,
+    canGoNext,
     transition,
     refreshTick,
     visibleSlideIndicesRef,
@@ -336,5 +338,22 @@ export function useCarouselViewport() {
     visibleSlideIndicesRef,
   ]);
 
-  return { viewportRef };
+  // Keyboard navigation per the WAI-ARIA Carousel pattern: arrow keys
+  // route through the same imperative API as the trigger buttons so the
+  // smooth scroll and loop-wrap animation match the click path. The
+  // event.target === currentTarget guard restricts handling to the
+  // Viewport itself — focus inside a slide (e.g. on a link or form
+  // control) keeps its native arrow-key semantics.
+  const onKeyDown = useCallback(
+    (event: KeyboardEvent<HTMLDivElement>) => {
+      if (event.target !== event.currentTarget) return;
+      if (event.key === "ArrowRight") {
+        event.preventDefault();
+        if (canGoNext) next();
+      }
+    },
+    [canGoNext, next],
+  );
+
+  return { viewportRef, onKeyDown };
 }

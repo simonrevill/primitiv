@@ -194,7 +194,7 @@ export function CarouselViewport({
 }: CarouselViewportProps) {
   const { isAutoRotating, ids, loop, transition, slidesPerPage } =
     useCarouselContext();
-  const { viewportRef } = useCarouselViewport();
+  const { viewportRef, onKeyDown } = useCarouselViewport();
 
   const renderedChildren = useMemo(() => {
     // transition='none' hands the visual to consumer CSS — there's no
@@ -207,8 +207,10 @@ export function CarouselViewport({
     <div
       ref={viewportRef}
       data-carousel-viewport=""
+      tabIndex={0}
       className={className}
       aria-live={isAutoRotating ? "off" : "polite"}
+      onKeyDown={onKeyDown}
       {...(ids.viewport !== undefined && { id: ids.viewport })}
       {...rest}
     >

@@ -46,7 +46,9 @@ export function useCarouselViewport() {
     currentPage,
     goTo,
     next,
+    previous,
     canGoNext,
+    canGoPrevious,
     transition,
     refreshTick,
     visibleSlideIndicesRef,
@@ -350,9 +352,12 @@ export function useCarouselViewport() {
       if (event.key === "ArrowRight") {
         event.preventDefault();
         if (canGoNext) next();
+      } else if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        if (canGoPrevious) previous();
       }
     },
-    [canGoNext, next],
+    [canGoNext, canGoPrevious, next, previous],
   );
 
   return { viewportRef, onKeyDown };

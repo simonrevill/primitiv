@@ -348,6 +348,10 @@ export function useCarouselViewport() {
   // control) keeps its native arrow-key semantics.
   const onKeyDown = useCallback(
     (event: KeyboardEvent<HTMLDivElement>) => {
+      // Restrict to keypresses originating on the Viewport itself —
+      // focus inside a slide (e.g. on a link or form control) keeps
+      // its native arrow-key semantics.
+      if (event.target !== event.currentTarget) return;
       if (event.key === "ArrowRight") {
         event.preventDefault();
         if (canGoNext) next();

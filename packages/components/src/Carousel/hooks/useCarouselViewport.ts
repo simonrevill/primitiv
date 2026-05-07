@@ -355,9 +355,12 @@ export function useCarouselViewport() {
       } else if (event.key === "ArrowLeft") {
         event.preventDefault();
         if (canGoPrevious) previous();
+      } else if (event.key === "Home") {
+        event.preventDefault();
+        if (totalPages > 0) goTo(0);
       }
     },
-    [canGoNext, canGoPrevious, next, previous],
+    [canGoNext, canGoPrevious, next, previous, goTo, totalPages],
   );
 
   return { viewportRef, onKeyDown };

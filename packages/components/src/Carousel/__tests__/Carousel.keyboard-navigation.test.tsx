@@ -71,4 +71,25 @@ describe("Carousel keyboard navigation", () => {
       "active",
     );
   });
+
+  it("should jump to the last page when End is pressed with the viewport focused", async () => {
+    const user = userEvent.setup();
+    render(
+      <Carousel.Root ariaLabel="Featured products">
+        <Carousel.Viewport data-testid="viewport">
+          <Carousel.Slide data-testid="slide-0" />
+          <Carousel.Slide data-testid="slide-1" />
+          <Carousel.Slide data-testid="slide-2" />
+        </Carousel.Viewport>
+      </Carousel.Root>,
+    );
+
+    await user.tab();
+    await user.keyboard("{End}");
+
+    expect(screen.getByTestId("slide-2")).toHaveAttribute(
+      "data-state",
+      "active",
+    );
+  });
 });

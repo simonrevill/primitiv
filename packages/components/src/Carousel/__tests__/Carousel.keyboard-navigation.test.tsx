@@ -1,0 +1,32 @@
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+
+import { Carousel } from "..";
+
+describe("Carousel keyboard navigation", () => {
+  it("should advance the active page when ArrowRight is pressed with the viewport focused", async () => {
+    const user = userEvent.setup();
+    render(
+      <Carousel.Root ariaLabel="Featured products">
+        <Carousel.Viewport data-testid="viewport">
+          <Carousel.Slide data-testid="slide-0" />
+          <Carousel.Slide data-testid="slide-1" />
+          <Carousel.Slide data-testid="slide-2" />
+        </Carousel.Viewport>
+      </Carousel.Root>,
+    );
+
+    // Tab into the carousel — the Viewport must be in the tab order so
+    // keyboard users can reach the rotation control without first
+    // tabbing through every slide's interactive content.
+    await user.tab();
+    expect(screen.getByTestId("viewport")).toHaveFocus();
+
+    await user.keyboard("{ArrowRight}");
+
+    expect(screen.getByTestId("slide-1")).toHaveAttribute(
+      "data-state",
+      "active",
+    );
+  });
+});

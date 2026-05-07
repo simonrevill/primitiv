@@ -594,4 +594,70 @@ describe("Carousel loop wrap edge cases", () => {
       vi.useRealTimers();
     }
   });
+
+  it("should re-anchor before scrolling to the next page when a wrap is interrupted before its scrollend settles", async () => {
+    // Regression: clicking Next twice quickly while looping forward
+    // through the trailing clone leaves the viewport mid-wrap (smooth
+    // scroll still heading toward the trailing clone, scrollend not yet
+    // fired). The effect cleanup tore down the scrollend listener
+    // without invoking the silent re-anchor, so the next scroll-effect
+    // computed its target from a scrollLeft deep in the clone region
+    // and produced a long backwards scroll across the carousel — the
+    // very behaviour the wrap clones were supposed to prevent.
+    const user = userEvent.setup();
+    const { container } = render(
+      <Carousel.Root ariaLabel="Featured products" loop defaultPage={2}>
+        <Carousel.Viewport data-testid="viewport">
+          <Carousel.Slide data-testid="slide-0" />
+          <Carousel.Slide data-testid="slide-1" />
+          <Carousel.Slide data-testid="slide-2" />
+        </Carousel.Viewport>
+        <Carousel.NextTrigger>Next</Carousel.NextTrigger>
+      </Carousel.Root>,
+    );
+
+    const viewport = screen.getByTestId("viewport");
+    viewport.scrollLeft = 200;
+    mockRect(viewport, 0);
+    mockRect(screen.getByTestId("slide-0"), -200);
+    mockRect(screen.getByTestId("slide-1"), -100);
+    mockRect(screen.getByTestId("slide-2"), 0);
+    const trailing = container.querySelector(
+      '[data-carousel-slide-clone="trailing"]',
+    )! as HTMLElement;
+    mockRect(trailing, 300);
+
+    // First click: wrap from page 2 → 0. The wrap scrolls into the
+    // trailing clone but scrollend has not fired yet.
+    await user.click(screen.getByRole("button", { name: "Next" }));
+
+    // Mid-wrap layout: scrollLeft is parked over the trailing clone,
+    // real slides have moved off to the left.
+    viewport.scrollLeft = 500;
+    mockRect(viewport, 0);
+    mockRect(screen.getByTestId("slide-0"), -500);
+    mockRect(screen.getByTestId("slide-1"), -400);
+    mockRect(screen.getByTestId("slide-2"), -300);
+    mockRect(trailing, 0);
+
+    const scrollToSpy = vi.spyOn(viewport, "scrollTo");
+
+    // Second click: page 0 → page 1. Without the cleanup re-anchor the
+    // smooth target would be computed from scrollLeft=500 + slide-1's
+    // current rect — landing way back across the carousel.
+    await user.click(screen.getByRole("button", { name: "Next" }));
+
+    // The cleanup of the previous (forward-wrap) effect must instant-
+    // snap the viewport from the trailing clone to real slide-0 first.
+    // Re-anchor target = scrollLeft (500) + (slide-0.left (-500) - viewport.left (0)) = 0.
+    expect(scrollToSpy).toHaveBeenCalledWith({
+      left: 0,
+      behavior: "instant",
+    });
+    // Then the new scroll-effect smooth-scrolls to slide-1.
+    // Smooth target = scrollLeft (500) + (slide-1.left (-400) - viewport.left (0)) = 100.
+    expect(scrollToSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ left: 100, behavior: "smooth" }),
+    );
+  });
 });

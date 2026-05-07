@@ -29,4 +29,25 @@ describe("Carousel keyboard navigation", () => {
       "active",
     );
   });
+
+  it("should retreat the active page when ArrowLeft is pressed with the viewport focused", async () => {
+    const user = userEvent.setup();
+    render(
+      <Carousel.Root ariaLabel="Featured products" defaultPage={2}>
+        <Carousel.Viewport data-testid="viewport">
+          <Carousel.Slide data-testid="slide-0" />
+          <Carousel.Slide data-testid="slide-1" />
+          <Carousel.Slide data-testid="slide-2" />
+        </Carousel.Viewport>
+      </Carousel.Root>,
+    );
+
+    await user.tab();
+    await user.keyboard("{ArrowLeft}");
+
+    expect(screen.getByTestId("slide-1")).toHaveAttribute(
+      "data-state",
+      "active",
+    );
+  });
 });

@@ -50,7 +50,7 @@ describe("Carousel IntersectionObserver fallback + isInView", () => {
       const ref = useRef<CarouselImperativeApi>(null);
       return (
         <Carousel.Root ref={ref} ariaLabel="Featured products">
-          <Carousel.Viewport>
+          <Carousel.Viewport data-testid="viewport">
             <Carousel.Slide data-testid="slide-0" />
             <Carousel.Slide data-testid="slide-1" />
             <Carousel.Slide data-testid="slide-2" />
@@ -60,6 +60,12 @@ describe("Carousel IntersectionObserver fallback + isInView", () => {
     }
 
     render(<Parent />);
+
+    // Settle the carousel's initial mount-time scroll so the IO callback
+    // is not gated by the in-flight programmatic scroll guard.
+    act(() => {
+      screen.getByTestId("viewport").dispatchEvent(new Event("scrollend"));
+    });
 
     const io = MockIntersectionObserver.latest!;
     act(() => {
@@ -120,7 +126,7 @@ describe("Carousel IntersectionObserver fallback + isInView", () => {
   it("should derive the page index from floor(slideIndex / slidesPerPage) when slidesPerPage > 1", () => {
     render(
       <Carousel.Root ariaLabel="Featured products" slidesPerPage={2}>
-        <Carousel.Viewport>
+        <Carousel.Viewport data-testid="viewport">
           <Carousel.Slide data-testid="slide-0" />
           <Carousel.Slide data-testid="slide-1" />
           <Carousel.Slide data-testid="slide-2" />
@@ -128,6 +134,12 @@ describe("Carousel IntersectionObserver fallback + isInView", () => {
         </Carousel.Viewport>
       </Carousel.Root>,
     );
+
+    // Settle the carousel's initial mount-time scroll so the IO callback
+    // is not gated by the in-flight programmatic scroll guard.
+    act(() => {
+      screen.getByTestId("viewport").dispatchEvent(new Event("scrollend"));
+    });
 
     const io = MockIntersectionObserver.latest!;
     act(() => {

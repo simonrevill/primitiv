@@ -15,7 +15,12 @@ import { useCarouselContext } from "./useCarouselContext";
  * asserts `isProgrammaticScrollRef` so the wrap-clone branch of the
  * scrollsnapchange handler can recognise edge-clone snap landings as
  * the result of our own scroll (initial-mount layout snap, smooth
- * wrap into a clone) rather than a user wrap intent.
+ * wrap into a clone) rather than a user wrap intent. When a wrap is
+ * still in flight at cleanup time (rapid follow-up navigation while
+ * the smooth scroll into a clone hasn't settled), the cleanup invokes
+ * the wrap re-anchor synchronously so the next scroll-effect computes
+ * its target relative to the real slide rather than the stale clone
+ * position.
  *
  * **Scroll → state.** When the user swipes the viewport, the browser
  * fires `scrollsnapchange` with the new snap target. The handler
@@ -154,7 +159,11 @@ export function useCarouselViewport() {
         // matching real slide so scrollLeft re-enters the normal range.
         // `instant` skips scroll-behavior: smooth, so the user only ever
         // sees the smooth animation into the clone — never this re-anchor.
-        const realEl = slidesRef.current!.get(firstSlideKey)!;
+        // The lookup may miss when this runs from the cleanup path on
+        // unmount (slide callback refs have already detached); skip the
+        // re-anchor in that case — the viewport is going away anyway.
+        const realEl = slidesRef.current!.get(firstSlideKey);
+        if (!realEl) return;
         const realRect = realEl.getBoundingClientRect();
         const realViewportRect = viewport.getBoundingClientRect();
         const realTarget =
@@ -170,6 +179,14 @@ export function useCarouselViewport() {
     return () => {
       clearTimeout(timeoutId);
       viewport.removeEventListener("scrollend", clearFlag);
+      // A rapid follow-up navigation re-runs the effect while the wrap's
+      // smooth scroll is still in flight. Without re-anchoring here, the
+      // next effect computes its target from a scrollLeft parked over the
+      // edge clone and the smooth scroll lands far away — exactly the
+      // long backwards scroll the clones exist to prevent. clearFlag is
+      // idempotent via the `cleared` guard, so this is a no-op when
+      // scrollend or the timeout fallback already fired.
+      clearFlag();
     };
   }, [
     transition,

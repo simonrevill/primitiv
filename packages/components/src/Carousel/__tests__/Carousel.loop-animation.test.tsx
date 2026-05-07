@@ -436,6 +436,102 @@ describe("Carousel loop wrap edge cases", () => {
     expect(scrollToSpy).not.toHaveBeenCalled();
   });
 
+  it("should ignore a scrollsnapchange whose target is an edge clone while the carousel's own scroll-effect is still in flight", () => {
+    // Regression: on initial mount with `loop`, the viewport renders with
+    // the leading clone occupying scrollLeft=0 and the scroll-effect
+    // immediately scrollTo's the active page's first slide. Some browsers
+    // (and real-world reorderings between scrollend / scrollsnapchange)
+    // surface that initial settling as a scrollsnapchange whose target IS
+    // the leading clone. The handler must not interpret that as a user
+    // wrap and fling the carousel to the last page.
+    const onPageChange = vi.fn();
+    const { container } = render(
+      <Carousel.Root
+        ariaLabel="Featured products"
+        loop
+        page={0}
+        onPageChange={onPageChange}
+      >
+        <Carousel.Viewport data-testid="viewport">
+          <Carousel.Slide data-testid="slide-0" />
+          <Carousel.Slide data-testid="slide-1" />
+          <Carousel.Slide data-testid="slide-2" />
+        </Carousel.Viewport>
+      </Carousel.Root>,
+    );
+
+    const viewport = screen.getByTestId("viewport");
+    const leading = container.querySelector(
+      '[data-carousel-slide-clone="leading"]',
+    )! as HTMLElement;
+
+    // The carousel's mount-time scrollTo is in flight (programmatic).
+    // Browser fires scrollsnapchange with the leading clone target before
+    // the smooth scroll has settled on slide-0.
+    fireScrollSnapChange(viewport, leading);
+
+    expect(onPageChange).not.toHaveBeenCalled();
+  });
+
+  it("should still scroll the viewport for the next page after a programmatic forward wrap whose smooth scroll lands the snap target on the trailing clone", async () => {
+    // Regression: the smooth wrap into the trailing clone produces a
+    // scrollsnapchange whose snapTargetInline IS the trailing clone — the
+    // same shape as a user swiping past the last slide. The handler must
+    // recognise this as the result of our own programmatic scroll (state
+    // is already at the wrap target; the scrollend handler will silently
+    // re-anchor) and not leave isUserScrollRef sticky-true. Otherwise the
+    // very next NextTrigger click no-ops visually: indicators move to
+    // page 1 but the viewport stays parked on slide-0.
+    const user = userEvent.setup();
+    const { container } = render(
+      <Carousel.Root ariaLabel="Featured products" loop defaultPage={2}>
+        <Carousel.Viewport data-testid="viewport">
+          <Carousel.Slide data-testid="slide-0" />
+          <Carousel.Slide data-testid="slide-1" />
+          <Carousel.Slide data-testid="slide-2" />
+        </Carousel.Viewport>
+        <Carousel.NextTrigger>Next</Carousel.NextTrigger>
+      </Carousel.Root>,
+    );
+
+    const viewport = screen.getByTestId("viewport");
+    viewport.scrollLeft = 200;
+    mockRect(viewport, 0);
+    mockRect(screen.getByTestId("slide-0"), -200);
+    mockRect(screen.getByTestId("slide-1"), -100);
+    mockRect(screen.getByTestId("slide-2"), 0);
+    const trailing = container.querySelector(
+      '[data-carousel-slide-clone="trailing"]',
+    )! as HTMLElement;
+    mockRect(trailing, 300);
+
+    // Click Next on the last page — wraps forward through the trailing clone.
+    await user.click(screen.getByRole("button", { name: "Next" }));
+
+    // Browser CSS snap settled on the trailing clone at the end of the
+    // smooth scroll. In real browsers this fires alongside scrollend.
+    fireScrollSnapChange(viewport, trailing);
+    act(() => {
+      viewport.dispatchEvent(new Event("scrollend"));
+    });
+
+    // From here, the viewport is parked on real slide-0 and currentPage is 0.
+    // Update mocks to reflect the post-wrap layout.
+    mockRect(viewport, 0);
+    mockRect(screen.getByTestId("slide-0"), 0);
+    mockRect(screen.getByTestId("slide-1"), 100);
+    mockRect(screen.getByTestId("slide-2"), 200);
+
+    const scrollToSpy = vi.spyOn(viewport, "scrollTo");
+
+    // Click Next again: page 0 → page 1. The viewport must scroll.
+    await user.click(screen.getByRole("button", { name: "Next" }));
+
+    expect(scrollToSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ left: 100, behavior: "smooth" }),
+    );
+  });
+
   it("should not double-fire the wrap re-anchor when scrollend AND the timeout fallback both trigger", () => {
     vi.useFakeTimers();
     try {

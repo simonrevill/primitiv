@@ -471,6 +471,25 @@ Pass `loop` to wrap navigation around the ends — clicking
 clicking `Carousel.NextTrigger` at the last jumps to the first. With
 `loop`, the triggers are never auto-disabled at boundaries.
 
+### Keyboard navigation
+
+`Carousel.Viewport` is in the tab order so keyboard users can reach the
+rotation control without first tabbing through every slide's
+interactive content. With the Viewport focused:
+
+| Key          | Action                                        |
+| ------------ | --------------------------------------------- |
+| `ArrowRight` | Advance by one page (same as `NextTrigger`)   |
+| `ArrowLeft`  | Retreat by one page (same as `PreviousTrigger`) |
+| `Home`       | Jump to the first page                        |
+| `End`        | Jump to the last page                         |
+
+Arrow keys clamp at the boundaries when `loop` is `false` and animate
+through the loop-wrap clones when `loop` is `true`, mirroring the
+trigger buttons. Keypresses are only intercepted when the Viewport
+itself is the focus target — focus inside a slide (e.g. on a link or
+form control) keeps its native arrow-key semantics.
+
 ```tsx
 <Carousel.Root ariaLabel="Featured products" loop>
   <Carousel.Viewport>

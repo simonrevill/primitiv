@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { KeyboardEvent, useCallback, useEffect, useMemo, useRef } from "react";
 
 import { useCarouselContext } from "./useCarouselContext";
 
@@ -35,6 +35,15 @@ import { useCarouselContext } from "./useCarouselContext";
  * the initial-mount layout settling on the leading clone) and
  * driving a page change here would set `isUserScrollRef` sticky-true
  * and short-circuit the next legitimate navigation.
+ *
+ * **Keyboard → state.** Returns an `onKeyDown` handler that wires the
+ * WAI-ARIA Carousel pattern arrow keys (`ArrowRight` / `ArrowLeft` for
+ * next / previous) plus `Home` / `End` (first / last) onto the same
+ * imperative API the trigger buttons call, so smooth scroll and
+ * loop-wrap animation match the click path. The handler only fires
+ * when the Viewport itself is the focus target — focus inside a slide
+ * keeps its native arrow-key semantics — and respects `canGoNext` /
+ * `canGoPrevious` so it clamps at the ends when `loop` is `false`.
  */
 export function useCarouselViewport() {
   const {
@@ -45,6 +54,10 @@ export function useCarouselViewport() {
     totalPages,
     currentPage,
     goTo,
+    next,
+    previous,
+    canGoNext,
+    canGoPrevious,
     transition,
     refreshTick,
     visibleSlideIndicesRef,
@@ -336,5 +349,34 @@ export function useCarouselViewport() {
     visibleSlideIndicesRef,
   ]);
 
-  return { viewportRef };
+  // Keyboard navigation per the WAI-ARIA Carousel pattern: arrow keys
+  // route through the same imperative API as the trigger buttons so the
+  // smooth scroll and loop-wrap animation match the click path. The
+  // event.target === currentTarget guard restricts handling to the
+  // Viewport itself — focus inside a slide (e.g. on a link or form
+  // control) keeps its native arrow-key semantics.
+  const onKeyDown = useCallback(
+    (event: KeyboardEvent<HTMLDivElement>) => {
+      // Restrict to keypresses originating on the Viewport itself —
+      // focus inside a slide (e.g. on a link or form control) keeps
+      // its native arrow-key semantics.
+      if (event.target !== event.currentTarget) return;
+      if (event.key === "ArrowRight") {
+        event.preventDefault();
+        if (canGoNext) next();
+      } else if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        if (canGoPrevious) previous();
+      } else if (event.key === "Home") {
+        event.preventDefault();
+        goTo(0);
+      } else if (event.key === "End") {
+        event.preventDefault();
+        goTo(totalPages - 1);
+      }
+    },
+    [canGoNext, canGoPrevious, next, previous, goTo, totalPages],
+  );
+
+  return { viewportRef, onKeyDown };
 }

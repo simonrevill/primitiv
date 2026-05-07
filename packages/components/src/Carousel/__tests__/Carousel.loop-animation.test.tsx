@@ -271,6 +271,12 @@ describe("Carousel loop wrap manual swipe onto a clone", () => {
     )! as HTMLElement;
     mockRect(trailing, 300);
 
+    // Settle the carousel's initial mount-time scroll before the user
+    // is able to interact, so isProgrammaticScrollRef returns to false.
+    act(() => {
+      viewport.dispatchEvent(new Event("scrollend"));
+    });
+
     const scrollToSpy = vi.spyOn(viewport, "scrollTo");
 
     // The browser's CSS scroll-snap landed the user on the trailing
@@ -312,6 +318,12 @@ describe("Carousel loop wrap manual swipe onto a clone", () => {
       '[data-carousel-slide-clone="leading"]',
     )! as HTMLElement;
     mockRect(leading, -300);
+
+    // Settle the carousel's initial mount-time scroll before the user
+    // is able to interact, so isProgrammaticScrollRef returns to false.
+    act(() => {
+      viewport.dispatchEvent(new Event("scrollend"));
+    });
 
     const scrollToSpy = vi.spyOn(viewport, "scrollTo");
 
@@ -515,8 +527,9 @@ describe("Carousel loop wrap edge cases", () => {
       viewport.dispatchEvent(new Event("scrollend"));
     });
 
-    // From here, the viewport is parked on real slide-0 and currentPage is 0.
-    // Update mocks to reflect the post-wrap layout.
+    // The clearFlag re-anchor in real browsers leaves the viewport parked
+    // on real slide-0; mirror that here (jsdom's scrollTo is a no-op).
+    viewport.scrollLeft = 0;
     mockRect(viewport, 0);
     mockRect(screen.getByTestId("slide-0"), 0);
     mockRect(screen.getByTestId("slide-1"), 100);

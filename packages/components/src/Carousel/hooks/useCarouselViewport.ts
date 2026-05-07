@@ -11,15 +11,25 @@ import { useCarouselContext } from "./useCarouselContext";
  * `slidesRef`, reads its `getBoundingClientRect` relative to the
  * viewport, and calls `scrollTo` so the visual surface tracks React
  * state. The current `scrollLeft` is included in the target so the
- * calculation is correct mid-scroll.
+ * calculation is correct mid-scroll. Each scroll-effect run also
+ * asserts `isProgrammaticScrollRef` so the wrap-clone branch of the
+ * scrollsnapchange handler can recognise edge-clone snap landings as
+ * the result of our own scroll (initial-mount layout snap, smooth
+ * wrap into a clone) rather than a user wrap intent.
  *
  * **Scroll → state.** When the user swipes the viewport, the browser
  * fires `scrollsnapchange` with the new snap target. The handler
  * looks up which slide that target is, computes
  * `floor(slideIndex / slidesPerPage)`, and calls `goTo` on the new
  * page (skipping when the page is unchanged so consumers don't see
- * spurious onPageChange callbacks). The IntersectionObserver fallback
- * for browsers without scrollsnapchange ships in a later cycle.
+ * spurious onPageChange callbacks). When the snap target is one of
+ * the loop-wrap clones, the handler re-anchors the viewport and
+ * dispatches the wrap goTo — but only when `isProgrammaticScrollRef`
+ * is clear and the wrap target differs from `currentPage`. Otherwise
+ * the snap-change is a side effect of our own programmatic wrap (or
+ * the initial-mount layout settling on the leading clone) and
+ * driving a page change here would set `isUserScrollRef` sticky-true
+ * and short-circuit the next legitimate navigation.
  */
 export function useCarouselViewport() {
   const {
@@ -82,6 +92,14 @@ export function useCarouselViewport() {
     }
 
     const viewport = internalRef.current!;
+
+    // Mark the scroll as programmatic for any browser-fired
+    // scrollsnapchange that lands on an edge clone while our scrollTo
+    // is in flight (initial-mount layout snap, smooth wrap into a
+    // clone). next() / previous() also set this — re-asserting here
+    // covers indicator-driven goTo and the initial scroll on mount,
+    // neither of which goes through next() / previous().
+    isProgrammaticScrollRef.current = true;
 
     // Loop boundary wrap: instead of the long backwards scroll a
     // regular wrap would produce, redirect into the matching edge
@@ -192,6 +210,25 @@ export function useCarouselViewport() {
         if (cloneType !== "trailing" && cloneType !== "leading") return;
 
         const wrapPage = cloneType === "trailing" ? 0 : totalPages - 1;
+
+        // Two ways the snap target ends up on an edge clone without a
+        // user actually wrapping: (a) our own scroll-effect targeted
+        // the clone for the wrap animation and the smooth scroll just
+        // settled, (b) the browser reported the leading clone as the
+        // initial snap on mount before we'd scrolled to slide-0. In
+        // both cases the page state is already correct — driving a
+        // page change here would set isUserScrollRef sticky-true and
+        // short-circuit the next legitimate navigation. The
+        // scroll-effect's scrollend handler does the silent re-anchor
+        // for case (a); case (b) needs no re-anchor because the
+        // initial scrollTo is already heading to the active page.
+        if (
+          isProgrammaticScrollRef.current ||
+          wrapPage === currentPage
+        ) {
+          return;
+        }
+
         const realKey = slideKeys[wrapPage * effectiveSlidesPerMove];
 
         const viewport = internalRef.current!;

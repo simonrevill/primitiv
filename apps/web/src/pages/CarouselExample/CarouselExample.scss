@@ -14,7 +14,7 @@
     overscroll-behavior-x: contain;
     /* Hide native scrollbars on mobile while keeping scroll behaviour. */
     scrollbar-width: none;
-    gap: 1rem;
+    // gap: 1rem;
   }
 
   &__viewport::-webkit-scrollbar {

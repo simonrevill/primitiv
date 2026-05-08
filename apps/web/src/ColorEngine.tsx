@@ -1,4 +1,4 @@
-import { Tabs } from "@primitiv/components";
+import { Tabs } from "@primitiv/react";
 
 import { Palette as ColorPalette } from "./Palette";
 import { useColors } from "./useColors";

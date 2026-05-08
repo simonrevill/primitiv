@@ -1,4 +1,4 @@
-import { Accordion } from "@primitiv/components";
+import { Accordion } from "@primitiv/react";
 import "./AccordionExample.scss";
 export function AccordionExample() {
   return (

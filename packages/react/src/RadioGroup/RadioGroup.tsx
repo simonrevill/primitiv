@@ -71,18 +71,12 @@ function RadioGroupRoot({
   children,
   ...rest
 }: RadioGroupRootProps) {
-  const {
-    value,
-    select,
-    registerItem,
-    itemValues,
-    disabledValues,
-    focusItem,
-  } = useRadioGroupRoot({
-    defaultValue,
-    value: controlledValue,
-    onValueChange,
-  });
+  const { value, select, registerItem, itemValues, disabledValues, focusItem } =
+    useRadioGroupRoot({
+      defaultValue,
+      value: controlledValue,
+      onValueChange,
+    });
   const contextValue = useMemo(
     () => ({
       value,
@@ -164,15 +158,10 @@ function RadioGroupItem({
     [itemValues, disabledValues],
   );
   const isTabStop =
-    selectedValue !== undefined
-      ? isChecked
-      : enabledValues[0] === value;
+    selectedValue !== undefined ? isChecked : enabledValues[0] === value;
 
   const localRef = useRef<HTMLButtonElement | null>(null);
-  const setRef = useMemo(
-    () => composeRefs(localRef, ref),
-    [ref],
-  );
+  const setRef = useMemo(() => composeRefs(localRef, ref), [ref]);
 
   useEffect(() => {
     registerItem(value, localRef.current, disabled);
@@ -189,10 +178,7 @@ function RadioGroupItem({
     },
   });
 
-  const itemContextValue = useMemo(
-    () => ({ checked: isChecked }),
-    [isChecked],
-  );
+  const itemContextValue = useMemo(() => ({ checked: isChecked }), [isChecked]);
 
   const itemProps = {
     ...rest,
@@ -306,7 +292,7 @@ type TRadioGroupCompound = typeof RadioGroupRoot & {
  *
  * @example Minimal usage
  * ```tsx
- * import { RadioGroup } from "@primitiv/components";
+ * import { RadioGroup } from "@primitiv/react";
  *
  * <RadioGroup.Root defaultValue="compact" aria-label="Density">
  *   <RadioGroup.Item value="compact">

@@ -352,7 +352,7 @@ were updated mechanically. `Swatch.tsx` aliases the import as
 
 ## Components package — `packages/components`
 
-A pnpm workspace package (`@primitiv/components`) that exports headless,
+A pnpm workspace package (`@primitiv/react`) that exports headless,
 accessible React components built on WAI-ARIA patterns. Zero styles ship
 with it.
 

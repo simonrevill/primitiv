@@ -1,4 +1,4 @@
-import { Dropdown } from "@primitiv/components";
+import { Dropdown } from "@primitiv/react";
 
 import "./DropdownExample.scss";
 

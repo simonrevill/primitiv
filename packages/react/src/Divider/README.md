@@ -4,18 +4,18 @@ A visual and semantic separator between content sections, implementing the
 [WAI-ARIA separator role](https://www.w3.org/TR/wai-aria-1.2/#separator).
 
 ```tsx
-import { Divider } from "@primitiv/components";
+import { Divider } from "@primitiv/react";
 
-<Divider />
+<Divider />;
 ```
 
 ## Props
 
-| Prop          | Type                             | Default        | Notes                                        |
-| ------------- | -------------------------------- | -------------- | -------------------------------------------- |
-| `orientation` | `"horizontal"` \| `"vertical"`  | `"horizontal"` | Sets `aria-orientation` on the element       |
-| `className`   | `string`                         | `""`           | Applied directly to the rendered element     |
-| `...rest`     | `ComponentProps<"span">`         | —              | All other `<span>` props, including `aria-*` |
+| Prop          | Type                           | Default        | Notes                                        |
+| ------------- | ------------------------------ | -------------- | -------------------------------------------- |
+| `orientation` | `"horizontal"` \| `"vertical"` | `"horizontal"` | Sets `aria-orientation` on the element       |
+| `className`   | `string`                       | `""`           | Applied directly to the rendered element     |
+| `...rest`     | `ComponentProps<"span">`       | —              | All other `<span>` props, including `aria-*` |
 
 ## Decorative use
 

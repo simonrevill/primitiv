@@ -1,4 +1,4 @@
-import { Carousel } from "@primitiv/components";
+import { Carousel } from "@primitiv/react";
 
 import "./CarouselExample.scss";
 

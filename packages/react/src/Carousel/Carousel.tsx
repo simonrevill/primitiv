@@ -328,30 +328,26 @@ function injectLoopClones(
   // slidesPerPage=4 carousel doesn't ask for more clones than exist.
   const cloneCount = Math.min(slidesPerPage, slides.length);
 
-  const trailing = slides
-    .slice(0, cloneCount)
-    .map((slide, i) => (
-      <CarouselCloneSlide
-        key={`__primitiv-clone-trailing-${i}`}
-        position="trailing"
-        className={slide.props.className}
-        style={slide.props.style}
-      >
-        {slide.props.children}
-      </CarouselCloneSlide>
-    ));
-  const leading = slides
-    .slice(slides.length - cloneCount)
-    .map((slide, i) => (
-      <CarouselCloneSlide
-        key={`__primitiv-clone-leading-${i}`}
-        position="leading"
-        className={slide.props.className}
-        style={slide.props.style}
-      >
-        {slide.props.children}
-      </CarouselCloneSlide>
-    ));
+  const trailing = slides.slice(0, cloneCount).map((slide, i) => (
+    <CarouselCloneSlide
+      key={`__primitiv-clone-trailing-${i}`}
+      position="trailing"
+      className={slide.props.className}
+      style={slide.props.style}
+    >
+      {slide.props.children}
+    </CarouselCloneSlide>
+  ));
+  const leading = slides.slice(slides.length - cloneCount).map((slide, i) => (
+    <CarouselCloneSlide
+      key={`__primitiv-clone-leading-${i}`}
+      position="leading"
+      className={slide.props.className}
+      style={slide.props.style}
+    >
+      {slide.props.children}
+    </CarouselCloneSlide>
+  ));
 
   return [...leading, ...slides, ...trailing, ...others];
 }
@@ -834,7 +830,7 @@ type CarouselCompound = typeof CarouselRoot & {
  *
  * @example
  * ```tsx
- * import { Carousel } from "@primitiv/components";
+ * import { Carousel } from "@primitiv/react";
  *
  * <Carousel.Root ariaLabel="Featured products">
  *   <Carousel.Viewport>

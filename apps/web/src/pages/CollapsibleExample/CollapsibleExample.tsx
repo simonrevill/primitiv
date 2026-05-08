@@ -1,4 +1,4 @@
-import { Collapsible, Checkbox } from "@primitiv/components";
+import { Collapsible, Checkbox } from "@primitiv/react";
 
 import "./CollapsibleExample.scss";
 

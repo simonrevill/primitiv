@@ -7,7 +7,7 @@ on top of the native HTML
 No portal, no floating-ui — the browser handles layering and light-dismiss.
 
 ```tsx
-import { Dropdown } from "@primitiv/components";
+import { Dropdown } from "@primitiv/react";
 
 <Dropdown.Root>
   <Dropdown.Trigger>Options</Dropdown.Trigger>
@@ -22,37 +22,37 @@ import { Dropdown } from "@primitiv/components";
 
 ## Sub-components
 
-| Export                  | Role                 | Notes                                                                                  |
-| ----------------------- | -------------------- | -------------------------------------------------------------------------------------- |
-| `Dropdown.Root`         | State owner          | Uncontrolled (`defaultOpen`) or controlled (`open` + `onOpenChange`)                   |
-| `Dropdown.Trigger`      | `aria-haspopup=menu` | Toggles the menu; supports `asChild`                                                   |
-| `Dropdown.Content`      | `menu`               | Native `popover="auto"`; handles arrow keys, typeahead, Escape                         |
-| `Dropdown.Item`         | `menuitem`           | Activatable row with `onSelect` escape hatch                                           |
-| `Dropdown.CheckboxItem` | `menuitemcheckbox`   | Tri-state toggle (`true` / `false` / `"indeterminate"`)                                |
-| `Dropdown.RadioGroup`   | `group`              | Single-selection container for `RadioItem`s                                            |
-| `Dropdown.RadioItem`    | `menuitemradio`      | Must live inside a `RadioGroup`                                                        |
-| `Dropdown.ItemIndicator`| —                    | Icon slot inside a `CheckboxItem` / `RadioItem`; exposes `data-state` + `forceMount`   |
-| `Dropdown.Label`        | —                    | Non-interactive label; auto-wired to the enclosing `Group` via `aria-labelledby`       |
-| `Dropdown.Group`        | `group`              | Semantic grouping for related items                                                    |
-| `Dropdown.Separator`    | `separator`          | Visual divider; skipped by focus and typeahead                                         |
-| `Dropdown.Sub`          | State owner          | Submenu boundary; same state modes as `Root`                                           |
-| `Dropdown.SubTrigger`   | `menuitem`           | Opens the submenu on click or `ArrowRight`                                             |
-| `Dropdown.SubContent`   | `menu`               | Submenu panel; `ArrowLeft` closes it and returns focus to the trigger                  |
+| Export                   | Role                 | Notes                                                                                |
+| ------------------------ | -------------------- | ------------------------------------------------------------------------------------ |
+| `Dropdown.Root`          | State owner          | Uncontrolled (`defaultOpen`) or controlled (`open` + `onOpenChange`)                 |
+| `Dropdown.Trigger`       | `aria-haspopup=menu` | Toggles the menu; supports `asChild`                                                 |
+| `Dropdown.Content`       | `menu`               | Native `popover="auto"`; handles arrow keys, typeahead, Escape                       |
+| `Dropdown.Item`          | `menuitem`           | Activatable row with `onSelect` escape hatch                                         |
+| `Dropdown.CheckboxItem`  | `menuitemcheckbox`   | Tri-state toggle (`true` / `false` / `"indeterminate"`)                              |
+| `Dropdown.RadioGroup`    | `group`              | Single-selection container for `RadioItem`s                                          |
+| `Dropdown.RadioItem`     | `menuitemradio`      | Must live inside a `RadioGroup`                                                      |
+| `Dropdown.ItemIndicator` | —                    | Icon slot inside a `CheckboxItem` / `RadioItem`; exposes `data-state` + `forceMount` |
+| `Dropdown.Label`         | —                    | Non-interactive label; auto-wired to the enclosing `Group` via `aria-labelledby`     |
+| `Dropdown.Group`         | `group`              | Semantic grouping for related items                                                  |
+| `Dropdown.Separator`     | `separator`          | Visual divider; skipped by focus and typeahead                                       |
+| `Dropdown.Sub`           | State owner          | Submenu boundary; same state modes as `Root`                                         |
+| `Dropdown.SubTrigger`    | `menuitem`           | Opens the submenu on click or `ArrowRight`                                           |
+| `Dropdown.SubContent`    | `menu`               | Submenu panel; `ArrowLeft` closes it and returns focus to the trigger                |
 
 All sub-components that render an element accept `asChild` to compose
 their ARIA and behaviour onto a caller-supplied child.
 
 ## Keyboard interaction
 
-| Key                     | Behaviour                                          |
-| ----------------------- | -------------------------------------------------- |
-| `ArrowDown` / `ArrowUp` | Move focus to next / previous item (wraps)         |
-| `Home` / `End`          | Jump to first / last enabled item                  |
-| `Enter` / `Space`       | Activate the focused item                          |
+| Key                     | Behaviour                                         |
+| ----------------------- | ------------------------------------------------- |
+| `ArrowDown` / `ArrowUp` | Move focus to next / previous item (wraps)        |
+| `Home` / `End`          | Jump to first / last enabled item                 |
+| `Enter` / `Space`       | Activate the focused item                         |
 | `Escape`                | Close the menu and return focus to the trigger    |
-| any printable character | Typeahead — focuses the next item matching prefix  |
-| `ArrowRight`            | Open a focused submenu (on `SubTrigger`)           |
-| `ArrowLeft`             | Close the current submenu (from inside)            |
+| any printable character | Typeahead — focuses the next item matching prefix |
+| `ArrowRight`            | Open a focused submenu (on `SubTrigger`)          |
+| `ArrowLeft`             | Close the current submenu (from inside)           |
 
 Typeahead accumulates keystrokes within a 500 ms window; pressing the
 same character repeatedly cycles through items sharing that first letter.
@@ -127,7 +127,10 @@ item via `Dropdown.ItemIndicator`. It defaults to a `<span>`, supports
 `data-state` for styling:
 
 ```tsx
-<Dropdown.CheckboxItem checked={showBookmarks} onCheckedChange={setShowBookmarks}>
+<Dropdown.CheckboxItem
+  checked={showBookmarks}
+  onCheckedChange={setShowBookmarks}
+>
   <Dropdown.ItemIndicator>
     <CheckIcon />
   </Dropdown.ItemIndicator>

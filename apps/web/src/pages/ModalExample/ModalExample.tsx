@@ -1,4 +1,4 @@
-import { Modal } from "@primitiv/components";
+import { Modal } from "@primitiv/react";
 
 import "./ModalExample.scss";
 

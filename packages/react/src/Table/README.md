@@ -5,7 +5,7 @@ A compound component wrapping standard HTML table elements. Follows the
 with zero styles shipped.
 
 ```tsx
-import { Table } from "@primitiv/components";
+import { Table } from "@primitiv/react";
 
 <Table.ScrollArea>
   <Table.Root>
@@ -35,22 +35,22 @@ import { Table } from "@primitiv/components";
       </Table.Row>
     </Table.Footer>
   </Table.Root>
-</Table.ScrollArea>
+</Table.ScrollArea>;
 ```
 
 ## Sub-components
 
-| Export | Renders | Notes |
-| ------ | ------- | ----- |
-| `Table.Root` | `<table>` | Implicit `role="table"`. Accepts all `TableHTMLAttributes`. |
-| `Table.Head` | `<thead>` | Groups header rows. Browsers may repeat on printed pages. |
-| `Table.Body` | `<tbody>` | Groups data rows. Multiple `<tbody>` elements are valid. |
-| `Table.Footer` | `<tfoot>` | Groups footer/summary rows. Browsers may repeat on printed pages. |
-| `Table.Row` | `<tr>` | Individual row. May contain `Table.Header` or `Table.Cell` children. |
-| `Table.Header` | `<th>` | Header cell. Set `scope` for accessibility — see [Accessible headers](#accessible-headers). |
-| `Table.Cell` | `<td>` | Data cell. Accepts `colSpan` and `rowSpan`. |
-| `Table.ScrollArea` | `<div>` | Horizontal-scroll wrapper — see [Responsive scrolling](#responsive-scrolling). |
-| `Table.Caption` | `<caption>` | Visible table label — see [Caption](#caption). |
+| Export             | Renders     | Notes                                                                                       |
+| ------------------ | ----------- | ------------------------------------------------------------------------------------------- |
+| `Table.Root`       | `<table>`   | Implicit `role="table"`. Accepts all `TableHTMLAttributes`.                                 |
+| `Table.Head`       | `<thead>`   | Groups header rows. Browsers may repeat on printed pages.                                   |
+| `Table.Body`       | `<tbody>`   | Groups data rows. Multiple `<tbody>` elements are valid.                                    |
+| `Table.Footer`     | `<tfoot>`   | Groups footer/summary rows. Browsers may repeat on printed pages.                           |
+| `Table.Row`        | `<tr>`      | Individual row. May contain `Table.Header` or `Table.Cell` children.                        |
+| `Table.Header`     | `<th>`      | Header cell. Set `scope` for accessibility — see [Accessible headers](#accessible-headers). |
+| `Table.Cell`       | `<td>`      | Data cell. Accepts `colSpan` and `rowSpan`.                                                 |
+| `Table.ScrollArea` | `<div>`     | Horizontal-scroll wrapper — see [Responsive scrolling](#responsive-scrolling).              |
+| `Table.Caption`    | `<caption>` | Visible table label — see [Caption](#caption).                                              |
 
 ## Accessible headers
 
@@ -58,12 +58,12 @@ The `scope` attribute on `Table.Header` tells assistive technology which data
 cells a header describes. Always set it — without `scope`, screen readers may
 struggle to announce the correct header for each cell.
 
-| Value | Associates header with |
-| ----- | ---------------------- |
-| `"col"` | All cells in the same column |
-| `"row"` | All cells in the same row |
+| Value        | Associates header with                               |
+| ------------ | ---------------------------------------------------- |
+| `"col"`      | All cells in the same column                         |
+| `"row"`      | All cells in the same row                            |
 | `"colgroup"` | All cells in the column group spanned by this header |
-| `"rowgroup"` | All cells in the row group spanned by this header |
+| `"rowgroup"` | All cells in the row group spanned by this header    |
 
 ```tsx
 <Table.Head>
@@ -92,26 +92,26 @@ assistive technology announces it when the user enters the table — no
 the table via the CSS `caption-side` property. Defaults to `"bottom"`.
 
 ```tsx
-{/* Caption below table (default) */}
+{
+  /* Caption below table (default) */
+}
 <Table.Root>
-  <Table.Caption>Q1 sales by region</Table.Caption>
-  …
-</Table.Root>
+  <Table.Caption>Q1 sales by region</Table.Caption>…
+</Table.Root>;
 
-{/* Caption above table */}
+{
+  /* Caption above table */
+}
 <Table.Root>
-  <Table.Caption captionSide="top">Q1 sales by region</Table.Caption>
-  …
-</Table.Root>
+  <Table.Caption captionSide="top">Q1 sales by region</Table.Caption>…
+</Table.Root>;
 ```
 
 When a visible caption is not desirable, use `aria-label` directly on
 `Table.Root` instead:
 
 ```tsx
-<Table.Root aria-label="Q1 sales by region">
-  …
-</Table.Root>
+<Table.Root aria-label="Q1 sales by region">…</Table.Root>
 ```
 
 ## Responsive scrolling
@@ -173,15 +173,33 @@ separating logical row groups within a single table:
 with whatever system you use:
 
 ```css
-table          { border-collapse: collapse; width: 100%; }
-th, td         { padding: 0.5rem 1rem; text-align: left; }
-thead          { background: #f9fafb; }
-tfoot          { font-weight: bold; }
-tr:nth-child(even) td { background: #f3f4f6; }
-[scope="col"]  { font-weight: 600; }
-caption        { font-size: 0.875rem; color: #6b7280; }
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+th,
+td {
+  padding: 0.5rem 1rem;
+  text-align: left;
+}
+thead {
+  background: #f9fafb;
+}
+tfoot {
+  font-weight: bold;
+}
+tr:nth-child(even) td {
+  background: #f3f4f6;
+}
+[scope="col"] {
+  font-weight: 600;
+}
+caption {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
 ```
 
 ---
 
-[Back to @primitiv/components](../../README.md)
+[Back to @primitiv/react](../../README.md)

@@ -206,7 +206,7 @@ type TCheckboxCompound = typeof CheckboxRoot & {
  *
  * @example Minimal usage
  * ```tsx
- * import { Checkbox } from "@primitiv/components";
+ * import { Checkbox } from "@primitiv/react";
  *
  * <Checkbox.Root aria-label="Accept terms">
  *   <Checkbox.Indicator>

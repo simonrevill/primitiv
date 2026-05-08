@@ -4,7 +4,7 @@ A compound component implementing the
 [WAI-ARIA Accordion pattern](https://www.w3.org/WAI/ARIA/apg/patterns/accordion/).
 
 ```tsx
-import { Accordion } from "@primitiv/components";
+import { Accordion } from "@primitiv/react";
 
 <Accordion.Root defaultValue="shipping">
   <Accordion.Item value="shipping">
@@ -24,14 +24,14 @@ import { Accordion } from "@primitiv/components";
 
 ## Sub-components
 
-| Export                  | Role           | Notes                                                                     |
-| ----------------------- | -------------- | ------------------------------------------------------------------------- |
-| `Accordion.Root`        | State owner    | Uncontrolled (`defaultValue`) or controlled (`value` + `onValueChange`)   |
-| `Accordion.Item`        | Item wrapper   | Owns the trigger–panel pair; optional `value` prop                        |
-| `Accordion.Header`      | Heading        | Configurable level (`h1`–`h6`); defaults to `h3`                         |
-| `Accordion.Trigger`     | Toggle button  | Supports `asChild`, ref forwarding, and `disabled`                        |
-| `Accordion.Content`     | `region` panel | Supports `forceMount` for CSS animation                                   |
-| `Accordion.TriggerIcon` | Icon wrapper   | Injects `aria-hidden` and `data-state` onto a decorative icon             |
+| Export                  | Role           | Notes                                                                   |
+| ----------------------- | -------------- | ----------------------------------------------------------------------- |
+| `Accordion.Root`        | State owner    | Uncontrolled (`defaultValue`) or controlled (`value` + `onValueChange`) |
+| `Accordion.Item`        | Item wrapper   | Owns the trigger–panel pair; optional `value` prop                      |
+| `Accordion.Header`      | Heading        | Configurable level (`h1`–`h6`); defaults to `h3`                        |
+| `Accordion.Trigger`     | Toggle button  | Supports `asChild`, ref forwarding, and `disabled`                      |
+| `Accordion.Content`     | `region` panel | Supports `forceMount` for CSS animation                                 |
+| `Accordion.TriggerIcon` | Icon wrapper   | Injects `aria-hidden` and `data-state` onto a decorative icon           |
 
 ## Keyboard interaction
 
@@ -157,7 +157,7 @@ import { ChevronDown } from "lucide-react";
   <Accordion.TriggerIcon>
     <ChevronDown />
   </Accordion.TriggerIcon>
-</Accordion.Trigger>
+</Accordion.Trigger>;
 ```
 
 ## Reading direction (RTL)

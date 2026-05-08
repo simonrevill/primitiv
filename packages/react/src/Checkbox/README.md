@@ -11,7 +11,7 @@ support, `Indicator` mounting driven by the checked state, and the
 `asChild` composition every primitive in this package supports.
 
 ```tsx
-import { Checkbox } from "@primitiv/components";
+import { Checkbox } from "@primitiv/react";
 
 <Checkbox.Root defaultChecked aria-label="Accept terms">
   <Checkbox.Indicator>
@@ -22,9 +22,9 @@ import { Checkbox } from "@primitiv/components";
 
 ## Sub-components
 
-| Export               | Element    | Notes                                                                              |
-| -------------------- | ---------- | ---------------------------------------------------------------------------------- |
-| `Checkbox.Root`      | `<button>` | `role="checkbox"`, `aria-checked`, `data-state`, `data-disabled`. `asChild`        |
+| Export               | Element    | Notes                                                                                      |
+| -------------------- | ---------- | ------------------------------------------------------------------------------------------ |
+| `Checkbox.Root`      | `<button>` | `role="checkbox"`, `aria-checked`, `data-state`, `data-disabled`. `asChild`                |
 | `Checkbox.Indicator` | `<span>`   | `aria-hidden="true"`. Renders only while checked or indeterminate. `asChild`, `forceMount` |
 
 ## Checked state
@@ -32,11 +32,11 @@ import { Checkbox } from "@primitiv/components";
 Checkbox is tri-state. The `checked` / `defaultChecked` value is
 `boolean | "indeterminate"`:
 
-| Value             | `aria-checked` | `data-state`      | Indicator renders? |
-| ----------------- | -------------- | ----------------- | ------------------ |
-| `true`            | `"true"`       | `"checked"`       | Yes                |
+| Value             | `aria-checked` | `data-state`      | Indicator renders?       |
+| ----------------- | -------------- | ----------------- | ------------------------ |
+| `true`            | `"true"`       | `"checked"`       | Yes                      |
 | `false`           | `"false"`      | `"unchecked"`     | No (unless `forceMount`) |
-| `"indeterminate"` | `"mixed"`      | `"indeterminate"` | Yes                |
+| `"indeterminate"` | `"mixed"`      | `"indeterminate"` | Yes                      |
 
 Clicking an indeterminate checkbox resolves it to `true` per the
 WAI-ARIA tri-state convention; subsequent clicks flip between `true`
@@ -52,19 +52,21 @@ TypeScript rejects mixing them.
 
 ```tsx
 // Uncontrolled
-<Checkbox.Root defaultChecked>…</Checkbox.Root>
+<Checkbox.Root defaultChecked>…</Checkbox.Root>;
 
 // Controlled
 const [checked, setChecked] = useState<CheckedState>(false);
-<Checkbox.Root checked={checked} onCheckedChange={setChecked}>…</Checkbox.Root>
+<Checkbox.Root checked={checked} onCheckedChange={setChecked}>
+  …
+</Checkbox.Root>;
 ```
 
 ## Keyboard interaction
 
-| Key             | Behaviour                                    |
-| --------------- | -------------------------------------------- |
-| `Space`         | Toggles the checkbox (native `<button>`)     |
-| `Enter`         | Toggles the checkbox (native `<button>`)     |
+| Key     | Behaviour                                |
+| ------- | ---------------------------------------- |
+| `Space` | Toggles the checkbox (native `<button>`) |
+| `Enter` | Toggles the checkbox (native `<button>`) |
 
 Keyboard handling comes from the underlying `<button>` element — no
 custom `keydown` listeners are needed.

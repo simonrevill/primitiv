@@ -6,7 +6,7 @@ on the [Radix UI Collapsible](https://www.radix-ui.com/primitives/docs/component
 contract.
 
 ```tsx
-import { Collapsible } from "@primitiv/components";
+import { Collapsible } from "@primitiv/react";
 
 <Collapsible.Root defaultOpen>
   <Collapsible.Trigger>Toggle</Collapsible.Trigger>
@@ -18,18 +18,18 @@ import { Collapsible } from "@primitiv/components";
 
 ## Sub-components
 
-| Export                   | Role             | Notes                                                                  |
-| ------------------------ | ---------------- | ---------------------------------------------------------------------- |
-| `Collapsible.Root`       | State owner      | Uncontrolled (`defaultOpen`) or controlled (`open` + `onOpenChange`); `disabled` short-circuits Trigger activation |
-| `Collapsible.Trigger`    | Toggle button    | Supports `asChild`, ref forwarding, explicit Enter/Space handling      |
-| `Collapsible.Content`    | Hidden panel     | Hidden via the `hidden` attribute; supports `forceMount` for CSS animation |
-| `Collapsible.TriggerIcon`| Icon wrapper     | Injects `aria-hidden` and `data-state` onto a decorative icon          |
+| Export                    | Role          | Notes                                                                                                              |
+| ------------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `Collapsible.Root`        | State owner   | Uncontrolled (`defaultOpen`) or controlled (`open` + `onOpenChange`); `disabled` short-circuits Trigger activation |
+| `Collapsible.Trigger`     | Toggle button | Supports `asChild`, ref forwarding, explicit Enter/Space handling                                                  |
+| `Collapsible.Content`     | Hidden panel  | Hidden via the `hidden` attribute; supports `forceMount` for CSS animation                                         |
+| `Collapsible.TriggerIcon` | Icon wrapper  | Injects `aria-hidden` and `data-state` onto a decorative icon                                                      |
 
 ## Keyboard interaction
 
-| Key               | Behaviour                       |
-| ----------------- | ------------------------------- |
-| `Enter` / `Space` | Toggle the collapsible          |
+| Key               | Behaviour              |
+| ----------------- | ---------------------- |
+| `Enter` / `Space` | Toggle the collapsible |
 
 `<button>` activates on `Enter` and `Space` natively. The Trigger also
 handles both keys explicitly so that `asChild` rendering on non-button

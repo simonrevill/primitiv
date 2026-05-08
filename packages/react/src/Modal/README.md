@@ -22,7 +22,7 @@ React layer adds what native `<dialog>` doesn't give you:
 
 `showModal()` promotes the `<dialog>` into the browser's **top layer**
 and paints a `::backdrop` pseudo-element underneath it — also in the
-top layer. Any sibling `Modal.Overlay` sits *below* that backdrop
+top layer. Any sibling `Modal.Overlay` sits _below_ that backdrop
 visually, so clicks on the "outside" area never reach it. Detection
 therefore has to live on the dialog itself: a `pointerdown` whose
 coordinates fall outside the dialog's bounding rect is, by
@@ -31,7 +31,7 @@ tree as a cosmetic + animation surface (for custom backdrop styling
 or motion wrappers that exceed what `::backdrop` can express).
 
 ```tsx
-import { Modal } from "@primitiv/components";
+import { Modal } from "@primitiv/react";
 
 <Modal.Root open={open} onOpenChange={setOpen}>
   <Modal.Trigger>Open</Modal.Trigger>
@@ -49,16 +49,16 @@ import { Modal } from "@primitiv/components";
 
 ## Sub-components
 
-| Export              | Element           | Notes                                                                               |
-| ------------------- | ----------------- | ----------------------------------------------------------------------------------- |
-| `Modal.Root`        | context provider  | Owns open state. Exposes `ModalImperativeApi` via `ref`                             |
-| `Modal.Trigger`     | `<button>`        | `aria-haspopup="dialog"`, `aria-expanded`, `aria-controls`. `asChild`               |
-| `Modal.Portal`      | `createPortal`    | `container?: HTMLElement` (default `document.body`). `forceMount`                   |
+| Export              | Element           | Notes                                                                                                                                          |
+| ------------------- | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Modal.Root`        | context provider  | Owns open state. Exposes `ModalImperativeApi` via `ref`                                                                                        |
+| `Modal.Trigger`     | `<button>`        | `aria-haspopup="dialog"`, `aria-expanded`, `aria-controls`. `asChild`                                                                          |
+| `Modal.Portal`      | `createPortal`    | `container?: HTMLElement` (default `document.body`). `forceMount`                                                                              |
 | `Modal.Overlay`     | `<div>` (sibling) | Decorative / animation target — **not** a click-outside event surface (see below). `aria-hidden="true"`. `data-state`. `asChild`, `forceMount` |
-| `Modal.Content`     | `<dialog>`        | Native modal dialog. `data-state`. Escape hatches for Esc / click-outside           |
-| `Modal.Title`       | `<h2>`            | Auto-wires `aria-labelledby` on Content. `asChild`                                  |
-| `Modal.Description` | `<p>`             | Auto-wires `aria-describedby` on Content. `asChild`                                 |
-| `Modal.Close`       | `<button>`        | Closes the modal. `asChild`                                                         |
+| `Modal.Content`     | `<dialog>`        | Native modal dialog. `data-state`. Escape hatches for Esc / click-outside                                                                      |
+| `Modal.Title`       | `<h2>`            | Auto-wires `aria-labelledby` on Content. `asChild`                                                                                             |
+| `Modal.Description` | `<p>`             | Auto-wires `aria-describedby` on Content. `asChild`                                                                                            |
+| `Modal.Close`       | `<button>`        | Closes the modal. `asChild`                                                                                                                    |
 
 ## Keyboard interaction
 
@@ -77,11 +77,13 @@ rejects mixing them.
 
 ```tsx
 // Uncontrolled
-<Modal.Root defaultOpen>…</Modal.Root>
+<Modal.Root defaultOpen>…</Modal.Root>;
 
 // Controlled
 const [open, setOpen] = useState(false);
-<Modal.Root open={open} onOpenChange={setOpen}>…</Modal.Root>
+<Modal.Root open={open} onOpenChange={setOpen}>
+  …
+</Modal.Root>;
 ```
 
 ## Escape hatches
@@ -107,7 +109,7 @@ open. `onPointerDownOutside` receives the native `PointerEvent`
 ## Imperative API
 
 ```tsx
-import { Modal, type ModalImperativeApi } from "@primitiv/components";
+import { Modal, type ModalImperativeApi } from "@primitiv/react";
 
 const ref = useRef<ModalImperativeApi>(null);
 

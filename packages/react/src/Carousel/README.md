@@ -18,7 +18,7 @@ Currently exposes:
   targets. Must be rendered as a descendant of `Carousel.Root`; rendering
   it elsewhere throws a descriptive error.
 - **`Carousel.Slide`** — an individual slide. Renders a `<div role="group"
-  aria-roledescription="slide">` and self-registers with the Root so each
+aria-roledescription="slide">` and self-registers with the Root so each
   slide knows its zero-based `data-index` and the live `data-total`
   count, even as slides mount and unmount. Each slide is auto-labelled
   `"N of M"` (e.g. `"1 of 3"`); pass `ariaLabel` to override with a more
@@ -52,7 +52,7 @@ Currently exposes:
   `Indicator`.
 - **`Carousel.PlayPauseTrigger`** — `<button>` that toggles the
   `playing` flag on Root. Auto-labels itself `"Start automatic slide
-  show"` / `"Stop automatic slide show"` per the WAI-ARIA Carousel
+show"` / `"Stop automatic slide show"` per the WAI-ARIA Carousel
   APG, exposes a `data-state="playing" | "paused"` styling hook, and
   passes `{ playing }` to a function `children` render prop so
   consumers can swap icons or labels per state.
@@ -67,11 +67,11 @@ Every carousel must have an accessible name. Pass exactly one of `ariaLabel`
 or `ariaLabelledBy`:
 
 ```tsx
-import { Carousel } from "@primitiv/components";
+import { Carousel } from "@primitiv/react";
 
 <Carousel.Root ariaLabel="Featured products">
   {/* viewport, slides, controls — added in upcoming cycles */}
-</Carousel.Root>
+</Carousel.Root>;
 ```
 
 ```tsx
@@ -146,11 +146,7 @@ strip), persisting the active page to a URL, or reacting to deep links.
 ```tsx
 const [page, setPage] = useState(0);
 
-<Carousel.Root
-  ariaLabel="Featured products"
-  page={page}
-  onPageChange={setPage}
->
+<Carousel.Root ariaLabel="Featured products" page={page} onPageChange={setPage}>
   …
 </Carousel.Root>;
 ```
@@ -193,8 +189,7 @@ const [open, setOpen] = useState(false);
     slidesPerPage={3}
   >
     <Carousel.Viewport>
-      <Carousel.Slide>…</Carousel.Slide>
-      …
+      <Carousel.Slide>…</Carousel.Slide>…
     </Carousel.Viewport>
   </Carousel.Root>
 
@@ -211,15 +206,14 @@ const [open, setOpen] = useState(false);
           onPlayingChange={() => {}}
         >
           <Carousel.Viewport>
-            <Carousel.Slide>…</Carousel.Slide>
-            …
+            <Carousel.Slide>…</Carousel.Slide>…
           </Carousel.Viewport>
           <Carousel.Indicators label="Choose slide" />
         </Carousel.Root>
       </Modal.Content>
     </Modal.Portal>
   </Modal.Root>
-</>
+</>;
 ```
 
 `Carousel.Root` doesn't focus anything on mount, so the `Modal`'s
@@ -235,7 +229,9 @@ exposes an imperative handle via `ref`:
 ```tsx
 const carouselRef = useRef<CarouselImperativeApi>(null);
 
-<Carousel.Root ref={carouselRef} ariaLabel="Featured products">…</Carousel.Root>;
+<Carousel.Root ref={carouselRef} ariaLabel="Featured products">
+  …
+</Carousel.Root>;
 
 carouselRef.current?.next();
 carouselRef.current?.previous();
@@ -291,7 +287,7 @@ viewport handles slide changes visually.
   listens for `scrollsnapchange` so user swipes update React state.
 - `transition="none"` — the Viewport installs no scroll wiring at
   all. Consumer CSS owns the visual via the `data-state="active" |
-  "inactive"` hook on each slide, which still flips with the active
+"inactive"` hook on each slide, which still flips with the active
   page. This is the entry point for crossfade, dissolve, zoom, or
   any CSS-only transition pattern:
 
@@ -477,12 +473,12 @@ clicking `Carousel.NextTrigger` at the last jumps to the first. With
 rotation control without first tabbing through every slide's
 interactive content. With the Viewport focused:
 
-| Key          | Action                                        |
-| ------------ | --------------------------------------------- |
-| `ArrowRight` | Advance by one page (same as `NextTrigger`)   |
+| Key          | Action                                          |
+| ------------ | ----------------------------------------------- |
+| `ArrowRight` | Advance by one page (same as `NextTrigger`)     |
 | `ArrowLeft`  | Retreat by one page (same as `PreviousTrigger`) |
-| `Home`       | Jump to the first page                        |
-| `End`        | Jump to the last page                         |
+| `Home`       | Jump to the first page                          |
+| `End`        | Jump to the last page                           |
 
 Arrow keys clamp at the boundaries when `loop` is `false` and animate
 through the loop-wrap clones when `loop` is `true`, mirroring the
@@ -527,7 +523,9 @@ suppress, restyle, or override their presentation:
 
 ```css
 /* Hide the clones if your layout doesn't want the visible buffer. */
-[data-carousel-slide-clone] { visibility: hidden; }
+[data-carousel-slide-clone] {
+  visibility: hidden;
+}
 ```
 
 Caveats and asymmetries:
@@ -583,7 +581,7 @@ flag has the same controlled / uncontrolled split as `page`:
 // Uncontrolled
 <Carousel.Root ariaLabel="Featured products" defaultPlaying={false}>
   <Carousel.PlayPauseTrigger />
-</Carousel.Root>
+</Carousel.Root>;
 
 // Controlled
 const [playing, setPlaying] = useState(false);
@@ -593,7 +591,7 @@ const [playing, setPlaying] = useState(false);
   onPlayingChange={setPlaying}
 >
   <Carousel.PlayPauseTrigger />
-</Carousel.Root>
+</Carousel.Root>;
 ```
 
 The discriminated union rejects mixed shapes (e.g. `defaultPlaying` +
@@ -660,7 +658,7 @@ suspended for the lifetime of that playing session — otherwise the
 user would fight a pause every time their pointer was already over
 the carousel when they pressed play. The override resets when
 `playing` flips back to `false` (via another click, or via an
-external state change), so a subsequent play that's *not* user-
+external state change), so a subsequent play that's _not_ user-
 initiated falls back to the standard WCAG pause.
 
 **Viewport live region.** `Carousel.Viewport` is also the live region

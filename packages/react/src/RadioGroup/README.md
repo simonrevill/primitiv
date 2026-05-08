@@ -11,7 +11,7 @@ navigation, an Indicator slot driven by the selected value, and the
 `asChild` composition every primitive in this package supports.
 
 ```tsx
-import { RadioGroup } from "@primitiv/components";
+import { RadioGroup } from "@primitiv/react";
 
 <RadioGroup.Root defaultValue="comfortable" aria-label="Density">
   <RadioGroup.Item value="compact">
@@ -27,10 +27,10 @@ import { RadioGroup } from "@primitiv/components";
 
 ## Sub-components
 
-| Export                 | Element    | Notes                                                                                     |
-| ---------------------- | ---------- | ----------------------------------------------------------------------------------------- |
-| `RadioGroup.Root`      | `<div>`    | `role="radiogroup"`. State owner, context provider. `asChild`                             |
-| `RadioGroup.Item`      | `<button>` | `role="radio"`, `aria-checked`, `data-state`, participates in roving tabindex. `asChild`  |
+| Export                 | Element    | Notes                                                                                         |
+| ---------------------- | ---------- | --------------------------------------------------------------------------------------------- |
+| `RadioGroup.Root`      | `<div>`    | `role="radiogroup"`. State owner, context provider. `asChild`                                 |
+| `RadioGroup.Item`      | `<button>` | `role="radio"`, `aria-checked`, `data-state`, participates in roving tabindex. `asChild`      |
 | `RadioGroup.Indicator` | `<span>`   | `aria-hidden="true"`. Renders only while the parent Item is selected. `asChild`, `forceMount` |
 
 ## State modes
@@ -43,21 +43,25 @@ TypeScript rejects mixing them.
 
 ```tsx
 // Uncontrolled
-<RadioGroup.Root defaultValue="compact" aria-label="Density">…</RadioGroup.Root>
+<RadioGroup.Root defaultValue="compact" aria-label="Density">
+  …
+</RadioGroup.Root>;
 
 // Controlled
 const [value, setValue] = useState("compact");
-<RadioGroup.Root value={value} onValueChange={setValue} aria-label="Density">…</RadioGroup.Root>
+<RadioGroup.Root value={value} onValueChange={setValue} aria-label="Density">
+  …
+</RadioGroup.Root>;
 ```
 
 ## Keyboard interaction
 
-| Key                  | Behaviour                                                                     |
-| -------------------- | ----------------------------------------------------------------------------- |
-| `Tab`                | Moves focus to the group's single tab stop (selected item, or first if none). |
-| `Space` / `Enter`    | Selects the focused item (native `<button>` activation).                      |
-| `ArrowDown` / `ArrowRight` | Moves focus **and** selection to the next non-disabled item, wrapping.  |
-| `ArrowUp` / `ArrowLeft`    | Moves focus **and** selection to the previous non-disabled item, wrapping. |
+| Key                        | Behaviour                                                                     |
+| -------------------------- | ----------------------------------------------------------------------------- |
+| `Tab`                      | Moves focus to the group's single tab stop (selected item, or first if none). |
+| `Space` / `Enter`          | Selects the focused item (native `<button>` activation).                      |
+| `ArrowDown` / `ArrowRight` | Moves focus **and** selection to the next non-disabled item, wrapping.        |
+| `ArrowUp` / `ArrowLeft`    | Moves focus **and** selection to the previous non-disabled item, wrapping.    |
 
 The group has exactly one tab stop — the selected item, or the first
 non-disabled item if nothing is selected. This is the standard WAI-ARIA

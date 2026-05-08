@@ -1,6 +1,7 @@
 .carousel {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 1rem;
 
   &__viewport {
@@ -38,17 +39,23 @@
 
   &__controls {
     display: flex;
-    justify-content: center;
-    gap: 1rem;
+    justify-content: space-between;
+    align-items: center;
+    gap: 4rem;
   }
 
   &__indicator-group {
     /* WCAG 2.5.8: 24×24 minimum hit area; 44×44 recommended for comfort
        on phones. The visible dot stays small via ::before so the button's
        hit area can be larger than its visual footprint. */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+
     [data-carousel-indicator] {
-      min-width: 2.75rem;
-      min-height: 2.75rem;
+      min-width: 1.5rem;
+      min-height: 1.5rem;
       display: inline-grid;
       place-items: center;
     }

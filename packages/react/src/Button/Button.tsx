@@ -8,7 +8,13 @@ export function Button({
   ...rest
 }: ButtonProps) {
   return (
-    <button type={type} ref={ref} disabled={disabled} {...rest}>
+    <button
+      type={type}
+      ref={ref}
+      disabled={disabled}
+      data-disabled={disabled ? "" : undefined}
+      {...rest}
+    >
       {children}
     </button>
   );

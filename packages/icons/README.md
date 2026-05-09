@@ -43,7 +43,45 @@ All other [SVG element attributes](https://developer.mozilla.org/en-US/docs/Web/
 
 | Icon | Import |
 |---|---|
+| [ArrowLeft](src/icons/ArrowLeft.tsx) | `import { ArrowLeft } from "@primitiv/icons"` |
+| [ArrowRight](src/icons/ArrowRight.tsx) | `import { ArrowRight } from "@primitiv/icons"` |
+| [Bell](src/icons/Bell.tsx) | `import { Bell } from "@primitiv/icons"` |
+| [Calendar](src/icons/Calendar.tsx) | `import { Calendar } from "@primitiv/icons"` |
 | [Check](src/icons/Check.tsx) | `import { Check } from "@primitiv/icons"` |
+| [ChevronDown](src/icons/ChevronDown.tsx) | `import { ChevronDown } from "@primitiv/icons"` |
+| [ChevronLeft](src/icons/ChevronLeft.tsx) | `import { ChevronLeft } from "@primitiv/icons"` |
+| [ChevronRight](src/icons/ChevronRight.tsx) | `import { ChevronRight } from "@primitiv/icons"` |
+| [ChevronUp](src/icons/ChevronUp.tsx) | `import { ChevronUp } from "@primitiv/icons"` |
+| [Close](src/icons/Close.tsx) | `import { Close } from "@primitiv/icons"` |
+| [Copy](src/icons/Copy.tsx) | `import { Copy } from "@primitiv/icons"` |
+| [Delete](src/icons/Delete.tsx) | `import { Delete } from "@primitiv/icons"` |
+| [Download](src/icons/Download.tsx) | `import { Download } from "@primitiv/icons"` |
+| [Edit](src/icons/Edit.tsx) | `import { Edit } from "@primitiv/icons"` |
+| [Error](src/icons/Error.tsx) | `import { Error } from "@primitiv/icons"` |
+| [ExternalLink](src/icons/ExternalLink.tsx) | `import { ExternalLink } from "@primitiv/icons"` |
+| [Eye](src/icons/Eye.tsx) | `import { Eye } from "@primitiv/icons"` |
+| [EyeOff](src/icons/EyeOff.tsx) | `import { EyeOff } from "@primitiv/icons"` |
+| [File](src/icons/File.tsx) | `import { File } from "@primitiv/icons"` |
+| [Filter](src/icons/Filter.tsx) | `import { Filter } from "@primitiv/icons"` |
+| [Folder](src/icons/Folder.tsx) | `import { Folder } from "@primitiv/icons"` |
+| [Grid](src/icons/Grid.tsx) | `import { Grid } from "@primitiv/icons"` |
+| [Home](src/icons/Home.tsx) | `import { Home } from "@primitiv/icons"` |
+| [Image](src/icons/Image.tsx) | `import { Image } from "@primitiv/icons"` |
+| [Info](src/icons/Info.tsx) | `import { Info } from "@primitiv/icons"` |
+| [Link](src/icons/Link.tsx) | `import { Link } from "@primitiv/icons"` |
+| [List](src/icons/List.tsx) | `import { List } from "@primitiv/icons"` |
+| [Mail](src/icons/Mail.tsx) | `import { Mail } from "@primitiv/icons"` |
+| [Menu](src/icons/Menu.tsx) | `import { Menu } from "@primitiv/icons"` |
+| [Minus](src/icons/Minus.tsx) | `import { Minus } from "@primitiv/icons"` |
+| [Plus](src/icons/Plus.tsx) | `import { Plus } from "@primitiv/icons"` |
+| [Search](src/icons/Search.tsx) | `import { Search } from "@primitiv/icons"` |
+| [Settings](src/icons/Settings.tsx) | `import { Settings } from "@primitiv/icons"` |
+| [Share](src/icons/Share.tsx) | `import { Share } from "@primitiv/icons"` |
+| [Sort](src/icons/Sort.tsx) | `import { Sort } from "@primitiv/icons"` |
+| [Success](src/icons/Success.tsx) | `import { Success } from "@primitiv/icons"` |
+| [Upload](src/icons/Upload.tsx) | `import { Upload } from "@primitiv/icons"` |
+| [User](src/icons/User.tsx) | `import { User } from "@primitiv/icons"` |
+| [Warning](src/icons/Warning.tsx) | `import { Warning } from "@primitiv/icons"` |
 
 ## Adding icons from Figma
 

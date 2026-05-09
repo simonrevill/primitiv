@@ -20,6 +20,12 @@ function extractInnerSvg(svgString: string): string {
   return match[1].trim()
 }
 
+// Strip hardcoded fill values so inner elements inherit currentColor from the IconBase root.
+// fill="none" is also removed — these are solid fill icons with no transparent cutouts.
+function stripFills(inner: string): string {
+  return inner.replace(/\s+fill="[^"]*"/g, '')
+}
+
 // Convert SVG attribute names to JSX-compatible camelCase equivalents
 function svgAttrsToJsx(inner: string): string {
   return inner
@@ -51,7 +57,7 @@ for (const file of svgFiles) {
     ],
   })
 
-  const innerSvg = svgAttrsToJsx(extractInnerSvg(optimized))
+  const innerSvg = svgAttrsToJsx(stripFills(extractInnerSvg(optimized)))
 
   const component = `import type { IconProps } from '../types'
 import { IconBase } from '../IconBase'

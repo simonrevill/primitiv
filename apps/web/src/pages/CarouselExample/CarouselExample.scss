@@ -9,12 +9,9 @@
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     scroll-behavior: smooth;
-    /* Prevent vertical page scroll from "rubber-banding" into the
-       carousel and vice-versa on iOS. */
     overscroll-behavior-x: contain;
-    /* Hide native scrollbars on mobile while keeping scroll behaviour. */
     scrollbar-width: none;
-    // gap: 1rem;
+    padding-inline: 20%; // (100% - 60%) / 2 — creates leading/trailing centering space
   }
 
   &__viewport::-webkit-scrollbar {
@@ -22,17 +19,15 @@
   }
 
   &__slide {
-    flex: 0 0 60%; // was 100% — narrower so neighbours are visible
+    flex: 0 0 100%; // 100% of content area = 60% of total viewport (after 20% padding each side)
     display: flex;
     justify-content: center;
     align-items: center;
-    scroll-snap-align: center; // was start — active slide sits centred
-    scroll-snap-stop: always; // add — prevent momentum scrolling past slides
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
     -webkit-user-drag: none;
-    animation: coverflow linear both; // add
-    animation-timeline: view(
-      inline
-    ); // add — progress driven by horizontal scroll position
+    animation: coverflow linear both;
+    animation-timeline: view(inline);
   }
 
   &__image {

@@ -48,7 +48,12 @@ export function CarouselExample() {
   ];
 
   return (
-    <Carousel.Root className="carousel" ariaLabel="Metal Primitives" loop>
+    <Carousel.Root
+      className="carousel"
+      ariaLabel="Metal Primitives"
+      loop
+      snapAlign="center"
+    >
       <Carousel.Viewport className="carousel__viewport">
         {images.map(({ src, description }) => (
           <Carousel.Slide key={src} className="carousel__slide">

@@ -1,5 +1,6 @@
-import { Accordion } from "@primitiv/react";
+import { Accordion, AccordionTriggerIcon } from "@primitiv/react";
 import "./AccordionExample.scss";
+import { ChevronDown } from "@primitiv/icons";
 export function AccordionExample() {
   return (
     <Accordion.Root defaultValue="shipping" className="accordion">
@@ -7,6 +8,9 @@ export function AccordionExample() {
         <Accordion.Header className="accordion__header">
           <Accordion.Trigger className="accordion__trigger">
             Shipping policy
+            <AccordionTriggerIcon>
+              <ChevronDown className="accordion__trigger-icon" />
+            </AccordionTriggerIcon>
           </Accordion.Trigger>
         </Accordion.Header>
         <Accordion.Content className="accordion__content">
@@ -17,6 +21,9 @@ export function AccordionExample() {
         <Accordion.Header className="accordion__header">
           <Accordion.Trigger className="accordion__trigger">
             Returns
+            <AccordionTriggerIcon>
+              <ChevronDown className="accordion__trigger-icon" />
+            </AccordionTriggerIcon>
           </Accordion.Trigger>
         </Accordion.Header>
         <Accordion.Content className="accordion__content">

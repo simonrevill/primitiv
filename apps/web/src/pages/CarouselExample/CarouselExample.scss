@@ -22,14 +22,17 @@
   }
 
   &__slide {
-    // flex: 0 0 calc(100% / 3);
-    flex: 0 0 100%;
+    flex: 0 0 60%; // was 100% — narrower so neighbours are visible
     display: flex;
     justify-content: center;
     align-items: center;
-    scroll-snap-align: start;
-    /* Stop the OS picking up images for drag/save during a swipe. */
+    scroll-snap-align: center; // was start — active slide sits centred
+    scroll-snap-stop: always; // add — prevent momentum scrolling past slides
     -webkit-user-drag: none;
+    animation: coverflow linear both; // add
+    animation-timeline: view(
+      inline
+    ); // add — progress driven by horizontal scroll position
   }
 
   &__image {
@@ -69,5 +72,20 @@
     [data-carousel-indicator][data-state="active"]::before {
       background: black;
     }
+  }
+}
+
+@keyframes coverflow {
+  from {
+    transform: perspective(600px) rotateY(60deg) translateZ(-400px);
+    opacity: 0.6;
+  }
+  50% {
+    transform: perspective(600px) rotateY(0deg) translateZ(0);
+    opacity: 1;
+  }
+  to {
+    transform: perspective(600px) rotateY(-60deg) translateZ(-400px);
+    opacity: 0.6;
   }
 }

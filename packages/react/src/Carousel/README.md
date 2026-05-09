@@ -277,6 +277,26 @@ Because `<a>` and other non-button elements don't honour the HTML
 their click handler when boundary clamping says "no further" — so
 asChild on a non-button still respects `loop={false}` boundaries.
 
+### Snap alignment
+
+By default the Viewport scrolls so the **start (left) edge** of the
+target slide aligns with the start edge of the scroll container — matching
+`scroll-snap-align: start` in consumer CSS. For layouts where slides are
+narrower than the Viewport and centred (e.g. Cover Flow), set
+`snapAlign="center"` so programmatic navigation lands on the centred
+position without the browser snapping-correcting after the scroll:
+
+```tsx
+<Carousel.Root ariaLabel="Gallery" snapAlign="center">
+  …
+</Carousel.Root>
+```
+
+Pair with `scroll-snap-align: center` on `Carousel.Slide` in your CSS.
+The default is `"start"`; `"center"` subtracts
+`(viewportWidth − slideWidth) / 2` from the scroll target so it matches
+where the browser's snap engine would settle.
+
 ### Transition modes
 
 `Carousel.Root` accepts a `transition` prop that controls how the

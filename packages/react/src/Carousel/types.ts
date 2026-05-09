@@ -101,6 +101,21 @@ export type CarouselAutoplay = boolean | { delay: number };
 export type CarouselTransition = "slide" | "none";
 
 /**
+ * Scroll-snap alignment that the Viewport should target when
+ * programmatically scrolling to a page.
+ *
+ * - `"start"` (default) — scrolls so the first slide of the target
+ *   page aligns with the **start** (left) edge of the Viewport.
+ *   Matches `scroll-snap-align: start` in consumer CSS.
+ * - `"center"` — scrolls so the first slide of the target page is
+ *   **centred** in the Viewport. The target is offset inward by
+ *   `(viewportWidth − slideWidth) / 2`. Use this with
+ *   `scroll-snap-align: center` in consumer CSS (e.g. Cover Flow
+ *   layouts where slides are narrower than the Viewport).
+ */
+export type CarouselSnapAlign = "start" | "center";
+
+/**
  * Pin DOM `id`s on the rendered sub-components for SSR / hydration
  * stability or for external `aria-controls` references. Any keys you
  * omit leave the corresponding element unidentified (or with whatever
@@ -190,6 +205,12 @@ export type CarouselRootProps = Omit<
      * {@link CarouselIds}. Useful for SSR hydration stability and
      * external `aria-controls` linkage. */
     ids?: CarouselIds;
+    /** Scroll-snap alignment the Viewport targets when programmatically
+     * scrolling to a page — see {@link CarouselSnapAlign}.
+     * Defaults to `"start"`. Set to `"center"` when consumer CSS uses
+     * `scroll-snap-align: center` on slides (e.g. Cover Flow layouts
+     * where slides are narrower than the Viewport). */
+    snapAlign?: CarouselSnapAlign;
   };
 
 /**
@@ -259,6 +280,8 @@ export type CarouselContextValue = {
   ids: CarouselIds;
   /** Resolved visual transition mode (defaults to `"slide"`). */
   transition: CarouselTransition;
+  /** Resolved scroll-snap alignment (defaults to `"start"`). */
+  snapAlign: CarouselSnapAlign;
   /** `true` when the consumer enabled `loop` on `Carousel.Root`. The
    * Viewport reads this to decide whether to render the aria-hidden
    * edge clones used by the wrap animation, and Prev/Next read it to

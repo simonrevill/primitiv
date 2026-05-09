@@ -100,6 +100,7 @@ export const CarouselRoot = forwardRef<
     translations,
     ids,
     transition,
+    snapAlign,
     children,
     ...rest
   },
@@ -120,6 +121,7 @@ export const CarouselRoot = forwardRef<
       translations,
       ids,
       transition,
+      snapAlign,
     },
     imperativeRef,
   );

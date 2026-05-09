@@ -1,4 +1,5 @@
 import { Carousel } from "@primitiv/react";
+import { Check } from "@primitiv/icons";
 
 import "./CarouselExample.scss";
 
@@ -49,29 +50,34 @@ export function CarouselExample() {
   ];
 
   return (
-    <Carousel.Root className="carousel" ariaLabel="Metal Primitives" loop>
-      <Carousel.Viewport className="carousel__viewport">
-        {images.map(({ src, description }) => (
-          <Carousel.Slide key={src} className="carousel__slide">
-            <img className="carousel__image" src={src} alt={description} />
-          </Carousel.Slide>
-        ))}
-      </Carousel.Viewport>
-      <div className="carousel__controls">
-        <Carousel.PreviousTrigger
-          className="carousel__trigger"
-          aria-label="Previous"
-        >
-          {"<"}
-        </Carousel.PreviousTrigger>
-        <Carousel.Indicators
-          label="Choose slide"
-          className="carousel__indicator-group"
-        />
-        <Carousel.NextTrigger className="carousel__trigger" aria-label="Next">
-          {">"}
-        </Carousel.NextTrigger>
-      </div>
-    </Carousel.Root>
+    <>
+      <button type="button" aria-label="Submit" style={{ color: "blue" }}>
+        <Check size={48} />
+      </button>
+      <Carousel.Root className="carousel" ariaLabel="Metal Primitives" loop>
+        <Carousel.Viewport className="carousel__viewport">
+          {images.map(({ src, description }) => (
+            <Carousel.Slide key={src} className="carousel__slide">
+              <img className="carousel__image" src={src} alt={description} />
+            </Carousel.Slide>
+          ))}
+        </Carousel.Viewport>
+        <div className="carousel__controls">
+          <Carousel.PreviousTrigger
+            className="carousel__trigger"
+            aria-label="Previous"
+          >
+            {"<"}
+          </Carousel.PreviousTrigger>
+          <Carousel.Indicators
+            label="Choose slide"
+            className="carousel__indicator-group"
+          />
+          <Carousel.NextTrigger className="carousel__trigger" aria-label="Next">
+            {">"}
+          </Carousel.NextTrigger>
+        </div>
+      </Carousel.Root>
+    </>
   );
 }

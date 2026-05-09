@@ -18,7 +18,8 @@ primitiv/
 │   ├── harmoni-core/          # Pure-Rust palette generation + contrast audit
 │   └── harmoni-wasm/          # wasm-bindgen adapter; consumed by apps/web
 ├── packages/
-│   └── components/            # Headless React component library
+│   ├── react/                 # Headless React component library
+│   └── icons/                 # Fill-based SVG icon library
 └── apps/
     └── web/                   # React dev surface (Vite + TS)
 ```

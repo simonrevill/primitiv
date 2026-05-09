@@ -15,6 +15,7 @@ import type {
   CarouselContextValue,
   CarouselIds,
   CarouselImperativeApi,
+  CarouselSnapAlign,
   CarouselTransition,
   CarouselTranslations,
 } from "../types";
@@ -77,6 +78,8 @@ type UseCarouselRootProps = {
   ids?: CarouselIds;
   /** Visual transition mode — see {@link CarouselTransition}. */
   transition?: CarouselTransition;
+  /** Scroll-snap alignment — see {@link CarouselSnapAlign}. */
+  snapAlign?: CarouselSnapAlign;
 };
 
 /**
@@ -119,6 +122,7 @@ export function useCarouselRoot(
     translations,
     ids = EMPTY_IDS,
     transition = "slide",
+    snapAlign = "start",
   }: UseCarouselRootProps = {},
   imperativeRef?: Ref<CarouselImperativeApi>,
 ) {
@@ -419,6 +423,7 @@ export function useCarouselRoot(
       translations: resolvedTranslations,
       ids,
       transition,
+      snapAlign,
       loop,
       refreshTick,
       visibleSlideIndicesRef,
@@ -446,6 +451,7 @@ export function useCarouselRoot(
       resolvedTranslations,
       ids,
       transition,
+      snapAlign,
       loop,
       refreshTick,
       setSlideInView,

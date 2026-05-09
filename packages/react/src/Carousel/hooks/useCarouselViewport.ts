@@ -59,6 +59,7 @@ export function useCarouselViewport() {
     canGoNext,
     canGoPrevious,
     transition,
+    snapAlign,
     refreshTick,
     visibleSlideIndicesRef,
     setSlideInView,
@@ -149,8 +150,12 @@ export function useCarouselViewport() {
 
     const slideRect = targetEl.getBoundingClientRect();
     const viewportRect = viewport.getBoundingClientRect();
+    const centeringOffset =
+      snapAlign === "center"
+        ? (viewportRect.width - slideRect.width) / 2
+        : 0;
     const targetScrollLeft =
-      viewport.scrollLeft + (slideRect.left - viewportRect.left);
+      viewport.scrollLeft + (slideRect.left - viewportRect.left) - centeringOffset;
 
     viewport.scrollTo({ left: targetScrollLeft, behavior: scrollBehavior });
 
@@ -203,6 +208,7 @@ export function useCarouselViewport() {
     };
   }, [
     transition,
+    snapAlign,
     currentPage,
     effectiveSlidesPerMove,
     slideKeys,

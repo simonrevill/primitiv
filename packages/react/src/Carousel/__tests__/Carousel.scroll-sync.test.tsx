@@ -145,4 +145,31 @@ describe("Carousel scroll sync (programmatic page change)", () => {
       expect.objectContaining({ left: 200, behavior: "smooth" }),
     );
   });
+
+  it("should offset the scroll target by half the remaining viewport width when snapAlign is 'center'", async () => {
+    const user = userEvent.setup();
+    render(
+      <Carousel.Root ariaLabel="Featured products" snapAlign="center">
+        <Carousel.Viewport data-testid="viewport">
+          <Carousel.Slide data-testid="slide-0" />
+          <Carousel.Slide data-testid="slide-1" />
+        </Carousel.Viewport>
+        <Carousel.NextTrigger>Next</Carousel.NextTrigger>
+      </Carousel.Root>,
+    );
+
+    const viewport = screen.getByTestId("viewport");
+    // viewport width=300, slide width=100 (mockSlideOffsets defaults)
+    // centeringOffset = (300 - 100) / 2 = 100
+    mockSlideOffsets({ "slide-0": 0, "slide-1": 300 });
+    viewport.scrollLeft = 0;
+    const scrollToSpy = vi.spyOn(viewport, "scrollTo");
+
+    await user.click(screen.getByRole("button", { name: "Next" }));
+
+    // "start" would scroll to 300; "center" subtracts 100 → 200
+    expect(scrollToSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ left: 200, behavior: "smooth" }),
+    );
+  });
 });

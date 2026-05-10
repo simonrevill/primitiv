@@ -7,6 +7,7 @@ import {
   MultiSlideScroll,
   MultiStepSlideCrossfade,
   MultiStepSlideScroll,
+  Peek,
   SingleSlideCrossfade,
   SingleSlideScroll,
 } from "./examples";
@@ -48,6 +49,11 @@ const TABS: ExampleTab[] = [
     value: "multi-step-slide-crossfade",
     label: "Multi · Step · Fade",
     render: () => <MultiStepSlideCrossfade />,
+  },
+  {
+    value: "peek",
+    label: "Peek",
+    render: () => <Peek />,
   },
 ];
 

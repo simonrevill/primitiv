@@ -2,7 +2,11 @@ import type { ReactNode } from "react";
 
 import { Tabs } from "@primitiv/react";
 
-import { SingleSlideCrossfade, SingleSlideScroll } from "./examples";
+import {
+  MultiSlideScroll,
+  SingleSlideCrossfade,
+  SingleSlideScroll,
+} from "./examples";
 import "./CarouselExample.scss";
 
 interface ExampleTab {
@@ -21,6 +25,11 @@ const TABS: ExampleTab[] = [
     value: "single-slide-crossfade",
     label: "Single · Fade",
     render: () => <SingleSlideCrossfade />,
+  },
+  {
+    value: "multi-slide-scroll",
+    label: "Multi · Slide",
+    render: () => <MultiSlideScroll />,
   },
 ];
 

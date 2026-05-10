@@ -1,81 +1,102 @@
-import { Carousel } from "@primitiv/react";
+import type { ReactNode } from "react";
+
+import { Tabs } from "@primitiv/react";
+
+import {
+  MultiSlideCrossfade,
+  MultiSlideScroll,
+  MultiStepSlideCrossfade,
+  MultiStepSlideScroll,
+  Peek,
+  Programmatic,
+  SingleSlideCrossfade,
+  SingleSlideScroll,
+  VariableSizes,
+} from "./examples";
 import "./CarouselExample.scss";
 
-export function CarouselExample() {
-  const images = [
-    {
-      name: "Cube (Damascus Steel)",
-      src: "/cube.png",
-      description:
-        "A precision-machined Damascus steel cube with an etched compass rose, set on a carved granite pedestal.",
-    },
-    {
-      name: "Sphere (Patinated Bronze)",
-      src: "/sphere.png",
-      description:
-        "A hammered bronze sphere with an etched gear symbol, resting on a heavy, rune-carved bronze pedestal.",
-    },
-    {
-      name: "Cylinder (Blued Titanium)",
-      src: "/cylinder.png",
-      description:
-        "A polished titanium cylinder with an etched circuit board pattern, sitting on an iridescent glass base in front of architectural models.",
-    },
-    {
-      name: "Cone (Stainless Steel & Brass)",
-      src: "/cone.png",
-      description:
-        "A multi-metal segmented cone with astronomical symbols, displayed next to miniature armillary spheres.",
-    },
-    {
-      name: "Torus (Damascus & Clockwork)",
-      src: "/torus.png",
-      description:
-        "A complex Damascus steel torus with internal moving clockwork and a compass rose, on a unique ebony-wood sound-wave pedestal.",
-    },
-    {
-      name: "Wedge (Verdigris Copper)",
-      src: "/wedge.png",
-      description:
-        "A weathered copper wedge with etched architectural glyphs and a hammer-and-chisel motif, on a pedestal of petrified wood and gears.",
-    },
-    {
-      name: "Pyramid (Multi-Metal Filigree)",
-      src: "/pyramid.png",
-      description:
-        "A gold and silver filigree pyramid with astronomical details, featured alongside miniature temple models.",
-    },
-  ];
+interface ExampleTab {
+  value: string;
+  label: string;
+  render: () => ReactNode;
+}
 
+const TABS: ExampleTab[] = [
+  {
+    value: "single-slide-scroll",
+    label: "Single · Slide",
+    render: () => <SingleSlideScroll />,
+  },
+  {
+    value: "single-slide-crossfade",
+    label: "Single · Fade",
+    render: () => <SingleSlideCrossfade />,
+  },
+  {
+    value: "multi-slide-scroll",
+    label: "Multi · Slide",
+    render: () => <MultiSlideScroll />,
+  },
+  {
+    value: "multi-slide-crossfade",
+    label: "Multi · Fade",
+    render: () => <MultiSlideCrossfade />,
+  },
+  {
+    value: "multi-step-slide-scroll",
+    label: "Multi · Step · Slide",
+    render: () => <MultiStepSlideScroll />,
+  },
+  {
+    value: "multi-step-slide-crossfade",
+    label: "Multi · Step · Fade",
+    render: () => <MultiStepSlideCrossfade />,
+  },
+  {
+    value: "peek",
+    label: "Peek",
+    render: () => <Peek />,
+  },
+  {
+    value: "variable-sizes",
+    label: "Variable sizes",
+    render: () => <VariableSizes />,
+  },
+  {
+    value: "programmatic",
+    label: "Programmatic",
+    render: () => <Programmatic />,
+  },
+];
+
+export function CarouselExample() {
   return (
-    <Carousel.Root
-      className="carousel carousel--debug"
-      ariaLabel="Metal Primitives"
-      loop
-      snapAlign="center"
-    >
-      <Carousel.Viewport className="carousel__viewport">
-        {images.map(({ src, description }) => (
-          <Carousel.Slide key={src} className="carousel__slide">
-            <img className="carousel__image" src={src} alt={description} />
-          </Carousel.Slide>
-        ))}
-      </Carousel.Viewport>
-      <div className="carousel__controls">
-        <Carousel.PreviousTrigger
-          className="carousel__trigger"
-          aria-label="Previous"
+    <div className="carousel-example">
+      <Tabs.Root defaultValue={TABS[0].value}>
+        <Tabs.List
+          className="carousel-example__tabs"
+          label="Carousel examples"
         >
-          {"<"}
-        </Carousel.PreviousTrigger>
-        <Carousel.Indicators
-          label="Choose slide"
-          className="carousel__indicator-group"
-        />
-        <Carousel.NextTrigger className="carousel__trigger" aria-label="Next">
-          {">"}
-        </Carousel.NextTrigger>
-      </div>
-    </Carousel.Root>
+          {TABS.map(({ value, label }) => (
+            <Tabs.Trigger
+              key={value}
+              className="carousel-example__tab"
+              value={value}
+            >
+              {label}
+            </Tabs.Trigger>
+          ))}
+        </Tabs.List>
+        {TABS.map(({ value, render }) => (
+          <Tabs.Content
+            key={value}
+            className="carousel-example__panel"
+            value={value}
+          >
+            {render()}
+          </Tabs.Content>
+        ))}
+      </Tabs.Root>
+    </div>
   );
 }

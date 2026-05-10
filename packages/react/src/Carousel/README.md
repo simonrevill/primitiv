@@ -58,8 +58,44 @@ show"` / `"Stop automatic slide show"` per the WAI-ARIA Carousel
   consumers can swap icons or labels per state.
 
 Pass `autoplay` on `Carousel.Root` to advance the active page on a
-timer while `playing` is `true`. Hover/focus pause behaviour and the
-`aria-live` flip on the viewport are added in subsequent cycles.
+timer while `playing` is `true`. Hover, focus, and active-touch
+suspend the timer per the WAI-ARIA APG (with a user-initiated play
+override), and the viewport's `aria-live` region flips between
+`"polite"` and `"off"` so assistive tech doesn't announce every
+auto-rotation tick.
+
+## JS vs CSS responsibilities
+
+The component ships zero styles, but a few features sit on the line
+between JS and CSS. This table is the contract — the rule of thumb
+is that JS owns _what is the active page_ and _where the scroll
+target lands_, and CSS owns _what the user sees_:
+
+| Feature                            | JS owns                                                  | CSS owns                                                                 |
+| ---------------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------ |
+| Active page state                  | `page` / `defaultPage`, `onPageChange`, `goTo`           | —                                                                        |
+| Boundary clamping                  | `canGoNext` / `canGoPrevious`, trigger `disabled`        | —                                                                        |
+| Loop wrap animation (slide mode)   | Edge clones, scroll into clone, re-anchor on `scrollend` | Slides positioned in flow; clones inherit slide CSS                      |
+| Crossfade / scale / dissolve       | `data-state="active"` flip on slides                     | `position: absolute`, `opacity` + `transition`                           |
+| Slide layout & widths              | —                                                        | `flex-basis` / `inline-size`, `gap`, `aspect-ratio`                      |
+| Peek of adjacent slides            | `snapAlign` (so scroll math matches CSS snap)            | Viewport `padding-inline`, slide `flex-basis`, `scroll-snap-align`       |
+| Gap between slides                 | —                                                        | `gap` on the viewport (no `spacing` prop — pure CSS)                     |
+| Variable-size slides               | Scroll target via `getBoundingClientRect`                | Per-slide width / `aspect-ratio`, `scroll-snap-align`                    |
+| Snap targeting                     | `snapAlign: "start" \| "center"` (Root only)             | `scroll-snap-type` on viewport, `scroll-snap-align` on each slide        |
+| Reduced motion                     | `behavior: "instant"`, skip clone hop                    | Optional `@media (prefers-reduced-motion: reduce)` on consumer animations |
+| Keyboard navigation                | Arrow / Home / End on focused viewport                   | `:focus-visible` on viewport                                             |
+| Touch / swipe                      | Native scroll + `scrollsnapchange` to sync state         | `overscroll-behavior-x: contain`, `scrollbar-width: none`                |
+| Indicator state                    | `data-state` on `[data-carousel-indicator]`              | Visual: dot, bar, thumbnail, etc.                                        |
+
+The only JS prop on the visual side is `snapAlign`, and only because
+the JS scroll target has to match where the browser's CSS snap engine
+will settle — otherwise programmatic navigation would re-snap after
+the smooth scroll. Everything else is either a state knob (JS) or a
+visual rule (CSS), with no overlap.
+
+The `apps/web` workbench at `/carousel` ships worked recipes for
+each cell of the matrix (single / multi / multi-step × slide / fade)
+plus peek, variable-size, and programmatic-control examples.
 
 ## Usage
 
@@ -69,8 +105,18 @@ or `ariaLabelledBy`:
 ```tsx
 import { Carousel } from "@primitiv/react";
 
-<Carousel.Root ariaLabel="Featured products">
-  {/* viewport, slides, controls — added in upcoming cycles */}
+<Carousel.Root ariaLabel="Featured products" loop>
+  <Carousel.Viewport>
+    <Carousel.Slide>
+      <img src="/cube.png" alt="Cube" />
+    </Carousel.Slide>
+    <Carousel.Slide>
+      <img src="/sphere.png" alt="Sphere" />
+    </Carousel.Slide>
+  </Carousel.Viewport>
+  <Carousel.PreviousTrigger>Previous</Carousel.PreviousTrigger>
+  <Carousel.Indicators label="Choose slide" />
+  <Carousel.NextTrigger>Next</Carousel.NextTrigger>
 </Carousel.Root>;
 ```
 

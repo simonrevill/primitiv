@@ -1,95 +1,37 @@
-.carousel {
+.carousel-example {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 1rem;
+  gap: 1.5rem;
 
-  &--debug {
-    & .carousel__viewport {
-      border: 2px solid red;
-    }
-    & .carousel__slide {
-      border: 2px solid cyan;
-    }
-  }
-
-  &__viewport {
+  &__tabs {
     display: flex;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scroll-behavior: smooth;
-    overscroll-behavior-x: contain;
-    scrollbar-width: none;
-    // padding-inline: 20%; // (100% - 60%) / 2 — creates leading/trailing centering space
+    gap: 0.25rem;
+    border-bottom: 1px solid #d4d4d4;
   }
 
-  &__viewport::-webkit-scrollbar {
+  &__tab {
+    appearance: none;
+    background: transparent;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    padding: 0.5rem 0.75rem;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    margin-bottom: -1px;
+
+    &[data-state="active"] {
+      border-bottom-color: currentColor;
+      font-weight: 600;
+    }
+
+    &:focus-visible {
+      outline: 2px solid currentColor;
+      outline-offset: 2px;
+    }
+  }
+
+  &__panel[data-state="inactive"] {
     display: none;
-  }
-
-  &__slide {
-    flex: 0 0 50%; // 100% of content area = 60% of total viewport (after 20% padding each side)
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    scroll-snap-align: center;
-    scroll-snap-stop: always;
-    -webkit-user-drag: none;
-    // animation: coverflow linear both;
-    // animation-timeline: view(inline);
-  }
-
-  &__image {
-    // width: 25rem;
-    height: auto;
-  }
-
-  &__controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 4rem;
-  }
-
-  &__indicator-group {
-    /* WCAG 2.5.8: 24×24 minimum hit area; 44×44 recommended for comfort
-       on phones. The visible dot stays small via ::before so the button's
-       hit area can be larger than its visual footprint. */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 0.5rem;
-
-    [data-carousel-indicator] {
-      min-width: 1.5rem;
-      min-height: 1.5rem;
-      display: inline-grid;
-      place-items: center;
-    }
-    [data-carousel-indicator]::before {
-      content: "";
-      width: 0.5rem;
-      height: 0.5rem;
-      border-radius: 50%;
-      background: lightgray;
-    }
-    [data-carousel-indicator][data-state="active"]::before {
-      background: black;
-    }
-  }
-}
-
-@keyframes coverflow {
-  from {
-    transform: perspective(600px) rotateY(60deg) translateZ(-400px);
-    opacity: 0.6;
-  }
-  50% {
-    transform: perspective(600px) rotateY(0deg) translateZ(0);
-    opacity: 1;
-  }
-  to {
-    transform: perspective(600px) rotateY(-60deg) translateZ(-400px);
-    opacity: 0.6;
   }
 }

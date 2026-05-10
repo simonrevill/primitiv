@@ -8,6 +8,7 @@ import {
   MultiStepSlideCrossfade,
   MultiStepSlideScroll,
   Peek,
+  Programmatic,
   SingleSlideCrossfade,
   SingleSlideScroll,
   VariableSizes,
@@ -60,6 +61,11 @@ const TABS: ExampleTab[] = [
     value: "variable-sizes",
     label: "Variable sizes",
     render: () => <VariableSizes />,
+  },
+  {
+    value: "programmatic",
+    label: "Programmatic",
+    render: () => <Programmatic />,
   },
 ];
 

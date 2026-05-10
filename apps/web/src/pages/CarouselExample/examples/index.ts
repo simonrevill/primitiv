@@ -3,6 +3,7 @@ export * from "./MultiSlideScroll";
 export * from "./MultiStepSlideCrossfade";
 export * from "./MultiStepSlideScroll";
 export * from "./Peek";
+export * from "./Programmatic";
 export * from "./SingleSlideCrossfade";
 export * from "./SingleSlideScroll";
 export * from "./VariableSizes";

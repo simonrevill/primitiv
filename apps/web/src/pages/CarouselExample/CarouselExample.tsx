@@ -10,6 +10,7 @@ import {
   Peek,
   SingleSlideCrossfade,
   SingleSlideScroll,
+  VariableSizes,
 } from "./examples";
 import "./CarouselExample.scss";
 
@@ -54,6 +55,11 @@ const TABS: ExampleTab[] = [
     value: "peek",
     label: "Peek",
     render: () => <Peek />,
+  },
+  {
+    value: "variable-sizes",
+    label: "Variable sizes",
+    render: () => <VariableSizes />,
   },
 ];
 

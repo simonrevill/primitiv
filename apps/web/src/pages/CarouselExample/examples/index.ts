@@ -5,3 +5,4 @@ export * from "./MultiStepSlideScroll";
 export * from "./Peek";
 export * from "./SingleSlideCrossfade";
 export * from "./SingleSlideScroll";
+export * from "./VariableSizes";

@@ -5,6 +5,7 @@ import { Tabs } from "@primitiv/react";
 import {
   MultiSlideCrossfade,
   MultiSlideScroll,
+  MultiStepSlideScroll,
   SingleSlideCrossfade,
   SingleSlideScroll,
 } from "./examples";
@@ -36,6 +37,11 @@ const TABS: ExampleTab[] = [
     value: "multi-slide-crossfade",
     label: "Multi · Fade",
     render: () => <MultiSlideCrossfade />,
+  },
+  {
+    value: "multi-step-slide-scroll",
+    label: "Multi · Step · Slide",
+    render: () => <MultiStepSlideScroll />,
   },
 ];
 

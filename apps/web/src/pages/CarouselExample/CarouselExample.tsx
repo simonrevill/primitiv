@@ -49,7 +49,7 @@ export function CarouselExample() {
 
   return (
     <Carousel.Root
-      className="carousel"
+      className="carousel carousel--debug"
       ariaLabel="Metal Primitives"
       loop
       snapAlign="center"

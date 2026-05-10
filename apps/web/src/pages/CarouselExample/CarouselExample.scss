@@ -4,6 +4,15 @@
   align-items: center;
   gap: 1rem;
 
+  &--debug {
+    & .carousel__viewport {
+      border: 2px solid red;
+    }
+    & .carousel__slide {
+      border: 2px solid cyan;
+    }
+  }
+
   &__viewport {
     display: flex;
     overflow-x: auto;
@@ -11,7 +20,7 @@
     scroll-behavior: smooth;
     overscroll-behavior-x: contain;
     scrollbar-width: none;
-    padding-inline: 20%; // (100% - 60%) / 2 — creates leading/trailing centering space
+    // padding-inline: 20%; // (100% - 60%) / 2 — creates leading/trailing centering space
   }
 
   &__viewport::-webkit-scrollbar {
@@ -19,19 +28,19 @@
   }
 
   &__slide {
-    flex: 0 0 100%; // 100% of content area = 60% of total viewport (after 20% padding each side)
+    flex: 0 0 50%; // 100% of content area = 60% of total viewport (after 20% padding each side)
     display: flex;
     justify-content: center;
     align-items: center;
     scroll-snap-align: center;
     scroll-snap-stop: always;
     -webkit-user-drag: none;
-    animation: coverflow linear both;
-    animation-timeline: view(inline);
+    // animation: coverflow linear both;
+    // animation-timeline: view(inline);
   }
 
   &__image {
-    width: 25rem;
+    // width: 25rem;
     height: auto;
   }
 

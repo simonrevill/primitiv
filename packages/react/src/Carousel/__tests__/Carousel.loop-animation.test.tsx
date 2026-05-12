@@ -211,12 +211,15 @@ describe("Carousel loop wrap backward scroll", () => {
     mockRect(screen.getByTestId("slide-0"), 0);
     mockRect(screen.getByTestId("slide-1"), 100);
     mockRect(screen.getByTestId("slide-2"), 200);
-    // Leading clone sits to the LEFT of slide-0, exactly where slide-N
-    // would visually appear if we wrapped backward from slide-0.
-    mockRect(
-      container.querySelector('[data-carousel-slide-clone="leading"]')!,
-      -300,
+    // The backward wrap targets the leading clone immediately adjacent to
+    // slide-0 (last of the leading clones, at index cloneCount-slidesPerPage).
+    // With slidesPerPage=1 and cloneCount=2 that is index 1 — copy of slide-2.
+    // The buffer clone (copy of slide-1) sits further left so the scroll
+    // target is never at the DOM edge.
+    const leadingClones = container.querySelectorAll(
+      '[data-carousel-slide-clone="leading"]',
     );
+    mockRect(leadingClones[leadingClones.length - 1], -300);
 
     const scrollToSpy = vi.spyOn(viewport, "scrollTo");
 

@@ -137,13 +137,21 @@ export function useCarouselViewport() {
 
     let targetEl: Element;
     if (wrapDirection === "forward") {
+      // First trailing clone = copy of slide 0. querySelectorAll DOM order
+      // puts it at index 0, and there are buffer clones after it so this
+      // element is never at the absolute right DOM edge.
       targetEl = viewport.querySelector(
         '[data-carousel-slide-clone="trailing"]',
       )!;
     } else if (wrapDirection === "backward") {
-      targetEl = viewport.querySelector(
+      // The leading clones are ordered [buffer..., copy-of-(N-spp), ..., copy-of-(N-1)].
+      // The clone at index (cloneCount - slidesPerPage) is the one that puts
+      // a full viewport-width of last-page content in view, with the buffer
+      // clone(s) further left so the scroll target is never at the DOM edge.
+      const leadingClones = viewport.querySelectorAll(
         '[data-carousel-slide-clone="leading"]',
-      )!;
+      );
+      targetEl = leadingClones[leadingClones.length - slidesPerPage]!;
     } else {
       targetEl = slidesRef.current!.get(firstSlideKey)!;
     }

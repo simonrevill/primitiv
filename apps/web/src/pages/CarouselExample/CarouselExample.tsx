@@ -85,8 +85,8 @@ export function CarouselExample() {
     <div className="carousel-example">
       <Tabs.Root
         defaultValue={TABS[0].value}
-        onValueChange={(value) =>
-          setEverActive((prev) => new Set([...prev, value]))
+        onChange={({ name }) =>
+          setEverActive((prev) => new Set([...prev, name]))
         }
       >
         <Tabs.List

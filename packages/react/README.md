@@ -29,6 +29,7 @@ import { Tabs } from "@primitiv/react";
 | [RadioGroup](src/RadioGroup/README.md)   | WAI-ARIA Radio Group pattern — native `<button role="radio">` items with single-selection state, roving tabindex, arrow-key navigation, disabled-item skipping, `Indicator` slot, and `asChild` composition                                                                             |
 | [Table](src/Table/README.md)             | WAI-ARIA Table pattern — compound component wrapping standard HTML table elements with accessible headers, captions, and a responsive scroll wrapper                                                                                                                                    |
 | [Tabs](src/Tabs/README.md)               | WAI-ARIA Tabs pattern — compound component with keyboard navigation, controlled/uncontrolled state, and `asChild` composition                                                                                                                                                           |
+| [Toggle](src/Toggle/README.md)           | WAI-ARIA Button pattern with `aria-pressed` — single stateful toggle button with controlled/uncontrolled state, `data-state` styling hook, and `asChild` composition                                                                                                                   |
 
 ## Internal utilities
 

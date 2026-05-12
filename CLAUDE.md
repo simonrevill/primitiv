@@ -77,8 +77,8 @@ rules below are not suggestions. Coverage must remain at 100% at all times.
      These three updates — test, JSDoc, README — are not optional
      follow-ups; they are part of the definition of "done" for any
      component change.
-   - When **adding a new component** to `packages/components`, the
-     package-level `packages/components/README.md` components table
+   - When **adding a new component** to `packages/react`, the
+     package-level `packages/react/README.md` components table
      must gain a new row for it, with a link to the component's own
      `src/<Component>/README.md`. The component README alone is not
      enough — the table is the index consumers hit first. This is
@@ -347,10 +347,9 @@ were updated mechanically. `Swatch.tsx` aliases the import as
 - `harmoni-core` has 3 direct deps (`csscolorparser`, `palette`,
   `serde`), 0 wasm/JS/TS concerns.
 - `harmoni-wasm` holds all Tsify/wasm-bindgen code.
-- `packages/components` — headless React component library,
-  119 tests green. See below.
+- `packages/react` — headless React component library. See below.
 
-## Components package — `packages/components`
+## Components package — `packages/react`
 
 A pnpm workspace package (`@primitiv/react`) that exports headless,
 accessible React components built on WAI-ARIA patterns. Zero styles ship
@@ -363,7 +362,7 @@ with it.
 
 ### Key architectural decisions
 
-**Slot / asChild pattern.** `packages/components/src/Slot.tsx` is a
+**Slot / asChild pattern.** `packages/react/src/Slot/Slot.tsx` is a
 self-contained implementation of the Radix UI `asChild` composition
 utility. It's intentionally not pulled from Radix as a dep — the entire
 needed surface is small and we want zero style baggage.
@@ -405,7 +404,7 @@ from its props (React 19 feature) — no `forwardRef` wrapper needed.
 ### Test layout
 
 ```
-packages/components/src/Tabs/__tests__/
+packages/react/src/Tabs/__tests__/
 ├── Tabs.activation-mode.test.tsx    # automatic vs manual, Space/Enter
 ├── Tabs.asChild.test.tsx            # asChild composition, ref forwarding
 ├── Tabs.basic-rendering.test.tsx    # ARIA roles, attributes, data-* hooks
@@ -424,10 +423,8 @@ packages/components/src/Tabs/__tests__/
 ### Running component tests
 
 ```sh
-cd packages/components
-npx vitest run          # run once
-npx vitest              # watch mode
-npx vitest run --coverage
+pnpm --filter @primitiv/react qa:units          # run once with coverage
+pnpm --filter @primitiv/react qa:units:watch    # watch mode
 ```
 
 ## Natural next moves (nothing here is committed to)
@@ -458,8 +455,8 @@ not instructions.
 # Run all Rust tests
 cargo test --workspace
 
-# Run React component tests (from packages/components)
-cd packages/components && npx vitest run
+# Run React component tests
+pnpm --filter @primitiv/react qa:units
 
 # Build the wasm package for the web app
 pnpm run build:wasm

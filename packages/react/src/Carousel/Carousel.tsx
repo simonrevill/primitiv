@@ -325,10 +325,10 @@ function injectLoopClones(
   // so clones would only add aria-hidden noise.
   if (slides.length <= 1) return children;
 
-  // The wrap scroll lands on a full visible window, so each end needs
-  // slidesPerPage clones. Clamp to the slide count so a 3-slide,
-  // slidesPerPage=4 carousel doesn't ask for more clones than exist.
-  const cloneCount = Math.min(slidesPerPage, slides.length);
+  // One extra clone beyond slidesPerPage ensures the wrap target is never the
+  // last DOM element, which eliminates edge-of-scroll browser effects (subtle
+  // bounce / paint delay) that don't appear for interior scroll positions.
+  const cloneCount = Math.min(slidesPerPage + 1, slides.length);
 
   const trailing = slides.slice(0, cloneCount).map((slide, i) => (
     <CarouselCloneSlide

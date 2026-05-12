@@ -194,7 +194,18 @@ export function useCarouselViewport() {
         const realViewportRect = viewport.getBoundingClientRect();
         const realTarget =
           viewport.scrollLeft + (realRect.left - realViewportRect.left);
+        // Suspend scroll-snap-type during the instant re-anchor so the
+        // browser's snap engine doesn't animate between snap points after
+        // the position jump. Without this, the consumer's `scroll-snap-type:
+        // x mandatory` causes a visible "settle" frame in Chrome between
+        // the clone's snap point and the real slide's snap point. Restored
+        // on the next frame so user scrolls still snap.
+        const originalSnapType = viewport.style.scrollSnapType;
+        viewport.style.scrollSnapType = "none";
         viewport.scrollTo({ left: realTarget, behavior: "instant" });
+        requestAnimationFrame(() => {
+          viewport.style.scrollSnapType = originalSnapType;
+        });
       }
     };
     viewport.addEventListener("scrollend", clearFlag, { once: true });

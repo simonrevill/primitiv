@@ -24,6 +24,13 @@
     scroll-snap-align: start;
     scroll-snap-stop: always;
     -webkit-user-drag: none;
+
+    // Buffer clones at the loop boundary inherit this class. Allow the
+    // snap engine to skip over them during the programmatic wrap so the
+    // smooth scroll doesn't stop at every intermediate clone snap point.
+    &[data-carousel-slide-clone] {
+      scroll-snap-stop: normal;
+    }
   }
 
   &__image {

@@ -243,6 +243,71 @@ describe("Carousel loop wrap backward scroll", () => {
       behavior: "instant",
     });
   });
+
+  it("should suspend scroll-snap-type during the instant re-anchor and restore it on the next frame", async () => {
+    const user = userEvent.setup();
+    const { container } = render(
+      <Carousel.Root ariaLabel="Featured products" loop>
+        <Carousel.Viewport data-testid="viewport">
+          <Carousel.Slide data-testid="slide-0" />
+          <Carousel.Slide data-testid="slide-1" />
+          <Carousel.Slide data-testid="slide-2" />
+        </Carousel.Viewport>
+        <Carousel.PreviousTrigger>Previous</Carousel.PreviousTrigger>
+      </Carousel.Root>,
+    );
+
+    const viewport = screen.getByTestId("viewport");
+    // Consumer-set inline style mimicking the example SCSS rule that
+    // makes the snap engine engage between snap points. The wrap re-anchor
+    // must briefly suspend this so the snap engine doesn't re-animate after
+    // the instant scrollTo.
+    viewport.style.scrollSnapType = "x mandatory";
+    viewport.scrollLeft = 0;
+
+    mockRect(viewport, 0);
+    mockRect(screen.getByTestId("slide-0"), 0);
+    mockRect(screen.getByTestId("slide-1"), 100);
+    mockRect(screen.getByTestId("slide-2"), 200);
+    const leadingClones = container.querySelectorAll(
+      '[data-carousel-slide-clone="leading"]',
+    );
+    mockRect(leadingClones[leadingClones.length - 1], -300);
+
+    // Capture the inline scrollSnapType at the moment the instant
+    // re-anchor fires — it should be "none" so the browser's snap
+    // engine doesn't animate from the clone snap point to the real
+    // slide's snap point.
+    const calls: { behavior?: ScrollBehavior; snapType: string }[] = [];
+    vi.spyOn(viewport, "scrollTo").mockImplementation(function (
+      this: HTMLElement,
+      options: ScrollToOptions | number,
+    ) {
+      if (typeof options === "object") {
+        calls.push({
+          behavior: options.behavior,
+          snapType: this.style.scrollSnapType,
+        });
+      }
+    } as typeof viewport.scrollTo);
+
+    await user.click(screen.getByRole("button", { name: "Previous" }));
+    act(() => {
+      viewport.dispatchEvent(new Event("scrollend"));
+    });
+
+    const instantCall = calls.find((c) => c.behavior === "instant");
+    expect(instantCall?.snapType).toBe("none");
+
+    // After one frame, the original snap-type must be restored so
+    // subsequent user scrolls still snap.
+    await act(async () => {
+      await new Promise<void>((resolve) =>
+        requestAnimationFrame(() => resolve()),
+      );
+    });
+    expect(viewport.style.scrollSnapType).toBe("x mandatory");
+  });
 });
 
 describe("Carousel loop wrap manual swipe onto a clone", () => {

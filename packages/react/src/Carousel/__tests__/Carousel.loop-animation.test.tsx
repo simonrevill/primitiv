@@ -79,7 +79,7 @@ describe("Carousel loop wrap clones", () => {
     ).toBeNull();
   });
 
-  it("should render slidesPerPage clones at each end so the wrap scroll has a full visible window to land on", () => {
+  it("should render slidesPerPage+1 clones at each end so the wrap target is never at the DOM scroll boundary", () => {
     const { container } = renderWithSlides(
       { loop: true, slidesPerPage: 2 },
       4,
@@ -87,10 +87,10 @@ describe("Carousel loop wrap clones", () => {
 
     expect(
       container.querySelectorAll('[data-carousel-slide-clone="leading"]'),
-    ).toHaveLength(2);
+    ).toHaveLength(3);
     expect(
       container.querySelectorAll('[data-carousel-slide-clone="trailing"]'),
-    ).toHaveLength(2);
+    ).toHaveLength(3);
   });
 });
 
@@ -413,9 +413,10 @@ describe("Carousel loop wrap edge cases", () => {
     );
 
     expect(screen.getByTestId("non-slide")).toHaveTextContent("caption");
+    // 2 slides, slidesPerPage=1: min(1+1, 2)=2 clones per end → 4 total
     expect(
       container.querySelectorAll('[data-carousel-slide-clone]'),
-    ).toHaveLength(2);
+    ).toHaveLength(4);
   });
 
   it("should ignore scrollsnapchange events whose snapTargetInline is missing", () => {

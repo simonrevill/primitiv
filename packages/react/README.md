@@ -30,6 +30,7 @@ import { Tabs } from "@primitiv/react";
 | [Table](src/Table/README.md)             | WAI-ARIA Table pattern — compound component wrapping standard HTML table elements with accessible headers, captions, and a responsive scroll wrapper                                                                                                                                    |
 | [Tabs](src/Tabs/README.md)               | WAI-ARIA Tabs pattern — compound component with keyboard navigation, controlled/uncontrolled state, and `asChild` composition                                                                                                                                                           |
 | [Toggle](src/Toggle/README.md)           | WAI-ARIA Button pattern with `aria-pressed` — single stateful toggle button with controlled/uncontrolled state, `data-state` styling hook, and `asChild` composition                                                                                                                   |
+| [ToggleGroup](src/ToggleGroup/README.md) | Grouped toggle buttons with roving-tabindex keyboard navigation — `type="single"` (at most one pressed, re-press deselects) or `type="multiple"` (items toggle independently), controlled/uncontrolled state, disabled-item skipping, and `asChild` composition                        |
 
 ## Internal utilities
 

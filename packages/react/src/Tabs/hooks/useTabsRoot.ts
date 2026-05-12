@@ -25,6 +25,7 @@ export function useTabsRoot(
     value,
     onValueChange,
     onChange,
+    lazyMount = false,
   }: Omit<TabsRootProps, "className">,
   ref: Ref<TabsImperativeApi>,
 ) {
@@ -119,6 +120,7 @@ export function useTabsRoot(
       setActiveValue,
       onValueChange,
       onChange,
+      lazyMount,
       registerTrigger,
       triggerValues,
       disabledTriggerValues,
@@ -134,6 +136,7 @@ export function useTabsRoot(
       setActiveValue,
       onValueChange,
       onChange,
+      lazyMount,
       registerTrigger,
       triggerValues,
       disabledTriggerValues,

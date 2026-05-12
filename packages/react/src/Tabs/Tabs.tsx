@@ -100,6 +100,7 @@ const TabsRoot = forwardRef<TabsImperativeApi, TabsRootProps>(function TabsRoot(
     value,
     onValueChange,
     onChange,
+    lazyMount = false,
     ...rest
   },
   ref,
@@ -113,6 +114,7 @@ const TabsRoot = forwardRef<TabsImperativeApi, TabsRootProps>(function TabsRoot(
       value,
       onValueChange,
       onChange,
+      lazyMount,
     },
     ref,
   );
@@ -330,7 +332,7 @@ export function TabsContent({
   value,
   ...rest
 }: TabsContentProps) {
-  const { panelId, triggerId, orientation, isActive, state, tabIndex } =
+  const { panelId, triggerId, orientation, isActive, state, tabIndex, shouldRender } =
     useTabsContent({ value });
 
   return (
@@ -345,7 +347,7 @@ export function TabsContent({
       tabIndex={tabIndex}
       {...rest}
     >
-      {children}
+      {shouldRender ? children : null}
     </div>
   );
 }

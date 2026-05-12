@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { useState } from "react";
 
 import { Tabs } from "@primitiv/react";
 
@@ -71,24 +70,9 @@ const TABS: ExampleTab[] = [
 ];
 
 export function CarouselExample() {
-  // Lazy-mount: only render a tab's carousel once it has been activated.
-  // Without this, all carousels mount inside display:none panels and their
-  // scroll-snap initialisation runs with zero viewport dimensions — causing
-  // the browser to misidentify the leading clone at scrollLeft=0 as the snap
-  // target when the panel first becomes visible, which jumps the carousel to
-  // the last page instead of page 0.
-  const [everActive, setEverActive] = useState<Set<string>>(
-    () => new Set([TABS[0].value]),
-  );
-
   return (
     <div className="carousel-example">
-      <Tabs.Root
-        defaultValue={TABS[0].value}
-        onChange={({ name }) =>
-          setEverActive((prev) => new Set([...prev, name]))
-        }
-      >
+      <Tabs.Root defaultValue={TABS[0].value} lazyMount>
         <Tabs.List
           className="carousel-example__tabs"
           label="Carousel examples"
@@ -109,7 +93,7 @@ export function CarouselExample() {
             className="carousel-example__panel"
             value={value}
           >
-            {everActive.has(value) ? render() : null}
+            {render()}
           </Tabs.Content>
         ))}
       </Tabs.Root>

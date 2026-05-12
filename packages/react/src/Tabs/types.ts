@@ -37,6 +37,12 @@ export type TabsRootProps = Omit<ComponentProps<"div">, "onChange"> & {
   orientation?: TabsOrientation;
   dir?: TabsReadingDirection;
   activationMode?: TabsActivationMode;
+  /** When `true`, a panel's children are not rendered until that tab is first
+   * activated. Once mounted they remain in the DOM across subsequent tab
+   * switches (lazy mount, not unmount-on-hide). Useful for panels that own
+   * expensive initialisation — e.g. a scroll-snap carousel whose initial
+   * scroll position must be set while the panel is visible. */
+  lazyMount?: boolean;
 } & BaseTabsRootProps &
   (UncontrolledTabsRootProps | ControlledTabsRootProps);
 
@@ -50,6 +56,7 @@ export type TabsContextValue = {
   onValueChange?: (value: string) => void;
   onChange?: ({ index, name }: TabMetadata) => void;
   tabsId: string;
+  lazyMount: boolean;
   registerTrigger: (
     value: string,
     element: HTMLButtonElement | null,

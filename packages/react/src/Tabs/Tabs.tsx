@@ -315,6 +315,13 @@ TabsTrigger.displayName = "TabsTrigger";
  * expensive subscriptions), render the `Tabs.Content` conditionally
  * yourself based on the active value.
  *
+ * When {@link TabsRootProps.lazyMount | `lazyMount`} is set on
+ * `Tabs.Root`, a panel's children are withheld until the tab is first
+ * activated. After that first activation the children remain mounted
+ * across subsequent tab switches (lazy mount, not unmount-on-hide).
+ * The `<div role="tabpanel">` wrapper always renders so the ARIA
+ * relationship between trigger and panel is always present in the DOM.
+ *
  * **Styling hooks.**
  * - `data-state="active" | "inactive"`.
  * - `data-orientation="horizontal" | "vertical"`.

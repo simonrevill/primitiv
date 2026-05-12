@@ -23,7 +23,7 @@ import { Tabs } from "@primitiv/react";
 | `Tabs.Root`    | State owner | Uncontrolled (`defaultValue`) or controlled (`value` + `onValueChange`)      |
 | `Tabs.List`    | `tablist`   | Requires `label` or `ariaLabelledBy` for accessibility                       |
 | `Tabs.Trigger` | `tab`       | Supports `asChild` to render any element with tab semantics                  |
-| `Tabs.Content` | `tabpanel`  | Stays mounted when inactive; use conditional rendering for unmount semantics |
+| `Tabs.Content` | `tabpanel`  | Stays mounted when inactive; use `lazyMount` or conditional rendering for deferred/unmount semantics |
 
 ## Keyboard interaction
 
@@ -44,6 +44,24 @@ import { Tabs } from "@primitiv/react";
 
 - `activationMode="automatic"` (default) — arrow keys immediately activate the panel.
 - `activationMode="manual"` — arrow keys move focus only; `Enter`/`Space` confirms.
+
+## Lazy mounting
+
+Pass `lazyMount` on `Tabs.Root` to defer rendering a panel's children until
+that tab is first activated. Once mounted, children remain in the DOM across
+subsequent tab switches (lazy mount, not unmount-on-hide). The
+`<div role="tabpanel">` wrapper always renders so the ARIA relationship between
+trigger and panel is always present.
+
+```tsx
+<Tabs.Root defaultValue="overview" lazyMount>
+  …
+</Tabs.Root>
+```
+
+This is useful when a panel owns expensive initialisation that depends on the
+element being visible — for example, a scroll-snap carousel whose initial scroll
+position must be computed while the panel has real dimensions.
 
 ## Imperative API
 

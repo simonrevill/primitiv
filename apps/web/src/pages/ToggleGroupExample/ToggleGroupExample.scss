@@ -69,13 +69,19 @@
     }
 
     &:hover:not([disabled]) {
-      background: #f9fafb;
+      background: #bebef0;
     }
 
     &:focus-visible {
       outline: 2px solid #6366f1;
       outline-offset: -2px;
       z-index: 1;
+    }
+
+    &:hover[data-state="on"] {
+      background: #4f51d5;
+      border-color: #4f51d5;
+      color: white;
     }
 
     &[data-state="on"] {

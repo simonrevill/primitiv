@@ -43,3 +43,7 @@ playwright/.cache/
 htmlcov/
 lcov.info
 coverage/
+
+# --- Claude Code ---
+# Per-machine local overrides — shared settings.json IS tracked
+.claude/settings.local.json

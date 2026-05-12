@@ -9,3 +9,4 @@ export * from "./Modal";
 export * from "./RadioGroup";
 export * from "./Table";
 export * from "./Tabs";
+export * from "./Toggle";

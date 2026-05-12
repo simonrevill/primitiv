@@ -120,7 +120,7 @@ keyword or by topic; do not paraphrase their content here.
 ```sh
 cargo test --workspace                            # all Rust tests
 pnpm --filter @primitiv/react qa:units            # React tests + coverage
-pnpm --filter @primitiv/react vitest run src/X    # scoped, during a cycle
+pnpm --filter @primitiv/react exec vitest run src/X    # scoped, during a cycle
 pnpm run build:wasm                               # rebuild wasm pkg
 pnpm run dev                                      # web dev server
 ```

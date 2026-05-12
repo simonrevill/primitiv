@@ -7,6 +7,8 @@ import {
   CollapsibleExample,
   DropdownExample,
   ModalExample,
+  ToggleExample,
+  ToggleGroupExample,
 } from "./pages";
 
 import "./App.scss";
@@ -22,6 +24,8 @@ function App() {
           <Link to="/collapsible">Collapsible</Link>
           <Link to="/dropdown">Dropdown</Link>
           <Link to="/modal">Modal</Link>
+          <Link to="/toggle">Toggle</Link>
+          <Link to="/toggle-group">Toggle Group</Link>
         </nav>
       </header>
       <main className="container">
@@ -32,6 +36,8 @@ function App() {
           <Route path="/collapsible" element={<CollapsibleExample />} />
           <Route path="/dropdown" element={<DropdownExample />} />
           <Route path="/modal" element={<ModalExample />} />
+          <Route path="/toggle" element={<ToggleExample />} />
+          <Route path="/toggle-group" element={<ToggleGroupExample />} />
         </Routes>
       </main>
     </>

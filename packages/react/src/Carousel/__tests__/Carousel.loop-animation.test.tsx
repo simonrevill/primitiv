@@ -29,10 +29,7 @@ function fireScrollSnapChange(viewport: HTMLElement, snapTarget: HTMLElement) {
 }
 
 function renderWithSlides(
-  rootProps: Omit<
-    React.ComponentProps<typeof Carousel.Root>,
-    "ariaLabel" | "children"
-  > & { ariaLabel?: string } = {},
+  rootProps: { loop?: boolean; transition?: "slide" | "none"; slidesPerPage?: number } = {},
   count = 3,
 ) {
   return render(

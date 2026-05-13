@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { createRef, useRef } from "react";
 import { act, render, screen } from "@testing-library/react";
 
 import { Carousel } from "..";
@@ -6,15 +6,15 @@ import type { CarouselImperativeApi } from "..";
 
 function ImperativeFixture({
   apiRef,
-  ...rootProps
+  defaultPage,
+  defaultPlaying,
 }: {
   apiRef: React.Ref<CarouselImperativeApi>;
-} & Omit<
-  React.ComponentProps<typeof Carousel.Root>,
-  "ariaLabel" | "children" | "ref"
->) {
+  defaultPage?: number;
+  defaultPlaying?: boolean;
+}) {
   return (
-    <Carousel.Root ref={apiRef} ariaLabel="Featured products" autoplay {...rootProps}>
+    <Carousel.Root ref={apiRef} ariaLabel="Featured products" autoplay defaultPage={defaultPage} defaultPlaying={defaultPlaying}>
       <Carousel.Viewport>
         <Carousel.Slide data-testid="slide-0" />
         <Carousel.Slide data-testid="slide-1" />
@@ -27,7 +27,7 @@ function ImperativeFixture({
 
 describe("Carousel imperative API", () => {
   it("should expose next() that advances the active page", () => {
-    const ref = { current: null } as React.RefObject<CarouselImperativeApi>;
+    const ref = createRef<CarouselImperativeApi>();
     render(<ImperativeFixture apiRef={ref} />);
 
     act(() => {
@@ -41,7 +41,7 @@ describe("Carousel imperative API", () => {
   });
 
   it("should expose previous() that retreats the active page", () => {
-    const ref = { current: null } as React.RefObject<CarouselImperativeApi>;
+    const ref = createRef<CarouselImperativeApi>();
     render(<ImperativeFixture apiRef={ref} defaultPage={2} />);
 
     act(() => {
@@ -55,7 +55,7 @@ describe("Carousel imperative API", () => {
   });
 
   it("should expose goTo(page) that jumps directly to the target page", () => {
-    const ref = { current: null } as React.RefObject<CarouselImperativeApi>;
+    const ref = createRef<CarouselImperativeApi>();
     render(<ImperativeFixture apiRef={ref} />);
 
     act(() => {
@@ -69,7 +69,7 @@ describe("Carousel imperative API", () => {
   });
 
   it("should expose play() that flips playing to true", () => {
-    const ref = { current: null } as React.RefObject<CarouselImperativeApi>;
+    const ref = createRef<CarouselImperativeApi>();
     render(<ImperativeFixture apiRef={ref} />);
 
     expect(screen.getByTestId("play-pause")).toHaveAttribute(
@@ -88,7 +88,7 @@ describe("Carousel imperative API", () => {
   });
 
   it("should expose pause() that flips playing to false", () => {
-    const ref = { current: null } as React.RefObject<CarouselImperativeApi>;
+    const ref = createRef<CarouselImperativeApi>();
     render(<ImperativeFixture apiRef={ref} defaultPlaying />);
 
     expect(screen.getByTestId("play-pause")).toHaveAttribute(

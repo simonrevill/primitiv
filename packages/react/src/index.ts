@@ -6,6 +6,7 @@ export * from "./Collapsible";
 export * from "./Divider";
 export * from "./Dropdown";
 export * from "./Modal";
+export * from "./Portal";
 export * from "./RadioGroup";
 export * from "./Table";
 export * from "./Tabs";

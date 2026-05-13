@@ -13,6 +13,7 @@ closest analogue to whatever you're scaffolding and mirror its shape.
 | Divider | Simple element | no | none | 1 | Horizontal / vertical separator. Single test file. |
 | Dropdown | Compound, very complex | yes (Root, Trigger, Content, Item, Group, Sub + 6 contexts) | Dropdown / Content / Group / ItemIndicator / RadioGroup / Sub | 17 | Menu with sub-menus, checkbox/radio items, typeahead, item indicators. Has its own `constants.ts`. |
 | Modal | Compound, disclosure | yes (Root, Trigger, Content) | ModalContext | 14 | Uses native `<dialog>` with a polyfill (`dialog-polyfill.ts`); nested modals, click-outside, escape-hatches. |
+| Portal | Simple utility | no | none | 1 | Public DOM-escape primitive wrapping `createPortal`. No state or context; consumed by Modal.Portal. |
 | RadioGroup | Compound, roving tabindex | yes (Root + item context) | RadioGroupContext, RadioGroupItemContext | 11 | `orientation: "both"`, pre-filters disabled; arrow does nothing while focus is on a disabled radio. |
 | Slot | Internal utility | n/a | n/a | 2 | The asChild composition primitive. Also exports `composeEventHandlers`. Used by every component that supports asChild. |
 | Table | Sub-component family | no | none | 9 | Compound but stateless — Root, Header, Body, Footer, Caption, Row, Cell, Head, ScrollArea. |
@@ -27,5 +28,5 @@ Patterns by inheritance:
 - For a **simple element** wrapper: copy Button or Divider.
 - For a **sub-component family without state**: copy Table.
 
-Total components: 12. The shared utilities they all build on are in
+Total components: 13. The shared utilities they all build on are in
 `shared-hooks.md` and `shared-utils.md`.

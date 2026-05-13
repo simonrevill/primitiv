@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { createRef } from "react";
 import { act, render, screen } from "@testing-library/react";
 
 import { Carousel } from "..";
@@ -18,7 +18,7 @@ function fixture(apiRef: React.Ref<CarouselImperativeApi>, slides = 3) {
 
 describe("Carousel imperative getProgress / refresh", () => {
   it("getProgress() should return the live page, totalPages, and a 0..1 value", () => {
-    const ref = { current: null } as React.RefObject<CarouselImperativeApi>;
+    const ref = createRef<CarouselImperativeApi>();
     render(fixture(ref, 4));
 
     expect(ref.current!.getProgress()).toEqual({
@@ -39,7 +39,7 @@ describe("Carousel imperative getProgress / refresh", () => {
   });
 
   it("getProgress() should return value=0 when no slides are registered", () => {
-    const ref = { current: null } as React.RefObject<CarouselImperativeApi>;
+    const ref = createRef<CarouselImperativeApi>();
     render(
       <Carousel.Root ref={ref} ariaLabel="Featured products" />,
     );
@@ -52,7 +52,7 @@ describe("Carousel imperative getProgress / refresh", () => {
   });
 
   it("getProgress() should return value=0 with a single page", () => {
-    const ref = { current: null } as React.RefObject<CarouselImperativeApi>;
+    const ref = createRef<CarouselImperativeApi>();
     render(fixture(ref, 1));
 
     expect(ref.current!.getProgress()).toEqual({
@@ -63,7 +63,7 @@ describe("Carousel imperative getProgress / refresh", () => {
   });
 
   it("refresh() should re-issue the scrollTo for the current page", () => {
-    const ref = { current: null } as React.RefObject<CarouselImperativeApi>;
+    const ref = createRef<CarouselImperativeApi>();
     render(
       <Carousel.Root ref={ref} ariaLabel="Featured products">
         <Carousel.Viewport data-testid="viewport">

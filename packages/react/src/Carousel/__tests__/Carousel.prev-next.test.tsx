@@ -5,10 +5,7 @@ import userEvent from "@testing-library/user-event";
 import { Carousel } from "..";
 
 function renderWithSlides(
-  rootProps: Omit<
-    React.ComponentProps<typeof Carousel.Root>,
-    "ariaLabel" | "children"
-  > & { ariaLabel?: string } = {},
+  rootProps: { defaultPage?: number; loop?: boolean } = {},
   count = 3,
 ) {
   return render(

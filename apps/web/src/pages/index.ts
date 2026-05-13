@@ -5,3 +5,4 @@ export * from "./DropdownExample";
 export * from "./ModalExample";
 export * from "./ToggleExample";
 export * from "./ToggleGroupExample";
+export * from "./TooltipExample";

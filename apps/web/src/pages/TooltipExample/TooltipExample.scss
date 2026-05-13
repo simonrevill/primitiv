@@ -1,0 +1,120 @@
+/* ── Shared tooltip content style ────────────────────────────────────────── */
+/* Applied to all tooltip content elements in this example page.             */
+/* The trigger/content pairing below assigns independent anchor-name values  */
+/* so each tooltip is positioned independently.                              */
+
+[class$="__content"],
+[class*="__content-"] {
+  position: absolute;
+  background: #1a1a1a;
+  color: #fff;
+  font-size: 13px;
+  padding: 5px 10px;
+  border-radius: 4px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* ── 1. Basic ────────────────────────────────────────────────────────────── */
+.tp-basic__trigger {
+  anchor-name: --tp-basic;
+}
+
+.tp-basic__content {
+  position-anchor: --tp-basic;
+  position-area: top;
+  margin-bottom: 6px;
+}
+
+/* ── 2. Multiple tooltips ────────────────────────────────────────────────── */
+.tp-multi {
+  display: flex;
+  gap: 8px;
+}
+
+.tp-multi__trigger-a { anchor-name: --tp-multi-a; }
+.tp-multi__trigger-b { anchor-name: --tp-multi-b; }
+.tp-multi__trigger-c { anchor-name: --tp-multi-c; }
+
+.tp-multi__content-a {
+  position-anchor: --tp-multi-a;
+  position-area: top;
+  margin-bottom: 6px;
+}
+
+.tp-multi__content-b {
+  position-anchor: --tp-multi-b;
+  position-area: top;
+  margin-bottom: 6px;
+}
+
+.tp-multi__content-c {
+  position-anchor: --tp-multi-c;
+  position-area: top;
+  margin-bottom: 6px;
+}
+
+/* ── 3. With arrow ───────────────────────────────────────────────────────── */
+.tp-arrow__trigger {
+  anchor-name: --tp-arrow;
+}
+
+.tp-arrow__content {
+  position-anchor: --tp-arrow;
+  position-area: top;
+  margin-bottom: 10px;
+  /* Override pointer-events so the arrow element is reachable */
+  pointer-events: auto;
+  position: relative;
+}
+
+.tp-arrow__arrow {
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  translate: -50% 0;
+  width: 10px;
+  height: 10px;
+  background: #1a1a1a;
+  rotate: 45deg;
+}
+
+/* ── 4. Placement variations ─────────────────────────────────────────────── */
+.tp-placement {
+  display: flex;
+  gap: 8px;
+}
+
+.tp-placement__trigger-top    { anchor-name: --tp-placement-top; }
+.tp-placement__trigger-bottom { anchor-name: --tp-placement-bottom; }
+
+.tp-placement__content-top {
+  position-anchor: --tp-placement-top;
+  position-area: top;
+  position-try-fallbacks: bottom;
+  margin-bottom: 6px;
+}
+
+.tp-placement__content-bottom {
+  position-anchor: --tp-placement-bottom;
+  position-area: bottom;
+  position-try-fallbacks: top;
+  margin-top: 6px;
+}
+
+/* ── 5. Controlled ───────────────────────────────────────────────────────── */
+.tp-controlled {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.tp-controlled__trigger {
+  anchor-name: --tp-controlled;
+}
+
+.tp-controlled__content {
+  position-anchor: --tp-controlled;
+  position-area: top;
+  margin-bottom: 6px;
+}

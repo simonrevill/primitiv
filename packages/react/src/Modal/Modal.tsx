@@ -1,6 +1,6 @@
 import { Ref, useEffect, useId } from "react";
-import { createPortal } from "react-dom";
 
+import { Portal } from "../Portal";
 import { Slot, composeEventHandlers, composeRefs } from "../Slot";
 
 import { ModalProvider } from "./ModalContext";
@@ -146,7 +146,7 @@ function ModalPortal({ children, container, forceMount }: ModalPortalProps) {
 
   if (!open && !forceMount) return null;
 
-  return createPortal(children, container ?? document.body);
+  return <Portal container={container}>{children}</Portal>;
 }
 
 ModalPortal.displayName = "ModalPortal";

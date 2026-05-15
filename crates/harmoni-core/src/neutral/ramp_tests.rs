@@ -78,6 +78,18 @@ fn should_interpolate_chroma_between_endpoints_in_inherit_tint_mode() {
 }
 
 #[test]
+fn should_force_chroma_to_zero_at_every_step_in_achromatic_tint_mode() {
+    let soft_white = Oklch::new(0.975, 0.02, 240.0);
+    let soft_black = Oklch::new(0.10, 0.008, 240.0);
+
+    let palette = generate_neutral_ramp(soft_white, soft_black, TintMode::Achromatic);
+
+    for (i, swatch) in palette.swatches.iter().enumerate() {
+        assert_eq!(swatch.c, 0.0, "step at index {} should have zero chroma", i);
+    }
+}
+
+#[test]
 fn should_decrease_lightness_monotonically_across_the_ramp() {
     let soft_white = Oklch::new(0.975, 0.006, 240.0);
     let soft_black = Oklch::new(0.10, 0.00375, 240.0);

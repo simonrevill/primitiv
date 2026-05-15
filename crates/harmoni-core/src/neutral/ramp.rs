@@ -13,23 +13,27 @@ pub enum TintMode {
 
 const STEPS: [u16; 10] = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
 
-pub fn generate_neutral_ramp(soft_white: Oklch, soft_black: Oklch, _tint: TintMode) -> Palette {
+pub fn generate_neutral_ramp(soft_white: Oklch, soft_black: Oklch, tint: TintMode) -> Palette {
     let hue = soft_white.hue.into_degrees();
     let last = STEPS.len() - 1;
     let curve_span = TARGET_LIGHTNESS[0] - TARGET_LIGHTNESS[last];
+    let apply_tint = |c: f32| match tint {
+        TintMode::Inherit => c,
+        TintMode::Achromatic => 0.0,
+    };
     let backgrounds: Vec<SwatchStep> = STEPS
         .iter()
         .enumerate()
         .map(|(i, &step)| {
             if i == 0 {
-                SwatchStep::from_label(soft_white.l, soft_white.chroma, hue, step)
+                SwatchStep::from_label(soft_white.l, apply_tint(soft_white.chroma), hue, step)
             } else if i == last {
-                SwatchStep::from_label(soft_black.l, soft_black.chroma, hue, step)
+                SwatchStep::from_label(soft_black.l, apply_tint(soft_black.chroma), hue, step)
             } else {
                 let fraction = (TARGET_LIGHTNESS[0] - TARGET_LIGHTNESS[i]) / curve_span;
                 let l = soft_white.l + (soft_black.l - soft_white.l) * fraction;
                 let c = soft_white.chroma + (soft_black.chroma - soft_white.chroma) * fraction;
-                SwatchStep::from_label(l, c, hue, step)
+                SwatchStep::from_label(l, apply_tint(c), hue, step)
             }
         })
         .collect();

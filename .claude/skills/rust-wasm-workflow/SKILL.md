@@ -36,12 +36,16 @@ The `api` module re-exports:
 
 ```rust
 pub use audit::audit_contrast;
-pub use generate::{generate, generate_with_options, GenerateOptions};
-pub use crate::palette::generator::generate_greyscale_oklch as generate_greyscale;
+pub use generate::{generate, generate_with_options, generate_with_lightness, GenerateOptions};
+pub use neutral::{derive_soft_neutrals, generate_neutral_ramp, tint_neutrals};
 ```
 
 If you find yourself reaching deeper, either lift the symbol into
 `api` or rethink the access pattern.
+
+(The old `generate_greyscale` re-export was removed — the `neutral`
+module owns greyscale/neutral ramps now. See `generate_neutral_ramp`,
+`derive_soft_neutrals`, `tint_neutrals`.)
 
 ## Mirror-types pattern
 
@@ -50,7 +54,11 @@ wasm adapter (`crates/harmoni-wasm`) holds **mirror types** in
 `src/types.rs` that shadow the core structs field-for-field and
 derive `Tsify`:
 
-- `SwatchLabel`, `SwatchStep`, `ContrastResult`, `Swatch` are mirrored.
+- `SwatchLabel`, `SwatchStep`, `ContrastResult`, `Swatch`, `Palette`,
+  `TintMode`, and `SoftNeutrals` are mirrored.
+- `OklchTriple` is a wasm-only helper — `SoftNeutrals` carries two of
+  them, flattening `palette::Oklch` to plain `{ l, c, h }` floats
+  because the wasm crate can't expose `Oklch` directly.
 - Each has a `From<harmoni_core::*>` so wasm entry points convert at
   the boundary:
 
@@ -60,6 +68,11 @@ api::audit_contrast(...)
     .map_err(to_js_error)
 ```
 
+A type the user passes **into** the engine (not just receives back)
+needs `From` impls in *both* directions. `TintMode` is the example:
+`From<core::TintMode> for types::TintMode` *and*
+`From<types::TintMode> for core::TintMode`.
+
 When you add a new field to a core struct, you must:
 
 1. Add it to the core struct in `harmoni-core`.
@@ -67,6 +80,11 @@ When you add a new field to a core struct, you must:
 3. Update the `From` impl.
 4. Regenerate the wasm pkg if you want the new TS types in the web
    app: `pnpm run build:wasm`.
+
+When you add a new wasm **entry point**, take CSS strings for colour
+arguments (`ColorInput::Css`), call the matching `api::*` function,
+and `.map(Into::into).map_err(to_js_error)`. `generate_neutral_ramp`,
+`derive_soft_neutrals`, and `tint_neutrals` all follow this shape.
 
 ## Opaque Palette extern type
 

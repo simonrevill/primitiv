@@ -50,12 +50,35 @@ lower-level modules. The curated surface is small by design:
 api::generate(ColorInput) -> Result<Palette, ColorInputError>
 api::generate_with_options(ColorInput, GenerateOptions)
     -> Result<Palette, ColorInputError>
-api::generate_greyscale() -> Palette
+api::generate_with_lightness(ColorInput, [f32; 10], GenerateOptions)
+    -> Result<Palette, ColorInputError>
+
+// Neutral / greyscale ramps
+api::generate_neutral_ramp(white: ColorInput, black: ColorInput, TintMode)
+    -> Result<Palette, ColorInputError>
+api::derive_soft_neutrals(brand: ColorInput, softness: f32)
+    -> Result<SoftNeutrals, ColorInputError>
+api::tint_neutrals(white: ColorInput, black: ColorInput,
+    source: ColorInput, strength: f32)
+    -> Result<SoftNeutrals, ColorInputError>
 
 // Contrast audit
 api::audit_contrast(ColorInput, ColorInput)
     -> Result<ContrastResult, ColorInputError>
 ```
+
+`GenerateOptions` carries `light_padding` / `dark_padding` plus
+optional `soft_white` / `soft_black` overrides — when set, those
+replace pure black/white as foreground-audit candidates.
+
+The neutral surface builds greyscale ramps. `generate_neutral_ramp`
+interpolates a 10-step ramp between a soft white and soft black
+along the perceptual lightness curve; `TintMode` is `Inherit`
+(mid-steps inherit the endpoints' chroma) or `Achromatic` (chroma
+forced to zero). `derive_soft_neutrals` produces soft black/white
+primitives from a brand colour, and `tint_neutrals` layers a brand
+hue onto already-chosen white/black while preserving their
+lightness.
 
 All colour input goes through the `ColorInput` enum, which is the
 single parsing path:

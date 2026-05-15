@@ -52,6 +52,32 @@ fn should_space_lightness_along_the_normalised_perceptual_curve() {
 }
 
 #[test]
+fn should_interpolate_chroma_between_endpoints_in_inherit_tint_mode() {
+    use crate::palette::generator::TARGET_LIGHTNESS;
+
+    let soft_white = Oklch::new(0.975, 0.02, 240.0);
+    let soft_black = Oklch::new(0.10, 0.008, 240.0);
+
+    let palette = generate_neutral_ramp(soft_white, soft_black, TintMode::Inherit);
+
+    let span = TARGET_LIGHTNESS[0] - TARGET_LIGHTNESS[9];
+    for i in 1..palette.swatches.len() - 1 {
+        let fraction = (TARGET_LIGHTNESS[0] - TARGET_LIGHTNESS[i]) / span;
+        let expected_c = soft_white.chroma + (soft_black.chroma - soft_white.chroma) * fraction;
+        let actual_c = palette.swatches[i].c;
+        assert!(
+            (actual_c - expected_c).abs() < 1e-5,
+            "step at index {} has c={} but expected {}",
+            i,
+            actual_c,
+            expected_c
+        );
+        assert!(actual_c > 0.0, "step at index {} should be tinted", i);
+        assert_eq!(palette.swatches[i].h, soft_white.hue.into_degrees());
+    }
+}
+
+#[test]
 fn should_decrease_lightness_monotonically_across_the_ramp() {
     let soft_white = Oklch::new(0.975, 0.006, 240.0);
     let soft_black = Oklch::new(0.10, 0.00375, 240.0);

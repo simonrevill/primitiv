@@ -28,7 +28,8 @@ pub fn generate_neutral_ramp(soft_white: Oklch, soft_black: Oklch, _tint: TintMo
             } else {
                 let fraction = (TARGET_LIGHTNESS[0] - TARGET_LIGHTNESS[i]) / curve_span;
                 let l = soft_white.l + (soft_black.l - soft_white.l) * fraction;
-                SwatchStep::from_label(l, soft_white.chroma, hue, step)
+                let c = soft_white.chroma + (soft_black.chroma - soft_white.chroma) * fraction;
+                SwatchStep::from_label(l, c, hue, step)
             }
         })
         .collect();

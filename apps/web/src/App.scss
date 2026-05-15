@@ -73,6 +73,7 @@ header {
   &__label {
     color: oklch(1 0 0);
     margin: 0;
+    text-transform: capitalize;
   }
 
   &__steps {

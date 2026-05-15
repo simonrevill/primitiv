@@ -30,7 +30,7 @@ export function ColorEngine() {
     <>
       <h1>Harmoni Color Engine</h1>
       <div className="palettes-grid">
-        <p className="palette__label">Greyscale</p>
+        <p className="palette__label">Neutral</p>
         <div className="neutral-pickers">
           <label>
             White
@@ -82,7 +82,7 @@ export function ColorEngine() {
 
           return (
             <Fragment key={key}>
-              <p className="palette__label">Red</p>
+              <p className="palette__label">{key}</p>
               <input
                 type="color"
                 onChange={handleColorChange(key)}

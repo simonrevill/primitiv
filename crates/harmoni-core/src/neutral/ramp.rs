@@ -43,10 +43,28 @@ pub fn generate_neutral_ramp(soft_white: Oklch, soft_black: Oklch, tint: TintMod
         .find(|bg| bg.label == SwatchLabel::Number(900))
         .expect("neutral ramp must include a 900 step");
 
+    let soft_white_candidate = SwatchStep::from_label(
+        soft_white.l,
+        soft_white.chroma,
+        soft_white.hue.into_degrees(),
+        SwatchLabel::Name(String::from("White")),
+    );
+    let soft_black_candidate = SwatchStep::from_label(
+        soft_black.l,
+        soft_black.chroma,
+        soft_black.hue.into_degrees(),
+        SwatchLabel::Name(String::from("Black")),
+    );
+
     let swatches: Vec<Swatch> = backgrounds
         .iter()
         .map(|background| {
-            let recommendation = get_best_foreground(background, dark_candidate, None, None);
+            let recommendation = get_best_foreground(
+                background,
+                dark_candidate,
+                Some(&soft_white_candidate),
+                Some(&soft_black_candidate),
+            );
             let contrast_result = get_contrast_rating_for_step(background, &recommendation.color);
             Swatch {
                 l: background.l,

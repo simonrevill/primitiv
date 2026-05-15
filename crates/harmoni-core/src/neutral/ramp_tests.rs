@@ -78,6 +78,28 @@ fn should_interpolate_chroma_between_endpoints_in_inherit_tint_mode() {
 }
 
 #[test]
+fn should_use_soft_white_as_the_white_foreground_candidate_for_the_audit() {
+    use crate::palette::generator::SwatchLabel;
+    let soft_white = palette::Oklch::new(0.95, 0.02, 240.0);
+    let soft_black = palette::Oklch::new(0.10, 0.005, 240.0);
+
+    let palette = generate_neutral_ramp(soft_white, soft_black, TintMode::Inherit);
+
+    // Step 900 has near-zero contrast against itself as a dark candidate,
+    // so the audit falls through to white. With the soft endpoints threaded
+    // in, that white must be the soft white the user supplied — not pure #fff.
+    let step_900 = &palette.swatches[9];
+    let fg = &step_900.best_foreground;
+    assert_eq!(fg.label, SwatchLabel::Name(String::from("White")));
+    assert!(
+        (fg.l - 0.95).abs() < 1e-5,
+        "step 900 foreground L should be soft_white.l (0.95), got {}",
+        fg.l,
+    );
+    assert!((fg.c - 0.02).abs() < 1e-5);
+}
+
+#[test]
 fn should_force_chroma_to_zero_at_every_step_in_achromatic_tint_mode() {
     let soft_white = Oklch::new(0.975, 0.02, 240.0);
     let soft_black = Oklch::new(0.10, 0.008, 240.0);

@@ -203,7 +203,7 @@ pub fn generate_palette_with_scale(
     let swatches: Vec<Swatch> = backgrounds
         .iter()
         .map(|background| {
-            let recommendation = get_best_foreground(background, dark_candidate);
+            let recommendation = get_best_foreground(background, dark_candidate, None, None);
             let contrast_result = get_contrast_rating_for_step(background, &recommendation.color);
 
             Swatch {

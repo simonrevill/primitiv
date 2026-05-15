@@ -28,6 +28,30 @@ fn should_return_ten_labelled_swatches_with_endpoints_pinned_to_soft_white_and_s
 }
 
 #[test]
+fn should_space_lightness_along_the_normalised_perceptual_curve() {
+    use crate::palette::generator::TARGET_LIGHTNESS;
+
+    let soft_white = Oklch::new(0.975, 0.006, 240.0);
+    let soft_black = Oklch::new(0.10, 0.00375, 240.0);
+
+    let palette = generate_neutral_ramp(soft_white, soft_black, TintMode::Inherit);
+
+    let span = TARGET_LIGHTNESS[0] - TARGET_LIGHTNESS[9];
+    for i in 0..palette.swatches.len() {
+        let fraction = (TARGET_LIGHTNESS[0] - TARGET_LIGHTNESS[i]) / span;
+        let expected_l = soft_white.l + (soft_black.l - soft_white.l) * fraction;
+        let actual_l = palette.swatches[i].l;
+        assert!(
+            (actual_l - expected_l).abs() < 1e-5,
+            "step at index {} has l={} but expected {}",
+            i,
+            actual_l,
+            expected_l
+        );
+    }
+}
+
+#[test]
 fn should_decrease_lightness_monotonically_across_the_ramp() {
     let soft_white = Oklch::new(0.975, 0.006, 240.0);
     let soft_black = Oklch::new(0.10, 0.00375, 240.0);

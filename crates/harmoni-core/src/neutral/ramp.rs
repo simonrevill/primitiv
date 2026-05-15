@@ -2,7 +2,7 @@ use palette::Oklch;
 
 use crate::audit::contrast::get_contrast_rating_for_step;
 use crate::audit::foreground::get_best_foreground;
-use crate::palette::generator::{Palette, Swatch, SwatchLabel, SwatchStep};
+use crate::palette::generator::{Palette, Swatch, SwatchLabel, SwatchStep, TARGET_LIGHTNESS};
 
 #[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub enum TintMode {
@@ -16,6 +16,7 @@ const STEPS: [u16; 10] = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
 pub fn generate_neutral_ramp(soft_white: Oklch, soft_black: Oklch, _tint: TintMode) -> Palette {
     let hue = soft_white.hue.into_degrees();
     let last = STEPS.len() - 1;
+    let curve_span = TARGET_LIGHTNESS[0] - TARGET_LIGHTNESS[last];
     let backgrounds: Vec<SwatchStep> = STEPS
         .iter()
         .enumerate()
@@ -25,8 +26,8 @@ pub fn generate_neutral_ramp(soft_white: Oklch, soft_black: Oklch, _tint: TintMo
             } else if i == last {
                 SwatchStep::from_label(soft_black.l, soft_black.chroma, hue, step)
             } else {
-                let t = i as f32 / last as f32;
-                let l = soft_white.l + (soft_black.l - soft_white.l) * t;
+                let fraction = (TARGET_LIGHTNESS[0] - TARGET_LIGHTNESS[i]) / curve_span;
+                let l = soft_white.l + (soft_black.l - soft_white.l) * fraction;
                 SwatchStep::from_label(l, soft_white.chroma, hue, step)
             }
         })

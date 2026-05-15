@@ -1,7 +1,8 @@
 import init, {
   type Palette,
+  type TintMode,
   Swatch,
-  generate_greyscale_oklch,
+  generate_neutral_ramp,
   generate_palette_with_lightness,
 } from "harmoni-wasm";
 import { useState, useEffect, ChangeEvent } from "react";
@@ -20,7 +21,9 @@ export function useColors() {
   useEffect(() => {
     if (!wasmReady) return;
 
-    setGreyscalePalette(generate_greyscale_oklch());
+    setGreyscalePalette(
+      generate_neutral_ramp("#ffffff", "#000000", "Inherit" as TintMode),
+    );
 
     setColors((prev) => {
       const next = { ...prev };

@@ -122,15 +122,6 @@ pub fn generate_palette_with_light_padding(
 }
 
 #[wasm_bindgen]
-pub fn generate_greyscale_oklch() -> Palette {
-    let data = api::generate_greyscale();
-    let wrapped: types::Palette = data.into();
-    serde_wasm_bindgen::to_value(&wrapped)
-        .expect("serializing greyscale palette should never fail")
-        .unchecked_into()
-}
-
-#[wasm_bindgen]
 pub fn generate_neutral_ramp(
     white: &str,
     black: &str,

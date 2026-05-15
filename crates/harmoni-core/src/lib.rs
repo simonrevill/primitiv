@@ -6,4 +6,6 @@ pub mod palette;
 
 pub use audit::contrast::ContrastResult;
 pub use color::input::{ColorInput, ColorInputError};
+pub use neutral::derive::SoftNeutrals;
+pub use neutral::ramp::TintMode;
 pub use palette::generator::{Palette, Swatch, SwatchLabel, SwatchStep};

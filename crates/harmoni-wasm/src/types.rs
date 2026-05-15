@@ -10,6 +10,64 @@ use harmoni_core as core;
 use serde::{Deserialize, Serialize};
 use tsify::Tsify;
 
+#[derive(Tsify, Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Default)]
+#[tsify(into_wasm_abi, from_wasm_abi)]
+pub enum TintMode {
+    #[default]
+    Inherit,
+    Achromatic,
+}
+
+impl From<core::TintMode> for TintMode {
+    fn from(value: core::TintMode) -> Self {
+        match value {
+            core::TintMode::Inherit => TintMode::Inherit,
+            core::TintMode::Achromatic => TintMode::Achromatic,
+        }
+    }
+}
+
+impl From<TintMode> for core::TintMode {
+    fn from(value: TintMode) -> Self {
+        match value {
+            TintMode::Inherit => core::TintMode::Inherit,
+            TintMode::Achromatic => core::TintMode::Achromatic,
+        }
+    }
+}
+
+#[derive(Tsify, Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
+#[tsify(into_wasm_abi, from_wasm_abi)]
+pub struct OklchTriple {
+    pub l: f32,
+    pub c: f32,
+    pub h: f32,
+}
+
+#[derive(Tsify, Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
+#[tsify(into_wasm_abi, from_wasm_abi)]
+pub struct SoftNeutrals {
+    pub white: OklchTriple,
+    pub black: OklchTriple,
+}
+
+impl From<core::SoftNeutrals> for SoftNeutrals {
+    fn from(value: core::SoftNeutrals) -> Self {
+        SoftNeutrals {
+            white: OklchTriple {
+                l: value.white.l,
+                c: value.white.chroma,
+                h: value.white.hue.into_degrees(),
+            },
+            black: OklchTriple {
+                l: value.black.l,
+                c: value.black.chroma,
+                h: value.black.hue.into_degrees(),
+            },
+        }
+    }
+}
+
 #[derive(Tsify, Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[tsify(into_wasm_abi, from_wasm_abi)]
 pub enum SwatchLabel {
@@ -141,6 +199,39 @@ mod tests {
                 label: SwatchLabel::Number(500),
             }
         );
+    }
+
+    #[test]
+    fn tint_mode_inherit_round_trips_through_conversions() {
+        let core_value = core::TintMode::Inherit;
+        let wasm_value: TintMode = core_value.into();
+        assert_eq!(wasm_value, TintMode::Inherit);
+
+        let core_again: core::TintMode = wasm_value.into();
+        assert_eq!(core_again, core::TintMode::Inherit);
+    }
+
+    #[test]
+    fn tint_mode_achromatic_round_trips_through_conversions() {
+        let core_value = core::TintMode::Achromatic;
+        let wasm_value: TintMode = core_value.into();
+        assert_eq!(wasm_value, TintMode::Achromatic);
+
+        let core_again: core::TintMode = wasm_value.into();
+        assert_eq!(core_again, core::TintMode::Achromatic);
+    }
+
+    #[test]
+    fn soft_neutrals_converts_from_core_preserving_oklch_components() {
+        let core_value = core::SoftNeutrals {
+            white: palette::Oklch::new(0.95, 0.02, 240.0),
+            black: palette::Oklch::new(0.10, 0.005, 240.0),
+        };
+        let wasm_value: SoftNeutrals = core_value.into();
+        assert!((wasm_value.white.l - 0.95).abs() < 1e-5);
+        assert!((wasm_value.white.c - 0.02).abs() < 1e-5);
+        assert!((wasm_value.black.l - 0.10).abs() < 1e-5);
+        assert!((wasm_value.black.c - 0.005).abs() < 1e-5);
     }
 
     #[test]

@@ -4,6 +4,7 @@ import init, {
   Swatch,
   generate_neutral_ramp,
   generate_palette_with_lightness,
+  tint_neutrals,
 } from "harmoni-wasm";
 import { useState, useEffect, ChangeEvent } from "react";
 import type { ColorKey, ColorMap } from "./types";
@@ -14,6 +15,8 @@ export function useColors() {
   const [greyscalePalette, setGreyscalePalette] = useState<Palette>();
   const [neutralWhite, setNeutralWhite] = useState("#ffffff");
   const [neutralBlack, setNeutralBlack] = useState("#000000");
+  const [tintSource, setTintSource] = useState<string | null>(null);
+  const [tintStrength, setTintStrength] = useState(0.5);
   const [colors, setColors] = useState<ColorMap>(DEFAULT_COLORS);
 
   useEffect(() => {
@@ -46,14 +49,31 @@ export function useColors() {
   }, [wasmReady]);
 
   // The neutral ramp regenerates whenever the white or black primitive
-  // changes, keeping the two pickers and the ramp in sync.
+  // changes, keeping the two pickers and the ramp in sync. When a tint
+  // source is set, the endpoints are tinted first — their lightness is
+  // kept, the source hue is layered on — so removing the tint snaps the
+  // ramp straight back to the plain white/black the user chose.
   useEffect(() => {
     if (!wasmReady) return;
 
+    let white = neutralWhite;
+    let black = neutralBlack;
+
+    if (tintSource) {
+      const tinted = tint_neutrals(
+        neutralWhite,
+        neutralBlack,
+        tintSource,
+        tintStrength,
+      );
+      white = `oklch(${tinted.white.l} ${tinted.white.c} ${tinted.white.h})`;
+      black = `oklch(${tinted.black.l} ${tinted.black.c} ${tinted.black.h})`;
+    }
+
     setGreyscalePalette(
-      generate_neutral_ramp(neutralWhite, neutralBlack, "Inherit" as TintMode),
+      generate_neutral_ramp(white, black, "Inherit" as TintMode),
     );
-  }, [wasmReady, neutralWhite, neutralBlack]);
+  }, [wasmReady, neutralWhite, neutralBlack, tintSource, tintStrength]);
 
   const handleNeutralWhiteChange = (e: ChangeEvent<HTMLInputElement>) => {
     setNeutralWhite(e.target.value);
@@ -61,6 +81,20 @@ export function useColors() {
 
   const handleNeutralBlackChange = (e: ChangeEvent<HTMLInputElement>) => {
     setNeutralBlack(e.target.value);
+  };
+
+  const handleUseAsTint = (key: ColorKey) => {
+    const source = colors[key].palette?.swatches[5];
+    if (!source) return;
+    setTintSource(`oklch(${source.l} ${source.c} ${source.h})`);
+  };
+
+  const handleTintStrengthChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setTintStrength(parseFloat(e.target.value) / 100);
+  };
+
+  const handleRemoveTint = () => {
+    setTintSource(null);
   };
 
   const handleColorChange =
@@ -205,8 +239,13 @@ export function useColors() {
     greyscalePalette,
     neutralWhite,
     neutralBlack,
+    tintSource,
+    tintStrength,
     handleNeutralWhiteChange,
     handleNeutralBlackChange,
+    handleUseAsTint,
+    handleTintStrengthChange,
+    handleRemoveTint,
     handleColorChange,
     colors,
     handleLightPaddingChange,

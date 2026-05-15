@@ -9,8 +9,13 @@ export function ColorEngine() {
     greyscalePalette,
     neutralWhite,
     neutralBlack,
+    tintSource,
+    tintStrength,
     handleNeutralWhiteChange,
     handleNeutralBlackChange,
+    handleUseAsTint,
+    handleTintStrengthChange,
+    handleRemoveTint,
     handleColorChange,
     colors,
     handleLightPaddingChange,
@@ -43,6 +48,28 @@ export function ColorEngine() {
               onChange={handleNeutralBlackChange}
             />
           </label>
+          {tintSource && (
+            <div className="neutral-tint">
+              <span
+                className="neutral-tint__swatch"
+                style={{ background: tintSource }}
+              />
+              <label>
+                Tint
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  step={1}
+                  value={tintStrength * 100}
+                  onChange={handleTintStrengthChange}
+                />
+              </label>
+              <button type="button" onClick={handleRemoveTint}>
+                Remove tint
+              </button>
+            </div>
+          )}
         </div>
         <div className="palette-container">
           <div className="palette">
@@ -61,6 +88,9 @@ export function ColorEngine() {
                 onChange={handleColorChange(key)}
                 value={hex}
               />
+              <button type="button" onClick={() => handleUseAsTint(key)}>
+                Use as neutral tint
+              </button>
               <div className="palette-container">
                 <div className="palette">
                   <ColorPalette palette={palette} />

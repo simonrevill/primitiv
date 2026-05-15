@@ -175,6 +175,8 @@ mod generator_tests {
                 &TARGET_CHROMA_SCALE,
                 0.0,
                 0.0,
+                None,
+                None,
             );
             let step_50_no_padding_lightness = palette_with_no_padding
                 .swatches.iter()
@@ -202,6 +204,8 @@ mod generator_tests {
                 &TARGET_CHROMA_SCALE,
                 positive_light_padding,
                 0.0,
+                None,
+                None,
             );
             let step_50_with_padding_lightness = palette_with_padding
                 .swatches.iter()
@@ -242,6 +246,8 @@ mod generator_tests {
                 &TARGET_CHROMA_SCALE,
                 0.0,
                 0.0,
+                None,
+                None,
             );
             let step_50_no_padding_lightness = palette_with_no_padding
                 .swatches.iter()
@@ -269,6 +275,8 @@ mod generator_tests {
                 &TARGET_CHROMA_SCALE,
                 negative_light_padding,
                 0.0,
+                None,
+                None,
             );
             let step_50_with_padding_lightness = palette_with_padding
                 .swatches.iter()
@@ -313,6 +321,8 @@ mod generator_tests {
                 &TARGET_CHROMA_SCALE,
                 0.0,
                 0.0,
+                None,
+                None,
             );
             let step_800_no = no_padding
                 .swatches.iter()
@@ -331,6 +341,8 @@ mod generator_tests {
                 &TARGET_CHROMA_SCALE,
                 0.0,
                 positive_dark_padding,
+                None,
+                None,
             );
             let step_800_with = with_padding
                 .swatches.iter()
@@ -358,6 +370,8 @@ mod generator_tests {
                 &TARGET_CHROMA_SCALE,
                 0.0,
                 0.0,
+                None,
+                None,
             );
             let step_800_no = no_padding
                 .swatches.iter()
@@ -376,6 +390,8 @@ mod generator_tests {
                 &TARGET_CHROMA_SCALE,
                 0.0,
                 negative_dark_padding,
+                None,
+                None,
             );
             let step_800_with = with_padding
                 .swatches.iter()
@@ -406,6 +422,8 @@ mod generator_tests {
             &TARGET_CHROMA_SCALE,
             0.0,
             0.0,
+            None,
+            None,
         );
 
         assert!(!palette.swatches.is_empty());
@@ -419,8 +437,8 @@ mod generator_tests {
         let yellow = Oklch::new(0.55, 0.18, 80.0);   // yellow – more constrained
         let blue   = Oklch::new(0.55, 0.18, 260.0);  // blue   – more headroom
 
-        let yellow_palette = generate_palette_with_scale(yellow, &TARGET_LIGHTNESS, &TARGET_CHROMA_SCALE, 0.0, 0.0);
-        let blue_palette   = generate_palette_with_scale(blue,   &TARGET_LIGHTNESS, &TARGET_CHROMA_SCALE, 0.0, 0.0);
+        let yellow_palette = generate_palette_with_scale(yellow, &TARGET_LIGHTNESS, &TARGET_CHROMA_SCALE, 0.0, 0.0, None, None);
+        let blue_palette   = generate_palette_with_scale(blue, &TARGET_LIGHTNESS, &TARGET_CHROMA_SCALE, 0.0, 0.0, None, None);
 
         assert!(
             yellow_palette.max_recommended_light_padding < blue_palette.max_recommended_light_padding,
@@ -469,6 +487,8 @@ mod generator_tests {
                 &TARGET_CHROMA_SCALE,
                 0.0,
                 0.0,
+                None,
+                None,
             );
 
             // Assert: Palette should store the exact lightness curve that was passed in

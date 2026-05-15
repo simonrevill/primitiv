@@ -72,6 +72,7 @@ pub fn generate_palette(
         GenerateOptions {
             light_padding,
             dark_padding,
+            ..GenerateOptions::default()
         },
     )
     .map_err(to_js_error)?;
@@ -94,6 +95,7 @@ pub fn generate_palette_with_lightness(
         GenerateOptions {
             light_padding,
             dark_padding,
+            ..GenerateOptions::default()
         },
     )
     .map_err(to_js_error)?;
@@ -111,6 +113,7 @@ pub fn generate_palette_with_light_padding(
         GenerateOptions {
             light_padding,
             dark_padding: 0.0,
+            ..GenerateOptions::default()
         },
     )
     .map_err(to_js_error)?;

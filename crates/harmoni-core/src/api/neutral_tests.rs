@@ -1,6 +1,24 @@
-use crate::api::neutral::generate_neutral_ramp;
+use crate::api::neutral::{derive_soft_neutrals, generate_neutral_ramp};
 use crate::color::input::ColorInput;
 use crate::neutral::ramp::TintMode;
+
+#[test]
+fn derive_soft_neutrals_returns_softened_values_from_brand_color_input() {
+    let result = derive_soft_neutrals(
+        ColorInput::Oklch {
+            l: 0.55,
+            c: 0.20,
+            h: 240.0,
+        },
+        0.5,
+    )
+    .expect("valid input should produce soft neutrals");
+
+    assert!((result.white.l - 0.975).abs() < 1e-5);
+    assert!((result.white.chroma - 0.008).abs() < 1e-5);
+    assert!((result.black.l - 0.10).abs() < 1e-5);
+    assert!((result.black.chroma - 0.005).abs() < 1e-5);
+}
 
 #[test]
 fn generate_neutral_ramp_returns_palette_with_endpoints_matching_color_inputs() {

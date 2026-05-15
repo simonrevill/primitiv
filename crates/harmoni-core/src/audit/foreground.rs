@@ -14,12 +14,16 @@ pub struct ForegroundRecommendation {
 pub fn get_best_foreground(
     background: &SwatchStep,
     dark_candidate: &SwatchStep,
-    _custom_white: Option<&SwatchStep>,
+    custom_white: Option<&SwatchStep>,
     custom_black: Option<&SwatchStep>,
 ) -> ForegroundRecommendation {
     let bg_color = Oklch::new(background.l, background.c, background.h);
     let dark_color = Oklch::new(dark_candidate.l, dark_candidate.c, dark_candidate.h);
-    let white_color = Oklch::new(1.0, 0.0, 0.0);
+    let (white_l, white_c, white_h) = match custom_white {
+        Some(w) => (w.l, w.c, w.h),
+        None => (1.0, 0.0, 0.0),
+    };
+    let white_color = Oklch::new(white_l, white_c, white_h);
     let (black_l, black_c, black_h) = match custom_black {
         Some(b) => (b.l, b.c, b.h),
         None => (0.01, 0.0, 0.0), // near-black (better than pure 0.0)
@@ -53,9 +57,9 @@ pub fn get_best_foreground(
     if ratio_white >= 4.5 && ratio_white >= ratio_black {
         return ForegroundRecommendation {
             color: SwatchStep {
-                l: 1.0,
-                c: 0.0,
-                h: 0.0,
+                l: white_l,
+                c: white_c,
+                h: white_h,
                 label: SwatchLabel::Name(String::from("White")),
             },
             contrast_ratio: ratio_white,

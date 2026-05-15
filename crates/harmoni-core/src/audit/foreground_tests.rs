@@ -71,6 +71,28 @@ fn should_pick_white_in_fallback_when_neither_passes_aa() {
 }
 
 #[test]
+fn should_use_custom_white_when_provided_against_a_very_dark_background() {
+    let dark_background = SwatchStep::from_label(0.10, 0.0, 0.0, SwatchLabel::Number(900));
+    let dark_candidate_failing_aa =
+        SwatchStep::from_label(0.10, 0.0, 0.0, SwatchLabel::Number(900));
+    let custom_white =
+        SwatchStep::from_label(0.95, 0.02, 240.0, SwatchLabel::Name(String::from("White")));
+    let expected =
+        SwatchStep::from_label(0.95, 0.02, 240.0, SwatchLabel::Name(String::from("White")));
+
+    let result = get_best_foreground(
+        &dark_background,
+        &dark_candidate_failing_aa,
+        Some(&custom_white),
+        None,
+    );
+
+    assert_eq!(result.color, expected);
+    assert!(!result.is_harmonious);
+    assert!(result.contrast_ratio >= 4.5);
+}
+
+#[test]
 fn should_use_custom_black_in_fallback_path_when_provided() {
     let light_background = SwatchStep::from_label(0.85, 0.0, 0.0, SwatchLabel::Number(200));
     let light_dark_candidate = SwatchStep::from_label(0.75, 0.0, 0.0, SwatchLabel::Number(900));

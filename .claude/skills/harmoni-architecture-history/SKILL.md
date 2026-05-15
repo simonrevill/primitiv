@@ -1,6 +1,6 @@
 ---
 name: harmoni-architecture-history
-description: The settled shape of the harmoni palette engine — what Steps C, D, A, B did, the ColorInput abstraction, the harmoni-core/harmoni-wasm boundary, the Tsify mirror-types pattern, and the SwatchStep/SwatchLabel/Swatch/Palette vocabulary. This is immutable historical reference, not steering for new work. TRIGGER when working on Rust crates (`crates/harmoni-core`, `crates/harmoni-wasm`), when you need to understand why `api::generate` is both a module and a function, why `harmoni-core` has zero wasm dependencies, what mirror types exist, or what the canonical color form is. SKIP for any pure React work.
+description: The settled shape of the harmoni palette engine — what Steps C, D, A, B did, the ColorInput abstraction, the harmoni-core/harmoni-wasm boundary, the Tsify mirror-types pattern, the SwatchStep/SwatchLabel/Swatch/Palette vocabulary, and the neutral colour module (ramps, soft neutrals, tinting). Historical reference, not steering for new work. TRIGGER when working on Rust crates (`crates/harmoni-core`, `crates/harmoni-wasm`), when you need to understand why `api::generate` is both a module and a function, why `harmoni-core` has zero wasm dependencies, what mirror types exist, what the canonical color form is, or what the neutral ramp / soft-neutral / tint functions do. SKIP for any pure React work.
 ---
 
 # Harmoni architecture history
@@ -100,6 +100,11 @@ Tsify's `typescript_custom_section` emission on `types::Swatch`.
 The web app's `import { type Palette } from "harmoni-wasm"` still
 resolves because the emitted type name is identical.
 
+> Superseded — see *Palette became a struct* below. `Palette` is
+> now a struct on both sides; the `export type Palette = Swatch[]`
+> custom section is gone, and `types::Palette` carries a `Tsify`
+> derive that emits a struct interface.
+
 ## Step B — rename
 
 `primitiv-core` → `harmoni-core`, `primitiv-wasm` → `harmoni-wasm`.
@@ -133,11 +138,72 @@ were updated mechanically. `Swatch.tsx` in the web app aliases the
 import as `SwatchData` to avoid colliding with the React component
 name.
 
-## Latent cleanup
+## Palette became a struct
 
-Fields like `max_recommended_light_padding`,
-`max_recommended_dark_padding`, and `note` are currently duplicated
-on every `Swatch` but logically belong on the palette (same value
-for every swatch in a given palette). If/when `Palette` becomes a
-struct instead of a type alias, these could move there. Not yet
-done.
+`Palette` was promoted from a `Vec<Swatch>` type alias to a struct:
+
+```rust
+pub struct Palette {
+    pub swatches: Vec<Swatch>,
+    pub lightness_curve: [f32; 10],
+    pub max_recommended_light_padding: f32,
+    pub max_recommended_dark_padding: f32,
+    pub note: String,
+}
+```
+
+The `max_recommended_*` and `note` metadata — once duplicated on
+every `Swatch` — now live on the palette, where they belong (one
+value per palette, not per swatch). The wasm `types::Palette`
+mirrors it as a `Tsify` struct.
+
+## Neutral colour handling (post-vocabulary-rename)
+
+A `neutral` module gives `harmoni-core` first-class greyscale /
+neutral ramps. Landed across PRs #56–#58.
+
+`crates/harmoni-core/src/neutral/` has three parts:
+
+- `derive::derive_soft_neutrals(brand, softness)` → `SoftNeutrals`
+  — soft black/white primitives derived from a brand colour. The
+  softness factor (clamped `[0, 1]`) controls how far the endpoints
+  pull off pure white/black and how much brand tint they carry.
+- `ramp::generate_neutral_ramp(white, black, TintMode)` → `Palette`
+  — a 10-step ramp interpolated between the two endpoints along the
+  normalised perceptual lightness curve. `TintMode::Inherit` lets the
+  mid-steps inherit the endpoints' chroma; `TintMode::Achromatic`
+  forces chroma to 0 at every step.
+- `tint::tint_neutrals(white, black, source, strength)` →
+  `SoftNeutrals` — layers `source`'s hue onto already-chosen white
+  and black, **keeping their lightness**. This is the
+  layer-a-tint-onto-my-tones operation; it does not derive new
+  lightnesses the way `derive_soft_neutrals` does.
+
+`SoftNeutrals { white, black }` (a pair of `palette::Oklch`) and
+`TintMode` are re-exported from the crate root. The `api` wrappers
+(`api::generate_neutral_ramp`, `api::derive_soft_neutrals`,
+`api::tint_neutrals`) take `ColorInput`.
+
+The standalone `generate_greyscale_oklch` / `api::generate_greyscale`
+from Step D was **removed** — the `neutral` module supersedes it.
+
+### Foreground audit + GenerateOptions
+
+`GenerateOptions` gained `soft_white` / `soft_black`
+(`Option<Oklch>`): when set they replace pure white/black as
+foreground-audit candidates, so a brand palette can use the design
+system's soft primitives.
+
+`get_best_foreground` became a six-tier audit, in preference order:
+harmonious dark (step 900) → harmonious light (step 50) → soft white
+→ soft black → pure white → pure black. Pure white/black are always
+evaluated last and mathematically guarantee an AA-passing result for
+any sRGB background.
+
+### wasm mirror types added
+
+`types.rs` gained `TintMode`, `SoftNeutrals`, and `OklchTriple`.
+`OklchTriple` is a wasm-only `{ l, c, h }` flattening — the wasm
+crate can't expose `palette::Oklch` directly. `TintMode` has `From`
+impls in *both* directions because it is passed into the engine, not
+just returned.

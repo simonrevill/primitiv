@@ -36,12 +36,16 @@ The `api` module re-exports:
 
 ```rust
 pub use audit::audit_contrast;
-pub use generate::{generate, generate_with_options, GenerateOptions};
-pub use crate::palette::generator::generate_greyscale_oklch as generate_greyscale;
+pub use generate::{generate, generate_with_options, generate_with_lightness, GenerateOptions};
+pub use neutral::{derive_soft_neutrals, generate_neutral_ramp, tint_neutrals};
 ```
 
 If you find yourself reaching deeper, either lift the symbol into
 `api` or rethink the access pattern.
+
+(The old `generate_greyscale` re-export was removed — the `neutral`
+module owns greyscale/neutral ramps now. See `generate_neutral_ramp`,
+`derive_soft_neutrals`, `tint_neutrals`.)
 
 ## Mirror-types pattern
 
@@ -50,7 +54,11 @@ wasm adapter (`crates/harmoni-wasm`) holds **mirror types** in
 `src/types.rs` that shadow the core structs field-for-field and
 derive `Tsify`:
 
-- `SwatchLabel`, `SwatchStep`, `ContrastResult`, `Swatch` are mirrored.
+- `SwatchLabel`, `SwatchStep`, `ContrastResult`, `Swatch`, `Palette`,
+  `TintMode`, and `SoftNeutrals` are mirrored.
+- `OklchTriple` is a wasm-only helper — `SoftNeutrals` carries two of
+  them, flattening `palette::Oklch` to plain `{ l, c, h }` floats
+  because the wasm crate can't expose `Oklch` directly.
 - Each has a `From<harmoni_core::*>` so wasm entry points convert at
   the boundary:
 
@@ -60,6 +68,11 @@ api::audit_contrast(...)
     .map_err(to_js_error)
 ```
 
+A type the user passes **into** the engine (not just receives back)
+needs `From` impls in *both* directions. `TintMode` is the example:
+`From<core::TintMode> for types::TintMode` *and*
+`From<types::TintMode> for core::TintMode`.
+
 When you add a new field to a core struct, you must:
 
 1. Add it to the core struct in `harmoni-core`.
@@ -68,16 +81,18 @@ When you add a new field to a core struct, you must:
 4. Regenerate the wasm pkg if you want the new TS types in the web
    app: `pnpm run build:wasm`.
 
+When you add a new wasm **entry point**, take CSS strings for colour
+arguments (`ColorInput::Css`), call the matching `api::*` function,
+and `.map(Into::into).map_err(to_js_error)`. `generate_neutral_ramp`,
+`derive_soft_neutrals`, and `tint_neutrals` all follow this shape.
+
 ## Opaque Palette extern type
 
-`Vec<T>` isn't a first-class wasm-abi return type. The pattern is:
+A struct shaped like the core `Palette` isn't directly returnable
+across the wasm ABI, so the wasm crate keeps an opaque extern type
+and serialises the real data through it:
 
 ```rust
-#[wasm_bindgen(typescript_custom_section)]
-const TS_PALETTE: &'static str = r#"
-export type Palette = Swatch[];
-"#;
-
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(typescript_type = "Palette")]
@@ -85,10 +100,14 @@ extern "C" {
 }
 ```
 
-The TS-side `Swatch` is emitted by Tsify's
-`typescript_custom_section` on `types::Swatch`. Both names line up
-with the engine vocabulary so the web app's
-`import { type Palette } from "harmoni-wasm"` resolves correctly.
+The TypeScript `Palette` is a **struct interface** —
+`{ swatches: Swatch[]; lightness_curve: number[]; ... }` — emitted
+by the `Tsify` derive on `types::Palette`. It is not a `Swatch[]`
+alias. A wasm entry point converts the core palette into
+`types::Palette`, serialises it with `serde_wasm_bindgen`, and
+returns it as the opaque `Palette` handle, so the web app's
+`import { type Palette } from "harmoni-wasm"` resolves to the
+struct interface.
 
 ## Color input
 
@@ -103,7 +122,8 @@ add a variant to `ColorInput`.
 
 ## Vocabulary
 
-The domain types are: `SwatchLabel`, `SwatchStep`, `Swatch`,
-`Palette` (type alias for `Vec<Swatch>`). Don't reintroduce the
-older `OklchStep`/`OklchLabel`/(old)`Palette` names — those were
-renamed in the post-Step B vocabulary alignment.
+The domain types are: `SwatchLabel`, `SwatchStep`, `Swatch`, and
+`Palette` — a struct of `swatches: Vec<Swatch>` plus the
+`lightness_curve` and padding / `note` metadata. Don't reintroduce
+the older `OklchStep`/`OklchLabel`/(old)`Palette` names — those
+were renamed in the post-Step B vocabulary alignment.

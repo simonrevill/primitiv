@@ -1,6 +1,7 @@
 pub mod api;
 pub mod audit;
 pub mod color;
+pub mod neutral;
 pub mod palette;
 
 pub use audit::contrast::ContrastResult;

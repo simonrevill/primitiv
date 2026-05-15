@@ -1,4 +1,4 @@
-use crate::api::generate::{generate, generate_with_options, GenerateOptions};
+use crate::api::generate::{generate, generate_with_lightness, generate_with_options, GenerateOptions};
 use crate::color::input::ColorInput;
 use crate::palette::generator::SwatchLabel;
 use palette::Oklch;
@@ -22,8 +22,14 @@ fn generate_returns_ten_step_palette_for_valid_oklch_input() {
 fn generate_with_options_threads_soft_white_through_to_audit_foreground() {
     let custom_white = Oklch::new(0.95, 0.02, 240.0);
 
-    let palette = generate_with_options(
+    // A flat, dark lightness curve puts every step at the same low L, so
+    // neither the step-50 nor the step-900 harmonious candidate has any
+    // contrast — the audit falls through to the soft white candidate, which
+    // does clear AA against such a dark background. The picked white must
+    // carry the custom L/C, not pure #fff.
+    let palette = generate_with_lightness(
         sample_input(),
+        [0.30; 10],
         GenerateOptions {
             soft_white: Some(custom_white),
             ..GenerateOptions::default()
@@ -35,7 +41,7 @@ fn generate_with_options_threads_soft_white_through_to_audit_foreground() {
         .swatches
         .iter()
         .find(|s| matches!(&s.best_foreground.label, SwatchLabel::Name(name) if name == "White"))
-        .expect("brand palette should have at least one swatch using a white foreground");
+        .expect("flat-curve palette should fall through to a white foreground");
 
     assert!(
         (white_swatch.best_foreground.l - 0.95).abs() < 1e-5,

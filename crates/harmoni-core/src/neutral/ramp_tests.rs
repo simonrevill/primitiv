@@ -78,25 +78,21 @@ fn should_interpolate_chroma_between_endpoints_in_inherit_tint_mode() {
 }
 
 #[test]
-fn should_use_soft_white_as_the_white_foreground_candidate_for_the_audit() {
+fn should_use_step_50_as_the_harmonious_light_foreground_for_step_900() {
     use crate::palette::generator::SwatchLabel;
     let soft_white = palette::Oklch::new(0.95, 0.02, 240.0);
     let soft_black = palette::Oklch::new(0.10, 0.005, 240.0);
 
     let palette = generate_neutral_ramp(soft_white, soft_black, TintMode::Inherit);
 
-    // Step 900 has near-zero contrast against itself as a dark candidate,
-    // so the audit falls through to white. With the soft endpoints threaded
-    // in, that white must be the soft white the user supplied — not pure #fff.
+    // Step 900 has no contrast against itself; step 50 (= soft_white) is the
+    // harmonious light candidate and wins on a dark background.
+    let step_50 = palette.swatches[0].clone();
     let step_900 = &palette.swatches[9];
     let fg = &step_900.best_foreground;
-    assert_eq!(fg.label, SwatchLabel::Name(String::from("White")));
-    assert!(
-        (fg.l - 0.95).abs() < 1e-5,
-        "step 900 foreground L should be soft_white.l (0.95), got {}",
-        fg.l,
-    );
-    assert!((fg.c - 0.02).abs() < 1e-5);
+    assert_eq!(fg.label, SwatchLabel::Number(50));
+    assert!((fg.l - step_50.l).abs() < 1e-5);
+    assert!((fg.c - step_50.c).abs() < 1e-5);
 }
 
 #[test]

@@ -202,6 +202,11 @@ pub fn generate_palette_with_scale(
         .find(|background| background.label == SwatchLabel::Number(900))
         .expect("Palette must contain a 900 step to act as a dark candidate");
 
+    let light_candidate = backgrounds
+        .iter()
+        .find(|background| background.label == SwatchLabel::Number(50))
+        .expect("Palette must contain a 50 step to act as a light candidate");
+
     let custom_white = soft_white.map(|w| {
         SwatchStep::from_label(
             w.l,
@@ -225,6 +230,7 @@ pub fn generate_palette_with_scale(
             let recommendation = get_best_foreground(
                 background,
                 dark_candidate,
+                light_candidate,
                 custom_white.as_ref(),
                 custom_black.as_ref(),
             );

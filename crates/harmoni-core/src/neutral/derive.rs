@@ -7,6 +7,7 @@ pub struct SoftNeutrals {
 }
 
 pub fn derive_soft_neutrals(brand: Oklch, softness: f32) -> SoftNeutrals {
+    let softness = softness.clamp(0.0, 1.0);
     let hue = brand.hue.into_degrees();
     let white_l = 1.0 - 0.05 * softness;
     let white_c = brand.chroma * 0.08 * softness;

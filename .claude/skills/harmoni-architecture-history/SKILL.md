@@ -100,6 +100,11 @@ Tsify's `typescript_custom_section` emission on `types::Swatch`.
 The web app's `import { type Palette } from "harmoni-wasm"` still
 resolves because the emitted type name is identical.
 
+> Superseded — see *Palette became a struct* below. `Palette` is
+> now a struct on both sides; the `export type Palette = Swatch[]`
+> custom section is gone, and `types::Palette` carries a `Tsify`
+> derive that emits a struct interface.
+
 ## Step B — rename
 
 `primitiv-core` → `harmoni-core`, `primitiv-wasm` → `harmoni-wasm`.
@@ -133,14 +138,24 @@ were updated mechanically. `Swatch.tsx` in the web app aliases the
 import as `SwatchData` to avoid colliding with the React component
 name.
 
-## Latent cleanup
+## Palette became a struct
 
-Fields like `max_recommended_light_padding`,
-`max_recommended_dark_padding`, and `note` are currently duplicated
-on every `Swatch` but logically belong on the palette (same value
-for every swatch in a given palette). If/when `Palette` becomes a
-struct instead of a type alias, these could move there. Not yet
-done.
+`Palette` was promoted from a `Vec<Swatch>` type alias to a struct:
+
+```rust
+pub struct Palette {
+    pub swatches: Vec<Swatch>,
+    pub lightness_curve: [f32; 10],
+    pub max_recommended_light_padding: f32,
+    pub max_recommended_dark_padding: f32,
+    pub note: String,
+}
+```
+
+The `max_recommended_*` and `note` metadata — once duplicated on
+every `Swatch` — now live on the palette, where they belong (one
+value per palette, not per swatch). The wasm `types::Palette`
+mirrors it as a `Tsify` struct.
 
 ## Neutral colour handling (post-vocabulary-rename)
 

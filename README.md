@@ -34,8 +34,8 @@ primitiv/
   Tsify TypeScript/ABI machinery, and convert at the boundary via
   `From<harmoni_core::*>`. Adapters for non-wasm runtimes would
   live as sibling crates alongside it.
-- `packages/components` is a headless, accessible React component
-  library with zero styles. See the [components package README](packages/components/README.md).
+- `packages/react` is a headless, accessible React component
+  library with zero styles. See the [React package README](packages/react/README.md).
 - `apps/web` is a small React app used for visual iteration on the
   palette algorithm. It is **not** a production surface for the
   design system — think of it as a workbench.
@@ -46,7 +46,7 @@ Adapters should program against `harmoni_core::api`, never the
 lower-level modules. The curated surface is small by design:
 
 ```rust
-// Palette generation (Palette = Vec<Swatch>)
+// Palette generation
 api::generate(ColorInput) -> Result<Palette, ColorInputError>
 api::generate_with_options(ColorInput, GenerateOptions)
     -> Result<Palette, ColorInputError>
@@ -66,6 +66,9 @@ api::tint_neutrals(white: ColorInput, black: ColorInput,
 api::audit_contrast(ColorInput, ColorInput)
     -> Result<ContrastResult, ColorInputError>
 ```
+
+A `Palette` is a struct — ten `Swatch`es plus the
+`lightness_curve` and padding / `note` metadata used to build them.
 
 `GenerateOptions` carries `light_padding` / `dark_padding` plus
 optional `soft_white` / `soft_black` overrides — when set, those
@@ -98,11 +101,11 @@ formula (`AAA ≥ 7.0`, `AA ≥ 4.5`).
 
 ## Components
 
-`packages/components` exports headless, accessible React components built on
+`packages/react` exports headless, accessible React components built on
 the WAI-ARIA authoring patterns. They ship with zero styles — style them with
 whatever system you use (CSS, Tailwind, CSS-in-JS, design tokens, etc.).
 
-See [`packages/components`](packages/components/README.md) for the full
+See [`packages/react`](packages/react/README.md) for the full
 component index and per-component documentation.
 
 ## Getting started

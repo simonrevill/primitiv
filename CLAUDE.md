@@ -91,7 +91,8 @@ keyword or by topic; do not paraphrase their content here.
   component. Stops at the RED commit. References generated
   inventories under `.claude/skills/new-react-component/_generated/`.
 - **`harmoni-architecture-history`** — Steps C/D/A/B, ColorInput,
-  mirror-types pattern, vocabulary rename. Immutable reference.
+  mirror-types pattern, vocabulary rename, the neutral module.
+  Historical reference.
 - **`rust-wasm-workflow`** — cargo commands, api module boundary,
   mirror-types add-a-field checklist, opaque Palette extern type.
 - **`sandbox-gotchas`** — git mv cross-device, wasm pkg-not-found,
@@ -111,6 +112,11 @@ keyword or by topic; do not paraphrase their content here.
 - `harmoni-core` is pure Rust (3 direct deps: `csscolorparser`,
   `palette`, `serde`); `harmoni-wasm` holds all Tsify/wasm-bindgen
   code.
+- The `neutral` module — greyscale/neutral ramps, soft neutrals,
+  hue tinting — is landed. See the `harmoni-architecture-history`
+  skill.
+- `Palette` is a struct (`swatches` + `lightness_curve` + padding /
+  `note` metadata), not a `Vec<Swatch>` type alias.
 - `packages/react` is the headless component library
   (`@primitiv/react`). Component inventory lives at
   `.claude/skills/new-react-component/_generated/component-inventory.md`.

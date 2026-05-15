@@ -88,14 +88,11 @@ and `.map(Into::into).map_err(to_js_error)`. `generate_neutral_ramp`,
 
 ## Opaque Palette extern type
 
-`Vec<T>` isn't a first-class wasm-abi return type. The pattern is:
+A struct shaped like the core `Palette` isn't directly returnable
+across the wasm ABI, so the wasm crate keeps an opaque extern type
+and serialises the real data through it:
 
 ```rust
-#[wasm_bindgen(typescript_custom_section)]
-const TS_PALETTE: &'static str = r#"
-export type Palette = Swatch[];
-"#;
-
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(typescript_type = "Palette")]
@@ -103,10 +100,14 @@ extern "C" {
 }
 ```
 
-The TS-side `Swatch` is emitted by Tsify's
-`typescript_custom_section` on `types::Swatch`. Both names line up
-with the engine vocabulary so the web app's
-`import { type Palette } from "harmoni-wasm"` resolves correctly.
+The TypeScript `Palette` is a **struct interface** —
+`{ swatches: Swatch[]; lightness_curve: number[]; ... }` — emitted
+by the `Tsify` derive on `types::Palette`. It is not a `Swatch[]`
+alias. A wasm entry point converts the core palette into
+`types::Palette`, serialises it with `serde_wasm_bindgen`, and
+returns it as the opaque `Palette` handle, so the web app's
+`import { type Palette } from "harmoni-wasm"` resolves to the
+struct interface.
 
 ## Color input
 
@@ -121,7 +122,8 @@ add a variant to `ColorInput`.
 
 ## Vocabulary
 
-The domain types are: `SwatchLabel`, `SwatchStep`, `Swatch`,
-`Palette` (type alias for `Vec<Swatch>`). Don't reintroduce the
-older `OklchStep`/`OklchLabel`/(old)`Palette` names — those were
-renamed in the post-Step B vocabulary alignment.
+The domain types are: `SwatchLabel`, `SwatchStep`, `Swatch`, and
+`Palette` — a struct of `swatches: Vec<Swatch>` plus the
+`lightness_curve` and padding / `note` metadata. Don't reintroduce
+the older `OklchStep`/`OklchLabel`/(old)`Palette` names — those
+were renamed in the post-Step B vocabulary alignment.

@@ -7,6 +7,10 @@ import { Fragment } from "react/jsx-runtime";
 export function ColorEngine() {
   const {
     greyscalePalette,
+    neutralWhite,
+    neutralBlack,
+    handleNeutralWhiteChange,
+    handleNeutralBlackChange,
     handleColorChange,
     colors,
     handleLightPaddingChange,
@@ -22,6 +26,24 @@ export function ColorEngine() {
       <h1>Harmoni Color Engine</h1>
       <div className="palettes-grid">
         <p className="palette__label">Greyscale</p>
+        <div className="neutral-pickers">
+          <label>
+            White
+            <input
+              type="color"
+              value={neutralWhite}
+              onChange={handleNeutralWhiteChange}
+            />
+          </label>
+          <label>
+            Black
+            <input
+              type="color"
+              value={neutralBlack}
+              onChange={handleNeutralBlackChange}
+            />
+          </label>
+        </div>
         <div className="palette-container">
           <div className="palette">
             <ColorPalette palette={greyscalePalette} />

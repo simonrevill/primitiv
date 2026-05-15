@@ -32,6 +32,20 @@ header {
   row-gap: 1rem;
 }
 
+.neutral-pickers {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-block-end: 1rem;
+
+  label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: oklch(1 0 0);
+  }
+}
+
 .palette {
   display: grid;
   grid-template-columns: repeat(10, 1fr);

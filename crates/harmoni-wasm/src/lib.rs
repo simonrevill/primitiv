@@ -146,3 +146,20 @@ pub fn derive_soft_neutrals(
         .map(Into::into)
         .map_err(to_js_error)
 }
+
+#[wasm_bindgen]
+pub fn tint_neutrals(
+    white: &str,
+    black: &str,
+    source: &str,
+    strength: f32,
+) -> Result<types::SoftNeutrals, JsError> {
+    api::tint_neutrals(
+        ColorInput::Css(white.to_string()),
+        ColorInput::Css(black.to_string()),
+        ColorInput::Css(source.to_string()),
+        strength,
+    )
+    .map(Into::into)
+    .map_err(to_js_error)
+}

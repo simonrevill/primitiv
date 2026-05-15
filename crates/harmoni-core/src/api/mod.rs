@@ -11,7 +11,7 @@ pub mod neutral;
 
 pub use audit::audit_contrast;
 pub use generate::{generate, generate_with_options, generate_with_lightness, GenerateOptions};
-pub use neutral::{derive_soft_neutrals, generate_neutral_ramp};
+pub use neutral::{derive_soft_neutrals, generate_neutral_ramp, tint_neutrals};
 
 #[cfg(test)]
 mod audit_tests;

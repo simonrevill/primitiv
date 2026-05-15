@@ -1,6 +1,37 @@
-use crate::api::neutral::{derive_soft_neutrals, generate_neutral_ramp};
+use crate::api::neutral::{derive_soft_neutrals, generate_neutral_ramp, tint_neutrals};
 use crate::color::input::ColorInput;
 use crate::neutral::ramp::TintMode;
+
+#[test]
+fn tint_neutrals_layers_source_hue_onto_color_input_endpoints() {
+    let result = tint_neutrals(
+        ColorInput::Oklch {
+            l: 0.96,
+            c: 0.0,
+            h: 0.0,
+        },
+        ColorInput::Oklch {
+            l: 0.22,
+            c: 0.0,
+            h: 0.0,
+        },
+        ColorInput::Oklch {
+            l: 0.55,
+            c: 0.18,
+            h: 240.0,
+        },
+        0.5,
+    )
+    .expect("valid inputs should produce tinted neutrals");
+
+    assert_eq!(result.white.l, 0.96);
+    assert_eq!(result.black.l, 0.22);
+    assert!(result.white.chroma > 0.0);
+    assert_eq!(
+        result.white.hue.into_degrees(),
+        result.black.hue.into_degrees()
+    );
+}
 
 #[test]
 fn derive_soft_neutrals_returns_softened_values_from_brand_color_input() {

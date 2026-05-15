@@ -14,11 +14,21 @@ pub enum TintMode {
 const STEPS: [u16; 10] = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
 
 pub fn generate_neutral_ramp(soft_white: Oklch, soft_black: Oklch, _tint: TintMode) -> Palette {
+    let hue = soft_white.hue.into_degrees();
+    let last = STEPS.len() - 1;
     let backgrounds: Vec<SwatchStep> = STEPS
         .iter()
-        .map(|&step| {
-            let source = if step == 900 { soft_black } else { soft_white };
-            SwatchStep::from_label(source.l, source.chroma, source.hue.into_degrees(), step)
+        .enumerate()
+        .map(|(i, &step)| {
+            if i == 0 {
+                SwatchStep::from_label(soft_white.l, soft_white.chroma, hue, step)
+            } else if i == last {
+                SwatchStep::from_label(soft_black.l, soft_black.chroma, hue, step)
+            } else {
+                let t = i as f32 / last as f32;
+                let l = soft_white.l + (soft_black.l - soft_white.l) * t;
+                SwatchStep::from_label(l, soft_white.chroma, hue, step)
+            }
         })
         .collect();
 

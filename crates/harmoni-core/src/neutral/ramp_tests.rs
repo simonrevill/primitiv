@@ -26,3 +26,22 @@ fn should_return_ten_labelled_swatches_with_endpoints_pinned_to_soft_white_and_s
     assert_eq!(step_900.c, soft_black.chroma);
     assert_eq!(step_900.h, soft_black.hue.into_degrees());
 }
+
+#[test]
+fn should_decrease_lightness_monotonically_across_the_ramp() {
+    let soft_white = Oklch::new(0.975, 0.006, 240.0);
+    let soft_black = Oklch::new(0.10, 0.00375, 240.0);
+
+    let palette = generate_neutral_ramp(soft_white, soft_black, TintMode::Inherit);
+
+    for i in 0..palette.swatches.len() - 1 {
+        assert!(
+            palette.swatches[i].l > palette.swatches[i + 1].l,
+            "step at index {} (l={}) is not greater than step at index {} (l={})",
+            i,
+            palette.swatches[i].l,
+            i + 1,
+            palette.swatches[i + 1].l
+        );
+    }
+}

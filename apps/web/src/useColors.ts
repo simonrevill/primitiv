@@ -1,7 +1,8 @@
 import init, {
   type Palette,
+  type TintMode,
   Swatch,
-  generate_greyscale_oklch,
+  generate_neutral_ramp,
   generate_palette_with_lightness,
 } from "harmoni-wasm";
 import { useState, useEffect, ChangeEvent } from "react";
@@ -11,6 +12,8 @@ import { DEFAULT_COLORS, STANDARD_KEYS, DEFAULT_LIGHTNESS } from "./constants";
 export function useColors() {
   const [wasmReady, setWasmReady] = useState(false);
   const [greyscalePalette, setGreyscalePalette] = useState<Palette>();
+  const [neutralWhite, setNeutralWhite] = useState("#ffffff");
+  const [neutralBlack, setNeutralBlack] = useState("#000000");
   const [colors, setColors] = useState<ColorMap>(DEFAULT_COLORS);
 
   useEffect(() => {
@@ -19,8 +22,6 @@ export function useColors() {
 
   useEffect(() => {
     if (!wasmReady) return;
-
-    setGreyscalePalette(generate_greyscale_oklch());
 
     setColors((prev) => {
       const next = { ...prev };
@@ -43,6 +44,24 @@ export function useColors() {
       return next;
     });
   }, [wasmReady]);
+
+  // The neutral ramp regenerates whenever the white or black primitive
+  // changes, keeping the two pickers and the ramp in sync.
+  useEffect(() => {
+    if (!wasmReady) return;
+
+    setGreyscalePalette(
+      generate_neutral_ramp(neutralWhite, neutralBlack, "Inherit" as TintMode),
+    );
+  }, [wasmReady, neutralWhite, neutralBlack]);
+
+  const handleNeutralWhiteChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setNeutralWhite(e.target.value);
+  };
+
+  const handleNeutralBlackChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setNeutralBlack(e.target.value);
+  };
 
   const handleColorChange =
     (key: ColorKey) => (e: ChangeEvent<HTMLInputElement>) => {
@@ -184,6 +203,10 @@ export function useColors() {
 
   return {
     greyscalePalette,
+    neutralWhite,
+    neutralBlack,
+    handleNeutralWhiteChange,
+    handleNeutralBlackChange,
     handleColorChange,
     colors,
     handleLightPaddingChange,

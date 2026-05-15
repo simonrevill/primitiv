@@ -8,33 +8,35 @@ use palette::{IntoColor, LinSrgb, Oklch};
 pub struct ForegroundRecommendation {
     pub color: SwatchStep,
     pub contrast_ratio: f32,
-    pub is_harmonious: bool, // true = used palette's own 900
+    pub is_harmonious: bool, // true = used palette's own step 50 or 900
 }
 
+fn relative_luminance(l: f32, c: f32, h: f32) -> f32 {
+    let lin: LinSrgb = Oklch::new(l, c, h).into_color();
+    lin.relative_luminance().luma
+}
+
+/// Picks the best foreground for `background` from a tiered candidate set:
+/// the palette's harmonious dark (step 900) and light (step 50), then the
+/// soft white/black primitives when supplied, then pure white/black as a
+/// guaranteed AA-passing last resort. Pure white/black are always evaluated
+/// last so that — for any sRGB-representable background — at least one
+/// candidate clears the 4.5:1 threshold.
 pub fn get_best_foreground(
     background: &SwatchStep,
     dark_candidate: &SwatchStep,
+    light_candidate: &SwatchStep,
+    custom_white: Option<&SwatchStep>,
+    custom_black: Option<&SwatchStep>,
 ) -> ForegroundRecommendation {
-    let bg_color = Oklch::new(background.l, background.c, background.h);
-    let dark_color = Oklch::new(dark_candidate.l, dark_candidate.c, dark_candidate.h);
-    let white_color = Oklch::new(1.0, 0.0, 0.0);
-    let black_color = Oklch::new(0.01, 0.0, 0.0); // near-black (better than pure 0.0)
+    let bg_lum = relative_luminance(background.l, background.c, background.h);
+    let dark_lum = relative_luminance(dark_candidate.l, dark_candidate.c, dark_candidate.h);
+    let light_lum = relative_luminance(light_candidate.l, light_candidate.c, light_candidate.h);
 
-    let bg_lin: LinSrgb = bg_color.into_color();
-    let dark_lin: LinSrgb = dark_color.into_color();
-    let white_lin: LinSrgb = white_color.into_color();
-    let black_lin: LinSrgb = black_color.into_color();
-
-    let bg_lum = bg_lin.relative_luminance().luma;
-    let dark_lum = dark_lin.relative_luminance().luma;
-    let white_lum = white_lin.relative_luminance().luma;
-    let black_lum = black_lin.relative_luminance().luma;
-
-    let ratio_white = (white_lum + 0.05) / (bg_lum + 0.05);
-    let ratio_black = (bg_lum + 0.05) / (black_lum + 0.05);
     let ratio_dark = (bg_lum + 0.05) / (dark_lum + 0.05);
+    let ratio_light = (light_lum + 0.05) / (bg_lum + 0.05);
 
-    // 1. Prefer harmonious dark_candidate (palette's 900) if it meets AA
+    // 1. Prefer the harmonious dark candidate (palette's 900) if it meets AA.
     if ratio_dark >= 4.5 {
         return ForegroundRecommendation {
             color: dark_candidate.clone(),
@@ -43,7 +45,55 @@ pub fn get_best_foreground(
         };
     }
 
-    // 2. Otherwise choose the better of white or black
+    // 2. Otherwise prefer the harmonious light candidate (palette's 50).
+    if ratio_light >= 4.5 {
+        return ForegroundRecommendation {
+            color: light_candidate.clone(),
+            contrast_ratio: ratio_light,
+            is_harmonious: true,
+        };
+    }
+
+    // 3. Otherwise use the soft white primitive when one was supplied.
+    if let Some(white) = custom_white {
+        let ratio = (relative_luminance(white.l, white.c, white.h) + 0.05) / (bg_lum + 0.05);
+        if ratio >= 4.5 {
+            return ForegroundRecommendation {
+                color: SwatchStep {
+                    l: white.l,
+                    c: white.c,
+                    h: white.h,
+                    label: SwatchLabel::Name(String::from("White")),
+                },
+                contrast_ratio: ratio,
+                is_harmonious: false,
+            };
+        }
+    }
+
+    // 4. Otherwise use the soft black primitive when one was supplied.
+    if let Some(black) = custom_black {
+        let ratio = (bg_lum + 0.05) / (relative_luminance(black.l, black.c, black.h) + 0.05);
+        if ratio >= 4.5 {
+            return ForegroundRecommendation {
+                color: SwatchStep {
+                    l: black.l,
+                    c: black.c,
+                    h: black.h,
+                    label: SwatchLabel::Name(String::from("Black")),
+                },
+                contrast_ratio: ratio,
+                is_harmonious: false,
+            };
+        }
+    }
+
+    // 5/6. Pure white / pure black — the guaranteed AA-passing last resort.
+    // For any sRGB-representable background, at least one of these clears
+    // 4.5:1; this is guaranteed by the WCAG relative luminance formula.
+    let ratio_white = (relative_luminance(1.0, 0.0, 0.0) + 0.05) / (bg_lum + 0.05);
+    let ratio_black = (bg_lum + 0.05) / (relative_luminance(0.01, 0.0, 0.0) + 0.05);
+
     if ratio_white >= 4.5 && ratio_white >= ratio_black {
         return ForegroundRecommendation {
             color: SwatchStep {
@@ -70,8 +120,5 @@ pub fn get_best_foreground(
         };
     }
 
-    // For any sRGB-representable background, at least one of white or black
-    // will always achieve a contrast ratio >= 4.5 against it.
-    // This is mathematically guaranteed by the WCAG relative luminance formula.
-    unreachable!("Both white and black failed AA — this should never happen for valid sRGB colors");
+    unreachable!("Pure white and pure black both failed AA — impossible for valid sRGB colors");
 }

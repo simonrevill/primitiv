@@ -72,6 +72,7 @@ pub fn generate_palette(
         GenerateOptions {
             light_padding,
             dark_padding,
+            ..GenerateOptions::default()
         },
     )
     .map_err(to_js_error)?;
@@ -94,6 +95,7 @@ pub fn generate_palette_with_lightness(
         GenerateOptions {
             light_padding,
             dark_padding,
+            ..GenerateOptions::default()
         },
     )
     .map_err(to_js_error)?;
@@ -111,6 +113,7 @@ pub fn generate_palette_with_light_padding(
         GenerateOptions {
             light_padding,
             dark_padding: 0.0,
+            ..GenerateOptions::default()
         },
     )
     .map_err(to_js_error)?;
@@ -119,10 +122,27 @@ pub fn generate_palette_with_light_padding(
 }
 
 #[wasm_bindgen]
-pub fn generate_greyscale_oklch() -> Palette {
-    let data = api::generate_greyscale();
-    let wrapped: types::Palette = data.into();
-    serde_wasm_bindgen::to_value(&wrapped)
-        .expect("serializing greyscale palette should never fail")
-        .unchecked_into()
+pub fn generate_neutral_ramp(
+    white: &str,
+    black: &str,
+    tint: types::TintMode,
+) -> Result<Palette, JsError> {
+    let palette_data = api::generate_neutral_ramp(
+        ColorInput::Css(white.to_string()),
+        ColorInput::Css(black.to_string()),
+        tint.into(),
+    )
+    .map_err(to_js_error)?;
+
+    palette_to_js(palette_data)
+}
+
+#[wasm_bindgen]
+pub fn derive_soft_neutrals(
+    brand: &str,
+    softness: f32,
+) -> Result<types::SoftNeutrals, JsError> {
+    api::derive_soft_neutrals(ColorInput::Css(brand.to_string()), softness)
+        .map(Into::into)
+        .map_err(to_js_error)
 }

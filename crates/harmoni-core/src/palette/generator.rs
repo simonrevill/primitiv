@@ -152,6 +152,8 @@ pub fn generate_palette_with_scale(
     chroma_scale: &[f32],
     light_padding: f32,
     dark_padding: f32,
+    soft_white: Option<Oklch>,
+    soft_black: Option<Oklch>,
 ) -> Palette {
     let base_hue = base_500.hue.into_degrees();
     let base_chroma = base_500.chroma;
@@ -200,10 +202,38 @@ pub fn generate_palette_with_scale(
         .find(|background| background.label == SwatchLabel::Number(900))
         .expect("Palette must contain a 900 step to act as a dark candidate");
 
+    let light_candidate = backgrounds
+        .iter()
+        .find(|background| background.label == SwatchLabel::Number(50))
+        .expect("Palette must contain a 50 step to act as a light candidate");
+
+    let custom_white = soft_white.map(|w| {
+        SwatchStep::from_label(
+            w.l,
+            w.chroma,
+            w.hue.into_degrees(),
+            SwatchLabel::Name(String::from("White")),
+        )
+    });
+    let custom_black = soft_black.map(|b| {
+        SwatchStep::from_label(
+            b.l,
+            b.chroma,
+            b.hue.into_degrees(),
+            SwatchLabel::Name(String::from("Black")),
+        )
+    });
+
     let swatches: Vec<Swatch> = backgrounds
         .iter()
         .map(|background| {
-            let recommendation = get_best_foreground(background, dark_candidate);
+            let recommendation = get_best_foreground(
+                background,
+                dark_candidate,
+                light_candidate,
+                custom_white.as_ref(),
+                custom_black.as_ref(),
+            );
             let contrast_result = get_contrast_rating_for_step(background, &recommendation.color);
 
             Swatch {
@@ -227,7 +257,15 @@ pub fn generate_palette_with_scale(
 }
 
 pub fn generate_palette(base_500: Oklch, light_padding: f32, dark_padding: f32) -> Palette {
-    generate_palette_with_scale(base_500, &TARGET_LIGHTNESS, &TARGET_CHROMA_SCALE, light_padding, dark_padding)
+    generate_palette_with_scale(
+        base_500,
+        &TARGET_LIGHTNESS,
+        &TARGET_CHROMA_SCALE,
+        light_padding,
+        dark_padding,
+        None,
+        None,
+    )
 }
 
 pub fn generate_palette_with_light_padding(base_500: Oklch, light_padding: f32) -> Palette {
@@ -237,6 +275,8 @@ pub fn generate_palette_with_light_padding(base_500: Oklch, light_padding: f32) 
         &TARGET_CHROMA_SCALE,
         light_padding,
         0.0,
+        None,
+        None,
     )
 }
 
@@ -247,16 +287,8 @@ pub fn generate_palette_with_dark_padding(base_500: Oklch, dark_padding: f32) ->
         &TARGET_CHROMA_SCALE,
         0.0,
         dark_padding,
+        None,
+        None,
     )
 }
 
-pub fn generate_greyscale_oklch() -> Palette {
-    let lightness_scale: [f32; 10] = [0.97, 0.93, 0.85, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1];
-    generate_palette_with_scale(
-        Oklch::new(0.5, 0.0, 0.0),
-        &lightness_scale,
-        &TARGET_CHROMA_SCALE,
-        0.0,
-        0.0,
-    )
-}

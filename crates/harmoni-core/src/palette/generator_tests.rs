@@ -23,101 +23,6 @@ mod generator_tests {
         }
     }
 
-    mod greyscale_palette_generation {
-        use super::*;
-
-        #[test]
-        fn test_generate_greyscale_oklch_returns_length_of_ten() {
-            let result = generate_greyscale_oklch();
-            assert_eq!(result.swatches.len(), 10);
-        }
-
-        #[test]
-        fn test_generate_greyscale_oklch_all_labels_are_correct() {
-            let result = generate_greyscale_oklch();
-            let expected_labels = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
-
-            for (i, step) in result.swatches.iter().enumerate() {
-                assert_eq!(step.label, SwatchLabel::Number(expected_labels[i]));
-            }
-        }
-
-        #[test]
-        fn test_generate_greyscale_oklch_first_step_lightness_is_very_bright() {
-            let result = generate_greyscale_oklch();
-            assert!(result.swatches[0].l > 0.9);
-        }
-
-        #[test]
-        fn test_generate_greyscale_oklch_all_steps_have_zero_chroma() {
-            let result = generate_greyscale_oklch();
-            for step in result.swatches {
-                assert_eq!(step.c, 0.0);
-            }
-        }
-
-        #[test]
-        fn test_generate_greyscale_oklch_all_steps_have_zero_hue() {
-            let result = generate_greyscale_oklch();
-            for step in result.swatches {
-                assert_eq!(step.h, 0.0);
-            }
-        }
-
-        #[test]
-        fn test_generate_greyscale_oklch_steps_are_perceptually_descending() {
-            let result = generate_greyscale_oklch();
-            for i in 0..result.swatches.len() - 1 {
-                assert!(result.swatches[i].l > result.swatches[i + 1].l);
-            }
-        }
-    }
-
-    mod foreground_metadata {
-        use crate::ContrastResult;
-
-        use super::*;
-
-        #[test]
-        fn should_include_best_foreground() {
-            let result = generate_greyscale_oklch();
-
-            let step_50 = result
-                .swatches.iter()
-                .find(|step| step.label == SwatchLabel::Number(50))
-                .expect("Should have a 50 step");
-
-            assert_eq!(
-                step_50.best_foreground,
-                SwatchStep {
-                    l: 0.049999982,
-                    c: 0.0,
-                    h: 0.0,
-                    label: SwatchLabel::Number(900),
-                }
-            );
-        }
-
-        #[test]
-        fn should_include_contrast_result() {
-            let result = generate_greyscale_oklch();
-
-            let step_50 = result
-                .swatches.iter()
-                .find(|step| step.label == SwatchLabel::Number(50))
-                .expect("Should have a 50 step");
-
-            assert_eq!(
-                step_50.contrast_result,
-                ContrastResult {
-                    ratio: 16.53,
-                    display_ratio: String::from("16.53:1"),
-                    rating: String::from("AAA"),
-                }
-            );
-        }
-    }
-
     mod swatch_label {
         use super::*;
 
@@ -175,6 +80,8 @@ mod generator_tests {
                 &TARGET_CHROMA_SCALE,
                 0.0,
                 0.0,
+                None,
+                None,
             );
             let step_50_no_padding_lightness = palette_with_no_padding
                 .swatches.iter()
@@ -202,6 +109,8 @@ mod generator_tests {
                 &TARGET_CHROMA_SCALE,
                 positive_light_padding,
                 0.0,
+                None,
+                None,
             );
             let step_50_with_padding_lightness = palette_with_padding
                 .swatches.iter()
@@ -242,6 +151,8 @@ mod generator_tests {
                 &TARGET_CHROMA_SCALE,
                 0.0,
                 0.0,
+                None,
+                None,
             );
             let step_50_no_padding_lightness = palette_with_no_padding
                 .swatches.iter()
@@ -269,6 +180,8 @@ mod generator_tests {
                 &TARGET_CHROMA_SCALE,
                 negative_light_padding,
                 0.0,
+                None,
+                None,
             );
             let step_50_with_padding_lightness = palette_with_padding
                 .swatches.iter()
@@ -313,6 +226,8 @@ mod generator_tests {
                 &TARGET_CHROMA_SCALE,
                 0.0,
                 0.0,
+                None,
+                None,
             );
             let step_800_no = no_padding
                 .swatches.iter()
@@ -331,6 +246,8 @@ mod generator_tests {
                 &TARGET_CHROMA_SCALE,
                 0.0,
                 positive_dark_padding,
+                None,
+                None,
             );
             let step_800_with = with_padding
                 .swatches.iter()
@@ -358,6 +275,8 @@ mod generator_tests {
                 &TARGET_CHROMA_SCALE,
                 0.0,
                 0.0,
+                None,
+                None,
             );
             let step_800_no = no_padding
                 .swatches.iter()
@@ -376,6 +295,8 @@ mod generator_tests {
                 &TARGET_CHROMA_SCALE,
                 0.0,
                 negative_dark_padding,
+                None,
+                None,
             );
             let step_800_with = with_padding
                 .swatches.iter()
@@ -406,6 +327,8 @@ mod generator_tests {
             &TARGET_CHROMA_SCALE,
             0.0,
             0.0,
+            None,
+            None,
         );
 
         assert!(!palette.swatches.is_empty());
@@ -419,8 +342,8 @@ mod generator_tests {
         let yellow = Oklch::new(0.55, 0.18, 80.0);   // yellow – more constrained
         let blue   = Oklch::new(0.55, 0.18, 260.0);  // blue   – more headroom
 
-        let yellow_palette = generate_palette_with_scale(yellow, &TARGET_LIGHTNESS, &TARGET_CHROMA_SCALE, 0.0, 0.0);
-        let blue_palette   = generate_palette_with_scale(blue,   &TARGET_LIGHTNESS, &TARGET_CHROMA_SCALE, 0.0, 0.0);
+        let yellow_palette = generate_palette_with_scale(yellow, &TARGET_LIGHTNESS, &TARGET_CHROMA_SCALE, 0.0, 0.0, None, None);
+        let blue_palette   = generate_palette_with_scale(blue, &TARGET_LIGHTNESS, &TARGET_CHROMA_SCALE, 0.0, 0.0, None, None);
 
         assert!(
             yellow_palette.max_recommended_light_padding < blue_palette.max_recommended_light_padding,
@@ -469,6 +392,8 @@ mod generator_tests {
                 &TARGET_CHROMA_SCALE,
                 0.0,
                 0.0,
+                None,
+                None,
             );
 
             // Assert: Palette should store the exact lightness curve that was passed in

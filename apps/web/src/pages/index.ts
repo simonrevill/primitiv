@@ -6,6 +6,7 @@ export * from "./DropdownExample";
 export * from "./MillerColumnsExample";
 export * from "./ModalExample";
 export * from "./RadioCardExample";
+export * from "./SwitchExample";
 export * from "./ToggleExample";
 export * from "./ToggleGroupExample";
 export * from "./TooltipExample";

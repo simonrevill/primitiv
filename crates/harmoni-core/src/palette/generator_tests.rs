@@ -23,6 +23,45 @@ mod generator_tests {
         }
     }
 
+    mod dark_palette_generation {
+        use super::*;
+
+        #[test]
+        fn dark_palette_for_a_pale_brand_has_reliably_dark_backgrounds_and_light_text() {
+            // A pale brand (L≈0.9) under the light offset model would yield
+            // "dark" backgrounds that aren't actually dark. The anchored dark
+            // model pins step 50 to an absolute dark target and step 900 to an
+            // absolute light target, independent of how pale the brand is.
+            let pale_brand = Oklch::new(0.9, 0.1, 240.0);
+            let palette = generate_dark_palette(pale_brand, &TARGET_LIGHTNESS_DARK, None, None);
+
+            assert_eq!(palette.swatches.len(), 10);
+
+            let step_50 = palette
+                .swatches
+                .iter()
+                .find(|s| s.label == SwatchLabel::Number(50))
+                .unwrap();
+            let step_900 = palette
+                .swatches
+                .iter()
+                .find(|s| s.label == SwatchLabel::Number(900))
+                .unwrap();
+
+            assert!(
+                step_50.l <= 0.30,
+                "step 50 should be reliably dark, got {}",
+                step_50.l
+            );
+            assert!(
+                step_900.l >= 0.88,
+                "step 900 should be reliably light, got {}",
+                step_900.l
+            );
+            assert!(step_50.l < step_900.l);
+        }
+    }
+
     mod swatch_label {
         use super::*;
 

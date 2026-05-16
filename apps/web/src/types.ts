@@ -13,7 +13,9 @@ export type ColorKey =
 export type ColorConfig = {
   hex: string;
   palette?: Palette;
+  darkPalette?: Palette;
   lightnessArray?: number[];
+  darkLightnessArray?: number[];
   lightPadding?: number;
   darkPadding?: number;
 };

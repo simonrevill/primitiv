@@ -310,9 +310,13 @@ pub fn generate_dark_palette(
         .enumerate()
         .zip(TARGET_CHROMA_SCALE.iter())
         .map(|((i, &step), &chroma_factor)| {
+            if step == 500 {
+                return SwatchStep::from_label(base_lightness, base_chroma, base_hue, step);
+            }
+
             // Lower half interpolates the dark background anchor up to the
             // brand; upper half interpolates the brand up to the text anchor.
-            let l = if i <= 5 {
+            let l = if i < 5 {
                 let frac = (dark_curve[i] - dark_curve[0]) / (dark_curve[5] - dark_curve[0]);
                 DARK_BG_ANCHOR + frac * (base_lightness - DARK_BG_ANCHOR)
             } else {

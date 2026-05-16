@@ -60,6 +60,21 @@ mod generator_tests {
             );
             assert!(step_50.l < step_900.l);
         }
+
+        #[test]
+        fn dark_palette_preserves_the_brand_color_exactly_at_step_500() {
+            // The two-segment model lands step 500 at the brand's lightness,
+            // but only an explicit passthrough keeps its chroma and hue byte-
+            // identical instead of routing chroma through the gamut formula.
+            let brand = Oklch::new(0.55, 0.15, 240.0);
+            let palette = generate_dark_palette(brand, &TARGET_LIGHTNESS_DARK, None, None);
+
+            let step_500 = &palette.swatches[5];
+            assert_eq!(step_500.label, SwatchLabel::Number(500));
+            assert_eq!(step_500.l, brand.l);
+            assert_eq!(step_500.c, brand.chroma);
+            assert_eq!(step_500.h, brand.hue.into_degrees());
+        }
     }
 
     mod swatch_label {

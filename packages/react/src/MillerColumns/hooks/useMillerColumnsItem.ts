@@ -48,7 +48,16 @@ export function useMillerColumnsItem(
     navigable: enabledValues,
     currentKey: value,
     includeHomeEnd: true,
-    onNavigate: (target) => focusItem(depth, target),
+    includeActivate: true,
+    onNavigate: (target, action) => {
+      if (action === "activate") {
+        if (!disabled) {
+          select(depth, value);
+        }
+        return;
+      }
+      focusItem(depth, target);
+    },
   });
 
   function handleClick(event: MouseEvent<HTMLDivElement>) {

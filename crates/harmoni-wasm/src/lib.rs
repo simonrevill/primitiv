@@ -104,6 +104,31 @@ pub fn generate_palette_with_lightness(
 }
 
 #[wasm_bindgen]
+pub fn generate_palette_pair(
+    hex: &str,
+    light_lightness: Array,
+    dark_lightness: Array,
+    light_padding: f32,
+    dark_padding: f32,
+) -> Result<types::PaletteSet, JsError> {
+    let light_curve = array_to_lightness(light_lightness)?;
+    let dark_curve = array_to_lightness(dark_lightness)?;
+
+    api::generate_pair(
+        ColorInput::Css(hex.to_string()),
+        &light_curve,
+        &dark_curve,
+        GenerateOptions {
+            light_padding,
+            dark_padding,
+            ..GenerateOptions::default()
+        },
+    )
+    .map(Into::into)
+    .map_err(to_js_error)
+}
+
+#[wasm_bindgen]
 pub fn generate_palette_with_light_padding(
     hex: &str,
     light_padding: f32,

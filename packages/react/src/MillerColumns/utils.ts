@@ -1,4 +1,11 @@
-import { Children, isValidElement, ReactElement, ReactNode } from "react";
+import {
+  Children,
+  cloneElement,
+  Fragment,
+  isValidElement,
+  ReactElement,
+  ReactNode,
+} from "react";
 
 import { MillerColumnsColumn } from "./MillerColumns";
 
@@ -26,6 +33,12 @@ export function isColumnElement(node: ReactNode): node is ReactElement {
 /**
  * Splits an `Item`'s children into its cell content and its single
  * optional nested `<MillerColumns.Column>`.
+ *
+ * The child column is matched however deeply it is wrapped in
+ * fragments, since `Children.toArray` does not descend into fragments —
+ * so `{cond ? <><Indicator/><Column/></> : null}` is partitioned the
+ * same as a bare `<Column/>`. Cell entries are re-keyed because
+ * unwrapping fragments can collide the keys `Children.toArray` assigns.
  */
 export function partitionItemChildren(children: ReactNode): {
   cell: ReactNode[];
@@ -34,18 +47,29 @@ export function partitionItemChildren(children: ReactNode): {
   const cell: ReactNode[] = [];
   let column: ReactElement | null = null;
 
-  for (const child of Children.toArray(children)) {
-    if (isColumnElement(child)) {
-      if (column !== null) {
-        throw new Error(
-          "A MillerColumns.Item may contain at most one nested <MillerColumns.Column>.",
-        );
+  const visit = (nodes: ReactNode): void => {
+    for (const child of Children.toArray(nodes)) {
+      if (isColumnElement(child)) {
+        if (column !== null) {
+          throw new Error(
+            "A MillerColumns.Item may contain at most one nested <MillerColumns.Column>.",
+          );
+        }
+        column = child;
+      } else if (isValidElement(child) && child.type === Fragment) {
+        visit((child.props as { children?: ReactNode }).children);
+      } else {
+        cell.push(child);
       }
-      column = child;
-    } else {
-      cell.push(child);
     }
-  }
+  };
 
-  return { cell, column };
+  visit(children);
+
+  return {
+    cell: cell.map((node, index) =>
+      isValidElement(node) ? cloneElement(node, { key: `mc-${index}` }) : node,
+    ),
+    column,
+  };
 }

@@ -135,6 +135,11 @@ Zero styles ship with the component. Style it through `data-*` hooks;
 typically the strip is `display: flex` and each column scrolls
 vertically.
 
+Inside the strip, each column is wrapped in a transparent
+(`display: contents`) slot element that fixes left-to-right order — so
+target columns with `[data-miller-columns-column]`, not a direct-child
+selector like `[data-miller-columns-strip] > *`.
+
 ```css
 [data-miller-columns-strip] {
   display: flex;

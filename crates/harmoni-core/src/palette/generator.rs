@@ -288,15 +288,21 @@ pub fn generate_palette_with_scale(
 /// and step 500 to the brand's exact lightness. Each half is shaped by the
 /// normalised `dark_curve`, guaranteeing reliably-dark backgrounds however
 /// pale the brand is, while keeping the scale monotonic and harmonious.
+///
+/// `light_padding` / `dark_padding` pad the curve before the anchored model
+/// runs, reshaping the steps between the fixed 50/500/900 anchors.
 pub fn generate_dark_palette(
     base_500: Oklch,
     dark_curve: &[f32; 10],
+    light_padding: f32,
+    dark_padding: f32,
     soft_white: Option<Oklch>,
     soft_black: Option<Oklch>,
 ) -> Palette {
     let base_hue = base_500.hue.into_degrees();
     let base_chroma = base_500.chroma;
     let base_lightness = base_500.l;
+    let adjusted_curve = apply_padding_to_lightness(dark_curve, light_padding, dark_padding);
 
     let base_gamut_max = max_in_gamut_chroma(base_lightness, base_hue);
     let base_ratio = if base_gamut_max > 0.001 {
@@ -317,10 +323,12 @@ pub fn generate_dark_palette(
             // Lower half interpolates the dark background anchor up to the
             // brand; upper half interpolates the brand up to the text anchor.
             let l = if i < 5 {
-                let frac = (dark_curve[i] - dark_curve[0]) / (dark_curve[5] - dark_curve[0]);
+                let frac = (adjusted_curve[i] - adjusted_curve[0])
+                    / (adjusted_curve[5] - adjusted_curve[0]);
                 DARK_BG_ANCHOR + frac * (base_lightness - DARK_BG_ANCHOR)
             } else {
-                let frac = (dark_curve[i] - dark_curve[5]) / (dark_curve[9] - dark_curve[5]);
+                let frac = (adjusted_curve[i] - adjusted_curve[5])
+                    / (adjusted_curve[9] - adjusted_curve[5]);
                 base_lightness + frac * (DARK_TEXT_ANCHOR - base_lightness)
             };
             let l = l.clamp(0.01, 0.99);

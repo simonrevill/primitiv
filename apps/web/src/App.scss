@@ -104,14 +104,15 @@ header {
   margin-block-end: 1rem;
   border: 0.0625rem solid #4f4f4f;
 
-  // Colour palettes stack a dark palette and its curve editor below the
-  // light pair; the plain neutral palette keeps the two-row default.
+  // Colour palettes stack the light steps, light curve editor, padding
+  // controls, then the dark steps and dark curve editor; the plain
+  // neutral palette keeps the two-row default.
   &--color {
-    grid-template-rows: 1fr 8.5rem 1fr 8.5rem;
+    grid-template-rows: 1fr 8.5rem auto 1fr 8.5rem;
   }
 
   &--dark-collapsed {
-    grid-template-rows: 1fr 8.5rem;
+    grid-template-rows: 1fr 8.5rem auto;
 
     .palette__steps--dark,
     .palette__curve-editor--dark {
@@ -140,7 +141,7 @@ header {
     grid-row: 1 / 2;
 
     &--dark {
-      grid-row: 3 / 4;
+      grid-row: 4 / 5;
     }
   }
 
@@ -187,7 +188,7 @@ header {
     // justify-content: flex-start;
 
     &--dark {
-      grid-row: 4 / 5;
+      grid-row: 5 / 6;
     }
 
     &-tabs {
@@ -232,6 +233,8 @@ input[type="range"][role="slider"].palette__slider {
 }
 
 .palette-padding {
+  grid-column: 1 / 11;
+  grid-row: 3 / 4;
   display: flex;
   justify-content: space-between;
   align-items: center;

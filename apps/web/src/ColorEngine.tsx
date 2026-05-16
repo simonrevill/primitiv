@@ -178,6 +178,54 @@ export function ColorEngine() {
                       handleLightnessCurveChange(key, index)
                     }
                   />
+                  <div className="palette-padding">
+                    <div className="palette__slider-container palette__slider-container--light-padding">
+                      <input
+                        type="range"
+                        role="slider"
+                        min={0}
+                        max={
+                          (palette?.max_recommended_light_padding ?? 0) * 100
+                        }
+                        step={1}
+                        value={(lightPadding ?? 0) * 100}
+                        onChange={handleLightPaddingChange(key)}
+                      />
+                      <span className="slider-label">
+                        {((lightPadding ?? 0) * 100).toFixed(0)}%
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleShiftLeft(key, palette?.swatches[6])}
+                    >
+                      {"< Shift"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleShiftRight(key, palette?.swatches[4])
+                      }
+                    >
+                      {"Shift >"}
+                    </button>
+                    <div className="palette__slider-container palette__slider-container--dark-padding">
+                      <input
+                        type="range"
+                        role="slider"
+                        min={0}
+                        max={
+                          (palette?.max_recommended_dark_padding ?? 0) * 100
+                        }
+                        step={1}
+                        value={(darkPadding ?? 0) * 100}
+                        onChange={handleDarkPaddingChange(key)}
+                      />
+                      <span className="slider-label">
+                        {((darkPadding ?? 0) * 100).toFixed(0)}%
+                      </span>
+                    </div>
+                  </div>
                   <ColorPalette
                     palette={darkPalette}
                     className="palette__steps--dark"
@@ -189,48 +237,6 @@ export function ColorEngine() {
                       handleDarkLightnessCurveChange(key, index)
                     }
                   />
-                </div>
-                <div className="palette-padding">
-                  <div className="palette__slider-container palette__slider-container--light-padding">
-                    <input
-                      type="range"
-                      role="slider"
-                      min={0}
-                      max={(palette?.max_recommended_light_padding ?? 0) * 100}
-                      step={1}
-                      value={(lightPadding ?? 0) * 100}
-                      onChange={handleLightPaddingChange(key)}
-                    />
-                    <span className="slider-label">
-                      {((lightPadding ?? 0) * 100).toFixed(0)}%
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => handleShiftLeft(key, palette?.swatches[6])}
-                  >
-                    {"< Shift"}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleShiftRight(key, palette?.swatches[4])}
-                  >
-                    {"Shift >"}
-                  </button>
-                  <div className="palette__slider-container palette__slider-container--dark-padding">
-                    <input
-                      type="range"
-                      role="slider"
-                      min={0}
-                      max={(palette?.max_recommended_dark_padding ?? 0) * 100}
-                      step={1}
-                      value={(darkPadding ?? 0) * 100}
-                      onChange={handleDarkPaddingChange(key)}
-                    />
-                    <span className="slider-label">
-                      {((darkPadding ?? 0) * 100).toFixed(0)}%
-                    </span>
-                  </div>
                 </div>
               </div>
             </Fragment>

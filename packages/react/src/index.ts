@@ -11,6 +11,7 @@ export * from "./Modal";
 export * from "./Portal";
 export * from "./RadioCard";
 export * from "./RadioGroup";
+export * from "./Switch";
 export * from "./Table";
 export * from "./Tabs";
 export * from "./Toggle";

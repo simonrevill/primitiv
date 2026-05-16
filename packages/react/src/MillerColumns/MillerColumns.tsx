@@ -10,6 +10,7 @@ import {
 } from "./MillerColumnsContext";
 import {
   useMillerColumnsColumn,
+  useMillerColumnsColumnContext,
   useMillerColumnsItem,
   useMillerColumnsItemContext,
   useMillerColumnsRoot,
@@ -22,6 +23,7 @@ import type {
   MillerColumnsColumnProps,
   MillerColumnsItemProps,
   MillerColumnsItemIndicatorProps,
+  MillerColumnsResizeHandleProps,
 } from "./types";
 
 /**
@@ -229,11 +231,46 @@ export function MillerColumnsItemIndicator({
 
 MillerColumnsItemIndicator.displayName = "MillerColumnsItemIndicator";
 
+/**
+ * A drag-to-resize affordance for the column it is rendered in. Renders a
+ * `<div role="separator" aria-orientation="vertical">` that, while
+ * pointer-dragged, drives that column's width as state on the `Root`.
+ *
+ * Must be rendered among a `MillerColumns.Column`'s children — it reads
+ * the column's depth from context. Position it with CSS (typically
+ * absolutely, against the column's trailing edge).
+ *
+ * @example
+ * ```tsx
+ * <MillerColumns.Column>
+ *   <MillerColumns.ResizeHandle />
+ *   <MillerColumns.Item value="a">A</MillerColumns.Item>
+ * </MillerColumns.Column>
+ * ```
+ */
+export function MillerColumnsResizeHandle(
+  props: MillerColumnsResizeHandleProps,
+) {
+  useMillerColumnsColumnContext();
+
+  return (
+    <div
+      role="separator"
+      aria-orientation="vertical"
+      data-miller-columns-resize-handle=""
+      {...props}
+    />
+  );
+}
+
+MillerColumnsResizeHandle.displayName = "MillerColumnsResizeHandle";
+
 type MillerColumnsCompound = typeof MillerColumnsRoot & {
   Root: typeof MillerColumnsRoot;
   Column: typeof MillerColumnsColumn;
   Item: typeof MillerColumnsItem;
   ItemIndicator: typeof MillerColumnsItemIndicator;
+  ResizeHandle: typeof MillerColumnsResizeHandle;
 };
 
 const MillerColumnsCompound: MillerColumnsCompound = Object.assign(
@@ -243,6 +280,7 @@ const MillerColumnsCompound: MillerColumnsCompound = Object.assign(
     Column: MillerColumnsColumn,
     Item: MillerColumnsItem,
     ItemIndicator: MillerColumnsItemIndicator,
+    ResizeHandle: MillerColumnsResizeHandle,
   },
 );
 

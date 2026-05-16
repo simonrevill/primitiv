@@ -122,10 +122,9 @@ export function useMillerColumnsItem(
         return;
       }
       event.preventDefault();
-      const parentValue = activePath[depth - 1];
-      if (parentValue !== undefined) {
-        focusItem(depth - 1, parentValue);
-      }
+      // A column at depth > 0 exists only because its parent item is
+      // selected, so activePath[depth - 1] is always defined here.
+      focusItem(depth - 1, activePath[depth - 1]);
       return;
     }
 

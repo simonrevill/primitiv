@@ -93,6 +93,9 @@ keyword or by topic; do not paraphrase their content here.
 - **`harmoni-architecture-history`** — Steps C/D/A/B, ColorInput,
   mirror-types pattern, vocabulary rename, the neutral module.
   Historical reference.
+- **`dark-mode-palettes`** — the anchored two-segment dark
+  generation model, `generate_dark_palette` / `generate_pair` /
+  `PaletteSet`, and the work deferred past v1.
 - **`rust-wasm-workflow`** — cargo commands, api module boundary,
   mirror-types add-a-field checklist, opaque Palette extern type.
 - **`sandbox-gotchas`** — git mv cross-device, wasm pkg-not-found,

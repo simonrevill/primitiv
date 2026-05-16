@@ -67,4 +67,39 @@ describe("MillerColumns — column projection", () => {
     ).not.toBeInTheDocument();
     expect(screen.getAllByRole("group")).toHaveLength(1);
   });
+
+  it("detects a child column declared inside a fragment", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <MillerColumns.Root>
+        <MillerColumns.Column>
+          <MillerColumns.Item value="fruit">
+            Fruit
+            <>
+              <MillerColumns.ItemIndicator data-testid="indicator">
+                ▸
+              </MillerColumns.ItemIndicator>
+              <MillerColumns.Column>
+                <MillerColumns.Item value="apple">Apple</MillerColumns.Item>
+              </MillerColumns.Column>
+            </>
+          </MillerColumns.Item>
+        </MillerColumns.Column>
+      </MillerColumns.Root>,
+    );
+
+    // The fragment-wrapped column is a child column: hidden until selected,
+    // and its presence is reflected on the branch item.
+    expect(
+      screen.queryByRole("treeitem", { name: "Apple" }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByTestId("indicator")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("treeitem", { name: "Fruit" }));
+
+    expect(
+      screen.getByRole("treeitem", { name: "Apple" }),
+    ).toBeInTheDocument();
+  });
 });

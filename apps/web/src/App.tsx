@@ -6,6 +6,7 @@ import {
   CarouselExample,
   CollapsibleExample,
   DropdownExample,
+  MillerColumnsExample,
   ModalExample,
   ToggleExample,
   ToggleGroupExample,
@@ -24,6 +25,7 @@ function App() {
           <Link to="/carousel">Carousel</Link>
           <Link to="/collapsible">Collapsible</Link>
           <Link to="/dropdown">Dropdown</Link>
+          <Link to="/miller-columns">Miller Columns</Link>
           <Link to="/modal">Modal</Link>
           <Link to="/toggle">Toggle</Link>
           <Link to="/toggle-group">Toggle Group</Link>
@@ -37,6 +39,10 @@ function App() {
           <Route path="/carousel" element={<CarouselExample />} />
           <Route path="/collapsible" element={<CollapsibleExample />} />
           <Route path="/dropdown" element={<DropdownExample />} />
+          <Route
+            path="/miller-columns"
+            element={<MillerColumnsExample />}
+          />
           <Route path="/modal" element={<ModalExample />} />
           <Route path="/toggle" element={<ToggleExample />} />
           <Route path="/toggle-group" element={<ToggleGroupExample />} />

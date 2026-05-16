@@ -1,0 +1,80 @@
+.miller-example {
+  --surface-bg: #ffffff;
+  --muted-border: #e6e6ea;
+  --accent: #6b46ff;
+  max-width: 720px;
+  margin: 0 auto;
+  color: #000;
+
+  h2 {
+    margin-bottom: 0.25rem;
+  }
+
+  p {
+    color: #4a4a52;
+    margin-bottom: 1rem;
+  }
+}
+
+/* The strip — a horizontal row of columns. */
+.miller {
+  display: flex;
+  height: 280px;
+  background: var(--surface-bg);
+  border: 1px solid var(--muted-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Each column scrolls vertically and is divided by a border. */
+.miller__column {
+  flex: 0 0 200px;
+  height: 100%;
+  overflow-y: auto;
+  border-right: 1px solid var(--muted-border);
+
+  &[data-depth="0"] {
+    /* the root column */
+  }
+}
+
+.miller__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  cursor: pointer;
+  user-select: none;
+
+  &:hover {
+    background: color-mix(in srgb, var(--accent) 8%, transparent);
+  }
+
+  &[data-state="selected"] {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  &:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--accent) 40%, transparent);
+    outline-offset: -2px;
+  }
+
+  &[data-disabled] {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.miller__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The chevron sits at the block end and only renders for folders. */
+.miller__chevron {
+  display: inline-flex;
+  flex: 0 0 auto;
+}

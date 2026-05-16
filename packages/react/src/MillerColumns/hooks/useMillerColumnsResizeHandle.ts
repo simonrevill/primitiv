@@ -24,10 +24,15 @@ export function useMillerColumnsResizeHandle({
       return;
     }
 
+    const activeDrag = drag;
+
     function handleMove(event: globalThis.PointerEvent) {
       setColumnWidth(
         depth,
-        Math.max(0, drag.startWidth + event.clientX - drag.startX),
+        Math.max(
+          0,
+          activeDrag.startWidth + event.clientX - activeDrag.startX,
+        ),
       );
     }
 

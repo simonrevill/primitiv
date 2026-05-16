@@ -44,7 +44,11 @@ export function MillerColumnsRoot({
   onValueChange,
   ...rest
 }: MillerColumnsRootProps) {
-  const { contextValue } = useMillerColumnsRoot(defaultValue);
+  const { contextValue } = useMillerColumnsRoot(
+    value,
+    defaultValue,
+    onValueChange,
+  );
 
   return (
     <MillerColumnsContext.Provider value={contextValue}>

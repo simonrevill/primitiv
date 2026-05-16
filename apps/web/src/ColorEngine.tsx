@@ -1,8 +1,52 @@
-import { Tabs } from "@primitiv/react";
+import { ChangeEvent, useState } from "react";
+import { Switch, Tabs } from "@primitiv/react";
 
 import { Palette as ColorPalette } from "./Palette";
 import { useColors } from "./useColors";
 import { Fragment } from "react/jsx-runtime";
+
+type CurveEditorProps = {
+  curve?: number[];
+  onCurveChange: (index: number) => (e: ChangeEvent<HTMLInputElement>) => void;
+  className?: string;
+};
+
+function CurveEditor({ curve, onCurveChange, className }: CurveEditorProps) {
+  return (
+    <div
+      className={
+        className
+          ? `palette__curve-editor ${className}`
+          : "palette__curve-editor"
+      }
+    >
+      <Tabs.Root className="palette__curve-editor-tabs" defaultValue="a">
+        <Tabs.List label="Demo tabs">
+          <Tabs.Trigger value="a">Sliders</Tabs.Trigger>
+          <Tabs.Trigger value="b">Curve</Tabs.Trigger>
+        </Tabs.List>
+        <Tabs.Content className="palette__sliders" value="a">
+          {curve?.map((lightnessValue, index) => (
+            <input
+              key={index}
+              className="palette__slider palette__slider--curve"
+              type="range"
+              role="slider"
+              min={0}
+              max={1}
+              step={0.01}
+              value={lightnessValue}
+              onChange={onCurveChange(index)}
+            />
+          ))}
+        </Tabs.Content>
+        <Tabs.Content className="palette__curve" value="b">
+          Second panel
+        </Tabs.Content>
+      </Tabs.Root>
+    </div>
+  );
+}
 
 export function ColorEngine() {
   const {
@@ -21,15 +65,34 @@ export function ColorEngine() {
     handleLightPaddingChange,
     handleDarkPaddingChange,
     handleLightnessCurveChange,
+    handleDarkLightnessCurveChange,
     STANDARD_KEYS,
     handleShiftLeft,
     handleShiftRight,
   } = useColors();
 
+  const [showDarkMode, setShowDarkMode] = useState(true);
+
   return (
     <>
       <h1>Harmoni Color Engine</h1>
-      <div className="palettes-grid">
+      <div className="dark-mode-toggle">
+        <Switch.Root
+          checked={showDarkMode}
+          onCheckedChange={setShowDarkMode}
+          aria-label="Show dark mode"
+        >
+          <Switch.Thumb />
+        </Switch.Root>
+        <span>Show dark mode</span>
+      </div>
+      <div
+        className={
+          showDarkMode
+            ? "palettes-grid"
+            : "palettes-grid palettes-grid--hide-dark"
+        }
+      >
         <p className="palette__label">Neutral</p>
         <div className="neutral-pickers">
           <label>
@@ -78,7 +141,8 @@ export function ColorEngine() {
         </div>
 
         {STANDARD_KEYS.map((key) => {
-          const { hex, palette, lightPadding, darkPadding } = colors[key];
+          const { hex, palette, darkPalette, lightPadding, darkPadding } =
+            colors[key];
 
           return (
             <Fragment key={key}>
@@ -96,37 +160,23 @@ export function ColorEngine() {
               <div className="palette-container">
                 <div className="palette">
                   <ColorPalette palette={palette} />
-                  <div className="palette__curve-editor">
-                    <Tabs.Root
-                      className="palette__curve-editor-tabs"
-                      defaultValue="a"
-                    >
-                      <Tabs.List label="Demo tabs">
-                        <Tabs.Trigger value="a">Sliders</Tabs.Trigger>
-                        <Tabs.Trigger value="b">Curve</Tabs.Trigger>
-                      </Tabs.List>
-                      <Tabs.Content className="palette__sliders" value="a">
-                        {palette?.lightness_curve.map(
-                          (lightnessValue, index) => (
-                            <input
-                              key={index}
-                              className="palette__slider palette__slider--curve"
-                              type="range"
-                              role="slider"
-                              min={0}
-                              max={1}
-                              step={0.01}
-                              value={lightnessValue}
-                              onChange={handleLightnessCurveChange(key, index)}
-                            />
-                          ),
-                        )}
-                      </Tabs.Content>
-                      <Tabs.Content className="palette__curve" value="b">
-                        Second panel
-                      </Tabs.Content>
-                    </Tabs.Root>
-                  </div>
+                  <CurveEditor
+                    curve={palette?.lightness_curve}
+                    onCurveChange={(index) =>
+                      handleLightnessCurveChange(key, index)
+                    }
+                  />
+                  <ColorPalette
+                    palette={darkPalette}
+                    className="palette__steps--dark"
+                  />
+                  <CurveEditor
+                    className="palette__curve-editor--dark"
+                    curve={darkPalette?.lightness_curve}
+                    onCurveChange={(index) =>
+                      handleDarkLightnessCurveChange(key, index)
+                    }
+                  />
                 </div>
                 <div className="palette-padding">
                   <div className="palette__slider-container palette__slider-container--light-padding">

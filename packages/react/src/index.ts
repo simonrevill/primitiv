@@ -2,6 +2,7 @@ export * from "./Accordion";
 export * from "./Button";
 export * from "./Carousel";
 export * from "./Checkbox";
+export * from "./CheckboxCard";
 export * from "./Collapsible";
 export * from "./Divider";
 export * from "./Dropdown";

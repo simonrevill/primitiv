@@ -91,4 +91,47 @@ describe("MillerColumns — resize handle", () => {
 
     expect(column).toHaveStyle({ width: "0px" });
   });
+
+  it("exposes a data-dragging hook while a drag is in progress", () => {
+    render(
+      <MillerColumns.Root>
+        <MillerColumns.Column>
+          <MillerColumns.ResizeHandle />
+          <MillerColumns.Item value="a">A</MillerColumns.Item>
+        </MillerColumns.Column>
+      </MillerColumns.Root>,
+    );
+
+    const handle = screen.getByRole("separator");
+
+    expect(handle).not.toHaveAttribute("data-dragging");
+
+    fireEvent.pointerDown(handle, { clientX: 0 });
+    expect(handle).toHaveAttribute("data-dragging");
+
+    fireEvent.pointerUp(window);
+    expect(handle).not.toHaveAttribute("data-dragging");
+  });
+
+  it("composes a consumer onPointerDown with the drag", () => {
+    const onPointerDown = vi.fn();
+
+    render(
+      <MillerColumns.Root>
+        <MillerColumns.Column>
+          <MillerColumns.ResizeHandle onPointerDown={onPointerDown} />
+          <MillerColumns.Item value="a">A</MillerColumns.Item>
+        </MillerColumns.Column>
+      </MillerColumns.Root>,
+    );
+
+    const handle = screen.getByRole("separator");
+    const column = screen.getByRole("group");
+
+    fireEvent.pointerDown(handle, { clientX: 100 });
+    fireEvent.pointerMove(window, { clientX: 200 });
+
+    expect(onPointerDown).toHaveBeenCalledTimes(1);
+    expect(column).toHaveStyle({ width: "100px" });
+  });
 });

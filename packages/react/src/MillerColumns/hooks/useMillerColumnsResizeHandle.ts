@@ -63,6 +63,7 @@ export function useMillerColumnsResizeHandle({
       role: "separator" as const,
       "aria-orientation": "vertical" as const,
       "data-miller-columns-resize-handle": "",
+      ...(drag ? { "data-dragging": "" } : {}),
       onPointerDown: handlePointerDown,
       ...rest,
     },

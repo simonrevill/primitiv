@@ -9,7 +9,12 @@ import { useMillerColumnsContext } from "./useMillerColumnsContext";
 import { useMillerColumnsColumnContext } from "./useMillerColumnsColumnContext";
 
 export function useMillerColumnsItem(
-  { value, onClick, ...rest }: Omit<MillerColumnsItemProps, "children">,
+  {
+    value,
+    onClick,
+    disabled = false,
+    ...rest
+  }: Omit<MillerColumnsItemProps, "children">,
   hasChildren: boolean,
 ) {
   const { activePath, select } = useMillerColumnsContext();
@@ -18,6 +23,9 @@ export function useMillerColumnsItem(
   const selected = activePath[depth] === value;
 
   function handleClick(event: MouseEvent<HTMLDivElement>) {
+    if (disabled) {
+      return;
+    }
     onClick?.(event);
     select(depth, value);
   }
@@ -28,6 +36,7 @@ export function useMillerColumnsItem(
     "data-state": selected ? "selected" : "unselected",
     "data-depth": depth,
     ...(hasChildren ? { "data-has-children": "" } : {}),
+    ...(disabled ? { "aria-disabled": true, "data-disabled": "" } : {}),
     onClick: handleClick,
     ...rest,
   };

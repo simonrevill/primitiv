@@ -26,6 +26,7 @@ export type MillerColumnsColumnProps = ComponentProps<"div"> & {
 
 export type MillerColumnsItemProps = ComponentProps<"div"> & {
   value: string;
+  disabled?: boolean;
   children: ReactNode;
 };
 

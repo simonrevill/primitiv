@@ -134,6 +134,8 @@ export function useMillerColumnsItem(
     role: "treeitem",
     tabIndex: isTabStop ? 0 : -1,
     "aria-selected": selected,
+    "aria-level": depth + 1,
+    ...(hasChildren ? { "aria-expanded": selected } : {}),
     "data-state": selected ? "selected" : "unselected",
     "data-depth": depth,
     ...(hasChildren ? { "data-has-children": "" } : {}),

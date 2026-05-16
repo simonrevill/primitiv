@@ -1,4 +1,10 @@
-import { ComponentProps, ReactNode, Ref, RefObject } from "react";
+import {
+  ComponentProps,
+  HTMLAttributes,
+  ReactNode,
+  Ref,
+  RefObject,
+} from "react";
 
 export type ModalImperativeApi = {
   open: () => void;
@@ -61,12 +67,10 @@ export type ModalOverlayProps = ComponentProps<"div"> & {
   forceMount?: boolean;
 };
 
-export type ModalTitleProps = {
-  children?: ReactNode;
+export type ModalTitleProps = HTMLAttributes<HTMLElement> & {
   asChild?: boolean;
 };
 
-export type ModalDescriptionProps = {
-  children?: ReactNode;
+export type ModalDescriptionProps = HTMLAttributes<HTMLElement> & {
   asChild?: boolean;
 };

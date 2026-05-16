@@ -130,4 +130,38 @@ describe("Modal accessibility — Title and Description", () => {
     // Assert
     expect(getDialog()).not.toHaveAttribute("aria-describedby");
   });
+
+  it("forwards extra HTML attributes (e.g. className) to the Description element", () => {
+    // Arrange & Act
+    render(
+      <Modal.Root defaultOpen>
+        <Modal.Content>
+          <Modal.Description className="my-description" data-testid="desc-el">
+            Enter your card details
+          </Modal.Description>
+        </Modal.Content>
+      </Modal.Root>,
+    );
+
+    // Assert
+    const paragraph = screen.getByTestId("desc-el");
+    expect(paragraph).toHaveClass("my-description");
+  });
+
+  it("forwards extra HTML attributes (e.g. className) to the Title element", () => {
+    // Arrange & Act
+    render(
+      <Modal.Root defaultOpen>
+        <Modal.Content>
+          <Modal.Title className="my-title" data-testid="title-el">
+            Payment
+          </Modal.Title>
+        </Modal.Content>
+      </Modal.Root>,
+    );
+
+    // Assert
+    const heading = screen.getByTestId("title-el");
+    expect(heading).toHaveClass("my-title");
+  });
 });

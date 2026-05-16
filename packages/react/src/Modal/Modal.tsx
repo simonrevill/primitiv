@@ -297,7 +297,7 @@ ModalContent.displayName = "ModalContent";
  * </Modal.Title>
  * ```
  */
-function ModalTitle({ children, asChild = false }: ModalTitleProps) {
+function ModalTitle({ children, asChild = false, ...rest }: ModalTitleProps) {
   const { registerTitle } = useModalContext();
   const id = useId();
 
@@ -307,10 +307,18 @@ function ModalTitle({ children, asChild = false }: ModalTitleProps) {
   }, [registerTitle, id]);
 
   if (asChild) {
-    return <Slot id={id}>{children}</Slot>;
+    return (
+      <Slot id={id} {...rest}>
+        {children}
+      </Slot>
+    );
   }
 
-  return <h2 id={id}>{children}</h2>;
+  return (
+    <h2 id={id} {...rest}>
+      {children}
+    </h2>
+  );
 }
 
 ModalTitle.displayName = "ModalTitle";
@@ -333,6 +341,7 @@ ModalTitle.displayName = "ModalTitle";
 function ModalDescription({
   children,
   asChild = false,
+  ...rest
 }: ModalDescriptionProps) {
   const { registerDescription } = useModalContext();
   const id = useId();
@@ -343,10 +352,18 @@ function ModalDescription({
   }, [registerDescription, id]);
 
   if (asChild) {
-    return <Slot id={id}>{children}</Slot>;
+    return (
+      <Slot id={id} {...rest}>
+        {children}
+      </Slot>
+    );
   }
 
-  return <p id={id}>{children}</p>;
+  return (
+    <p id={id} {...rest}>
+      {children}
+    </p>
+  );
 }
 
 ModalDescription.displayName = "ModalDescription";

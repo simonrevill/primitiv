@@ -160,6 +160,75 @@ pub fn validate_lightness_curve(lightness: [f32; 10]) -> Result<(), String> {
     Ok(())
 }
 
+/// Shared tail of palette generation: given the per-step background
+/// colours, pick each swatch's best foreground via the contrast audit and
+/// assemble the `Palette`. Independent of how `backgrounds` was derived.
+fn assemble_palette(
+    backgrounds: Vec<SwatchStep>,
+    lightness_curve: [f32; 10],
+    base_hue: f32,
+    soft_white: Option<Oklch>,
+    soft_black: Option<Oklch>,
+) -> Palette {
+    let dark_candidate = backgrounds
+        .iter()
+        .find(|background| background.label == SwatchLabel::Number(900))
+        .expect("Palette must contain a 900 step to act as a dark candidate");
+
+    let light_candidate = backgrounds
+        .iter()
+        .find(|background| background.label == SwatchLabel::Number(50))
+        .expect("Palette must contain a 50 step to act as a light candidate");
+
+    let custom_white = soft_white.map(|w| {
+        SwatchStep::from_label(
+            w.l,
+            w.chroma,
+            w.hue.into_degrees(),
+            SwatchLabel::Name(String::from("White")),
+        )
+    });
+    let custom_black = soft_black.map(|b| {
+        SwatchStep::from_label(
+            b.l,
+            b.chroma,
+            b.hue.into_degrees(),
+            SwatchLabel::Name(String::from("Black")),
+        )
+    });
+
+    let swatches: Vec<Swatch> = backgrounds
+        .iter()
+        .map(|background| {
+            let recommendation = get_best_foreground(
+                background,
+                dark_candidate,
+                light_candidate,
+                custom_white.as_ref(),
+                custom_black.as_ref(),
+            );
+            let contrast_result = get_contrast_rating_for_step(background, &recommendation.color);
+
+            Swatch {
+                l: background.l,
+                c: background.c,
+                h: background.h,
+                label: background.label.clone(),
+                best_foreground: recommendation.color,
+                contrast_result,
+            }
+        })
+        .collect();
+
+    Palette {
+        swatches,
+        lightness_curve,
+        max_recommended_light_padding: get_max_recommended_light_padding(base_hue),
+        max_recommended_dark_padding: get_max_recommended_dark_padding(base_hue),
+        note: "".to_string(),
+    }
+}
+
 pub fn generate_palette_with_scale(
     base_500: Oklch,
     lightness_scale: &[f32; 10],
@@ -211,63 +280,7 @@ pub fn generate_palette_with_scale(
         })
         .collect();
 
-    let dark_candidate = backgrounds
-        .iter()
-        .find(|background| background.label == SwatchLabel::Number(900))
-        .expect("Palette must contain a 900 step to act as a dark candidate");
-
-    let light_candidate = backgrounds
-        .iter()
-        .find(|background| background.label == SwatchLabel::Number(50))
-        .expect("Palette must contain a 50 step to act as a light candidate");
-
-    let custom_white = soft_white.map(|w| {
-        SwatchStep::from_label(
-            w.l,
-            w.chroma,
-            w.hue.into_degrees(),
-            SwatchLabel::Name(String::from("White")),
-        )
-    });
-    let custom_black = soft_black.map(|b| {
-        SwatchStep::from_label(
-            b.l,
-            b.chroma,
-            b.hue.into_degrees(),
-            SwatchLabel::Name(String::from("Black")),
-        )
-    });
-
-    let swatches: Vec<Swatch> = backgrounds
-        .iter()
-        .map(|background| {
-            let recommendation = get_best_foreground(
-                background,
-                dark_candidate,
-                light_candidate,
-                custom_white.as_ref(),
-                custom_black.as_ref(),
-            );
-            let contrast_result = get_contrast_rating_for_step(background, &recommendation.color);
-
-            Swatch {
-                l: background.l,
-                c: background.c,
-                h: background.h,
-                label: background.label.clone(),
-                best_foreground: recommendation.color,
-                contrast_result,
-            }
-        })
-        .collect();
-
-    Palette {
-        swatches,
-        lightness_curve: *lightness_scale,
-        max_recommended_light_padding: get_max_recommended_light_padding(base_hue),
-        max_recommended_dark_padding: get_max_recommended_dark_padding(base_hue),
-        note: "".to_string(),
-    }
+    assemble_palette(backgrounds, *lightness_scale, base_hue, soft_white, soft_black)
 }
 
 /// Generate a dark-mode palette using the anchored two-segment model:
@@ -314,63 +327,7 @@ pub fn generate_dark_palette(
         })
         .collect();
 
-    let dark_candidate = backgrounds
-        .iter()
-        .find(|background| background.label == SwatchLabel::Number(900))
-        .expect("Palette must contain a 900 step to act as a dark candidate");
-
-    let light_candidate = backgrounds
-        .iter()
-        .find(|background| background.label == SwatchLabel::Number(50))
-        .expect("Palette must contain a 50 step to act as a light candidate");
-
-    let custom_white = soft_white.map(|w| {
-        SwatchStep::from_label(
-            w.l,
-            w.chroma,
-            w.hue.into_degrees(),
-            SwatchLabel::Name(String::from("White")),
-        )
-    });
-    let custom_black = soft_black.map(|b| {
-        SwatchStep::from_label(
-            b.l,
-            b.chroma,
-            b.hue.into_degrees(),
-            SwatchLabel::Name(String::from("Black")),
-        )
-    });
-
-    let swatches: Vec<Swatch> = backgrounds
-        .iter()
-        .map(|background| {
-            let recommendation = get_best_foreground(
-                background,
-                dark_candidate,
-                light_candidate,
-                custom_white.as_ref(),
-                custom_black.as_ref(),
-            );
-            let contrast_result = get_contrast_rating_for_step(background, &recommendation.color);
-
-            Swatch {
-                l: background.l,
-                c: background.c,
-                h: background.h,
-                label: background.label.clone(),
-                best_foreground: recommendation.color,
-                contrast_result,
-            }
-        })
-        .collect();
-
-    Palette {
-        swatches,
-        lightness_curve: *dark_curve,
-        max_recommended_light_padding: get_max_recommended_light_padding(base_hue),
-        max_recommended_dark_padding: get_max_recommended_dark_padding(base_hue),
-        note: "".to_string(),
-    }
+    assemble_palette(backgrounds, *dark_curve, base_hue, soft_white, soft_black)
 }
 
 pub fn generate_palette(base_500: Oklch, light_padding: f32, dark_padding: f32) -> Palette {

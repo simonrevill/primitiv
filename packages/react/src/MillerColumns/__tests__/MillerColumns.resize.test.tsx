@@ -48,4 +48,47 @@ describe("MillerColumns — resize handle", () => {
 
     expect(column).toHaveStyle({ width: "160px" });
   });
+
+  it("continues a second drag from the already-resized width", () => {
+    render(
+      <MillerColumns.Root>
+        <MillerColumns.Column>
+          <MillerColumns.ResizeHandle />
+          <MillerColumns.Item value="a">A</MillerColumns.Item>
+        </MillerColumns.Column>
+      </MillerColumns.Root>,
+    );
+
+    const handle = screen.getByRole("separator");
+    const column = screen.getByRole("group");
+
+    fireEvent.pointerDown(handle, { clientX: 100 });
+    fireEvent.pointerMove(window, { clientX: 260 });
+    fireEvent.pointerUp(window);
+
+    fireEvent.pointerDown(handle, { clientX: 0 });
+    fireEvent.pointerMove(window, { clientX: 40 });
+    fireEvent.pointerUp(window);
+
+    expect(column).toHaveStyle({ width: "200px" });
+  });
+
+  it("does not resize a column below zero width", () => {
+    render(
+      <MillerColumns.Root>
+        <MillerColumns.Column>
+          <MillerColumns.ResizeHandle />
+          <MillerColumns.Item value="a">A</MillerColumns.Item>
+        </MillerColumns.Column>
+      </MillerColumns.Root>,
+    );
+
+    const handle = screen.getByRole("separator");
+    const column = screen.getByRole("group");
+
+    fireEvent.pointerDown(handle, { clientX: 100 });
+    fireEvent.pointerMove(window, { clientX: -500 });
+
+    expect(column).toHaveStyle({ width: "0px" });
+  });
 });

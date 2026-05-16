@@ -1,4 +1,4 @@
-import { PointerEvent, useEffect, useRef, useState } from "react";
+import { PointerEvent, useEffect, useState } from "react";
 
 import type { MillerColumnsResizeHandleProps } from "../types";
 
@@ -14,22 +14,17 @@ export function useMillerColumnsResizeHandle({
   const { columnWidths, setColumnWidth } = useMillerColumnsContext();
   const { depth } = useMillerColumnsColumnContext();
 
-  const dragRef = useRef<DragState | null>(null);
-  const [dragging, setDragging] = useState(false);
+  const [drag, setDrag] = useState<DragState | null>(null);
 
   // A drag is tracked on `window`, not the handle, so the pointer can
   // travel anywhere once it is down; the listeners live only for the
   // lifetime of the drag.
   useEffect(() => {
-    if (!dragging) {
+    if (!drag) {
       return;
     }
 
     function handleMove(event: globalThis.PointerEvent) {
-      const drag = dragRef.current;
-      if (!drag) {
-        return;
-      }
       setColumnWidth(
         depth,
         Math.max(0, drag.startWidth + event.clientX - drag.startX),
@@ -37,8 +32,7 @@ export function useMillerColumnsResizeHandle({
     }
 
     function endDrag() {
-      dragRef.current = null;
-      setDragging(false);
+      setDrag(null);
     }
 
     window.addEventListener("pointermove", handleMove);
@@ -49,19 +43,19 @@ export function useMillerColumnsResizeHandle({
       window.removeEventListener("pointerup", endDrag);
       window.removeEventListener("pointercancel", endDrag);
     };
-  }, [dragging, depth, setColumnWidth]);
+  }, [drag, depth, setColumnWidth]);
 
   function handlePointerDown(event: PointerEvent<HTMLDivElement>) {
     onPointerDown?.(event);
+    // The handle only renders inside a Column (enforced by context), so
+    // its column ancestor is always present in the DOM. Once a column
+    // has been resized its width is known; before that, measure it.
     const column = event.currentTarget.closest<HTMLElement>(
       "[data-miller-columns-column]",
-    );
+    )!;
     const startWidth =
-      columnWidths.get(depth) ??
-      column?.getBoundingClientRect().width ??
-      0;
-    dragRef.current = { startX: event.clientX, startWidth };
-    setDragging(true);
+      columnWidths.get(depth) ?? column.getBoundingClientRect().width;
+    setDrag({ startX: event.clientX, startWidth });
   }
 
   return {

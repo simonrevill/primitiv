@@ -1,6 +1,9 @@
-import { MouseEvent } from "react";
+import { MouseEvent, useMemo } from "react";
 
-import type { MillerColumnsItemProps } from "../types";
+import type {
+  MillerColumnsItemContextValue,
+  MillerColumnsItemProps,
+} from "../types";
 
 import { useMillerColumnsContext } from "./useMillerColumnsContext";
 import { useMillerColumnsColumnContext } from "./useMillerColumnsColumnContext";
@@ -29,5 +32,10 @@ export function useMillerColumnsItem(
     ...rest,
   };
 
-  return { itemProps, selected };
+  const itemContextValue = useMemo<MillerColumnsItemContextValue>(
+    () => ({ selected, hasChildren }),
+    [selected, hasChildren],
+  );
+
+  return { itemProps, selected, itemContextValue };
 }

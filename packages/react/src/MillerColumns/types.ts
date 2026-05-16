@@ -29,6 +29,10 @@ export type MillerColumnsItemProps = ComponentProps<"div"> & {
   children: ReactNode;
 };
 
+export type MillerColumnsItemIndicatorProps = ComponentProps<"span"> & {
+  children?: ReactNode;
+};
+
 export type MillerColumnsContextValue = {
   strip: HTMLElement | null;
   setStrip: (element: HTMLDivElement | null) => void;
@@ -38,4 +42,9 @@ export type MillerColumnsContextValue = {
 
 export type MillerColumnsColumnContextValue = {
   depth: number;
+};
+
+export type MillerColumnsItemContextValue = {
+  selected: boolean;
+  hasChildren: boolean;
 };

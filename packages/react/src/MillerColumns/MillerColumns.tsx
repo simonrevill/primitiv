@@ -3,10 +3,12 @@ import { createPortal } from "react-dom";
 import {
   MillerColumnsContext,
   MillerColumnsColumnContext,
+  MillerColumnsItemContext,
 } from "./MillerColumnsContext";
 import {
   useMillerColumnsColumn,
   useMillerColumnsItem,
+  useMillerColumnsItemContext,
   useMillerColumnsRoot,
 } from "./hooks";
 
@@ -16,6 +18,7 @@ import type {
   MillerColumnsRootProps,
   MillerColumnsColumnProps,
   MillerColumnsItemProps,
+  MillerColumnsItemIndicatorProps,
 } from "./types";
 
 /**
@@ -139,22 +142,72 @@ export function MillerColumnsItem({
   ...props
 }: MillerColumnsItemProps) {
   const { cell, column } = partitionItemChildren(children);
-  const { itemProps, selected } = useMillerColumnsItem(props, column !== null);
+  const { itemProps, selected, itemContextValue } = useMillerColumnsItem(
+    props,
+    column !== null,
+  );
 
   return (
-    <>
+    <MillerColumnsItemContext.Provider value={itemContextValue}>
       <div {...itemProps}>{cell}</div>
       {selected ? column : null}
-    </>
+    </MillerColumnsItemContext.Provider>
   );
 }
 
 MillerColumnsItem.displayName = "MillerColumnsItem";
 
+/**
+ * An optional, decorative affordance for a branch item — typically a
+ * chevron or arrow signalling "this item reveals a child column".
+ *
+ * Renders a `<span aria-hidden="true">` (so the glyph is ignored by
+ * assistive technology) **only for branch items**; for a leaf item it
+ * renders nothing. Place it among an `Item`'s cell content.
+ *
+ * **Styling hooks.**
+ * - `data-state="selected" | "unselected"` — mirrors the parent item.
+ * - `data-has-children` — always present (the indicator only renders
+ *   for branch items).
+ *
+ * @example
+ * ```tsx
+ * <MillerColumns.Item value="docs">
+ *   Docs
+ *   <MillerColumns.ItemIndicator>▸</MillerColumns.ItemIndicator>
+ *   <MillerColumns.Column>…</MillerColumns.Column>
+ * </MillerColumns.Item>
+ * ```
+ */
+export function MillerColumnsItemIndicator({
+  children,
+  ...rest
+}: MillerColumnsItemIndicatorProps) {
+  const { selected, hasChildren } = useMillerColumnsItemContext();
+
+  if (!hasChildren) {
+    return null;
+  }
+
+  return (
+    <span
+      aria-hidden="true"
+      data-state={selected ? "selected" : "unselected"}
+      data-has-children=""
+      {...rest}
+    >
+      {children}
+    </span>
+  );
+}
+
+MillerColumnsItemIndicator.displayName = "MillerColumnsItemIndicator";
+
 type MillerColumnsCompound = typeof MillerColumnsRoot & {
   Root: typeof MillerColumnsRoot;
   Column: typeof MillerColumnsColumn;
   Item: typeof MillerColumnsItem;
+  ItemIndicator: typeof MillerColumnsItemIndicator;
 };
 
 const MillerColumnsCompound: MillerColumnsCompound = Object.assign(
@@ -163,6 +216,7 @@ const MillerColumnsCompound: MillerColumnsCompound = Object.assign(
     Root: MillerColumnsRoot,
     Column: MillerColumnsColumn,
     Item: MillerColumnsItem,
+    ItemIndicator: MillerColumnsItemIndicator,
   },
 );
 

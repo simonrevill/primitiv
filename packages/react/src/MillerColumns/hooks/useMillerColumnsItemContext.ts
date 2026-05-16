@@ -1,1 +1,1 @@
-export {};
+export { useMillerColumnsItemContext } from "../MillerColumnsContext";

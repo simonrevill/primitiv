@@ -4,3 +4,4 @@ export { useMillerColumnsItemContext } from "./useMillerColumnsItemContext";
 export { useMillerColumnsRoot } from "./useMillerColumnsRoot";
 export { useMillerColumnsColumn } from "./useMillerColumnsColumn";
 export { useMillerColumnsItem } from "./useMillerColumnsItem";
+export { useMillerColumnsResizeHandle } from "./useMillerColumnsResizeHandle";

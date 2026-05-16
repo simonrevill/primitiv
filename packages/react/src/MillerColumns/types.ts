@@ -65,6 +65,8 @@ export type MillerColumnsItemAddress = {
 
 export type MillerColumnsContextValue = {
   slots: Map<number, HTMLElement>;
+  columnWidths: Map<number, number>;
+  setColumnWidth: (depth: number, width: number) => void;
   activePath: string[];
   select: (depth: number, value: string) => void;
   registerItem: (

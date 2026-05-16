@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 
 import { MillerColumns } from "../MillerColumns";
 
@@ -27,5 +27,25 @@ describe("MillerColumns — resize handle", () => {
         </MillerColumns.Root>,
       ),
     ).toThrow("<MillerColumns.Column>");
+  });
+
+  it("resizes its column on pointer drag", () => {
+    render(
+      <MillerColumns.Root>
+        <MillerColumns.Column>
+          <MillerColumns.ResizeHandle />
+          <MillerColumns.Item value="a">A</MillerColumns.Item>
+        </MillerColumns.Column>
+      </MillerColumns.Root>,
+    );
+
+    const handle = screen.getByRole("separator");
+    const column = screen.getByRole("group");
+
+    fireEvent.pointerDown(handle, { clientX: 100 });
+    fireEvent.pointerMove(window, { clientX: 260 });
+    fireEvent.pointerUp(window);
+
+    expect(column).toHaveStyle({ width: "160px" });
   });
 });

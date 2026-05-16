@@ -10,9 +10,9 @@ import {
 } from "./MillerColumnsContext";
 import {
   useMillerColumnsColumn,
-  useMillerColumnsColumnContext,
   useMillerColumnsItem,
   useMillerColumnsItemContext,
+  useMillerColumnsResizeHandle,
   useMillerColumnsRoot,
 } from "./hooks";
 
@@ -97,9 +97,10 @@ MillerColumnsRoot.displayName = "MillerColumnsRoot";
  */
 export function MillerColumnsColumn({
   children,
+  style,
   ...rest
 }: MillerColumnsColumnProps) {
-  const { slot, depth, columnContextValue } = useMillerColumnsColumn();
+  const { slot, depth, width, columnContextValue } = useMillerColumnsColumn();
 
   if (!slot) {
     return null;
@@ -111,6 +112,7 @@ export function MillerColumnsColumn({
         role="group"
         data-miller-columns-column=""
         data-depth={depth}
+        style={{ ...style, ...(width !== undefined ? { width } : {}) }}
         {...rest}
       >
         {children}
@@ -251,16 +253,9 @@ MillerColumnsItemIndicator.displayName = "MillerColumnsItemIndicator";
 export function MillerColumnsResizeHandle(
   props: MillerColumnsResizeHandleProps,
 ) {
-  useMillerColumnsColumnContext();
+  const { handleProps } = useMillerColumnsResizeHandle(props);
 
-  return (
-    <div
-      role="separator"
-      aria-orientation="vertical"
-      data-miller-columns-resize-handle=""
-      {...props}
-    />
-  );
+  return <div {...handleProps} />;
 }
 
 MillerColumnsResizeHandle.displayName = "MillerColumnsResizeHandle";

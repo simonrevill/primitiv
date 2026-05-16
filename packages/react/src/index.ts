@@ -5,6 +5,7 @@ export * from "./Checkbox";
 export * from "./Collapsible";
 export * from "./Divider";
 export * from "./Dropdown";
+export * from "./MillerColumns";
 export * from "./Modal";
 export * from "./Portal";
 export * from "./RadioGroup";

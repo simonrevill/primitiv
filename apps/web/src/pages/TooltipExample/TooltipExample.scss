@@ -1,10 +1,11 @@
 /* ── Shared tooltip content style ────────────────────────────────────────── */
 /* Applied to all tooltip content elements in this example page.             */
-/* The trigger/content pairing below assigns independent anchor-name values  */
-/* so each tooltip is positioned independently.                              */
+/* Scoped to the page's own `tp-` classes — a bare [class$="__content"]      */
+/* selector leaks across the bundled workbench and hits other components'    */
+/* `__content` elements (e.g. the Modal dialog's `modal__content`).          */
 
-[class$="__content"],
-[class*="__content-"] {
+[class^="tp-"][class$="__content"],
+[class^="tp-"][class*="__content-"] {
   position: absolute;
   background: #1a1a1a;
   color: #fff;

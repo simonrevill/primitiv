@@ -30,24 +30,12 @@ header {
 .palettes-grid {
   display: grid;
   row-gap: 1rem;
-
-  &--hide-dark {
-    .palette {
-      grid-template-rows: 1fr 8.5rem;
-    }
-
-    .palette__steps--dark,
-    .palette__curve-editor--dark {
-      display: none;
-    }
-  }
 }
 
 .dark-mode-toggle {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-block-end: 1rem;
   color: oklch(1 0 0);
 
   [role="switch"] {
@@ -109,12 +97,28 @@ header {
 .palette {
   display: grid;
   grid-template-columns: repeat(10, 1fr);
-  grid-template-rows: 1fr 8.5rem 1fr 8.5rem;
+  grid-template-rows: 1fr 8.5rem;
   row-gap: 1rem;
   min-width: 0;
   padding-block-end: 1rem;
   margin-block-end: 1rem;
   border: 0.0625rem solid #4f4f4f;
+
+  // Colour palettes stack the light steps, light curve editor, padding
+  // controls, then the dark steps and dark curve editor; the plain
+  // neutral palette keeps the two-row default.
+  &--color {
+    grid-template-rows: 1fr 8.5rem auto 1fr 8.5rem;
+  }
+
+  &--dark-collapsed {
+    grid-template-rows: 1fr 8.5rem auto;
+
+    .palette__steps--dark,
+    .palette__curve-editor--dark {
+      display: none;
+    }
+  }
 
   &__input {
     display: flex;
@@ -137,7 +141,7 @@ header {
     grid-row: 1 / 2;
 
     &--dark {
-      grid-row: 3 / 4;
+      grid-row: 4 / 5;
     }
   }
 
@@ -184,7 +188,7 @@ header {
     // justify-content: flex-start;
 
     &--dark {
-      grid-row: 4 / 5;
+      grid-row: 5 / 6;
     }
 
     &-tabs {
@@ -229,6 +233,8 @@ input[type="range"][role="slider"].palette__slider {
 }
 
 .palette-padding {
+  grid-column: 1 / 11;
+  grid-row: 3 / 4;
   display: flex;
   justify-content: space-between;
   align-items: center;

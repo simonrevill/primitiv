@@ -33,7 +33,8 @@ mod generator_tests {
             // model pins step 50 to an absolute dark target and step 900 to an
             // absolute light target, independent of how pale the brand is.
             let pale_brand = Oklch::new(0.9, 0.1, 240.0);
-            let palette = generate_dark_palette(pale_brand, &TARGET_LIGHTNESS_DARK, None, None);
+            let palette =
+                generate_dark_palette(pale_brand, &TARGET_LIGHTNESS_DARK, 0.0, 0.0, None, None);
 
             assert_eq!(palette.swatches.len(), 10);
 
@@ -67,13 +68,36 @@ mod generator_tests {
             // but only an explicit passthrough keeps its chroma and hue byte-
             // identical instead of routing chroma through the gamut formula.
             let brand = Oklch::new(0.55, 0.15, 240.0);
-            let palette = generate_dark_palette(brand, &TARGET_LIGHTNESS_DARK, None, None);
+            let palette =
+                generate_dark_palette(brand, &TARGET_LIGHTNESS_DARK, 0.0, 0.0, None, None);
 
             let step_500 = &palette.swatches[5];
             assert_eq!(step_500.label, SwatchLabel::Number(500));
             assert_eq!(step_500.l, brand.l);
             assert_eq!(step_500.c, brand.chroma);
             assert_eq!(step_500.h, brand.hue.into_degrees());
+        }
+
+        #[test]
+        fn dark_palette_light_padding_reshapes_the_steps_between_the_anchors() {
+            // Light padding feeds into dark generation: it pads the curve
+            // before the anchored model runs, reshaping the steps between the
+            // fixed 50/500/900 anchors.
+            let brand = Oklch::new(0.55, 0.15, 240.0);
+            let unpadded =
+                generate_dark_palette(brand, &TARGET_LIGHTNESS_DARK, 0.0, 0.0, None, None);
+            let padded =
+                generate_dark_palette(brand, &TARGET_LIGHTNESS_DARK, 0.2, 0.0, None, None);
+
+            let step_100 = |p: &Palette| {
+                p.swatches
+                    .iter()
+                    .find(|s| s.label == SwatchLabel::Number(100))
+                    .unwrap()
+                    .l
+            };
+
+            assert_ne!(step_100(&unpadded), step_100(&padded));
         }
     }
 

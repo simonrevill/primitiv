@@ -43,8 +43,10 @@ model applies only to the dark path.
 
 ## API surface
 
-- `generate_dark_palette(base_500, dark_curve, soft_white, soft_black)`
-  — core, returns a `Palette`.
+- `generate_dark_palette(base_500, dark_curve, light_padding,
+  dark_padding, soft_white, soft_black)` — core, returns a `Palette`.
+  Padding is applied to the curve before the anchored model runs, so
+  it reshapes the steps between the fixed 50/500/900 anchors.
 - `generate_pair(input, light_curve, dark_curve, options)` — api,
   returns a `PaletteSet { light, dark }`. Light via the offset model,
   dark via the anchored model, from one brand colour.
@@ -54,7 +56,11 @@ model applies only to the dark path.
   for every regeneration, so light and dark never drift apart.
 
 The contrast audit (`get_best_foreground`, six-tier rating) is reused
-unchanged — it handles the dark→light foreground role flip on its own.
+for the dark palette. Its harmonious-candidate scoring is order-
+independent (`wcag_contrast`): a dark palette's step 900 is *lighter*
+than its backgrounds, the opposite of a light palette, and the audit
+must still recognise that real contrast rather than fall through to
+pure white/black.
 
 ## Deferred work (not in v1)
 
@@ -66,7 +72,5 @@ These were consciously left out; revisit here before reopening them.
   emitted for extreme brands; `note` stays `""`.
 - **`TARGET_CHROMA_SCALE_DARK`** — dark-specific chroma shaping. v1
   reuses the light `TARGET_CHROMA_SCALE`.
-- **Dark-palette padding** — no light/dark padding is applied to the
-  dark palette.
 - **Anchored model for the light palette** — would fix pale-brand
   washout there too, but regenerates every existing palette and test.

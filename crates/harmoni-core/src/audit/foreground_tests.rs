@@ -38,6 +38,30 @@ fn should_return_light_candidate_foreground_when_background_is_very_dark_and_dar
 }
 
 #[test]
+fn should_use_harmonious_candidate_even_when_the_dark_candidate_is_lighter_than_the_background() {
+    // In a dark palette the "dark candidate" (step 900) is the *lightest*
+    // step. The audit must score real WCAG contrast symmetrically rather
+    // than assume the dark candidate is darker — otherwise it wrongly
+    // rejects a perfectly good harmonious foreground and falls through to
+    // pure white/black.
+    let dark_background = SwatchStep::from_label(0.21, 0.0, 0.0, SwatchLabel::Number(50));
+    let light_step_900 = SwatchStep::from_label(0.94, 0.0, 0.0, SwatchLabel::Number(900));
+    let dark_step_50 = SwatchStep::from_label(0.21, 0.0, 0.0, SwatchLabel::Number(50));
+
+    let result = get_best_foreground(
+        &dark_background,
+        &light_step_900,
+        &dark_step_50,
+        None,
+        None,
+    );
+
+    assert_eq!(result.color, light_step_900);
+    assert!(result.is_harmonious);
+    assert!(result.contrast_ratio >= 4.5);
+}
+
+#[test]
 fn should_return_white_foreground_when_background_is_very_dark() {
     let example_background = SwatchStep::from_label(0.1, 0.0, 0.0, SwatchLabel::Number(900));
     let example_dark_candidate = SwatchStep::from_label(0.1, 0.0, 0.0, SwatchLabel::Number(900));

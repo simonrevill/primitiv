@@ -63,7 +63,14 @@ pub fn generate_pair(
         options.soft_white,
         options.soft_black,
     );
-    let dark = generate_dark_palette(oklch, dark_curve, options.soft_white, options.soft_black);
+    let dark = generate_dark_palette(
+        oklch,
+        dark_curve,
+        options.light_padding,
+        options.dark_padding,
+        options.soft_white,
+        options.soft_black,
+    );
 
     Ok(PaletteSet { light, dark })
 }

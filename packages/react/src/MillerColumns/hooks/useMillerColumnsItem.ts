@@ -5,11 +5,10 @@ import type { MillerColumnsItemProps } from "../types";
 import { useMillerColumnsContext } from "./useMillerColumnsContext";
 import { useMillerColumnsColumnContext } from "./useMillerColumnsColumnContext";
 
-export function useMillerColumnsItem({
-  value,
-  onClick,
-  ...rest
-}: Omit<MillerColumnsItemProps, "children">) {
+export function useMillerColumnsItem(
+  { value, onClick, ...rest }: Omit<MillerColumnsItemProps, "children">,
+  hasChildren: boolean,
+) {
   const { activePath, select } = useMillerColumnsContext();
   const { depth } = useMillerColumnsColumnContext();
 
@@ -23,6 +22,9 @@ export function useMillerColumnsItem({
   const itemProps = {
     role: "treeitem",
     "aria-selected": selected,
+    "data-state": selected ? "selected" : "unselected",
+    "data-depth": depth,
+    ...(hasChildren ? { "data-has-children": "" } : {}),
     onClick: handleClick,
     ...rest,
   };

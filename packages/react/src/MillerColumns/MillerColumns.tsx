@@ -84,7 +84,7 @@ export function MillerColumnsColumn({
   children,
   ...rest
 }: MillerColumnsColumnProps) {
-  const { strip, columnContextValue } = useMillerColumnsColumn();
+  const { strip, depth, columnContextValue } = useMillerColumnsColumn();
 
   if (!strip) {
     return null;
@@ -92,7 +92,12 @@ export function MillerColumnsColumn({
 
   return createPortal(
     <MillerColumnsColumnContext.Provider value={columnContextValue}>
-      <div role="group" {...rest}>
+      <div
+        role="group"
+        data-miller-columns-column=""
+        data-depth={depth}
+        {...rest}
+      >
         {children}
       </div>
     </MillerColumnsColumnContext.Provider>,
@@ -133,8 +138,8 @@ export function MillerColumnsItem({
   children,
   ...props
 }: MillerColumnsItemProps) {
-  const { itemProps, selected } = useMillerColumnsItem(props);
   const { cell, column } = partitionItemChildren(children);
+  const { itemProps, selected } = useMillerColumnsItem(props, column !== null);
 
   return (
     <>

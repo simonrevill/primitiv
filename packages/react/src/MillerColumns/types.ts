@@ -40,6 +40,19 @@ export type MillerColumnsItemIndicatorProps = ComponentProps<"span"> & {
   children?: ReactNode;
 };
 
+export type MillerColumnsResizeHandleProps = ComponentProps<"div">;
+
+export type MillerColumnsPreviewPanelProps = ComponentProps<"div"> & {
+  children?: ReactNode;
+};
+
+export type MillerColumnsSelection = {
+  /** The full active path — selected item ids, root column first. */
+  path: string[];
+  /** The deepest selected item id, or `undefined` when nothing is selected. */
+  selectedValue: string | undefined;
+};
+
 export type MillerColumnsItemMeta = {
   value: string;
   disabled: boolean;
@@ -52,6 +65,8 @@ export type MillerColumnsItemAddress = {
 
 export type MillerColumnsContextValue = {
   slots: Map<number, HTMLElement>;
+  columnWidths: Map<number, number>;
+  setColumnWidth: (depth: number, width: number) => void;
   activePath: string[];
   select: (depth: number, value: string) => void;
   registerItem: (

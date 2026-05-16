@@ -10,8 +10,10 @@ import {
 } from "./MillerColumnsContext";
 import {
   useMillerColumnsColumn,
+  useMillerColumnsContext,
   useMillerColumnsItem,
   useMillerColumnsItemContext,
+  useMillerColumnsResizeHandle,
   useMillerColumnsRoot,
 } from "./hooks";
 
@@ -22,6 +24,8 @@ import type {
   MillerColumnsColumnProps,
   MillerColumnsItemProps,
   MillerColumnsItemIndicatorProps,
+  MillerColumnsResizeHandleProps,
+  MillerColumnsPreviewPanelProps,
 } from "./types";
 
 /**
@@ -50,15 +54,13 @@ export function MillerColumnsRoot({
   onValueChange,
   ...rest
 }: MillerColumnsRootProps) {
-  const { contextValue, columnCount, registerSlotRef } = useMillerColumnsRoot(
-    value,
-    defaultValue,
-    onValueChange,
-  );
+  const { contextValue, columnCount, registerSlotRef, stripRef } =
+    useMillerColumnsRoot(value, defaultValue, onValueChange);
 
   return (
     <MillerColumnsContext.Provider value={contextValue}>
       <div
+        ref={stripRef}
         role="tree"
         data-miller-columns-strip=""
         data-orientation="horizontal"
@@ -95,9 +97,10 @@ MillerColumnsRoot.displayName = "MillerColumnsRoot";
  */
 export function MillerColumnsColumn({
   children,
+  style,
   ...rest
 }: MillerColumnsColumnProps) {
-  const { slot, depth, columnContextValue } = useMillerColumnsColumn();
+  const { slot, depth, width, columnContextValue } = useMillerColumnsColumn();
 
   if (!slot) {
     return null;
@@ -109,6 +112,7 @@ export function MillerColumnsColumn({
         role="group"
         data-miller-columns-column=""
         data-depth={depth}
+        style={{ ...style, ...(width !== undefined ? { width } : {}) }}
         {...rest}
       >
         {children}
@@ -229,11 +233,83 @@ export function MillerColumnsItemIndicator({
 
 MillerColumnsItemIndicator.displayName = "MillerColumnsItemIndicator";
 
+/**
+ * A drag-to-resize affordance for the column it is rendered in. Renders a
+ * `<div role="separator" aria-orientation="vertical">` that, while
+ * pointer-dragged, drives that column's width as state on the `Root`.
+ *
+ * Must be rendered among a `MillerColumns.Column`'s children — it reads
+ * the column's depth from context. Position it with CSS (typically
+ * absolutely, against the column's trailing edge).
+ *
+ * @example
+ * ```tsx
+ * <MillerColumns.Column>
+ *   <MillerColumns.ResizeHandle />
+ *   <MillerColumns.Item value="a">A</MillerColumns.Item>
+ * </MillerColumns.Column>
+ * ```
+ */
+export function MillerColumnsResizeHandle(
+  props: MillerColumnsResizeHandleProps,
+) {
+  const { handleProps } = useMillerColumnsResizeHandle(props);
+
+  return <div {...handleProps} />;
+}
+
+MillerColumnsResizeHandle.displayName = "MillerColumnsResizeHandle";
+
+/**
+ * A trailing panel for previewing the current selection — the
+ * macOS-Finder-style preview pane.
+ *
+ * Renders a plain `<div data-miller-columns-preview>` as the last child
+ * of the strip, sitting to the right of the columns. The component is
+ * deliberately content-agnostic: it does not know how to preview an
+ * item, so the consumer supplies whatever the panel should show.
+ *
+ * Pair it with {@link useMillerColumnsSelection} to render content for
+ * the current selection. Author it as the **last child** of `Root`, a
+ * sibling of the root `Column`.
+ *
+ * @example
+ * ```tsx
+ * function FilePreview() {
+ *   const { selectedValue } = useMillerColumnsSelection();
+ *   return selectedValue ? <Preview id={selectedValue} /> : null;
+ * }
+ *
+ * <MillerColumns.Root>
+ *   <MillerColumns.Column>{items}</MillerColumns.Column>
+ *   <MillerColumns.PreviewPanel>
+ *     <FilePreview />
+ *   </MillerColumns.PreviewPanel>
+ * </MillerColumns.Root>;
+ * ```
+ */
+export function MillerColumnsPreviewPanel({
+  children,
+  ...rest
+}: MillerColumnsPreviewPanelProps) {
+  useMillerColumnsContext();
+
+  return (
+    <div data-miller-columns-preview="" {...rest}>
+      {children}
+    </div>
+  );
+}
+
+MillerColumnsPreviewPanel.displayName = "MillerColumnsPreviewPanel";
+
 type MillerColumnsCompound = typeof MillerColumnsRoot & {
   Root: typeof MillerColumnsRoot;
   Column: typeof MillerColumnsColumn;
   Item: typeof MillerColumnsItem;
   ItemIndicator: typeof MillerColumnsItemIndicator;
+  ResizeHandle: typeof MillerColumnsResizeHandle;
+  PreviewPanel: typeof MillerColumnsPreviewPanel;
 };
 
 const MillerColumnsCompound: MillerColumnsCompound = Object.assign(
@@ -243,6 +319,8 @@ const MillerColumnsCompound: MillerColumnsCompound = Object.assign(
     Column: MillerColumnsColumn,
     Item: MillerColumnsItem,
     ItemIndicator: MillerColumnsItemIndicator,
+    ResizeHandle: MillerColumnsResizeHandle,
+    PreviewPanel: MillerColumnsPreviewPanel,
   },
 );
 

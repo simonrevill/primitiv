@@ -54,7 +54,11 @@ model applies only to the dark path.
   for every regeneration, so light and dark never drift apart.
 
 The contrast audit (`get_best_foreground`, six-tier rating) is reused
-unchanged — it handles the dark→light foreground role flip on its own.
+for the dark palette. Its harmonious-candidate scoring is order-
+independent (`wcag_contrast`): a dark palette's step 900 is *lighter*
+than its backgrounds, the opposite of a light palette, and the audit
+must still recognise that real contrast rather than fall through to
+pure white/black.
 
 ## Deferred work (not in v1)
 

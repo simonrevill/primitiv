@@ -97,6 +97,15 @@ tabbable at a time. The tabstop follows the last-focused item and
 defaults to the deepest selected item, falling back to the first item
 of the root column.
 
+## Auto-scroll
+
+When selecting a branch reveals a new column, the strip scrolls to its
+trailing edge so the newly opened column is brought into view. This
+fires only when a column is *added* — neither the initial render nor
+closing a column scrolls the strip. Scrolling only has a visible
+effect when the strip is itself an overflow container; give
+`[data-miller-columns-strip]` an `overflow-x` for it to take hold.
+
 ## ARIA
 
 - The strip is `role="tree"`.

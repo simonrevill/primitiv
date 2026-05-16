@@ -71,28 +71,24 @@ export function ColorEngine() {
     handleShiftRight,
   } = useColors();
 
-  const [showDarkMode, setShowDarkMode] = useState(true);
+  const [darkHidden, setDarkHidden] = useState<Set<string>>(new Set());
+
+  const toggleDark = (key: string) => (checked: boolean) => {
+    setDarkHidden((prev) => {
+      const next = new Set(prev);
+      if (checked) {
+        next.delete(key);
+      } else {
+        next.add(key);
+      }
+      return next;
+    });
+  };
 
   return (
     <>
       <h1>Harmoni Color Engine</h1>
-      <div className="dark-mode-toggle">
-        <Switch.Root
-          checked={showDarkMode}
-          onCheckedChange={setShowDarkMode}
-          aria-label="Show dark mode"
-        >
-          <Switch.Thumb />
-        </Switch.Root>
-        <span>Show dark mode</span>
-      </div>
-      <div
-        className={
-          showDarkMode
-            ? "palettes-grid"
-            : "palettes-grid palettes-grid--hide-dark"
-        }
-      >
+      <div className="palettes-grid">
         <p className="palette__label">Neutral</p>
         <div className="neutral-pickers">
           <label>
@@ -156,9 +152,25 @@ export function ColorEngine() {
                 <button type="button" onClick={() => handleUseAsTint(key)}>
                   Use as neutral tint
                 </button>
+                <div className="dark-mode-toggle">
+                  <Switch.Root
+                    checked={!darkHidden.has(key)}
+                    onCheckedChange={toggleDark(key)}
+                    aria-label={`Show ${key} dark mode`}
+                  >
+                    <Switch.Thumb />
+                  </Switch.Root>
+                  <span>Show dark mode</span>
+                </div>
               </div>
               <div className="palette-container">
-                <div className="palette">
+                <div
+                  className={
+                    darkHidden.has(key)
+                      ? "palette palette--color palette--dark-collapsed"
+                      : "palette palette--color"
+                  }
+                >
                   <ColorPalette palette={palette} />
                   <CurveEditor
                     curve={palette?.lightness_curve}

@@ -52,6 +52,8 @@ export type MillerColumnsContextValue = {
   ) => void;
   getColumnItems: (depth: number) => MillerColumnsItemMeta[];
   focusItem: (depth: number, value: string) => void;
+  focusFirstInColumn: (depth: number) => boolean;
+  requestColumnFocus: (depth: number) => void;
 };
 
 export type MillerColumnsColumnContextValue = {

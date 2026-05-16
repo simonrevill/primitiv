@@ -16,6 +16,23 @@ function FlatList() {
   );
 }
 
+function Tree() {
+  return (
+    <MillerColumns.Root>
+      <MillerColumns.Column>
+        <MillerColumns.Item value="fruit">
+          Fruit
+          <MillerColumns.Column>
+            <MillerColumns.Item value="apple">Apple</MillerColumns.Item>
+            <MillerColumns.Item value="pear">Pear</MillerColumns.Item>
+          </MillerColumns.Column>
+        </MillerColumns.Item>
+        <MillerColumns.Item value="veg">Veg</MillerColumns.Item>
+      </MillerColumns.Column>
+    </MillerColumns.Root>
+  );
+}
+
 describe("MillerColumns — keyboard interaction", () => {
   describe("vertical navigation within a column", () => {
     it.each(verticalArrowCases)(
@@ -98,6 +115,67 @@ describe("MillerColumns — keyboard interaction", () => {
       await user.keyboard("{Enter}");
 
       expect(item).toHaveAttribute("aria-selected", "false");
+    });
+  });
+
+  describe("horizontal navigation between columns", () => {
+    it("ArrowRight on a branch selects it and focuses the first child item", async () => {
+      const user = userEvent.setup();
+
+      render(<Tree />);
+      screen.getByRole("treeitem", { name: "Fruit" }).focus();
+
+      await user.keyboard("{ArrowRight}");
+
+      expect(screen.getByRole("treeitem", { name: "Apple" })).toHaveFocus();
+    });
+
+    it("ArrowRight on an already-expanded branch focuses its child column", async () => {
+      const user = userEvent.setup();
+
+      render(<Tree />);
+      await user.click(screen.getByRole("treeitem", { name: "Fruit" }));
+      screen.getByRole("treeitem", { name: "Fruit" }).focus();
+
+      await user.keyboard("{ArrowRight}");
+
+      expect(screen.getByRole("treeitem", { name: "Apple" })).toHaveFocus();
+    });
+
+    it("ArrowRight on a leaf does nothing", async () => {
+      const user = userEvent.setup();
+
+      render(<Tree />);
+      const veg = screen.getByRole("treeitem", { name: "Veg" });
+      veg.focus();
+
+      await user.keyboard("{ArrowRight}");
+
+      expect(veg).toHaveFocus();
+    });
+
+    it("ArrowLeft focuses the selected item of the parent column", async () => {
+      const user = userEvent.setup();
+
+      render(<Tree />);
+      await user.click(screen.getByRole("treeitem", { name: "Fruit" }));
+      screen.getByRole("treeitem", { name: "Pear" }).focus();
+
+      await user.keyboard("{ArrowLeft}");
+
+      expect(screen.getByRole("treeitem", { name: "Fruit" })).toHaveFocus();
+    });
+
+    it("ArrowLeft in the root column does nothing", async () => {
+      const user = userEvent.setup();
+
+      render(<Tree />);
+      const veg = screen.getByRole("treeitem", { name: "Veg" });
+      veg.focus();
+
+      await user.keyboard("{ArrowLeft}");
+
+      expect(veg).toHaveFocus();
     });
   });
 });

@@ -26,8 +26,15 @@ export function useMillerColumnsItem(
   }: Omit<MillerColumnsItemProps, "children">,
   hasChildren: boolean,
 ) {
-  const { activePath, select, registerItem, getColumnItems, focusItem } =
-    useMillerColumnsContext();
+  const {
+    activePath,
+    select,
+    registerItem,
+    getColumnItems,
+    focusItem,
+    focusFirstInColumn,
+    requestColumnFocus,
+  } = useMillerColumnsContext();
   const { depth } = useMillerColumnsColumnContext();
 
   const selected = activePath[depth] === value;
@@ -70,6 +77,33 @@ export function useMillerColumnsItem(
 
   function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     onKeyDown?.(event);
+
+    if (event.key === "ArrowRight") {
+      if (!hasChildren || disabled) {
+        return;
+      }
+      event.preventDefault();
+      if (selected) {
+        focusFirstInColumn(depth + 1);
+      } else {
+        requestColumnFocus(depth + 1);
+        select(depth, value);
+      }
+      return;
+    }
+
+    if (event.key === "ArrowLeft") {
+      if (depth === 0) {
+        return;
+      }
+      event.preventDefault();
+      const parentValue = activePath[depth - 1];
+      if (parentValue !== undefined) {
+        focusItem(depth - 1, parentValue);
+      }
+      return;
+    }
+
     rovingKeyDown(event);
   }
 

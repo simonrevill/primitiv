@@ -32,6 +32,8 @@ export type MillerColumnsItemProps = ComponentProps<"div"> & {
 export type MillerColumnsContextValue = {
   strip: HTMLElement | null;
   setStrip: (element: HTMLDivElement | null) => void;
+  activePath: string[];
+  select: (depth: number, value: string) => void;
 };
 
 export type MillerColumnsColumnContextValue = {

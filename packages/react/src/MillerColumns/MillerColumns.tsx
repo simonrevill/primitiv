@@ -4,8 +4,11 @@ import {
   MillerColumnsContext,
   MillerColumnsColumnContext,
 } from "./MillerColumnsContext";
-import { useMillerColumnsColumn, useMillerColumnsRoot } from "./hooks";
-import { useMillerColumnsColumnContext } from "./hooks/useMillerColumnsColumnContext";
+import {
+  useMillerColumnsColumn,
+  useMillerColumnsItem,
+  useMillerColumnsRoot,
+} from "./hooks";
 
 import type {
   MillerColumnsRootProps,
@@ -34,9 +37,12 @@ import type {
  */
 export function MillerColumnsRoot({
   children,
+  defaultValue,
+  value,
+  onValueChange,
   ...rest
 }: MillerColumnsRootProps) {
-  const { contextValue } = useMillerColumnsRoot();
+  const { contextValue } = useMillerColumnsRoot(defaultValue);
 
   return (
     <MillerColumnsContext.Provider value={contextValue}>
@@ -104,16 +110,11 @@ MillerColumnsColumn.displayName = "MillerColumnsColumn";
  */
 export function MillerColumnsItem({
   children,
-  value,
-  ...rest
+  ...props
 }: MillerColumnsItemProps) {
-  useMillerColumnsColumnContext();
+  const { itemProps } = useMillerColumnsItem(props);
 
-  return (
-    <div role="treeitem" {...rest}>
-      {children}
-    </div>
-  );
+  return <div {...itemProps}>{children}</div>;
 }
 
 MillerColumnsItem.displayName = "MillerColumnsItem";

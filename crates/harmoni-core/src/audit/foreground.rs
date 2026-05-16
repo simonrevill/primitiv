@@ -16,6 +16,20 @@ fn relative_luminance(l: f32, c: f32, h: f32) -> f32 {
     lin.relative_luminance().luma
 }
 
+/// WCAG 2.1 contrast ratio between two relative luminances, independent of
+/// which one is lighter — `(lighter + 0.05) / (darker + 0.05)`. Candidates
+/// can sit on either side of the background (a dark palette's step 900 is
+/// lighter than its backgrounds; a light palette's is darker), so contrast
+/// must be scored symmetrically.
+fn wcag_contrast(lum_a: f32, lum_b: f32) -> f32 {
+    let (lighter, darker) = if lum_a >= lum_b {
+        (lum_a, lum_b)
+    } else {
+        (lum_b, lum_a)
+    };
+    (lighter + 0.05) / (darker + 0.05)
+}
+
 /// Picks the best foreground for `background` from a tiered candidate set:
 /// the palette's harmonious dark (step 900) and light (step 50), then the
 /// soft white/black primitives when supplied, then pure white/black as a
@@ -33,8 +47,8 @@ pub fn get_best_foreground(
     let dark_lum = relative_luminance(dark_candidate.l, dark_candidate.c, dark_candidate.h);
     let light_lum = relative_luminance(light_candidate.l, light_candidate.c, light_candidate.h);
 
-    let ratio_dark = (bg_lum + 0.05) / (dark_lum + 0.05);
-    let ratio_light = (light_lum + 0.05) / (bg_lum + 0.05);
+    let ratio_dark = wcag_contrast(bg_lum, dark_lum);
+    let ratio_light = wcag_contrast(bg_lum, light_lum);
 
     // 1. Prefer the harmonious dark candidate (palette's 900) if it meets AA.
     if ratio_dark >= 4.5 {

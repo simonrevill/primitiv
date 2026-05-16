@@ -1,4 +1,7 @@
+import { Ref } from "react";
 import { createPortal } from "react-dom";
+
+import { Slot } from "../Slot";
 
 import {
   MillerColumnsContext,
@@ -122,6 +125,16 @@ MillerColumnsColumn.displayName = "MillerColumnsColumn";
  * strip) only while the item is selected; an item with no nested column
  * is a leaf.
  *
+ * **`asChild` prop.** Pass `asChild` to render the cell as a
+ * consumer-supplied element (e.g. an `<a>`) instead of the default
+ * `<div>`. All treeitem ARIA attributes, event handlers, and the internal
+ * ref are merged onto that child. A nested `<MillerColumns.Column>` is
+ * still declared as a sibling of the cell element.
+ *
+ * **Ref forwarding.** A `ref` prop (React 19 ref-as-prop style) is
+ * forwarded to the rendered element and composed with the library's
+ * internal ref.
+ *
  * @example Leaf
  * ```tsx
  * <MillerColumns.Item value="guides">Guides</MillerColumns.Item>
@@ -137,19 +150,25 @@ MillerColumnsColumn.displayName = "MillerColumnsColumn";
  * </MillerColumns.Item>
  * ```
  */
-export function MillerColumnsItem({
+export function MillerColumnsItem<T extends HTMLElement = HTMLDivElement>({
   children,
+  ref,
+  asChild = false,
   ...props
-}: MillerColumnsItemProps) {
+}: MillerColumnsItemProps<T>) {
   const { cell, column } = partitionItemChildren(children);
   const { itemProps, selected, itemContextValue } = useMillerColumnsItem(
-    props,
+    { ref: ref as Ref<HTMLDivElement>, ...props },
     column !== null,
   );
 
   return (
     <MillerColumnsItemContext.Provider value={itemContextValue}>
-      <div {...itemProps}>{cell}</div>
+      {asChild ? (
+        <Slot {...itemProps}>{cell[0]}</Slot>
+      ) : (
+        <div {...itemProps}>{cell}</div>
+      )}
       {selected ? column : null}
     </MillerColumnsItemContext.Provider>
   );

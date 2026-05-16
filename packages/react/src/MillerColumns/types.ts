@@ -1,4 +1,4 @@
-import { ComponentProps, ReactNode } from "react";
+import { ComponentProps, ReactNode, Ref } from "react";
 
 type MillerColumnsRootBaseProps = Omit<ComponentProps<"div">, "ref"> & {
   children: ReactNode;
@@ -24,10 +24,16 @@ export type MillerColumnsColumnProps = ComponentProps<"div"> & {
   children: ReactNode;
 };
 
-export type MillerColumnsItemProps = ComponentProps<"div"> & {
+export type MillerColumnsItemProps<
+  T extends HTMLElement = HTMLDivElement,
+> = Omit<ComponentProps<"div">, "ref"> & {
   value: string;
   disabled?: boolean;
+  asChild?: boolean;
   children: ReactNode;
+  /** Ref to the rendered element. Defaults to `HTMLDivElement`; when using
+   * `asChild`, specify the child's element type. */
+  ref?: Ref<T>;
 };
 
 export type MillerColumnsItemIndicatorProps = ComponentProps<"span"> & {

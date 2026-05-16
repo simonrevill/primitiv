@@ -8,6 +8,7 @@ import {
 } from "react";
 
 import { useRovingTabindex } from "../../hooks";
+import { composeRefs } from "../../Slot";
 
 import type {
   MillerColumnsItemContextValue,
@@ -20,6 +21,7 @@ import { useMillerColumnsColumnContext } from "./useMillerColumnsColumnContext";
 export function useMillerColumnsItem(
   {
     value,
+    ref,
     onClick,
     onKeyDown,
     onFocus,
@@ -44,6 +46,7 @@ export function useMillerColumnsItem(
   const selected = activePath[depth] === value;
 
   const itemRef = useRef<HTMLDivElement>(null);
+  const composedRef = ref ? composeRefs(itemRef, ref) : itemRef;
 
   useEffect(() => {
     registerItem(depth, value, itemRef.current, disabled);
@@ -130,7 +133,7 @@ export function useMillerColumnsItem(
   }
 
   const itemProps = {
-    ref: itemRef,
+    ref: composedRef,
     role: "treeitem",
     tabIndex: isTabStop ? 0 : -1,
     "aria-selected": selected,

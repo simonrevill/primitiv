@@ -36,6 +36,11 @@ export function partitionItemChildren(children: ReactNode): {
 
   for (const child of Children.toArray(children)) {
     if (isColumnElement(child)) {
+      if (column !== null) {
+        throw new Error(
+          "A MillerColumns.Item may contain at most one nested <MillerColumns.Column>.",
+        );
+      }
       column = child;
     } else {
       cell.push(child);

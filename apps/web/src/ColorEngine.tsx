@@ -83,14 +83,16 @@ export function ColorEngine() {
           return (
             <Fragment key={key}>
               <p className="palette__label">{key}</p>
-              <input
-                type="color"
-                onChange={handleColorChange(key)}
-                value={hex}
-              />
-              <button type="button" onClick={() => handleUseAsTint(key)}>
-                Use as neutral tint
-              </button>
+              <div className="palette__input">
+                <input
+                  type="color"
+                  onChange={handleColorChange(key)}
+                  value={hex}
+                />
+                <button type="button" onClick={() => handleUseAsTint(key)}>
+                  Use as neutral tint
+                </button>
+              </div>
               <div className="palette-container">
                 <div className="palette">
                   <ColorPalette palette={palette} />

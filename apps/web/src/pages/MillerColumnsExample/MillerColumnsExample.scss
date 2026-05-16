@@ -16,25 +16,40 @@
   }
 }
 
-/* The strip — a horizontal row of columns. */
+/* The strip — a horizontal row of columns that scrolls when it overflows. */
 .miller {
   display: flex;
   height: 280px;
   background: var(--surface-bg);
   border: 1px solid var(--muted-border);
   border-radius: 8px;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
-/* Each column scrolls vertically and is divided by a border. */
+/* Each column scrolls vertically, is resizable, and is divided by a border. */
 .miller__column {
-  flex: 0 0 200px;
+  position: relative;
+  flex: 0 0 auto;
+  width: 200px;
+  min-width: 120px;
   height: 100%;
   overflow-y: auto;
   border-right: 1px solid var(--muted-border);
+}
 
-  &[data-depth="0"] {
-    /* the root column */
+/* The drag-to-resize grip, pinned to the column's trailing edge. */
+.miller__resize {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 0;
+  width: 6px;
+  cursor: col-resize;
+  z-index: 1;
+
+  &:hover,
+  &[data-dragging] {
+    background: color-mix(in srgb, var(--accent) 35%, transparent);
   }
 }
 
@@ -77,4 +92,89 @@
 .miller__chevron {
   display: inline-flex;
   flex: 0 0 auto;
+}
+
+/* The trailing preview pane. */
+.miller__preview {
+  flex: 0 0 auto;
+  width: 240px;
+  height: 100%;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.miller__preview-hint {
+  color: #8a8a92;
+  font-size: 0.875rem;
+}
+
+.miller__preview-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+}
+
+.miller__preview-name {
+  font-size: 0.95rem;
+  word-break: break-word;
+}
+
+.miller__preview-meta {
+  color: #8a8a92;
+  font-size: 0.8rem;
+}
+
+.miller__preview-button {
+  margin-top: 0.5rem;
+  padding: 0.4rem 0.9rem;
+  border: none;
+  border-radius: 6px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.85rem;
+  cursor: pointer;
+
+  &:hover {
+    background: color-mix(in srgb, var(--accent) 85%, #000);
+  }
+}
+
+/* The image lightbox, rendered via Modal into the top layer. */
+.miller-lightbox {
+  border: none;
+  border-radius: 10px;
+  padding: 1rem;
+  background: #fff;
+  color: #000;
+  max-width: 90vw;
+
+  &::backdrop {
+    background: rgba(0, 0, 0, 0.62);
+  }
+}
+
+.miller-lightbox__title {
+  margin: 0 0 0.6rem;
+  font-size: 1rem;
+}
+
+.miller-lightbox__image {
+  display: block;
+  max-width: min(70vw, 640px);
+  max-height: 65vh;
+  border-radius: 6px;
+}
+
+.miller-lightbox__close {
+  margin-top: 0.75rem;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--muted-border);
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+
+  &:hover {
+    background: #f3f3f5;
+  }
 }

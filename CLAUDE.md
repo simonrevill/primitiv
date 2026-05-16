@@ -97,6 +97,9 @@ keyword or by topic; do not paraphrase their content here.
   mirror-types add-a-field checklist, opaque Palette extern type.
 - **`sandbox-gotchas`** — git mv cross-device, wasm pkg-not-found,
   broken `build:core`, missing wasm-pack, deleted Playwright e2e.
+- **`workbench-examples`** — authoring `apps/web` example pages:
+  folder layout, router wiring, and the global-CSS-bundling gotcha
+  (every example's SCSS is bundled globally — scope every selector).
 - **`model-routing`** — Opus/Sonnet/Haiku decision tree.
 
 ## Slash commands

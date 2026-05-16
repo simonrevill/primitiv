@@ -1,4 +1,5 @@
 import {
+  FocusEvent,
   KeyboardEvent,
   MouseEvent,
   useEffect,
@@ -21,6 +22,7 @@ export function useMillerColumnsItem(
     value,
     onClick,
     onKeyDown,
+    onFocus,
     disabled = false,
     ...rest
   }: Omit<MillerColumnsItemProps, "children">,
@@ -34,6 +36,8 @@ export function useMillerColumnsItem(
     focusItem,
     focusFirstInColumn,
     requestColumnFocus,
+    activeItem,
+    setActiveItem,
   } = useMillerColumnsContext();
   const { depth } = useMillerColumnsColumnContext();
 
@@ -75,6 +79,24 @@ export function useMillerColumnsItem(
     select(depth, value);
   }
 
+  function handleFocus(event: FocusEvent<HTMLDivElement>) {
+    onFocus?.(event);
+    setActiveItem({ depth, value });
+  }
+
+  // Exactly one item in the whole tree is the Tab stop. It follows the
+  // last-focused item; before any focus it defaults to the deepest
+  // selected item, falling back to the first enabled root item.
+  const tabStop =
+    activeItem ??
+    (activePath.length > 0
+      ? { depth: activePath.length - 1, value: activePath[activePath.length - 1] }
+      : null);
+  const isTabStop = tabStop
+    ? tabStop.depth === depth && tabStop.value === value
+    : depth === 0 &&
+      getColumnItems(0).find((item) => !item.disabled)?.value === value;
+
   function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     onKeyDown?.(event);
 
@@ -110,7 +132,7 @@ export function useMillerColumnsItem(
   const itemProps = {
     ref: itemRef,
     role: "treeitem",
-    tabIndex: -1,
+    tabIndex: isTabStop ? 0 : -1,
     "aria-selected": selected,
     "data-state": selected ? "selected" : "unselected",
     "data-depth": depth,
@@ -118,6 +140,7 @@ export function useMillerColumnsItem(
     ...(disabled ? { "aria-disabled": true, "data-disabled": "" } : {}),
     onClick: handleClick,
     onKeyDown: handleKeyDown,
+    onFocus: handleFocus,
     ...rest,
   };
 

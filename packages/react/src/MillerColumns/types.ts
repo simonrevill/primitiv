@@ -39,6 +39,11 @@ export type MillerColumnsItemMeta = {
   disabled: boolean;
 };
 
+export type MillerColumnsItemAddress = {
+  depth: number;
+  value: string;
+};
+
 export type MillerColumnsContextValue = {
   strip: HTMLElement | null;
   setStrip: (element: HTMLDivElement | null) => void;
@@ -54,6 +59,8 @@ export type MillerColumnsContextValue = {
   focusItem: (depth: number, value: string) => void;
   focusFirstInColumn: (depth: number) => boolean;
   requestColumnFocus: (depth: number) => void;
+  activeItem: MillerColumnsItemAddress | null;
+  setActiveItem: (item: MillerColumnsItemAddress) => void;
 };
 
 export type MillerColumnsColumnContextValue = {

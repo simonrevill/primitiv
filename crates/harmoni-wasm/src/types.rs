@@ -168,6 +168,22 @@ impl From<core::Palette> for Palette {
     }
 }
 
+#[derive(Tsify, Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[tsify(into_wasm_abi, from_wasm_abi)]
+pub struct PaletteSet {
+    pub light: Palette,
+    pub dark: Palette,
+}
+
+impl From<core::PaletteSet> for PaletteSet {
+    fn from(value: core::PaletteSet) -> Self {
+        PaletteSet {
+            light: value.light.into(),
+            dark: value.dark.into(),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -232,6 +248,24 @@ mod tests {
         assert!((wasm_value.white.c - 0.02).abs() < 1e-5);
         assert!((wasm_value.black.l - 0.10).abs() < 1e-5);
         assert!((wasm_value.black.c - 0.005).abs() < 1e-5);
+    }
+
+    #[test]
+    fn palette_set_converts_from_core_preserving_both_palettes() {
+        let core_set = core::api::generate_pair(
+            core::ColorInput::Css("#3b82f6".to_string()),
+            &core::palette::generator::TARGET_LIGHTNESS,
+            &core::palette::generator::TARGET_LIGHTNESS_DARK,
+            core::api::GenerateOptions::default(),
+        )
+        .expect("valid input should produce a palette set");
+
+        let wasm_set: PaletteSet = core_set.clone().into();
+
+        let expected_light: Palette = core_set.light.into();
+        let expected_dark: Palette = core_set.dark.into();
+        assert_eq!(wasm_set.light, expected_light);
+        assert_eq!(wasm_set.dark, expected_dark);
     }
 
     #[test]

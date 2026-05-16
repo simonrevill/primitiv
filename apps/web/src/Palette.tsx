@@ -3,11 +3,14 @@ import { Swatch } from "./Swatch";
 
 export type PaletteProps = {
   palette?: Palette;
+  className?: string;
 };
 
-export function Palette({ palette }: PaletteProps) {
+export function Palette({ palette, className }: PaletteProps) {
   return (
-    <div className="palette__steps">
+    <div
+      className={className ? `palette__steps ${className}` : "palette__steps"}
+    >
       {palette?.swatches?.map((step, index) => (
         <Swatch
           key={

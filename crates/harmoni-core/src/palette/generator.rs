@@ -73,6 +73,20 @@ pub const TARGET_LIGHTNESS: [f32; 10] =
 pub const TARGET_CHROMA_SCALE: [f32; 10] =
     [0.12, 0.35, 0.65, 0.80, 0.92, 1.0, 0.92, 0.80, 0.65, 0.50];
 
+/// Absolute OkLCH lightness of step 50 in a dark palette — the darkest
+/// background, pinned regardless of the brand colour.
+const DARK_BG_ANCHOR: f32 = 0.21;
+
+/// Absolute OkLCH lightness of step 900 in a dark palette — the lightest
+/// text step, pinned regardless of the brand colour.
+const DARK_TEXT_ANCHOR: f32 = 0.94;
+
+/// Default monotonic-ascending shape reference for a dark palette. Only
+/// the curve's *shape* is consumed by `generate_dark_palette`; the
+/// absolute endpoints come from `DARK_BG_ANCHOR` / `DARK_TEXT_ANCHOR`.
+pub const TARGET_LIGHTNESS_DARK: [f32; 10] =
+    [0.21, 0.25, 0.30, 0.37, 0.46, 0.55, 0.66, 0.77, 0.87, 0.94];
+
 /// Binary search for the maximum chroma that stays within the sRGB gamut
 /// for a given OkLCH lightness and hue.
 pub fn max_in_gamut_chroma(lightness: f32, hue: f32) -> f32 {
@@ -146,57 +160,16 @@ pub fn validate_lightness_curve(lightness: [f32; 10]) -> Result<(), String> {
     Ok(())
 }
 
-pub fn generate_palette_with_scale(
-    base_500: Oklch,
-    lightness_scale: &[f32; 10],
-    chroma_scale: &[f32],
-    light_padding: f32,
-    dark_padding: f32,
+/// Shared tail of palette generation: given the per-step background
+/// colours, pick each swatch's best foreground via the contrast audit and
+/// assemble the `Palette`. Independent of how `backgrounds` was derived.
+fn assemble_palette(
+    backgrounds: Vec<SwatchStep>,
+    lightness_curve: [f32; 10],
+    base_hue: f32,
     soft_white: Option<Oklch>,
     soft_black: Option<Oklch>,
 ) -> Palette {
-    let base_hue = base_500.hue.into_degrees();
-    let base_chroma = base_500.chroma;
-    let base_lightness = base_500.l;
-    let adjusted_lightness =
-        apply_padding_to_lightness(lightness_scale, light_padding, dark_padding);
-
-    // Express the base chroma as a fraction of its gamut maximum,
-    // so we can apply the same proportional saturation at every step.
-    let base_gamut_max = max_in_gamut_chroma(base_lightness, base_hue);
-    let base_ratio = if base_gamut_max > 0.001 {
-        (base_chroma / base_gamut_max).min(1.0)
-    } else {
-        0.0
-    };
-
-    let backgrounds: Vec<SwatchStep> = STEPS
-        .iter()
-        .zip(adjusted_lightness.iter())
-        .zip(chroma_scale.iter())
-        .map(|((&step, &reference_lightness), &chroma_factor)| {
-            let (final_lightness, final_chroma) = if step == 500 {
-                (base_lightness, base_chroma)
-            } else {
-                let offset = reference_lightness - 0.55;
-                let l = (base_lightness + offset).clamp(0.01, 0.99);
-                let step_gamut_max = max_in_gamut_chroma(l, base_hue);
-                // Use 95% of gamut max as a safety margin to avoid edge clipping
-                let chroma = step_gamut_max * 0.95 * base_ratio * chroma_factor;
-                (l, chroma)
-            };
-
-            let oklch_color = Oklch::new(final_lightness, final_chroma, base_hue);
-
-            SwatchStep::from_label(
-                oklch_color.l,
-                oklch_color.chroma,
-                oklch_color.hue.into_degrees(),
-                step,
-            )
-        })
-        .collect();
-
     let dark_candidate = backgrounds
         .iter()
         .find(|background| background.label == SwatchLabel::Number(900))
@@ -249,11 +222,116 @@ pub fn generate_palette_with_scale(
 
     Palette {
         swatches,
-        lightness_curve: *lightness_scale,
+        lightness_curve,
         max_recommended_light_padding: get_max_recommended_light_padding(base_hue),
         max_recommended_dark_padding: get_max_recommended_dark_padding(base_hue),
         note: "".to_string(),
     }
+}
+
+pub fn generate_palette_with_scale(
+    base_500: Oklch,
+    lightness_scale: &[f32; 10],
+    chroma_scale: &[f32],
+    light_padding: f32,
+    dark_padding: f32,
+    soft_white: Option<Oklch>,
+    soft_black: Option<Oklch>,
+) -> Palette {
+    let base_hue = base_500.hue.into_degrees();
+    let base_chroma = base_500.chroma;
+    let base_lightness = base_500.l;
+    let adjusted_lightness =
+        apply_padding_to_lightness(lightness_scale, light_padding, dark_padding);
+
+    // Express the base chroma as a fraction of its gamut maximum,
+    // so we can apply the same proportional saturation at every step.
+    let base_gamut_max = max_in_gamut_chroma(base_lightness, base_hue);
+    let base_ratio = if base_gamut_max > 0.001 {
+        (base_chroma / base_gamut_max).min(1.0)
+    } else {
+        0.0
+    };
+
+    let backgrounds: Vec<SwatchStep> = STEPS
+        .iter()
+        .zip(adjusted_lightness.iter())
+        .zip(chroma_scale.iter())
+        .map(|((&step, &reference_lightness), &chroma_factor)| {
+            let (final_lightness, final_chroma) = if step == 500 {
+                (base_lightness, base_chroma)
+            } else {
+                let offset = reference_lightness - 0.55;
+                let l = (base_lightness + offset).clamp(0.01, 0.99);
+                let step_gamut_max = max_in_gamut_chroma(l, base_hue);
+                // Use 95% of gamut max as a safety margin to avoid edge clipping
+                let chroma = step_gamut_max * 0.95 * base_ratio * chroma_factor;
+                (l, chroma)
+            };
+
+            let oklch_color = Oklch::new(final_lightness, final_chroma, base_hue);
+
+            SwatchStep::from_label(
+                oklch_color.l,
+                oklch_color.chroma,
+                oklch_color.hue.into_degrees(),
+                step,
+            )
+        })
+        .collect();
+
+    assemble_palette(backgrounds, *lightness_scale, base_hue, soft_white, soft_black)
+}
+
+/// Generate a dark-mode palette using the anchored two-segment model:
+/// step 50 is pinned to `DARK_BG_ANCHOR`, step 900 to `DARK_TEXT_ANCHOR`,
+/// and step 500 to the brand's exact lightness. Each half is shaped by the
+/// normalised `dark_curve`, guaranteeing reliably-dark backgrounds however
+/// pale the brand is, while keeping the scale monotonic and harmonious.
+pub fn generate_dark_palette(
+    base_500: Oklch,
+    dark_curve: &[f32; 10],
+    soft_white: Option<Oklch>,
+    soft_black: Option<Oklch>,
+) -> Palette {
+    let base_hue = base_500.hue.into_degrees();
+    let base_chroma = base_500.chroma;
+    let base_lightness = base_500.l;
+
+    let base_gamut_max = max_in_gamut_chroma(base_lightness, base_hue);
+    let base_ratio = if base_gamut_max > 0.001 {
+        (base_chroma / base_gamut_max).min(1.0)
+    } else {
+        0.0
+    };
+
+    let backgrounds: Vec<SwatchStep> = STEPS
+        .iter()
+        .enumerate()
+        .zip(TARGET_CHROMA_SCALE.iter())
+        .map(|((i, &step), &chroma_factor)| {
+            if step == 500 {
+                return SwatchStep::from_label(base_lightness, base_chroma, base_hue, step);
+            }
+
+            // Lower half interpolates the dark background anchor up to the
+            // brand; upper half interpolates the brand up to the text anchor.
+            let l = if i < 5 {
+                let frac = (dark_curve[i] - dark_curve[0]) / (dark_curve[5] - dark_curve[0]);
+                DARK_BG_ANCHOR + frac * (base_lightness - DARK_BG_ANCHOR)
+            } else {
+                let frac = (dark_curve[i] - dark_curve[5]) / (dark_curve[9] - dark_curve[5]);
+                base_lightness + frac * (DARK_TEXT_ANCHOR - base_lightness)
+            };
+            let l = l.clamp(0.01, 0.99);
+            let step_gamut_max = max_in_gamut_chroma(l, base_hue);
+            let chroma = step_gamut_max * 0.95 * base_ratio * chroma_factor;
+
+            SwatchStep::from_label(l, chroma, base_hue, step)
+        })
+        .collect();
+
+    assemble_palette(backgrounds, *dark_curve, base_hue, soft_white, soft_black)
 }
 
 pub fn generate_palette(base_500: Oklch, light_padding: f32, dark_padding: f32) -> Palette {

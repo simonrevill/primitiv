@@ -3,12 +3,40 @@ import init, {
   type TintMode,
   Swatch,
   generate_neutral_ramp,
-  generate_palette_with_lightness,
+  generate_palette_pair,
   tint_neutrals,
 } from "harmoni-wasm";
 import { useState, useEffect, ChangeEvent } from "react";
-import type { ColorKey, ColorMap } from "./types";
-import { DEFAULT_COLORS, STANDARD_KEYS, DEFAULT_LIGHTNESS } from "./constants";
+import type { ColorConfig, ColorKey, ColorMap } from "./types";
+import {
+  DEFAULT_COLORS,
+  STANDARD_KEYS,
+  DEFAULT_LIGHTNESS,
+  DEFAULT_DARK_LIGHTNESS,
+} from "./constants";
+
+// Regenerate a colour's light and dark palettes together from its current
+// config, so the two halves never drift out of sync.
+function regeneratePair(config: ColorConfig): ColorConfig {
+  const lightnessArray = config.lightnessArray ?? DEFAULT_LIGHTNESS;
+  const darkLightnessArray =
+    config.darkLightnessArray ?? DEFAULT_DARK_LIGHTNESS;
+  const set = generate_palette_pair(
+    config.hex,
+    lightnessArray,
+    darkLightnessArray,
+    config.lightPadding ?? 0,
+    config.darkPadding ?? 0,
+  );
+
+  return {
+    ...config,
+    lightnessArray,
+    darkLightnessArray,
+    palette: set.light,
+    darkPalette: set.dark,
+  };
+}
 
 export function useColors() {
   const [wasmReady, setWasmReady] = useState(false);
@@ -30,18 +58,7 @@ export function useColors() {
       const next = { ...prev };
 
       for (const key of Object.keys(next) as ColorKey[]) {
-        const { hex, lightPadding = 0, darkPadding = 0 } = next[key];
-        const lightnessArray = next[key].lightnessArray ?? DEFAULT_LIGHTNESS;
-        next[key] = {
-          ...next[key],
-          lightnessArray,
-          palette: generate_palette_with_lightness(
-            hex,
-            lightnessArray,
-            lightPadding,
-            darkPadding,
-          ),
-        };
+        next[key] = regeneratePair(next[key]);
       }
 
       return next;
@@ -101,69 +118,30 @@ export function useColors() {
     (key: ColorKey) => (e: ChangeEvent<HTMLInputElement>) => {
       const hex = e.target.value;
 
-      setColors((prev) => {
-        const lightnessArray = prev[key].lightnessArray ?? DEFAULT_LIGHTNESS;
-        return {
-          ...prev,
-          [key]: {
-            ...prev[key],
-            hex,
-            lightnessArray,
-            palette: generate_palette_with_lightness(
-              hex,
-              lightnessArray,
-              prev[key].lightPadding ?? 0,
-              prev[key].darkPadding ?? 0,
-            ),
-          },
-        };
-      });
+      setColors((prev) => ({
+        ...prev,
+        [key]: regeneratePair({ ...prev[key], hex }),
+      }));
     };
 
   const handleLightPaddingChange =
     (key: ColorKey) => (e: ChangeEvent<HTMLInputElement>) => {
       const lightPadding = parseFloat(e.target.value) / 100;
 
-      setColors((prev) => {
-        const lightnessArray = prev[key].lightnessArray ?? DEFAULT_LIGHTNESS;
-        return {
-          ...prev,
-          [key]: {
-            ...prev[key],
-            lightPadding,
-            lightnessArray,
-            palette: generate_palette_with_lightness(
-              prev[key].hex,
-              lightnessArray,
-              lightPadding,
-              prev[key].darkPadding ?? 0,
-            ),
-          },
-        };
-      });
+      setColors((prev) => ({
+        ...prev,
+        [key]: regeneratePair({ ...prev[key], lightPadding }),
+      }));
     };
 
   const handleDarkPaddingChange =
     (key: ColorKey) => (e: ChangeEvent<HTMLInputElement>) => {
       const darkPadding = parseFloat(e.target.value) / 100;
 
-      setColors((prev) => {
-        const lightnessArray = prev[key].lightnessArray ?? DEFAULT_LIGHTNESS;
-        return {
-          ...prev,
-          [key]: {
-            ...prev[key],
-            darkPadding,
-            lightnessArray,
-            palette: generate_palette_with_lightness(
-              prev[key].hex,
-              lightnessArray,
-              prev[key].lightPadding ?? 0,
-              darkPadding,
-            ),
-          },
-        };
-      });
+      setColors((prev) => ({
+        ...prev,
+        [key]: regeneratePair({ ...prev[key], darkPadding }),
+      }));
     };
 
   const handleLightnessCurveChange =
@@ -177,16 +155,24 @@ export function useColors() {
         );
         return {
           ...prev,
-          [key]: {
-            ...prev[key],
-            lightnessArray,
-            palette: generate_palette_with_lightness(
-              prev[key].hex,
-              lightnessArray,
-              prev[key].lightPadding ?? 0,
-              prev[key].darkPadding ?? 0,
-            ),
-          },
+          [key]: regeneratePair({ ...prev[key], lightnessArray }),
+        };
+      });
+    };
+
+  const handleDarkLightnessCurveChange =
+    (key: ColorKey, index: number) => (e: ChangeEvent<HTMLInputElement>) => {
+      const value = parseFloat(e.target.value);
+
+      setColors((prev) => {
+        const prevDark =
+          prev[key].darkLightnessArray ?? DEFAULT_DARK_LIGHTNESS;
+        const darkLightnessArray = prevDark.map((v, i) =>
+          i === index ? value : v,
+        );
+        return {
+          ...prev,
+          [key]: regeneratePair({ ...prev[key], darkLightnessArray }),
         };
       });
     };
@@ -194,45 +180,19 @@ export function useColors() {
   const handleShiftLeft = (key: ColorKey, targetSwatch?: Swatch) => {
     const hex = `oklch(${targetSwatch?.l} ${targetSwatch?.c} ${targetSwatch?.h})`;
 
-    setColors((prev) => {
-      const lightnessArray = prev[key].lightnessArray ?? DEFAULT_LIGHTNESS;
-      return {
-        ...prev,
-        [key]: {
-          ...prev[key],
-          hex,
-          lightnessArray,
-          palette: generate_palette_with_lightness(
-            hex,
-            lightnessArray,
-            prev[key].lightPadding ?? 0,
-            prev[key].darkPadding ?? 0,
-          ),
-        },
-      };
-    });
+    setColors((prev) => ({
+      ...prev,
+      [key]: regeneratePair({ ...prev[key], hex }),
+    }));
   };
 
   const handleShiftRight = (key: ColorKey, targetSwatch?: Swatch) => {
     const hex = `oklch(${targetSwatch?.l} ${targetSwatch?.c} ${targetSwatch?.h})`;
 
-    setColors((prev) => {
-      const lightnessArray = prev[key].lightnessArray ?? DEFAULT_LIGHTNESS;
-      return {
-        ...prev,
-        [key]: {
-          ...prev[key],
-          hex,
-          lightnessArray,
-          palette: generate_palette_with_lightness(
-            hex,
-            lightnessArray,
-            prev[key].lightPadding ?? 0,
-            prev[key].darkPadding ?? 0,
-          ),
-        },
-      };
-    });
+    setColors((prev) => ({
+      ...prev,
+      [key]: regeneratePair({ ...prev[key], hex }),
+    }));
   };
 
   return {
@@ -251,6 +211,7 @@ export function useColors() {
     handleLightPaddingChange,
     handleDarkPaddingChange,
     handleLightnessCurveChange,
+    handleDarkLightnessCurveChange,
     STANDARD_KEYS,
     handleShiftLeft,
     handleShiftRight,

@@ -8,4 +8,5 @@ pub use audit::contrast::ContrastResult;
 pub use color::input::{ColorInput, ColorInputError};
 pub use neutral::derive::SoftNeutrals;
 pub use neutral::ramp::TintMode;
+pub use api::generate::PaletteSet;
 pub use palette::generator::{Palette, Swatch, SwatchLabel, SwatchStep};

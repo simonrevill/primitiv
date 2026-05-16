@@ -4,10 +4,13 @@ import { ColorEngine } from "./ColorEngine";
 import {
   AccordionExample,
   CarouselExample,
+  CheckboxCardExample,
   CollapsibleExample,
   DropdownExample,
   MillerColumnsExample,
   ModalExample,
+  RadioCardExample,
+  SwitchExample,
   ToggleExample,
   ToggleGroupExample,
   TooltipExample,
@@ -23,10 +26,13 @@ function App() {
           <Link to="/">Color Engine</Link>
           <Link to="/accordion">Accordion</Link>
           <Link to="/carousel">Carousel</Link>
+          <Link to="/checkbox-card">Checkbox Card</Link>
           <Link to="/collapsible">Collapsible</Link>
           <Link to="/dropdown">Dropdown</Link>
           <Link to="/miller-columns">Miller Columns</Link>
           <Link to="/modal">Modal</Link>
+          <Link to="/radio-card">Radio Card</Link>
+          <Link to="/switch">Switch</Link>
           <Link to="/toggle">Toggle</Link>
           <Link to="/toggle-group">Toggle Group</Link>
           <Link to="/tooltip">Tooltip</Link>
@@ -36,6 +42,10 @@ function App() {
         <Routes>
           <Route path="/" element={<ColorEngine />} />
           <Route path="/accordion" element={<AccordionExample />} />
+          <Route
+            path="/checkbox-card"
+            element={<CheckboxCardExample />}
+          />
           <Route path="/carousel" element={<CarouselExample />} />
           <Route path="/collapsible" element={<CollapsibleExample />} />
           <Route path="/dropdown" element={<DropdownExample />} />
@@ -44,6 +54,8 @@ function App() {
             element={<MillerColumnsExample />}
           />
           <Route path="/modal" element={<ModalExample />} />
+          <Route path="/radio-card" element={<RadioCardExample />} />
+          <Route path="/switch" element={<SwitchExample />} />
           <Route path="/toggle" element={<ToggleExample />} />
           <Route path="/toggle-group" element={<ToggleGroupExample />} />
           <Route path="/tooltip" element={<TooltipExample />} />

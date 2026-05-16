@@ -1,6 +1,8 @@
-use crate::api::generate::{generate, generate_with_lightness, generate_with_options, GenerateOptions};
+use crate::api::generate::{
+    generate, generate_pair, generate_with_lightness, generate_with_options, GenerateOptions,
+};
 use crate::color::input::ColorInput;
-use crate::palette::generator::SwatchLabel;
+use crate::palette::generator::{SwatchLabel, TARGET_LIGHTNESS, TARGET_LIGHTNESS_DARK};
 use palette::Oklch;
 
 fn sample_input() -> ColorInput {
@@ -49,6 +51,33 @@ fn generate_with_options_threads_soft_white_through_to_audit_foreground() {
         white_swatch.best_foreground.l
     );
     assert!((white_swatch.best_foreground.c - 0.02).abs() < 1e-5);
+}
+
+#[test]
+fn generate_pair_returns_a_light_palette_matching_generate_and_an_anchored_dark_palette() {
+    let set = generate_pair(
+        sample_input(),
+        &TARGET_LIGHTNESS,
+        &TARGET_LIGHTNESS_DARK,
+        GenerateOptions::default(),
+    )
+    .expect("valid input should produce a palette set");
+
+    // The light side is the unchanged offset-model palette.
+    let light = generate(sample_input()).expect("valid input");
+    assert_eq!(set.light, light);
+
+    // The dark side carries the anchored dark endpoints.
+    assert!(
+        set.dark.swatches[0].l <= 0.30,
+        "dark step 50 should be reliably dark, got {}",
+        set.dark.swatches[0].l
+    );
+    assert!(
+        set.dark.swatches[9].l >= 0.88,
+        "dark step 900 should be reliably light, got {}",
+        set.dark.swatches[9].l
+    );
 }
 
 #[test]

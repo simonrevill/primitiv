@@ -50,7 +50,7 @@ export function MillerColumnsRoot({
   onValueChange,
   ...rest
 }: MillerColumnsRootProps) {
-  const { contextValue } = useMillerColumnsRoot(
+  const { contextValue, columnCount, registerSlotRef } = useMillerColumnsRoot(
     value,
     defaultValue,
     onValueChange,
@@ -62,9 +62,16 @@ export function MillerColumnsRoot({
         role="tree"
         data-miller-columns-strip=""
         data-orientation="horizontal"
-        ref={contextValue.setStrip}
         {...rest}
       >
+        {Array.from({ length: columnCount }, (_, depth) => (
+          <div
+            key={depth}
+            data-miller-columns-slot=""
+            style={{ display: "contents" }}
+            ref={registerSlotRef(depth)}
+          />
+        ))}
         {children}
       </div>
     </MillerColumnsContext.Provider>
@@ -90,9 +97,9 @@ export function MillerColumnsColumn({
   children,
   ...rest
 }: MillerColumnsColumnProps) {
-  const { strip, depth, columnContextValue } = useMillerColumnsColumn();
+  const { slot, depth, columnContextValue } = useMillerColumnsColumn();
 
-  if (!strip) {
+  if (!slot) {
     return null;
   }
 
@@ -107,7 +114,7 @@ export function MillerColumnsColumn({
         {children}
       </div>
     </MillerColumnsColumnContext.Provider>,
-    strip,
+    slot,
   );
 }
 

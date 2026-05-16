@@ -51,8 +51,7 @@ export type MillerColumnsItemAddress = {
 };
 
 export type MillerColumnsContextValue = {
-  strip: HTMLElement | null;
-  setStrip: (element: HTMLDivElement | null) => void;
+  slots: Map<number, HTMLElement>;
   activePath: string[];
   select: (depth: number, value: string) => void;
   registerItem: (

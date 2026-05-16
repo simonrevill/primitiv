@@ -68,6 +68,62 @@ describe("MillerColumns — column projection", () => {
     expect(screen.getAllByRole("group")).toHaveLength(1);
   });
 
+  it("projects columns left-to-right in depth order on mount", () => {
+    render(
+      <MillerColumns.Root defaultValue={["fruit", "apple"]}>
+        <MillerColumns.Column>
+          <MillerColumns.Item value="fruit">
+            Fruit
+            <MillerColumns.Column>
+              <MillerColumns.Item value="apple">
+                Apple
+                <MillerColumns.Column>
+                  <MillerColumns.Item value="gala">Gala</MillerColumns.Item>
+                </MillerColumns.Column>
+              </MillerColumns.Item>
+            </MillerColumns.Column>
+          </MillerColumns.Item>
+        </MillerColumns.Column>
+      </MillerColumns.Root>,
+    );
+
+    const groups = screen.getAllByRole("group");
+    expect(groups).toHaveLength(3);
+    expect(groups[0]).toHaveAttribute("data-depth", "0");
+    expect(groups[1]).toHaveAttribute("data-depth", "1");
+    expect(groups[2]).toHaveAttribute("data-depth", "2");
+  });
+
+  it("tears down deeper column slots when a shallower item is selected", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <MillerColumns.Root>
+        <MillerColumns.Column>
+          <MillerColumns.Item value="fruit">
+            Fruit
+            <MillerColumns.Column>
+              <MillerColumns.Item value="apple">
+                Apple
+                <MillerColumns.Column>
+                  <MillerColumns.Item value="gala">Gala</MillerColumns.Item>
+                </MillerColumns.Column>
+              </MillerColumns.Item>
+            </MillerColumns.Column>
+          </MillerColumns.Item>
+          <MillerColumns.Item value="veg">Veg</MillerColumns.Item>
+        </MillerColumns.Column>
+      </MillerColumns.Root>,
+    );
+
+    await user.click(screen.getByRole("treeitem", { name: "Fruit" }));
+    await user.click(screen.getByRole("treeitem", { name: "Apple" }));
+    expect(screen.getAllByRole("group")).toHaveLength(3);
+
+    await user.click(screen.getByRole("treeitem", { name: "Veg" }));
+    expect(screen.getAllByRole("group")).toHaveLength(1);
+  });
+
   it("detects a child column declared inside a fragment", async () => {
     const user = userEvent.setup();
 

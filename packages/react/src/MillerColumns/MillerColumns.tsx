@@ -52,15 +52,13 @@ export function MillerColumnsRoot({
   onValueChange,
   ...rest
 }: MillerColumnsRootProps) {
-  const { contextValue, columnCount, registerSlotRef } = useMillerColumnsRoot(
-    value,
-    defaultValue,
-    onValueChange,
-  );
+  const { contextValue, columnCount, registerSlotRef, stripRef } =
+    useMillerColumnsRoot(value, defaultValue, onValueChange);
 
   return (
     <MillerColumnsContext.Provider value={contextValue}>
       <div
+        ref={stripRef}
         role="tree"
         data-miller-columns-strip=""
         data-orientation="horizontal"

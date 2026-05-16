@@ -10,6 +10,8 @@ import {
   useMillerColumnsRoot,
 } from "./hooks";
 
+import { partitionItemChildren } from "./utils";
+
 import type {
   MillerColumnsRootProps,
   MillerColumnsColumnProps,
@@ -98,23 +100,44 @@ MillerColumnsColumn.displayName = "MillerColumnsColumn";
 
 /**
  * A single selectable node within a `Column`. Renders a
- * `<div role="treeitem">`.
+ * `<div role="treeitem">` for its cell content.
  *
  * The {@link MillerColumnsItemProps.value | `value`} prop is the stable
  * identifier used to match this item against the active selection path.
  *
- * @example
+ * An `Item` becomes a branch by nesting a `<MillerColumns.Column>` among
+ * its children. That child column is mounted (and projected into the
+ * strip) only while the item is selected; an item with no nested column
+ * is a leaf.
+ *
+ * @example Leaf
  * ```tsx
  * <MillerColumns.Item value="guides">Guides</MillerColumns.Item>
+ * ```
+ *
+ * @example Branch
+ * ```tsx
+ * <MillerColumns.Item value="docs">
+ *   Docs
+ *   <MillerColumns.Column>
+ *     <MillerColumns.Item value="guides">Guides</MillerColumns.Item>
+ *   </MillerColumns.Column>
+ * </MillerColumns.Item>
  * ```
  */
 export function MillerColumnsItem({
   children,
   ...props
 }: MillerColumnsItemProps) {
-  const { itemProps } = useMillerColumnsItem(props);
+  const { itemProps, selected } = useMillerColumnsItem(props);
+  const { cell, column } = partitionItemChildren(children);
 
-  return <div {...itemProps}>{children}</div>;
+  return (
+    <>
+      <div {...itemProps}>{cell}</div>
+      {selected ? column : null}
+    </>
+  );
 }
 
 MillerColumnsItem.displayName = "MillerColumnsItem";

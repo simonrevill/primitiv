@@ -27,5 +27,5 @@ export function useMillerColumnsItem({
     ...rest,
   };
 
-  return { itemProps };
+  return { itemProps, selected };
 }

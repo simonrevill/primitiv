@@ -62,6 +62,7 @@ are ever rendered.
 | `MillerColumns.Item`          | Tree node     | A `role="treeitem"`; branch when it nests a `Column`. Supports `disabled`, `asChild`, `ref`     |
 | `MillerColumns.ItemIndicator` | Icon wrapper  | Decorative `aria-hidden` icon, rendered only for branch items                                  |
 | `MillerColumns.ResizeHandle`  | Resize grip   | A `role="separator"` drag handle that sets its column's width                                   |
+| `MillerColumns.PreviewPanel`  | Preview pane  | A content-agnostic trailing panel; pair with `useMillerColumnsSelection`                        |
 
 ## Selection model
 
@@ -160,6 +161,49 @@ width is clamped so it can never be dragged below zero — use CSS
 `min-width` for any larger floor. Resize is pointer-only; the handle
 is not keyboard-operable.
 
+## Preview panel
+
+`MillerColumns.PreviewPanel` is a trailing pane — the macOS-Finder
+"preview" column — rendered as the last child of the strip, to the
+right of the columns. It is deliberately **content-agnostic**: the
+component cannot know how to preview an item, so the consumer decides
+what the panel shows. Author it as the last child of `Root`, a sibling
+of the root `Column`:
+
+```tsx
+<MillerColumns.Root>
+  <MillerColumns.Column>{items}</MillerColumns.Column>
+  <MillerColumns.PreviewPanel>
+    <FilePreview />
+  </MillerColumns.PreviewPanel>
+</MillerColumns.Root>
+```
+
+To render content for whatever is selected, read the selection with
+the `useMillerColumnsSelection` hook from any component inside `Root`:
+
+```tsx
+import { useMillerColumnsSelection } from "@primitiv/react";
+
+function FilePreview() {
+  const { path, selectedValue } = useMillerColumnsSelection();
+  if (!selectedValue) {
+    return <p>Nothing selected</p>;
+  }
+  return <Preview id={selectedValue} />;
+}
+```
+
+`useMillerColumnsSelection` returns the active `path` and the deepest
+`selectedValue` (`undefined` when nothing is selected). It works for
+both controlled and uncontrolled roots, and throws if called outside
+`MillerColumns.Root`.
+
+The panel ships with no ARIA role. The strip is a `role="tree"`, whose
+conforming children are `treeitem`s and `group`s — so give the panel
+content its own labelled landmark (`role`, `aria-label`, …) through
+props if the preview warrants being announced.
+
 ## `asChild` composition
 
 `MillerColumns.Item` accepts `asChild` to render the cell as a
@@ -218,6 +262,7 @@ selector like `[data-miller-columns-strip] > *`.
 | `Item`          | `data-state="selected" \| "unselected"`, `data-depth`, `data-has-children`, `data-disabled` |
 | `ItemIndicator` | `data-state`, `data-has-children`                                           |
 | `ResizeHandle`  | `data-miller-columns-resize-handle`, `data-dragging` (present mid-drag)     |
+| `PreviewPanel`  | `data-miller-columns-preview`                                               |
 
 ## Deferred / follow-up work
 

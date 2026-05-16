@@ -10,6 +10,7 @@ import {
 } from "./MillerColumnsContext";
 import {
   useMillerColumnsColumn,
+  useMillerColumnsContext,
   useMillerColumnsItem,
   useMillerColumnsItemContext,
   useMillerColumnsResizeHandle,
@@ -24,6 +25,7 @@ import type {
   MillerColumnsItemProps,
   MillerColumnsItemIndicatorProps,
   MillerColumnsResizeHandleProps,
+  MillerColumnsPreviewPanelProps,
 } from "./types";
 
 /**
@@ -258,12 +260,56 @@ export function MillerColumnsResizeHandle(
 
 MillerColumnsResizeHandle.displayName = "MillerColumnsResizeHandle";
 
+/**
+ * A trailing panel for previewing the current selection — the
+ * macOS-Finder-style preview pane.
+ *
+ * Renders a plain `<div data-miller-columns-preview>` as the last child
+ * of the strip, sitting to the right of the columns. The component is
+ * deliberately content-agnostic: it does not know how to preview an
+ * item, so the consumer supplies whatever the panel should show.
+ *
+ * Pair it with {@link useMillerColumnsSelection} to render content for
+ * the current selection. Author it as the **last child** of `Root`, a
+ * sibling of the root `Column`.
+ *
+ * @example
+ * ```tsx
+ * function FilePreview() {
+ *   const { selectedValue } = useMillerColumnsSelection();
+ *   return selectedValue ? <Preview id={selectedValue} /> : null;
+ * }
+ *
+ * <MillerColumns.Root>
+ *   <MillerColumns.Column>{items}</MillerColumns.Column>
+ *   <MillerColumns.PreviewPanel>
+ *     <FilePreview />
+ *   </MillerColumns.PreviewPanel>
+ * </MillerColumns.Root>;
+ * ```
+ */
+export function MillerColumnsPreviewPanel({
+  children,
+  ...rest
+}: MillerColumnsPreviewPanelProps) {
+  useMillerColumnsContext();
+
+  return (
+    <div data-miller-columns-preview="" {...rest}>
+      {children}
+    </div>
+  );
+}
+
+MillerColumnsPreviewPanel.displayName = "MillerColumnsPreviewPanel";
+
 type MillerColumnsCompound = typeof MillerColumnsRoot & {
   Root: typeof MillerColumnsRoot;
   Column: typeof MillerColumnsColumn;
   Item: typeof MillerColumnsItem;
   ItemIndicator: typeof MillerColumnsItemIndicator;
   ResizeHandle: typeof MillerColumnsResizeHandle;
+  PreviewPanel: typeof MillerColumnsPreviewPanel;
 };
 
 const MillerColumnsCompound: MillerColumnsCompound = Object.assign(
@@ -274,6 +320,7 @@ const MillerColumnsCompound: MillerColumnsCompound = Object.assign(
     Item: MillerColumnsItem,
     ItemIndicator: MillerColumnsItemIndicator,
     ResizeHandle: MillerColumnsResizeHandle,
+    PreviewPanel: MillerColumnsPreviewPanel,
   },
 );
 

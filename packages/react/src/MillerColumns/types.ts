@@ -34,11 +34,24 @@ export type MillerColumnsItemIndicatorProps = ComponentProps<"span"> & {
   children?: ReactNode;
 };
 
+export type MillerColumnsItemMeta = {
+  value: string;
+  disabled: boolean;
+};
+
 export type MillerColumnsContextValue = {
   strip: HTMLElement | null;
   setStrip: (element: HTMLDivElement | null) => void;
   activePath: string[];
   select: (depth: number, value: string) => void;
+  registerItem: (
+    depth: number,
+    value: string,
+    element: HTMLElement | null,
+    disabled: boolean,
+  ) => void;
+  getColumnItems: (depth: number) => MillerColumnsItemMeta[];
+  focusItem: (depth: number, value: string) => void;
 };
 
 export type MillerColumnsColumnContextValue = {

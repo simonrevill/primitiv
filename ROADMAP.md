@@ -73,7 +73,7 @@ semantics that CSS alone cannot provide.
 ### Disclosure
 
 - [x] Accordion
-- [ ] Breadcrumb
+- [x] Breadcrumb
 - [x] Carousel
 - [x] Collapsible
 - [ ] Pagination
@@ -92,7 +92,7 @@ semantics that CSS alone cannot provide.
 
 - [ ] Alert
 - [ ] Empty State
-- [ ] Progress
+- [x] Progress
 - [ ] Progress Circle
 - [ ] Status
 

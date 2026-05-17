@@ -1,1 +1,1 @@
-export {};
+export { useSliderContext } from "../SliderContext";

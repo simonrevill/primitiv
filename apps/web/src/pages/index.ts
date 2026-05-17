@@ -1,4 +1,5 @@
 export * from "./AccordionExample";
+export * from "./BreadcrumbExample";
 export * from "./CheckboxCardExample";
 export * from "./CarouselExample";
 export * from "./CollapsibleExample";

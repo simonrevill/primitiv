@@ -3,6 +3,7 @@ import { Routes, Route, Link } from "react-router-dom";
 import { ColorEngine } from "./ColorEngine";
 import {
   AccordionExample,
+  BreadcrumbExample,
   CarouselExample,
   CheckboxCardExample,
   CollapsibleExample,
@@ -27,6 +28,7 @@ function App() {
         <nav>
           <Link to="/">Color Engine</Link>
           <Link to="/accordion">Accordion</Link>
+          <Link to="/breadcrumb">Breadcrumb</Link>
           <Link to="/carousel">Carousel</Link>
           <Link to="/checkbox-card">Checkbox Card</Link>
           <Link to="/collapsible">Collapsible</Link>
@@ -46,6 +48,7 @@ function App() {
         <Routes>
           <Route path="/" element={<ColorEngine />} />
           <Route path="/accordion" element={<AccordionExample />} />
+          <Route path="/breadcrumb" element={<BreadcrumbExample />} />
           <Route
             path="/checkbox-card"
             element={<CheckboxCardExample />}

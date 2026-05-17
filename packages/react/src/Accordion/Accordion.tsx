@@ -334,7 +334,8 @@ AccordionContent.displayName = "AccordionContent";
  *
  * Renders a `<span>` with `aria-hidden="true"` around the child so the
  * icon is hidden from assistive technology regardless of whether the child
- * component forwards unknown props.
+ * component forwards unknown props. Any additional props (`className`,
+ * `data-*`, `ref`, etc.) are forwarded to that `<span>`.
  *
  * **Styling hooks.**
  * - `data-state="open" | "closed"` on the rendered `<span>`.
@@ -362,11 +363,18 @@ AccordionContent.displayName = "AccordionContent";
  * </Accordion.Trigger>
  * ```
  */
-export function AccordionTriggerIcon({ children }: AccordionTriggerIconProps) {
+export function AccordionTriggerIcon({
+  children,
+  ...rest
+}: AccordionTriggerIconProps) {
   const { isExpanded } = useAccordionItemContext();
 
   return (
-    <span aria-hidden="true" data-state={isExpanded ? "open" : "closed"}>
+    <span
+      {...rest}
+      aria-hidden="true"
+      data-state={isExpanded ? "open" : "closed"}
+    >
       {children}
     </span>
   );

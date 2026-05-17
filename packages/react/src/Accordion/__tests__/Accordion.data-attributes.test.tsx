@@ -235,4 +235,38 @@ describe("Accordion data attributes tests", () => {
     const iconWrapper = trigger.querySelector("[aria-hidden='true']");
     expect(iconWrapper).toHaveAttribute("data-state", "open");
   });
+
+  it("should forward arbitrary props to the trigger icon wrapper span", () => {
+    // Arrange
+    const title = "Accordion Trigger 1";
+    render(
+      <Accordion.Root>
+        <Accordion.Item>
+          <Accordion.Header>
+            <Accordion.Trigger>
+              {title}
+              <Accordion.TriggerIcon
+                className="custom-icon"
+                data-testid="icon"
+                data-custom="x"
+              >
+                <svg viewBox="0 0 24 24">
+                  <path d="M5 12h14" />
+                </svg>
+              </Accordion.TriggerIcon>
+            </Accordion.Trigger>
+          </Accordion.Header>
+          <Accordion.Content>Content</Accordion.Content>
+        </Accordion.Item>
+      </Accordion.Root>,
+    );
+    const iconWrapper = screen.getByTestId("icon");
+
+    // Assert — forwarded props land on the span without clobbering its own hooks
+    expect(iconWrapper.tagName).toBe("SPAN");
+    expect(iconWrapper).toHaveClass("custom-icon");
+    expect(iconWrapper).toHaveAttribute("data-custom", "x");
+    expect(iconWrapper).toHaveAttribute("aria-hidden", "true");
+    expect(iconWrapper).toHaveAttribute("data-state", "closed");
+  });
 });

@@ -51,7 +51,7 @@ export type AccordionContentProps = ComponentProps<"div"> & {
   forceMount?: boolean;
 };
 
-export type AccordionTriggerIconProps = {
+export type AccordionTriggerIconProps = ComponentProps<"span"> & {
   children: ReactNode;
 };
 

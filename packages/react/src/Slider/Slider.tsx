@@ -18,6 +18,7 @@ function SliderRoot({
   orientation = "horizontal",
   dir = "ltr",
   inverted = false,
+  disabled = false,
   defaultValue,
   value,
   onValueChange,
@@ -40,6 +41,7 @@ function SliderRoot({
     orientation,
     dir,
     inverted,
+    disabled,
     defaultValue,
     value,
     onValueChange,
@@ -52,6 +54,7 @@ function SliderRoot({
         ref={composeRefs(rootRef, ref)}
         dir={dir}
         data-orientation={orientation}
+        data-disabled={disabled ? "" : undefined}
         onPointerDown={composeEventHandlers(onPointerDown, handlePointerDown)}
       >
         {children}
@@ -75,9 +78,13 @@ function SliderRoot({
 SliderRoot.displayName = "SliderRoot";
 
 function SliderTrack({ children, ...rest }: SliderTrackProps) {
-  const { orientation } = useSliderContext();
+  const { orientation, disabled } = useSliderContext();
   return (
-    <span {...rest} data-orientation={orientation}>
+    <span
+      {...rest}
+      data-orientation={orientation}
+      data-disabled={disabled ? "" : undefined}
+    >
       {children}
     </span>
   );
@@ -86,11 +93,13 @@ function SliderTrack({ children, ...rest }: SliderTrackProps) {
 SliderTrack.displayName = "SliderTrack";
 
 function SliderRange({ style, ...rest }: SliderRangeProps) {
-  const { values, min, max, orientation, dir, inverted } = useSliderContext();
+  const { values, min, max, orientation, dir, inverted, disabled } =
+    useSliderContext();
   return (
     <span
       {...rest}
       data-orientation={orientation}
+      data-disabled={disabled ? "" : undefined}
       style={{
         ...getRangeStyle(values, min, max, { orientation, dir, inverted }),
         ...style,
@@ -113,6 +122,7 @@ function SliderThumb({
     min,
     max,
     orientation,
+    disabled,
     style: positionStyle,
     onKeyDown: handleKeyDown,
   } = useSliderThumb();
@@ -121,12 +131,14 @@ function SliderThumb({
       {...rest}
       ref={composeRefs(ref, forwardedRef)}
       role="slider"
-      tabIndex={0}
+      tabIndex={disabled ? undefined : 0}
       aria-orientation={orientation}
       aria-valuemin={min}
       aria-valuemax={max}
       aria-valuenow={value}
+      aria-disabled={disabled || undefined}
       data-orientation={orientation}
+      data-disabled={disabled ? "" : undefined}
       onKeyDown={composeEventHandlers(onKeyDown, handleKeyDown)}
       style={{ ...positionStyle, ...style }}
     />

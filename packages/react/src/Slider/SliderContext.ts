@@ -10,6 +10,7 @@ export type SliderContextValue = {
   orientation: SliderOrientation;
   dir: SliderDirection;
   inverted: boolean;
+  disabled: boolean;
   registerThumb: (id: string, element: HTMLSpanElement | null) => void;
   orderedThumbIds: string[];
   setThumbValue: (index: number, value: number) => number[] | null;

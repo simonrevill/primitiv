@@ -14,6 +14,7 @@ type UseSliderRootArgs = {
   orientation: SliderOrientation;
   dir: SliderDirection;
   inverted: boolean;
+  disabled: boolean;
   defaultValue?: number[];
   value?: number[];
   onValueChange?: (value: number[]) => void;
@@ -28,6 +29,7 @@ export function useSliderRoot({
   orientation,
   dir,
   inverted,
+  disabled,
   defaultValue,
   value,
   onValueChange,
@@ -80,6 +82,9 @@ export function useSliderRoot({
 
   const onPointerDown = useCallback(
     (event: ReactPointerEvent<HTMLSpanElement>) => {
+      if (disabled) {
+        return;
+      }
       const rect = rootRef.current!.getBoundingClientRect();
       const pointerValue = getPointerValue(event.clientX, event.clientY, rect, {
         min,
@@ -130,6 +135,7 @@ export function useSliderRoot({
       orientation,
       dir,
       inverted,
+      disabled,
       setThumbValue,
       commit,
       orderedThumbIds,
@@ -156,6 +162,7 @@ export function useSliderRoot({
       orientation,
       dir,
       inverted,
+      disabled,
       registerThumb,
       orderedThumbIds,
       setThumbValue,
@@ -169,6 +176,7 @@ export function useSliderRoot({
       orientation,
       dir,
       inverted,
+      disabled,
       registerThumb,
       orderedThumbIds,
       setThumbValue,

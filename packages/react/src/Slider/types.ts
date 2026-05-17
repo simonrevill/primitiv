@@ -14,6 +14,7 @@ type SliderRootSharedProps = Omit<
   orientation?: SliderOrientation;
   dir?: SliderDirection;
   inverted?: boolean;
+  disabled?: boolean;
   name?: string;
 };
 

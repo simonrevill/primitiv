@@ -13,6 +13,7 @@ export function useSliderThumb() {
     orientation,
     dir,
     inverted,
+    disabled,
     registerThumb,
     orderedThumbIds,
     setThumbValue,
@@ -33,6 +34,9 @@ export function useSliderThumb() {
 
   const onKeyDown = useCallback(
     (event: KeyboardEvent<HTMLSpanElement>) => {
+      if (disabled) {
+        return;
+      }
       const action = getKeyAction(event.key, { orientation, dir, inverted });
       if (action === null) {
         return;
@@ -63,10 +67,11 @@ export function useSliderThumb() {
       orientation,
       dir,
       inverted,
+      disabled,
       setThumbValue,
       commit,
     ],
   );
 
-  return { ref, value, min, max, orientation, style, onKeyDown };
+  return { ref, value, min, max, orientation, disabled, style, onKeyDown };
 }

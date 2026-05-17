@@ -35,6 +35,10 @@ import { ToggleGroupItemProps, ToggleGroupRootProps } from "./types";
  * **Styling hooks.** `data-orientation="horizontal" | "vertical"` on the
  * root. Each item: `data-state="on" | "off"`, `data-disabled=""`.
  *
+ * **`asChild` prop.** Pass `asChild` to render any consumer-supplied
+ * element in place of the native `<div>`, with the group's `role`,
+ * `data-orientation`, and ref merged in.
+ *
  * @example Single mode — text alignment
  * ```tsx
  * <ToggleGroup.Root type="single" defaultValue="left" aria-label="Alignment">
@@ -149,6 +153,10 @@ ToggleGroupRoot.displayName = "ToggleGroupRoot";
  *
  * **Styling hooks.** `data-state="on" | "off"` mirrors the pressed state.
  * `data-disabled=""` when disabled.
+ *
+ * **`asChild` prop.** Pass `asChild` to render any consumer element in
+ * place of the native `<button>`, with the Item's `aria-pressed`,
+ * `data-state`, `tabIndex`, and event handlers merged onto it.
  *
  * @throws if rendered outside a `ToggleGroup.Root`.
  */

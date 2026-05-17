@@ -85,6 +85,32 @@ export function getRangeStyle(
   };
 }
 
+/** Resolve the value at a pointer's horizontal position on the track. */
+export function getPointerValue(
+  clientX: number,
+  rect: { left: number; width: number },
+  min: number,
+  max: number,
+  step: number,
+): number {
+  const percent = clamp((clientX - rect.left) / rect.width, 0, 1);
+  return clamp(snapToStep(min + percent * (max - min), min, step), min, max);
+}
+
+/** Index of the thumb whose value sits nearest to `value` (ties favour the first). */
+export function getClosestThumbIndex(value: number, values: number[]): number {
+  let closestIndex = 0;
+  let smallestDistance = Infinity;
+  values.forEach((thumbValue, index) => {
+    const distance = Math.abs(thumbValue - value);
+    if (distance < smallestDistance) {
+      smallestDistance = distance;
+      closestIndex = index;
+    }
+  });
+  return closestIndex;
+}
+
 /** Order registered thumb ids by their position in the DOM. */
 export function sortThumbsByDomOrder(
   thumbs: Map<string, HTMLElement>,

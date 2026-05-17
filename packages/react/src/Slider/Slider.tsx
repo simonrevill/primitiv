@@ -21,10 +21,16 @@ function SliderRoot({
   defaultValue,
   value,
   onValueChange,
+  onPointerDown,
+  ref,
   children,
   ...rest
 }: SliderRootProps) {
-  const { contextValue } = useSliderRoot({
+  const {
+    contextValue,
+    rootRef,
+    onPointerDown: handlePointerDown,
+  } = useSliderRoot({
     min,
     max,
     step,
@@ -38,7 +44,13 @@ function SliderRoot({
   });
   return (
     <SliderContext.Provider value={contextValue}>
-      <span {...rest} dir={dir} data-orientation={orientation}>
+      <span
+        {...rest}
+        ref={composeRefs(rootRef, ref)}
+        dir={dir}
+        data-orientation={orientation}
+        onPointerDown={composeEventHandlers(onPointerDown, handlePointerDown)}
+      >
         {children}
       </span>
     </SliderContext.Provider>

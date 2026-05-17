@@ -5,6 +5,7 @@ export * from "./CollapsibleExample";
 export * from "./DropdownExample";
 export * from "./MillerColumnsExample";
 export * from "./ModalExample";
+export * from "./ProgressExample";
 export * from "./RadioCardExample";
 export * from "./SliderExample";
 export * from "./SwitchExample";

@@ -9,6 +9,7 @@ import {
   DropdownExample,
   MillerColumnsExample,
   ModalExample,
+  ProgressExample,
   RadioCardExample,
   SliderExample,
   SwitchExample,
@@ -32,6 +33,7 @@ function App() {
           <Link to="/dropdown">Dropdown</Link>
           <Link to="/miller-columns">Miller Columns</Link>
           <Link to="/modal">Modal</Link>
+          <Link to="/progress">Progress</Link>
           <Link to="/radio-card">Radio Card</Link>
           <Link to="/slider">Slider</Link>
           <Link to="/switch">Switch</Link>
@@ -56,6 +58,7 @@ function App() {
             element={<MillerColumnsExample />}
           />
           <Route path="/modal" element={<ModalExample />} />
+          <Route path="/progress" element={<ProgressExample />} />
           <Route path="/radio-card" element={<RadioCardExample />} />
           <Route path="/slider" element={<SliderExample />} />
           <Route path="/switch" element={<SwitchExample />} />

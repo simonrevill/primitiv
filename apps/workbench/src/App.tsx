@@ -2,7 +2,9 @@ import { Routes, Route, Link, useLocation } from "react-router-dom";
 
 import { ColorEngine } from "./ColorEngine";
 import {
+  AccessibleIconExample,
   AccordionExample,
+  AlertExample,
   AvatarExample,
   BreadcrumbExample,
   ButtonExample,
@@ -20,12 +22,14 @@ import {
   RadioCardExample,
   RadioGroupExample,
   SliderExample,
+  StatusExample,
   SwitchExample,
   TableExample,
   TabsExample,
   ToggleExample,
   ToggleGroupExample,
   TooltipExample,
+  VisuallyHiddenExample,
 } from "./pages";
 
 import "./App.scss";
@@ -77,7 +81,11 @@ const navGroups: { title: string; links: NavLink[] }[] = [
   },
   {
     title: "Feedback & Status",
-    links: [{ to: "/progress", label: "Progress" }],
+    links: [
+      { to: "/alert", label: "Alert" },
+      { to: "/progress", label: "Progress" },
+      { to: "/status", label: "Status" },
+    ],
   },
   {
     title: "Data Display",
@@ -86,7 +94,14 @@ const navGroups: { title: string; links: NavLink[] }[] = [
       { to: "/table", label: "Table" },
     ],
   },
-  { title: "Utilities", links: [{ to: "/portal", label: "Portal" }] },
+  {
+    title: "Utilities",
+    links: [
+      { to: "/accessible-icon", label: "Accessible Icon" },
+      { to: "/portal", label: "Portal" },
+      { to: "/visually-hidden", label: "Visually Hidden" },
+    ],
+  },
   {
     title: "Showcase",
     links: [{ to: "/design-system-test", label: "Design System Test" }],
@@ -125,7 +140,12 @@ function App() {
       <main className={containerClasses}>
         <Routes>
           <Route path="/" element={<ColorEngine />} />
+          <Route
+            path="/accessible-icon"
+            element={<AccessibleIconExample />}
+          />
           <Route path="/accordion" element={<AccordionExample />} />
+          <Route path="/alert" element={<AlertExample />} />
           <Route path="/avatar" element={<AvatarExample />} />
           <Route path="/breadcrumb" element={<BreadcrumbExample />} />
           <Route path="/button" element={<ButtonExample />} />
@@ -146,12 +166,17 @@ function App() {
           <Route path="/radio-card" element={<RadioCardExample />} />
           <Route path="/radio-group" element={<RadioGroupExample />} />
           <Route path="/slider" element={<SliderExample />} />
+          <Route path="/status" element={<StatusExample />} />
           <Route path="/switch" element={<SwitchExample />} />
           <Route path="/table" element={<TableExample />} />
           <Route path="/tabs" element={<TabsExample />} />
           <Route path="/toggle" element={<ToggleExample />} />
           <Route path="/toggle-group" element={<ToggleGroupExample />} />
           <Route path="/tooltip" element={<TooltipExample />} />
+          <Route
+            path="/visually-hidden"
+            element={<VisuallyHiddenExample />}
+          />
         </Routes>
       </main>
     </div>

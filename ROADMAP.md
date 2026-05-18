@@ -89,11 +89,11 @@ semantics that CSS alone cannot provide.
 
 ### Feedback & Status
 
-- [ ] Alert
+- [x] Alert
 - [ ] Empty State
 - [x] Progress
 - [ ] Progress Circle
-- [ ] Status
+- [x] Status
 
 ### Data Display
 
@@ -106,14 +106,14 @@ semantics that CSS alone cannot provide.
 
 ### Utilities
 
-- [ ] Accessible Icon
+- [x] Accessible Icon
 - [ ] Direction Provider
 - [ ] Environment Provider
 - [x] Portal
 - [ ] Presence
 - [ ] Skip Nav
 - [x] Slot
-- [ ] Visually Hidden
+- [x] Visually Hidden
 
 ### Borderline cases
 
@@ -140,13 +140,17 @@ behaviour, but were kept for meaningful ARIA semantics:
 `apps/workbench` carries one example page per component. Every public
 component now has a workbench example:
 
+- [x] Accessible Icon
+- [x] Alert
 - [x] Button
 - [x] Checkbox
 - [x] Divider
 - [x] Portal
 - [x] Radio Group
+- [x] Status
 - [x] Table
 - [x] Tabs
+- [x] Visually Hidden
 
 `Slot` is an internal composition utility, not a public component —
 it does not need a workbench page.

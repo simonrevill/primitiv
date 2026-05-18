@@ -1,6 +1,12 @@
 import { SkipNavLinkProps } from "./types";
 
-function SkipNavLink({ children, contentId, ...rest }: SkipNavLinkProps) {
+const DEFAULT_CONTENT_ID = "primitiv-skip-nav";
+
+function SkipNavLink({
+  children,
+  contentId = DEFAULT_CONTENT_ID,
+  ...rest
+}: SkipNavLinkProps) {
   return (
     <a href={`#${contentId}`} {...rest}>
       {children}

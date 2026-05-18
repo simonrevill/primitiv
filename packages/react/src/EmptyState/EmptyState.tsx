@@ -1,5 +1,9 @@
 import { Slot } from "../Slot";
-import { EmptyStateMediaProps, EmptyStateRootProps } from "./types";
+import {
+  EmptyStateMediaProps,
+  EmptyStateRootProps,
+  EmptyStateTitleProps,
+} from "./types";
 
 /**
  * The root of an Empty State — renders a `<div role="status">` wrapping the
@@ -82,14 +86,49 @@ function EmptyStateMedia({
 
 EmptyStateMedia.displayName = "EmptyStateMedia";
 
+/**
+ * The headline of an Empty State — renders a `<p>` with the short summary of
+ * why the view is empty (e.g. "No results found").
+ *
+ * A `<p>` is the safe default: a headless primitive cannot know the correct
+ * heading level for the surrounding document outline. When the empty state
+ * stands in for a titled section, promote the title to a real heading with
+ * `asChild` so it joins the page's heading hierarchy.
+ *
+ * **`asChild` composition.** Renders the consumer's element instead of a
+ * `<p>`, merging all props in via the {@link Slot} utility.
+ *
+ * @example Promote to a heading
+ * ```tsx
+ * <EmptyState.Title asChild>
+ *   <h2>No results found</h2>
+ * </EmptyState.Title>
+ * ```
+ */
+function EmptyStateTitle({
+  asChild = false,
+  children,
+  ...rest
+}: EmptyStateTitleProps) {
+  if (asChild) {
+    return <Slot {...rest}>{children}</Slot>;
+  }
+
+  return <p {...rest}>{children}</p>;
+}
+
+EmptyStateTitle.displayName = "EmptyStateTitle";
+
 type EmptyStateCompound = typeof EmptyStateRoot & {
   Root: typeof EmptyStateRoot;
   Media: typeof EmptyStateMedia;
+  Title: typeof EmptyStateTitle;
 };
 
 const EmptyState: EmptyStateCompound = Object.assign(EmptyStateRoot, {
   Root: EmptyStateRoot,
   Media: EmptyStateMedia,
+  Title: EmptyStateTitle,
 });
 
 /**
@@ -104,6 +143,7 @@ const EmptyState: EmptyStateCompound = Object.assign(EmptyStateRoot, {
  *   polite live region wrapping the placeholder.
  * - {@link EmptyStateMedia | `EmptyState.Media`} — `<div aria-hidden="true">`,
  *   the decorative icon/illustration slot.
+ * - {@link EmptyStateTitle | `EmptyState.Title`} — `<p>`, the headline.
  *
  * @example
  * ```tsx

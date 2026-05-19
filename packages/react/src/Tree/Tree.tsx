@@ -24,13 +24,21 @@ export function TreeRoot({
   expandedValues,
   defaultExpandedValues,
   onExpandedChange,
+  selectionMode = "single",
+  selectedValue,
+  defaultSelectedValue,
+  onSelectedValueChange,
   ...rest
 }: TreeRootProps) {
-  const treeContext = useTreeRoot(
+  const treeContext = useTreeRoot({
     expandedValues,
     defaultExpandedValues,
     onExpandedChange,
-  );
+    selectionMode,
+    selectedValue,
+    defaultSelectedValue,
+    onSelectedValueChange,
+  });
 
   return (
     <TreeContext.Provider value={treeContext}>
@@ -45,11 +53,25 @@ export function TreeRoot({
 
 TreeRoot.displayName = "TreeRoot";
 
-export function TreeItem({ value: _value, children, ...rest }: TreeItemProps) {
+export function TreeItem({
+  value,
+  children,
+  onClick,
+  ...rest
+}: TreeItemProps) {
   const { depth } = useTreeLevelContext();
+  const { isSelected, select } = useTreeContext();
+  const selected = isSelected(value);
 
   return (
-    <div role="treeitem" aria-level={depth + 1} data-depth={depth} {...rest}>
+    <div
+      role="treeitem"
+      aria-level={depth + 1}
+      aria-selected={selected}
+      data-depth={depth}
+      onClick={composeEventHandlers(onClick, () => select(value))}
+      {...rest}
+    >
       {children}
     </div>
   );

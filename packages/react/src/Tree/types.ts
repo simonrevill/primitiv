@@ -18,8 +18,28 @@ type TreeRootControlledExpansionProps = {
   onExpandedChange: (values: string[]) => void;
 };
 
+type TreeRootSingleUncontrolledSelectionProps = {
+  selectionMode?: "single";
+  /** The value selected on first render when uncontrolled. */
+  defaultSelectedValue?: string | null;
+  selectedValue?: never;
+  onSelectedValueChange?: (value: string | null) => void;
+};
+
+type TreeRootSingleControlledSelectionProps = {
+  selectionMode?: "single";
+  defaultSelectedValue?: never;
+  /** The selected value, owned by the consumer. */
+  selectedValue: string | null;
+  onSelectedValueChange: (value: string | null) => void;
+};
+
 export type TreeRootProps = TreeRootBaseProps &
-  (TreeRootUncontrolledExpansionProps | TreeRootControlledExpansionProps);
+  (TreeRootUncontrolledExpansionProps | TreeRootControlledExpansionProps) &
+  (
+    | TreeRootSingleUncontrolledSelectionProps
+    | TreeRootSingleControlledSelectionProps
+  );
 
 export type TreeItemProps = ComponentProps<"div"> & {
   /** Stable identifier for this item, unique within the tree. */
@@ -53,8 +73,11 @@ export type TreeLevelContextValue = {
 };
 
 export type TreeContextValue = {
+  selectionMode: "single";
   isExpanded: (value: string) => boolean;
   toggleExpanded: (value: string, next?: boolean) => void;
+  isSelected: (value: string) => boolean;
+  select: (value: string) => void;
 };
 
 export type TreeItemContextValue = {

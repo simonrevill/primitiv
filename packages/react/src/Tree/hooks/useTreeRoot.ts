@@ -4,19 +4,32 @@ import { useControllableState } from "../../hooks";
 
 import type { TreeContextValue } from "../types";
 
+export type UseTreeRootOptions = {
+  expandedValues: string[] | undefined;
+  defaultExpandedValues: string[] | undefined;
+  onExpandedChange: ((values: string[]) => void) | undefined;
+  selectionMode: "single";
+  selectedValue: string | null | undefined;
+  defaultSelectedValue: string | null | undefined;
+  onSelectedValueChange: ((value: string | null) => void) | undefined;
+};
+
 /**
- * Owns the Tree's expansion state and exposes the read/toggle surface
- * shared with every branch via `TreeContext`.
+ * Owns the Tree's expansion and selection state, exposing the
+ * read/toggle/select surface shared with every sub-component via
+ * `TreeContext`.
  */
-export function useTreeRoot(
-  controlledExpandedValues: string[] | undefined,
-  defaultExpandedValues: string[] | undefined,
-  onExpandedChange: ((values: string[]) => void) | undefined,
-): TreeContextValue {
+export function useTreeRoot(options: UseTreeRootOptions): TreeContextValue {
   const [expandedValues, setExpandedValues] = useControllableState<string[]>(
-    controlledExpandedValues,
-    defaultExpandedValues ?? [],
-    onExpandedChange,
+    options.expandedValues,
+    options.defaultExpandedValues ?? [],
+    options.onExpandedChange,
+  );
+
+  const [selectedValue, setSelectedValue] = useControllableState<string | null>(
+    options.selectedValue,
+    options.defaultSelectedValue ?? null,
+    options.onSelectedValueChange,
   );
 
   const isExpanded = useCallback(
@@ -40,5 +53,26 @@ export function useTreeRoot(
     [expandedValues, setExpandedValues],
   );
 
-  return { isExpanded, toggleExpanded };
+  const isSelected = useCallback(
+    (value: string) => selectedValue === value,
+    [selectedValue],
+  );
+
+  const select = useCallback(
+    (value: string) => {
+      if (selectedValue === value) {
+        return;
+      }
+      setSelectedValue(value);
+    },
+    [selectedValue, setSelectedValue],
+  );
+
+  return {
+    selectionMode: options.selectionMode,
+    isExpanded,
+    toggleExpanded,
+    isSelected,
+    select,
+  };
 }

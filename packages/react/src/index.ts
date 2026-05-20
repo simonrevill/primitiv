@@ -29,4 +29,5 @@ export * from "./Textarea";
 export * from "./Toggle";
 export * from "./ToggleGroup";
 export * from "./Tooltip";
+export * from "./Tree";
 export * from "./VisuallyHidden";

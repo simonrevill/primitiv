@@ -26,6 +26,79 @@
   }
 }
 
+.tree-example__panel {
+  display: flex;
+  flex-direction: column;
+
+  /* Remove the tree's bottom border and bottom corners so the path
+     bar attaches flush, forming one continuous bordered block. */
+  .tree-example__tree {
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+  }
+}
+
+.tree-example__path-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid var(--color-border, #ddd);
+  border-radius: 0 0 8px 8px;
+  background: var(--color-surface-2, #f0f0f0);
+  font-family: ui-monospace, monospace;
+  font-size: 0.8rem;
+  color: var(--color-text, #111);
+  min-height: 2rem;
+  justify-content: center;
+
+  nav {
+    display: contents;
+  }
+
+  ol {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.15rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li {
+    display: flex;
+    align-items: center;
+  }
+
+  /* ancestor segments */
+  span:not([aria-current]) {
+    color: var(--color-text-muted, #777);
+  }
+
+  /* current (leaf) item */
+  [aria-current="page"] {
+    color: var(--color-text, #111);
+    font-weight: 500;
+  }
+
+  /* separator */
+  [role="presentation"] {
+    color: var(--color-text-muted, #aaa);
+
+    svg {
+      display: block;
+      width: 0.75rem;
+      height: 0.75rem;
+    }
+  }
+}
+
+.tree-example__path-bar-empty {
+  color: var(--color-text-muted, #aaa);
+  font-style: italic;
+}
+
 .tree-example__modes {
   display: flex;
   gap: 1rem;
@@ -54,9 +127,25 @@
   border-radius: 8px;
   padding: 0.5rem 0.25rem;
   background: var(--color-surface, #fff);
+  color: var(--color-text, #111);
   font-family: ui-monospace, monospace;
   font-size: 0.9rem;
   user-select: none;
+}
+
+/*
+ * Open/close transition for branch content.
+ * interpolate-size: allow-keywords enables height: 0 → auto animation.
+ */
+.tree-example [role="group"] {
+  interpolate-size: allow-keywords;
+  height: 0;
+  overflow: hidden;
+  transition: height 220ms ease;
+}
+
+.tree-example [role="group"][data-state="open"] {
+  height: auto;
 }
 
 /*
@@ -67,9 +156,7 @@
  * their parent's indent — each row indents purely by its own depth.
  */
 .tree-example [role="treeitem"] {
-  --tree-example-indent: calc(
-    attr(data-depth type(<integer>), 0) * 1.25rem
-  );
+  --tree-example-indent: calc(attr(data-depth type(<integer>), 0) * 1.25rem);
 }
 
 .tree-example [role="treeitem"] > .tree-example__row {

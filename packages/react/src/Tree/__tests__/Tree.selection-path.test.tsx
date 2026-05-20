@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { Tree, useTreePath } from "../../Tree";
@@ -108,6 +108,62 @@ describe("Tree selection-path tests", () => {
         "src",
         "button.tsx",
       ]);
+    });
+  });
+
+  describe("Tree.SelectionPath default rendering", () => {
+    it("should render the wrapper with data-empty when no item is selected", () => {
+      // Arrange
+      render(
+        <Tree.Root>
+          <Tree.Item value="readme" label="readme.md">
+            readme.md
+          </Tree.Item>
+          <Tree.SelectionPath data-testid="path" />
+        </Tree.Root>,
+      );
+
+      // Assert
+      const wrapper = screen.getByTestId("path");
+
+      expect(wrapper).toHaveAttribute("data-empty", "");
+      expect(wrapper).not.toContainElement(screen.queryByRole("navigation"));
+    });
+
+    it("should render one Breadcrumb trail for a single selected item, with the final segment as the current page", () => {
+      // Arrange
+      render(
+        <Tree.Root
+          defaultExpandedValues={["src"]}
+          defaultSelectedValue="button"
+        >
+          <Tree.Branch value="src" label="src">
+            <Tree.BranchControl>src</Tree.BranchControl>
+            <Tree.BranchContent>
+              <Tree.Item value="button" label="button.tsx">
+                button.tsx
+              </Tree.Item>
+            </Tree.BranchContent>
+          </Tree.Branch>
+          <Tree.SelectionPath data-testid="path" />
+        </Tree.Root>,
+      );
+
+      // Assert
+      const wrapper = screen.getByTestId("path");
+
+      expect(wrapper).not.toHaveAttribute("data-empty");
+
+      const trails = within(wrapper).getAllByRole("navigation", {
+        name: "Breadcrumb",
+      });
+      expect(trails).toHaveLength(1);
+      expect(trails[0]).toHaveTextContent(/src/);
+      expect(trails[0]).toHaveTextContent(/button\.tsx/);
+
+      // The leaf label is the current page, not a link.
+      const current = within(trails[0]).getByText("button.tsx");
+      expect(current).toHaveAttribute("aria-current", "page");
     });
   });
 });

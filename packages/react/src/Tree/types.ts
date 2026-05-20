@@ -124,6 +124,29 @@ export type TreeBranchContentProps = ComponentProps<"div"> & {
 
 export type TreeBranchIndicatorProps = ComponentProps<"span">;
 
+/** Arguments passed to the `Tree.SelectionPath` render-prop form. */
+export type TreeSelectionPathRenderProps = {
+  /** One root-to-leaf chain per currently-selected value, in selection order. */
+  paths: TreePathSegment[][];
+};
+
+export type TreeSelectionPathProps = Omit<
+  ComponentProps<"div">,
+  "children"
+> & {
+  /**
+   * Either standard React children (ignored — the subcomponent does its
+   * own rendering) or a render-prop receiving the resolved selection
+   * paths so consumers can lay out custom markup.
+   */
+  children?: ReactNode | ((args: TreeSelectionPathRenderProps) => ReactNode);
+  /**
+   * Node passed to each `Breadcrumb.Separator` in the default rendering.
+   * Defaults to Breadcrumb's built-in `"/"` glyph.
+   */
+  separator?: ReactNode;
+};
+
 export type TreeLevelContextValue = {
   /** Zero-based nesting depth — `0` for items directly inside `Tree.Root`. */
   depth: number;

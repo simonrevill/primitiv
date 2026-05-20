@@ -1,5 +1,6 @@
-import { useLayoutEffect, useRef } from "react";
+import { Fragment, useLayoutEffect, useRef } from "react";
 
+import { Breadcrumb } from "../Breadcrumb";
 import { Slot, composeEventHandlers } from "../Slot";
 import { deriveId } from "../utils";
 
@@ -11,7 +12,7 @@ import {
   useTreeItemContext,
   useTreeLevelContext,
 } from "./TreeContext";
-import { useTreeItemKeyboard, useTreeRoot } from "./hooks";
+import { useTreeItemKeyboard, useTreeRoot, useTreeSelectionPaths } from "./hooks";
 import { partitionBranchChildren } from "./utils";
 
 import type {
@@ -21,6 +22,8 @@ import type {
   TreeBranchControlProps,
   TreeBranchContentProps,
   TreeBranchIndicatorProps,
+  TreeSelectionPathProps,
+  TreeSelectionPathRenderProps,
 } from "./types";
 
 /**
@@ -126,6 +129,7 @@ TreeRoot.displayName = "TreeRoot";
  */
 export function TreeItem({
   value,
+  label,
   disabled = false,
   asChild = false,
   children,
@@ -154,9 +158,10 @@ export function TreeItem({
       disabled,
       depth,
       parentValue,
+      label: label ?? null,
     });
     return () => registerNode(value, null);
-  }, [value, depth, parentValue, disabled, registerNode]);
+  }, [value, label, depth, parentValue, disabled, registerNode]);
 
   const itemProps = {
     ref,
@@ -220,6 +225,7 @@ TreeItem.displayName = "TreeItem";
  */
 export function TreeBranch({
   value,
+  label,
   disabled = false,
   children,
   onFocus,
@@ -258,9 +264,10 @@ export function TreeBranch({
       disabled,
       depth,
       parentValue,
+      label: label ?? null,
     });
     return () => registerNode(value, null);
-  }, [value, depth, parentValue, disabled, registerNode]);
+  }, [value, label, depth, parentValue, disabled, registerNode]);
 
   return (
     <TreeItemContext.Provider
@@ -402,6 +409,119 @@ export function TreeBranchIndicator({
 
 TreeBranchIndicator.displayName = "TreeBranchIndicator";
 
+/**
+ * Renders breadcrumb trails for the currently-selected tree value(s).
+ *
+ * The default rendering composes the package's `Breadcrumb` primitive:
+ * one `<nav aria-label="Breadcrumb"><ol>` per selected value, with
+ * non-final segments as plain `<li>` text and the leaf as a
+ * `Breadcrumb.Page` (`aria-current="page"`). Each segment falls back
+ * to its `value` when no `label` prop was supplied on the originating
+ * `Tree.Item` or `Tree.Branch`.
+ *
+ * - Empty selection — the wrapper still renders with `data-empty=""`
+ *   so consumers can style a "no selection" placeholder; nothing is
+ *   rendered inside.
+ * - Multiple selection — one trail per selected value, in selection
+ *   order.
+ *
+ * Pass `separator` to customise the divider glyph between segments.
+ *
+ * Pass a function as `children` to take full control of rendering
+ * (e.g. wire up router links). The function receives the resolved
+ * paths and replaces the default markup entirely.
+ *
+ * @example Default rendering
+ * ```tsx
+ * <Tree.SelectionPath separator={<ChevronRight />} />
+ * ```
+ *
+ * @example Render-prop escape hatch
+ * ```tsx
+ * <Tree.SelectionPath>
+ *   {({ paths }) => paths.map((path, i) => (
+ *     <Breadcrumb.Root key={i}>
+ *       <Breadcrumb.List>
+ *         {path.map((seg, j) => (
+ *           <Breadcrumb.Item key={seg.value}>
+ *             <Breadcrumb.Link asChild>
+ *               <RouterLink to={`/files/${seg.value}`}>
+ *                 {seg.label ?? seg.value}
+ *               </RouterLink>
+ *             </Breadcrumb.Link>
+ *           </Breadcrumb.Item>
+ *         ))}
+ *       </Breadcrumb.List>
+ *     </Breadcrumb.Root>
+ *   ))}
+ * </Tree.SelectionPath>
+ * ```
+ */
+export function TreeSelectionPath({
+  children,
+  separator,
+  ...rest
+}: TreeSelectionPathProps) {
+  const paths = useTreeSelectionPaths();
+  const empty = paths.length === 0;
+
+  let content: React.ReactNode = null;
+  if (typeof children === "function") {
+    content = (children as (args: TreeSelectionPathRenderProps) => React.ReactNode)({
+      paths,
+    });
+  } else if (!empty) {
+    content = paths.map((path, pathIndex) => (
+      <Breadcrumb.Root key={pathIndex}>
+        <Breadcrumb.List>
+          {path.map((segment, segmentIndex) => {
+            const isLast = segmentIndex === path.length - 1;
+            const label = segment.label ?? segment.value;
+            return (
+              <Fragment key={segment.value}>
+                <Breadcrumb.Item>
+                  {isLast ? (
+                    <Breadcrumb.Page
+                      data-tree-selection-segment=""
+                      data-value={segment.value}
+                      data-disabled={segment.disabled ? "" : undefined}
+                    >
+                      {label}
+                    </Breadcrumb.Page>
+                  ) : (
+                    <span
+                      data-tree-selection-segment=""
+                      data-value={segment.value}
+                      data-disabled={segment.disabled ? "" : undefined}
+                    >
+                      {label}
+                    </span>
+                  )}
+                </Breadcrumb.Item>
+                {!isLast ? (
+                  <Breadcrumb.Separator>{separator}</Breadcrumb.Separator>
+                ) : null}
+              </Fragment>
+            );
+          })}
+        </Breadcrumb.List>
+      </Breadcrumb.Root>
+    ));
+  }
+
+  return (
+    <div
+      data-tree-selection-path=""
+      data-empty={empty ? "" : undefined}
+      {...rest}
+    >
+      {content}
+    </div>
+  );
+}
+
+TreeSelectionPath.displayName = "TreeSelectionPath";
+
 type TreeCompound = typeof TreeRoot & {
   Root: typeof TreeRoot;
   Item: typeof TreeItem;
@@ -409,6 +529,7 @@ type TreeCompound = typeof TreeRoot & {
   BranchControl: typeof TreeBranchControl;
   BranchContent: typeof TreeBranchContent;
   BranchIndicator: typeof TreeBranchIndicator;
+  SelectionPath: typeof TreeSelectionPath;
 };
 
 const TreeCompound: TreeCompound = Object.assign(TreeRoot, {
@@ -418,6 +539,7 @@ const TreeCompound: TreeCompound = Object.assign(TreeRoot, {
   BranchControl: TreeBranchControl,
   BranchContent: TreeBranchContent,
   BranchIndicator: TreeBranchIndicator,
+  SelectionPath: TreeSelectionPath,
 });
 
 TreeCompound.displayName = "Tree";

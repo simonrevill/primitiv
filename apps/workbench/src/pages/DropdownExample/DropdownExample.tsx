@@ -53,7 +53,13 @@ export function DropdownExample() {
           </Dropdown.SubContent>
         </Dropdown.Sub>
         <Dropdown.Separator />
-        <Dropdown.CheckboxItem className="dd-sub-checkbox-item">
+        <Dropdown.CheckboxItem
+          className="dd-sub-checkbox-item"
+          onSelect={(event) => event.preventDefault()}
+        >
+          <Dropdown.ItemIndicator className="dd-item-indicator">
+            <span aria-hidden="true">✓</span>
+          </Dropdown.ItemIndicator>
           Show bookmarks
         </Dropdown.CheckboxItem>
         <Dropdown.Separator />
@@ -64,13 +70,21 @@ export function DropdownExample() {
           <Dropdown.RadioItem
             value="Simon Revil"
             className="dd-sub-radio-group-item"
+            onSelect={(event) => event.preventDefault()}
           >
+            <Dropdown.ItemIndicator className="dd-item-indicator">
+              <span aria-hidden="true">•</span>
+            </Dropdown.ItemIndicator>
             Simon Revill
           </Dropdown.RadioItem>
           <Dropdown.RadioItem
             value="David Beckham"
             className="dd-sub-radio-group-item"
+            onSelect={(event) => event.preventDefault()}
           >
+            <Dropdown.ItemIndicator className="dd-item-indicator">
+              <span aria-hidden="true">•</span>
+            </Dropdown.ItemIndicator>
             David Beckham
           </Dropdown.RadioItem>
         </Dropdown.RadioGroup>

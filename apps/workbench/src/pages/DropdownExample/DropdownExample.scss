@@ -93,11 +93,27 @@
 /* ── Shared item styles ───────────────────────────────────────────── */
 .dd-content li,
 .dd-sub-content li {
+  position: relative;
   padding: 6px 12px 6px 28px;
   border-radius: 4px;
   cursor: default;
   font-size: 14px;
   user-select: none;
+}
+
+.dd-item-indicator {
+  position: absolute;
+  inset-inline-start: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  font-size: 12px;
+  line-height: 1;
+  color: currentColor;
 }
 
 .dd-content [data-highlighted],
@@ -127,5 +143,6 @@
 }
 
 .dd-sub-radio-group-item[role="menuitemradio"] {
-  padding-inline-start: 0;
+  /* Keep the 28px left gutter so the .dd-item-indicator has room to render. */
+  padding-inline-start: 28px;
 }

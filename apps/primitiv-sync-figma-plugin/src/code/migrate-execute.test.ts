@@ -168,6 +168,80 @@ describe('executeMigration', () => {
     )
   })
 
+  it('rebinds a VARIABLE_ALIAS that points at a source Typography variable', async () => {
+    const figmaMock = createFigmaMock()
+    const mockComponentVar = {
+      id: 'component-v1',
+      name: 'button/font-family',
+      resolvedType: 'STRING',
+      variableCollectionId: 'cm',
+      valuesByMode: { mm: { type: 'VARIABLE_ALIAS', id: 'cv1' } },
+      setValueForMode: vi.fn(),
+    }
+    figmaMock.variables.getLocalVariablesAsync.mockResolvedValue([mockComponentVar])
+    const newSemanticVar = { id: 'nv1', setValueForMode: vi.fn() }
+    figmaMock.variables.createVariable.mockReturnValue(newSemanticVar)
+    vi.stubGlobal('figma', figmaMock)
+
+    await executeMigration(PLAN, INPUT)
+
+    expect(mockComponentVar.setValueForMode).toHaveBeenCalledWith(
+      'mm',
+      { type: 'VARIABLE_ALIAS', id: 'nv1' },
+    )
+  })
+
+  it('does not rebind aliases pointing at unrelated variables', async () => {
+    const figmaMock = createFigmaMock()
+    const mockComponentVar = {
+      id: 'component-v1',
+      name: 'button/color',
+      resolvedType: 'COLOR',
+      variableCollectionId: 'cm',
+      valuesByMode: { mm: { type: 'VARIABLE_ALIAS', id: 'unrelated-id' } },
+      setValueForMode: vi.fn(),
+    }
+    figmaMock.variables.getLocalVariablesAsync.mockResolvedValue([mockComponentVar])
+    vi.stubGlobal('figma', figmaMock)
+
+    await executeMigration(PLAN, INPUT)
+
+    expect(mockComponentVar.setValueForMode).not.toHaveBeenCalled()
+  })
+
+  it('rebinds aliases for already-existing Semantic variables on a re-run', async () => {
+    const figmaMock = createFigmaMock()
+    const existingSemanticVar = {
+      id: 'existing-nv1',
+      name: 'typography/compact/display/xl/font-family',
+      resolvedType: 'STRING',
+      variableCollectionId: 'new-semantic-id',
+      valuesByMode: {},
+    }
+    const mockComponentVar = {
+      id: 'component-v1',
+      name: 'button/font-family',
+      resolvedType: 'STRING',
+      variableCollectionId: 'cm',
+      valuesByMode: { mm: { type: 'VARIABLE_ALIAS', id: 'cv1' } },
+      setValueForMode: vi.fn(),
+    }
+    figmaMock.variables.getLocalVariablesAsync.mockResolvedValue([
+      existingSemanticVar,
+      mockComponentVar,
+    ])
+    vi.stubGlobal('figma', figmaMock)
+
+    await executeMigration(PLAN, INPUT)
+
+    // No new variable created (duplicate), but the alias is still rebound
+    expect(figmaMock.variables.createVariable).not.toHaveBeenCalled()
+    expect(mockComponentVar.setValueForMode).toHaveBeenCalledWith(
+      'mm',
+      { type: 'VARIABLE_ALIAS', id: 'existing-nv1' },
+    )
+  })
+
   it('removes each Typography collection listed as deletable', async () => {
     const figmaMock = createFigmaMock()
     const mockCollection = { id: 'cc', defaultModeId: 'mc', remove: vi.fn() }

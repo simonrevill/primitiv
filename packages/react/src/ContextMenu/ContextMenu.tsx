@@ -9,6 +9,7 @@ import {
 } from "react";
 
 import { useCheckboxRoot } from "../Checkbox/hooks";
+import { useDirection } from "../DirectionProvider";
 import { useRadioGroupRoot } from "../RadioGroup/hooks";
 import { useControllableState } from "../hooks";
 import { Slot, composeEventHandlers } from "../Slot";
@@ -60,16 +61,24 @@ import { MENUITEM_SELECTOR, TYPEAHEAD_RESET_MS } from "./constants";
  *   {@link ContextMenuRootProps.onOpenChange | `onOpenChange`} together. The
  *   parent owns the state; the component defers every transition back through
  *   the callback.
+ *
+ * **Reading direction.** Pass {@link ContextMenuRootProps.dir | `dir`} to
+ * set `"ltr"` or `"rtl"`, which inverts the submenu open / close arrow
+ * keys (`ArrowRight` ↔ `ArrowLeft`). When omitted, the component reads
+ * the inherited {@link DirectionProvider} value, falling back to `"ltr"`.
  */
 function ContextMenuRoot({
   defaultOpen = false,
   open: controlledOpen,
   onOpenChange,
+  dir,
   children,
 }: ContextMenuRootProps) {
   const contentId = useId();
   const triggerRef = useRef<HTMLElement | null>(null);
   const [position, setPosition] = useState<ContextMenuPosition | null>(null);
+  const inheritedDir = useDirection();
+  const resolvedDir = dir ?? inheritedDir;
   const [open, setOpenBase] = useControllableState<boolean>(
     controlledOpen,
     defaultOpen,
@@ -90,8 +99,16 @@ function ContextMenuRoot({
   );
 
   const contextValue = useMemo(
-    () => ({ open, setOpen, position, setPosition, contentId, triggerRef }),
-    [open, setOpen, position, contentId],
+    () => ({
+      open,
+      setOpen,
+      position,
+      setPosition,
+      contentId,
+      triggerRef,
+      dir: resolvedDir,
+    }),
+    [open, setOpen, position, contentId, resolvedDir],
   );
 
   return (
@@ -805,8 +822,10 @@ ContextMenuSub.displayName = "ContextMenuSub";
  * `aria-expanded`, and `aria-controls` wiring it to the sibling
  * {@link ContextMenuSubContent | `ContextMenu.SubContent`}.
  *
- * Opens the submenu on click, `ArrowRight`, or pointer hover. Disabled
- * triggers ignore both click and `ArrowRight`.
+ * Opens the submenu on click, the inline-forward arrow key, or pointer
+ * hover. The open key follows the resolved reading direction —
+ * `ArrowRight` in `"ltr"`, `ArrowLeft` in `"rtl"`. Disabled triggers
+ * ignore both click and the open arrow key.
  */
 function ContextMenuSubTrigger({
   children,
@@ -817,6 +836,8 @@ function ContextMenuSubTrigger({
   ...rest
 }: ContextMenuSubTriggerProps) {
   const sub = useContextMenuSubContext();
+  const { dir } = useContextMenuContext();
+  const openKey = dir === "rtl" ? "ArrowLeft" : "ArrowRight";
   const closeSiblingSub = useCloseSiblingSub();
   const [hovered, setHovered] = useState(false);
   const toggle = () => {
@@ -825,7 +846,7 @@ function ContextMenuSubTrigger({
   };
   const handleKeyDown = (event: React.KeyboardEvent<HTMLLIElement>) => {
     if (disabled) return;
-    if (event.key !== "ArrowRight") return;
+    if (event.key !== openKey) return;
     event.preventDefault();
     event.stopPropagation();
     sub.setOpen(true);
@@ -864,8 +885,9 @@ ContextMenuSubTrigger.displayName = "ContextMenuSubTrigger";
  * `ContextMenu.Sub`}.
  *
  * Renders a `<menu role="menu" popover="auto">` by default. When the submenu
- * opens, focus moves to its first enabled item. `ArrowLeft` closes the
- * submenu and returns focus to the SubTrigger.
+ * opens, focus moves to its first enabled item. The inline-backward arrow
+ * key closes the submenu and returns focus to the SubTrigger —
+ * `ArrowLeft` in `"ltr"`, `ArrowRight` in `"rtl"`.
  */
 function ContextMenuSubContent({
   children,
@@ -874,6 +896,8 @@ function ContextMenuSubContent({
   ...rest
 }: ContextMenuSubContentProps) {
   const sub = useContextMenuSubContext();
+  const { dir } = useContextMenuContext();
+  const closeKey = dir === "rtl" ? "ArrowRight" : "ArrowLeft";
   const menuRef = useRef<HTMLMenuElement | null>(null);
 
   useEffect(() => {
@@ -901,7 +925,7 @@ function ContextMenuSubContent({
   }, [sub.setOpen]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLMenuElement>) => {
-    if (event.key !== "ArrowLeft") return;
+    if (event.key !== closeKey) return;
     event.preventDefault();
     event.stopPropagation();
     sub.setOpen(false);

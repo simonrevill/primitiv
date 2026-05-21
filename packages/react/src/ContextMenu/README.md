@@ -40,8 +40,8 @@ import { ContextMenu } from "@primitiv/react";
 | `ContextMenu.Group`         | `group`              | Semantic grouping for related items                                                  |
 | `ContextMenu.Separator`     | `separator`          | Visual divider; skipped by focus and typeahead                                       |
 | `ContextMenu.Sub`           | State owner          | Submenu boundary; same state modes as `Root`                                         |
-| `ContextMenu.SubTrigger`    | `menuitem`           | Opens the submenu on click, hover, or `ArrowRight`                                   |
-| `ContextMenu.SubContent`    | `menu`               | Submenu panel; `ArrowLeft` closes it and returns focus to the trigger                |
+| `ContextMenu.SubTrigger`    | `menuitem`           | Opens the submenu on click, hover, or the inline-forward arrow (`ArrowRight` LTR / `ArrowLeft` RTL) |
+| `ContextMenu.SubContent`    | `menu`               | Submenu panel; the inline-backward arrow (`ArrowLeft` LTR / `ArrowRight` RTL) closes it and returns focus to the trigger |
 
 All sub-components that render an element accept `asChild` to compose
 their ARIA and behaviour onto a caller-supplied child.
@@ -76,12 +76,30 @@ browser menu through.
 | `Enter` / `Space`       | Activate the focused item                         |
 | `Escape`                | Close the menu and return focus to the Trigger    |
 | any printable character | Typeahead — focuses the next item matching prefix |
-| `ArrowRight`            | Open a focused submenu (on `SubTrigger`)          |
-| `ArrowLeft`             | Close the current submenu (from inside)           |
+| `ArrowRight`            | Open a focused submenu (`SubTrigger`, LTR) / close the submenu (inside `SubContent`, RTL) |
+| `ArrowLeft`             | Close the current submenu (inside `SubContent`, LTR) / open a focused submenu (`SubTrigger`, RTL) |
 
 Typeahead accumulates keystrokes within a 500 ms window; pressing the
 same character repeatedly cycles through items sharing that first letter.
 Disabled items are skipped by arrow navigation, typeahead, and activation.
+
+## Reading direction
+
+Pass `dir="ltr"` or `dir="rtl"` on `ContextMenu.Root` to invert the
+submenu open / close arrow keys. When omitted, the component reads the
+inherited `DirectionProvider` value, falling back to `"ltr"`:
+
+```tsx
+<DirectionProvider dir="rtl">
+  <ContextMenu.Root>{/* submenus now open on ArrowLeft */}</ContextMenu.Root>
+</DirectionProvider>
+```
+
+An explicit `dir` prop on `ContextMenu.Root` always wins over the
+inherited value. The reading direction only affects keyboard handling —
+submenu visual placement is the consumer's CSS concern (the workbench
+example uses logical positioning + `position-try-fallbacks: flip-inline`
+so subs reflow automatically in RTL).
 
 ## State modes
 
@@ -125,7 +143,8 @@ no-op on activation. Arrow navigation and typeahead skip them.
 <ContextMenu.Item disabled>Archive (coming soon)</ContextMenu.Item>
 ```
 
-A disabled `SubTrigger` refuses to open on both click and `ArrowRight`.
+A disabled `SubTrigger` refuses to open on both click and the
+inline-forward arrow key.
 
 ## Checkbox and radio items
 
@@ -193,9 +212,10 @@ Rendering `ContextMenu.ItemIndicator` outside a `CheckboxItem` or
 </ContextMenu.Content>
 ```
 
-Open a submenu with `ArrowRight`, a click on the trigger, or pointer
-hover; close it with `ArrowLeft` or by selecting an item. Focus returns
-to the `SubTrigger` when the submenu closes.
+Open a submenu with the inline-forward arrow key (`ArrowRight` in LTR,
+`ArrowLeft` in RTL), a click on the trigger, or pointer hover; close it
+with the inline-backward arrow or by selecting an item. Focus returns to
+the `SubTrigger` when the submenu closes.
 
 ## Groups and labels
 

@@ -183,7 +183,7 @@ describe('handleUiMessage', () => {
     expect(figmaMock.variables.createVariableCollection).toHaveBeenCalledWith('Semantic')
     expect(figmaMock.variables.createVariable).toHaveBeenCalledWith(
       'typography/compact/display/xl/font-family',
-      'new-semantic-id',
+      expect.objectContaining({ id: 'new-semantic-id' }),
       'STRING',
     )
     expect(figmaMock.ui.postMessage).toHaveBeenCalledWith({

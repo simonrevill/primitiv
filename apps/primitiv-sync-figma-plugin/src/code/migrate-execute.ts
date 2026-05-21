@@ -20,21 +20,10 @@ export async function executeMigration(
   plan: MigrationPlan,
   input: MigrationInput,
 ): Promise<void> {
-  // 1. Resolve the Semantic collection
-  let semanticCollectionId: string
-  let semanticModeId: string
-
-  if (plan.semantic.needsCreate) {
-    const collection = figma.variables.createVariableCollection(SEMANTIC_COLLECTION_NAME)
-    semanticCollectionId = collection.id
-    semanticModeId = collection.defaultModeId
-  } else {
-    const collection = await figma.variables.getVariableCollectionByIdAsync(
-      plan.semantic.existingId!,
-    )
-    semanticCollectionId = collection.id
-    semanticModeId = collection.defaultModeId
-  }
+  // 1. Resolve the Semantic collection node
+  const semanticCollection = plan.semantic.needsCreate
+    ? figma.variables.createVariableCollection(SEMANTIC_COLLECTION_NAME)
+    : await figma.variables.getVariableCollectionByIdAsync(plan.semantic.existingId!)
 
   // Build lookup maps from the snapshot so we don't need extra Figma reads
   const variableById = new Map(input.variables.map((v) => [v.id, v]))
@@ -44,7 +33,7 @@ export async function executeMigration(
   for (const planned of plan.newVariables) {
     const newVar = figma.variables.createVariable(
       planned.name,
-      semanticCollectionId,
+      semanticCollection,
       planned.resolvedType,
     )
 
@@ -52,7 +41,7 @@ export async function executeMigration(
     const sourceCollection = collectionById.get(planned.sourceCollectionId)
     if (sourceVar !== undefined && sourceCollection !== undefined) {
       const value = sourceVar.valuesByMode[sourceCollection.defaultModeId]
-      newVar.setValueForMode(semanticCollectionId, semanticModeId, value)
+      newVar.setValueForMode(semanticCollection, semanticCollection.defaultModeId, value)
     }
   }
 

@@ -1,9 +1,92 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { ContextMenu } from "../ContextMenu";
 
 describe("ContextMenu mouse interaction", () => {
+  it("opens the menu and reports onOpenChange(true) when the Trigger receives a contextmenu event", () => {
+    // Arrange
+    const onOpenChange = vi.fn();
+    render(
+      <ContextMenu.Root onOpenChange={onOpenChange}>
+        <ContextMenu.Trigger>Area</ContextMenu.Trigger>
+        <ContextMenu.Content>
+          <ContextMenu.Item>Rename</ContextMenu.Item>
+        </ContextMenu.Content>
+      </ContextMenu.Root>,
+    );
+    const trigger = screen.getByText("Area");
+
+    // Act
+    fireEvent.contextMenu(trigger, { clientX: 40, clientY: 80 });
+
+    // Assert
+    expect(onOpenChange).toHaveBeenCalledWith(true);
+  });
+
+  it("suppresses the native browser menu by calling preventDefault on the contextmenu event", () => {
+    // Arrange
+    render(
+      <ContextMenu.Root>
+        <ContextMenu.Trigger>Area</ContextMenu.Trigger>
+        <ContextMenu.Content>
+          <ContextMenu.Item>Rename</ContextMenu.Item>
+        </ContextMenu.Content>
+      </ContextMenu.Root>,
+    );
+    const trigger = screen.getByText("Area");
+
+    // Act — fireEvent returns false when the dispatched event was default-prevented.
+    const result = fireEvent.contextMenu(trigger, { clientX: 0, clientY: 0 });
+
+    // Assert
+    expect(result).toBe(false);
+  });
+
+  it("positions Content via fixed coordinates matching the cursor", () => {
+    // Arrange
+    render(
+      <ContextMenu.Root>
+        <ContextMenu.Trigger>Area</ContextMenu.Trigger>
+        <ContextMenu.Content>
+          <ContextMenu.Item>Rename</ContextMenu.Item>
+        </ContextMenu.Content>
+      </ContextMenu.Root>,
+    );
+    const trigger = screen.getByText("Area");
+
+    // Act
+    fireEvent.contextMenu(trigger, { clientX: 123, clientY: 456 });
+
+    // Assert
+    const menu = screen.getByRole("menu", { hidden: true });
+    expect(menu).toHaveStyle({
+      position: "fixed",
+      left: "123px",
+      top: "456px",
+    });
+  });
+
+  it("does not open and does not call onOpenChange when the Trigger is disabled", () => {
+    // Arrange
+    const onOpenChange = vi.fn();
+    render(
+      <ContextMenu.Root onOpenChange={onOpenChange}>
+        <ContextMenu.Trigger disabled>Area</ContextMenu.Trigger>
+        <ContextMenu.Content>
+          <ContextMenu.Item>Rename</ContextMenu.Item>
+        </ContextMenu.Content>
+      </ContextMenu.Root>,
+    );
+    const trigger = screen.getByText("Area");
+
+    // Act
+    fireEvent.contextMenu(trigger, { clientX: 10, clientY: 10 });
+
+    // Assert
+    expect(onOpenChange).not.toHaveBeenCalled();
+  });
+
   it("adds data-highlighted to an Item when the pointer enters it", async () => {
     // Arrange
     const user = userEvent.setup();

@@ -174,6 +174,9 @@ By default the indicator **unmounts** when its parent is unchecked. Pass
 `forceMount` to keep the DOM node in both states so CSS transitions or a
 React animation library can drive the visual state off `data-state`.
 
+Rendering `ContextMenu.ItemIndicator` outside a `CheckboxItem` or
+`RadioItem` throws a descriptive error.
+
 ## Submenus
 
 ```tsx

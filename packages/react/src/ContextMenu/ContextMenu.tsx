@@ -522,8 +522,8 @@ ContextMenuCheckboxItem.displayName = "ContextMenuCheckboxItem";
 /**
  * The visible mark (usually a checkmark) rendered inside a
  * {@link ContextMenuCheckboxItem | `ContextMenu.CheckboxItem`} (or radio item).
- * Must be a descendant of one; rendering it anywhere else returns null
- * silently.
+ * Must be a descendant of one; rendering it anywhere else throws a
+ * descriptive error.
  *
  * Renders a `<span>` by default. Exposes `data-state` reflecting the parent
  * item's live state: `"checked"`, `"unchecked"`, or `"indeterminate"`.
@@ -539,7 +539,11 @@ function ContextMenuItemIndicator({
   ...rest
 }: ContextMenuItemIndicatorProps) {
   const context = useContext(ContextMenuItemIndicatorContext);
-  if (!context) return null;
+  if (!context) {
+    throw new Error(
+      "ContextMenu.ItemIndicator must be rendered inside a <ContextMenu.CheckboxItem> or <ContextMenu.RadioItem>.",
+    );
+  }
 
   const { checked } = context;
   const dataState =

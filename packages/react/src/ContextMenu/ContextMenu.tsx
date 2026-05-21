@@ -14,6 +14,7 @@ import {
   ContextMenuRootProps,
   ContextMenuTriggerProps,
 } from "./types";
+import { MENUITEM_SELECTOR } from "./constants";
 
 /**
  * The root of a ContextMenu — owns the open state and the position the
@@ -131,16 +132,22 @@ ContextMenuTrigger.displayName = "ContextMenuTrigger";
 function ContextMenuContent({
   children,
   style,
+  onKeyDown,
   asChild = false,
   ...rest
 }: ContextMenuContentProps) {
-  const { open, setOpen, position, contentId } = useContextMenuContext();
+  const { open, setOpen, position, contentId, triggerRef } =
+    useContextMenuContext();
   const menuRef = useRef<HTMLMenuElement | null>(null);
 
   useEffect(() => {
     const menu = menuRef.current!;
     if (open) {
       menu.showPopover();
+      if (!menu.contains(document.activeElement)) {
+        const firstItem = menu.querySelector<HTMLElement>(MENUITEM_SELECTOR);
+        firstItem?.focus();
+      }
     } else {
       try {
         menu.hidePopover();
@@ -159,6 +166,47 @@ function ContextMenuContent({
     return () => menu.removeEventListener("toggle", handleToggle);
   }, [setOpen]);
 
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLMenuElement>) => {
+    const menu = menuRef.current!;
+    const focused = document.activeElement as HTMLElement | null;
+    const scope = (focused?.closest("[popover]") as HTMLElement | null) ?? menu;
+    const items = Array.from(
+      scope.querySelectorAll<HTMLElement>(MENUITEM_SELECTOR),
+    ).filter((el) => el.closest("[popover]") === scope);
+    if (items.length === 0) return;
+    const currentIndex = items.indexOf(document.activeElement as HTMLElement);
+
+    let nextIndex: number | null = null;
+    if (event.key === "ArrowDown") {
+      nextIndex = (currentIndex + 1) % items.length;
+    } else if (event.key === "ArrowUp") {
+      nextIndex = currentIndex <= 0 ? items.length - 1 : currentIndex - 1;
+    } else if (event.key === "Home") {
+      nextIndex = 0;
+    } else if (event.key === "End") {
+      nextIndex = items.length - 1;
+    }
+
+    if (nextIndex !== null) {
+      event.preventDefault();
+      items[nextIndex].focus();
+      return;
+    }
+
+    if (event.key === "Enter" || event.key === " ") {
+      if (currentIndex < 0) return;
+      event.preventDefault();
+      items[currentIndex].click();
+      return;
+    }
+
+    if (event.key === "Escape") {
+      event.preventDefault();
+      setOpen(false);
+      triggerRef.current?.focus();
+    }
+  };
+
   const positionedStyle = position
     ? {
         position: "fixed" as const,
@@ -176,6 +224,7 @@ function ContextMenuContent({
     role: "menu" as const,
     popover: "auto" as const,
     style: positionedStyle,
+    onKeyDown: composeEventHandlers(onKeyDown, handleKeyDown),
   };
 
   if (asChild) {

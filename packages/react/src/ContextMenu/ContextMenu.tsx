@@ -9,6 +9,7 @@ import {
   useContextMenuContext,
 } from "./ContextMenuContext";
 import {
+  ContextMenuContentProps,
   ContextMenuRootProps,
   ContextMenuTriggerProps,
 } from "./types";
@@ -115,9 +116,80 @@ function ContextMenuTrigger({
 
 ContextMenuTrigger.displayName = "ContextMenuTrigger";
 
+/**
+ * The menu panel rendered with the native HTML
+ * [Popover API](https://developer.mozilla.org/en-US/docs/Web/API/Popover_API)
+ * (`popover="auto"`) — no portal, no floating-ui. The browser manages
+ * layering via the top layer and dispatches a light-dismiss on outside
+ * click and Escape in the light-dismiss flow.
+ *
+ * Renders a `<menu role="menu">` positioned at the pointer coordinates
+ * captured when the Trigger fired its `contextmenu` event. Pass `asChild`
+ * to render any element with menu semantics.
+ */
+function ContextMenuContent({
+  children,
+  style,
+  asChild = false,
+  ...rest
+}: ContextMenuContentProps) {
+  const { open, setOpen, position, contentId } = useContextMenuContext();
+  const menuRef = useRef<HTMLMenuElement | null>(null);
+
+  useEffect(() => {
+    const menu = menuRef.current!;
+    if (open) {
+      menu.showPopover();
+    } else {
+      try {
+        menu.hidePopover();
+      } catch {
+        // already hidden — no-op
+      }
+    }
+  }, [open]);
+
+  useEffect(() => {
+    const menu = menuRef.current!;
+    const handleToggle = (event: Event) => {
+      if ((event as ToggleEvent).newState === "closed") setOpen(false);
+    };
+    menu.addEventListener("toggle", handleToggle);
+    return () => menu.removeEventListener("toggle", handleToggle);
+  }, [setOpen]);
+
+  const positionedStyle = position
+    ? {
+        position: "fixed" as const,
+        left: position.x,
+        top: position.y,
+        margin: 0,
+        ...style,
+      }
+    : style;
+
+  const contentProps = {
+    ...rest,
+    ref: menuRef,
+    id: contentId,
+    role: "menu" as const,
+    popover: "auto" as const,
+    style: positionedStyle,
+  };
+
+  if (asChild) {
+    return <Slot {...contentProps}>{children}</Slot>;
+  }
+
+  return <menu {...contentProps}>{children}</menu>;
+}
+
+ContextMenuContent.displayName = "ContextMenuContent";
+
 type TContextMenuCompound = typeof ContextMenuRoot & {
   Root: typeof ContextMenuRoot;
   Trigger: typeof ContextMenuTrigger;
+  Content: typeof ContextMenuContent;
 };
 
 const ContextMenuCompound: TContextMenuCompound = Object.assign(
@@ -125,6 +197,7 @@ const ContextMenuCompound: TContextMenuCompound = Object.assign(
   {
     Root: ContextMenuRoot,
     Trigger: ContextMenuTrigger,
+    Content: ContextMenuContent,
   },
 );
 

@@ -26,3 +26,12 @@ export type ContextMenuTriggerProps = ComponentProps<"span"> & {
   asChild?: boolean;
   disabled?: boolean;
 };
+
+export type ContextMenuContentProps = Omit<
+  ComponentProps<"menu">,
+  "role" | "popover" | "id"
+> & {
+  children?: ReactNode;
+  ref?: Ref<HTMLMenuElement>;
+  asChild?: boolean;
+};

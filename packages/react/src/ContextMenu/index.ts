@@ -1,1 +1,1 @@
-export {};
+export { ContextMenu } from "./ContextMenu";

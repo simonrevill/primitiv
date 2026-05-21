@@ -9,6 +9,7 @@ import {
 } from "react";
 
 import { useCheckboxRoot } from "../Checkbox/hooks";
+import { useRadioGroupRoot } from "../RadioGroup/hooks";
 import { useControllableState } from "../hooks";
 import { Slot, composeEventHandlers } from "../Slot";
 
@@ -19,6 +20,7 @@ import {
 } from "./ContextMenuContext";
 import { ContextMenuGroupContext } from "./ContextMenuGroupContext";
 import { ContextMenuItemIndicatorContext } from "./ContextMenuItemIndicatorContext";
+import { ContextMenuRadioGroupContext } from "./ContextMenuRadioGroupContext";
 import {
   ContextMenuCheckboxItemProps,
   ContextMenuContentProps,
@@ -26,6 +28,8 @@ import {
   ContextMenuItemIndicatorProps,
   ContextMenuItemProps,
   ContextMenuLabelProps,
+  ContextMenuRadioGroupProps,
+  ContextMenuRadioItemProps,
   ContextMenuRootProps,
   ContextMenuSeparatorProps,
   ContextMenuTriggerProps,
@@ -550,6 +554,115 @@ function ContextMenuItemIndicator({
 
 ContextMenuItemIndicator.displayName = "ContextMenuItemIndicator";
 
+/**
+ * A single-selection group of menu items. Children must be
+ * {@link ContextMenuRadioItem | `ContextMenu.RadioItem`} elements. Renders a
+ * `<li role="group">` wrapping `<ul role="none">`.
+ */
+function ContextMenuRadioGroup({
+  defaultValue,
+  value: controlledValue,
+  onValueChange,
+  children,
+  asChild = false,
+  ...rest
+}: ContextMenuRadioGroupProps) {
+  const { value, select } = useRadioGroupRoot({
+    defaultValue,
+    value: controlledValue,
+    onValueChange,
+  });
+  const contextValue = useMemo(() => ({ value, select }), [value, select]);
+  const groupProps = { ...rest, role: "group" as const };
+
+  return (
+    <ContextMenuRadioGroupContext.Provider value={contextValue}>
+      {asChild ? (
+        <Slot {...groupProps}>{children}</Slot>
+      ) : (
+        <li {...groupProps}>
+          <ul role="none">{children}</ul>
+        </li>
+      )}
+    </ContextMenuRadioGroupContext.Provider>
+  );
+}
+
+ContextMenuRadioGroup.displayName = "ContextMenuRadioGroup";
+
+/**
+ * A single radio choice. Must be rendered inside a {@link ContextMenuRadioGroup |
+ * `ContextMenu.RadioGroup`}; rendering it outside one throws a descriptive
+ * error.
+ *
+ * Renders a `<li role="menuitemradio">` with `aria-checked` reflecting whether
+ * this item's `value` matches the group's active value.
+ *
+ * Activation (click) selects this item, updating the group's value, then fires
+ * {@link ContextMenuRadioItemProps.onSelect | `onSelect`} with a cancellable
+ * `Event`. Call `event.preventDefault()` to keep the menu open.
+ */
+function ContextMenuRadioItem({
+  children,
+  onClick,
+  onSelect,
+  disabled,
+  value: itemValue,
+  asChild = false,
+  ...rest
+}: ContextMenuRadioItemProps) {
+  const { setOpen } = useContextMenuContext();
+  const [highlighted, setHighlighted] = useState(false);
+  const group = useContext(ContextMenuRadioGroupContext);
+  if (!group) {
+    throw new Error(
+      "ContextMenu.RadioItem must be rendered inside a <ContextMenu.RadioGroup>.",
+    );
+  }
+  const checked = group.value === itemValue;
+
+  const handleClick = () => {
+    if (disabled) return;
+    group.select(itemValue);
+    const event = new Event("contextmenu.select", { cancelable: true });
+    onSelect?.(event);
+    if (!event.defaultPrevented) {
+      setOpen(false);
+    }
+  };
+
+  const itemProps = {
+    ...rest,
+    role: "menuitemradio" as const,
+    tabIndex: -1,
+    "aria-checked": checked,
+    "aria-disabled": disabled || undefined,
+    "data-highlighted": highlighted ? "" : undefined,
+    onClick: composeEventHandlers(onClick, handleClick),
+    onMouseEnter: composeEventHandlers(rest.onMouseEnter, () =>
+      setHighlighted(true),
+    ),
+    onMouseLeave: composeEventHandlers(rest.onMouseLeave, () =>
+      setHighlighted(false),
+    ),
+  };
+
+  const indicatorContextValue = useMemo(() => ({ checked }), [checked]);
+  const content = asChild ? (
+    <Slot {...itemProps}>{children}</Slot>
+  ) : (
+    <li {...itemProps}>{children}</li>
+  );
+
+  return (
+    <ContextMenuItemIndicatorContext.Provider value={indicatorContextValue}>
+      {content}
+    </ContextMenuItemIndicatorContext.Provider>
+  );
+}
+
+ContextMenuRadioItem.displayName = "ContextMenuRadioItem";
+
 type TContextMenuCompound = typeof ContextMenuRoot & {
   Root: typeof ContextMenuRoot;
   Trigger: typeof ContextMenuTrigger;
@@ -560,6 +673,8 @@ type TContextMenuCompound = typeof ContextMenuRoot & {
   Label: typeof ContextMenuLabel;
   CheckboxItem: typeof ContextMenuCheckboxItem;
   ItemIndicator: typeof ContextMenuItemIndicator;
+  RadioGroup: typeof ContextMenuRadioGroup;
+  RadioItem: typeof ContextMenuRadioItem;
 };
 
 const ContextMenuCompound: TContextMenuCompound = Object.assign(
@@ -574,6 +689,8 @@ const ContextMenuCompound: TContextMenuCompound = Object.assign(
     Label: ContextMenuLabel,
     CheckboxItem: ContextMenuCheckboxItem,
     ItemIndicator: ContextMenuItemIndicator,
+    RadioGroup: ContextMenuRadioGroup,
+    RadioItem: ContextMenuRadioItem,
   },
 );
 

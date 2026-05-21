@@ -115,3 +115,38 @@ export type ContextMenuItemIndicatorProps = ComponentProps<"span"> & {
    */
   forceMount?: boolean;
 };
+
+type ContextMenuRadioGroupBaseProps = Omit<ComponentProps<"li">, "role"> & {
+  children?: ReactNode;
+  ref?: Ref<HTMLLIElement>;
+  asChild?: boolean;
+};
+
+type ContextMenuRadioGroupUncontrolledProps =
+  ContextMenuRadioGroupBaseProps & {
+    defaultValue?: string;
+    value?: never;
+    onValueChange?: (value: string) => void;
+  };
+
+type ContextMenuRadioGroupControlledProps = ContextMenuRadioGroupBaseProps & {
+  defaultValue?: never;
+  value: string;
+  onValueChange: (value: string) => void;
+};
+
+export type ContextMenuRadioGroupProps =
+  | ContextMenuRadioGroupUncontrolledProps
+  | ContextMenuRadioGroupControlledProps;
+
+export type ContextMenuRadioItemProps = Omit<
+  ComponentProps<"li">,
+  "role" | "tabIndex" | "aria-checked" | "onSelect"
+> & {
+  children?: ReactNode;
+  ref?: Ref<HTMLLIElement>;
+  asChild?: boolean;
+  disabled?: boolean;
+  value: string;
+  onSelect?: (event: Event) => void;
+};

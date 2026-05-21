@@ -307,6 +307,16 @@ function ContextMenuContent({
   const closeOpenSubRef = useRef<(() => void) | null>(null);
   const contentContextValue = useMemo(() => ({ closeOpenSubRef }), []);
 
+  // Cascade-close: when our own popover closes, also close any registered
+  // direct-child sub so its state doesn't leak into the next open. Without
+  // this, clicking an item inside a SubContent closes Root but leaves the
+  // child Sub.open=true, which then briefly drives a stale popover render
+  // the next time the menu opens. Each SubContent runs the same cascade
+  // against its own child sub, so the chain unwinds bottom-up.
+  useEffect(() => {
+    if (!open) closeOpenSubRef.current?.();
+  }, [open]);
+
   const contentProps = {
     ...rest,
     ref: menuRef,
@@ -888,6 +898,11 @@ function ContextMenuSubContent({
 
   const closeOpenSubRef = useRef<(() => void) | null>(null);
   const contentContextValue = useMemo(() => ({ closeOpenSubRef }), []);
+
+  // Cascade-close — see the matching effect on ContextMenuContent.
+  useEffect(() => {
+    if (!sub.open) closeOpenSubRef.current?.();
+  }, [sub.open]);
 
   const subContentProps = {
     ...rest,

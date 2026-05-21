@@ -27,25 +27,6 @@ export type VariableSummary = {
   valuesByMode: Record<string, unknown>
 }
 
-/** One variable the migration would create inside Semantic. */
-export type PlannedVariable = {
-  name: string
-  resolvedType: FigmaResolvedType
-  sourceVariableId: string
-  sourceCollectionId: string
-}
-
-/** The plan computed for a Typography → Semantic migration. */
-export type MigrationPlan = {
-  semantic: {
-    needsCreate: boolean
-    existingId?: string
-    modeName: string
-  }
-  newVariables: PlannedVariable[]
-  deletedCollectionIds: string[]
-}
-
 /** A message posted from the sandbox to the UI. */
 export type SandboxMessage =
   | { type: 'plugin-ready'; pageName: string }
@@ -59,14 +40,10 @@ export type SandboxMessage =
       collections: CollectionSummary[]
       variables: VariableSummary[]
     }
-  | { type: 'migrate-preview-result'; plan: MigrationPlan }
-  | { type: 'migrate-execute-result'; success: boolean; error?: string }
 
 /** A message posted from the UI back to the sandbox. */
 export type UiMessage =
   | { type: 'ui-ready' }
   | { type: 'inspect-variables-request' }
   | { type: 'export-tokens-request' }
-  | { type: 'migrate-preview-request' }
-  | { type: 'migrate-execute-request' }
   | { type: 'close' }

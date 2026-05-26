@@ -231,6 +231,8 @@ function routeCollection(name: string): Routing {
   if (name === 'Primitives') return { file: 'primitives', prefix: [] }
   if (name === 'Semantic') return { file: 'semantic', prefix: [] }
   if (name === 'Components') return { file: 'components', prefix: [] }
+  if (name === 'Interaction')
+    return { file: 'semantic', prefix: ['interaction'] }
   const ctx = name.match(/^Context\s*\/\s*(.+)$/)
   if (ctx) {
     return { file: 'semantic', prefix: ['context', ctx[1].toLowerCase()] }

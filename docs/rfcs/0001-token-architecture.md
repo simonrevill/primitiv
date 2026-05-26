@@ -555,12 +555,18 @@ Centralised state modifiers and focus geometry. Lives once, applied
 everywhere.
 
 ```
-interaction.hover.opacity         0.92
-interaction.active.opacity        0.84
-interaction.disabled.opacity      0.40
-interaction.focus.ring.width      2
-interaction.focus.ring.offset     2
+interaction.hover.opacity         {opacity.90}        ← 0.90
+interaction.active.opacity        {opacity.80}        ← 0.80
+interaction.disabled.opacity      {opacity.40}        ← 0.40
+interaction.focus.ring.width      {border-width.2}    ← 2
+interaction.focus.ring.offset     {border-width.2}    ← 2
 ```
+
+Each interaction variable is a Figma alias into Primitives — the layer
+stays strict (no raw values outside primitives). The numeric values land
+on the regular `opacity.{10..100}` and `border-width.{0..8}` scales;
+extending those scales (e.g. `opacity.92` for a perceptually-tuned
+hover) is a primitive-side decision, not an interaction-layer one.
 
 **Implication for `components.json` today:** the per‑variant `disabled`
 colour entries that currently restate the default colour

@@ -89,6 +89,7 @@ Collection names are matched **literally** by `routeCollection`:
 | `Semantic` | `semantic.json` | `[]` |
 | `Components` | `components.json` | `[]` |
 | `Context / <name>` | `semantic.json` | `['context', '<name lower>']` |
+| `Interaction` | `semantic.json` | `['interaction']` |
 | anything else | **throws** `Unrecognised collection name: <name>` |
 
 The Context prefix is regex-matched (`/^Context\s*\/\s*(.+)$/`) so the

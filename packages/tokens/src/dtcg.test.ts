@@ -421,6 +421,40 @@ describe('figmaVarsToDtcg', () => {
     })
   })
 
+  it('routes an Interaction variable into semantic under interaction.*', () => {
+    const INTERACTION_COLL: FigmaCollection = {
+      id: 'ci',
+      name: 'Interaction',
+      modes: [{ modeId: 'mi', name: 'Value' }],
+      defaultModeId: 'mi',
+    }
+
+    const result = figmaVarsToDtcg(
+      [INTERACTION_COLL],
+      [
+        {
+          id: 'v1',
+          name: 'hover/opacity',
+          resolvedType: 'FLOAT',
+          variableCollectionId: 'ci',
+          valuesByMode: { mi: 0.9 },
+        },
+        {
+          id: 'v2',
+          name: 'focus/ring/width',
+          resolvedType: 'FLOAT',
+          variableCollectionId: 'ci',
+          valuesByMode: { mi: 2 },
+        },
+      ],
+    )
+
+    expect(result.semantic.interaction).toEqual({
+      hover: { opacity: { $type: 'number', $value: 0.9 } },
+      focus: { ring: { width: { $type: 'number', $value: 2 } } },
+    })
+  })
+
   it('routes a Components variable into components without a prefix', () => {
     const result = figmaVarsToDtcg(
       [COMPONENTS_COLL],

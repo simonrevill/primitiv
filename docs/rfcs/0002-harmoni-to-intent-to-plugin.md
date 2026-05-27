@@ -334,9 +334,10 @@ Commits `5aa9fcc`, `1237f21`, `ff12824` on `main`. Three TDD cycles:
    created, 8 danger warnings (the 2 danger foreground variables alias into
    `color/neutral/*` and created successfully; only the 8 background/border
    danger variables need the missing `color/danger/light/*` ramp).
-2. Verify aliases propagate: change a palette variable → intent layer reflects it.
-3. Run **Export tokens** to confirm `dtcg.ts` picks up `Intent / Light` and routes
-   it to `semantic.json`.
+2. ✅ Alias propagation verified in Figma — changing a palette variable propagates
+   through the intent layer immediately.
+3. ✅ Export tokens confirmed — `dtcg.ts` routes `Intent / Light` to
+   `semantic.color.*` in `semantic.json`. (Routing case added in commit `29832e4`.)
 
 ---
 

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { RampData, UiMessage } from "../shared/messages";
 import { Palette } from "./Palette";
 import { useColors } from "./useColors";
@@ -21,6 +22,8 @@ function stepLabel(index: number): string {
 }
 
 export function ColorEngine() {
+  const [rampName, setRampName] = useState("brand");
+
   const {
     wasmReady,
     neutralWhite,
@@ -56,7 +59,7 @@ export function ColorEngine() {
 
     if (brand.lightPalette?.swatches) {
       ramps.push({
-        name: "brand/light",
+        name: `${rampName}/light`,
         swatches: brand.lightPalette.swatches.map((s, i) => ({
           step: stepLabel(i),
           rgba: oklchToRgba(s.oklch),
@@ -66,7 +69,7 @@ export function ColorEngine() {
 
     if (brand.darkPalette?.swatches) {
       ramps.push({
-        name: "brand/dark",
+        name: `${rampName}/dark`,
         swatches: brand.darkPalette.swatches.map((s, i) => ({
           step: stepLabel(i),
           rgba: oklchToRgba(s.oklch),
@@ -193,6 +196,14 @@ export function ColorEngine() {
       </section>
 
       <section className="color-engine__actions">
+        <label>
+          Ramp name
+          <input
+            type="text"
+            value={rampName}
+            onChange={(e) => setRampName(e.target.value)}
+          />
+        </label>
         <button type="button" onClick={handleApply} disabled={!wasmReady}>
           Apply to Figma
         </button>

@@ -943,18 +943,22 @@ Reality vs the plan above. Updated as work lands.
 | Phase | State |
 | --- | --- |
 | **0** Paper validation | ✅ Done in‑chat. |
-| **1** Foundations | Partial. ✅ `Context / Comfortable` with the full §5 typography roles **and all four** §6 anatomy patterns (framed‑control, label‑control, nav‑item, container) — overshooting the original Phase 1 scope of framed‑control‑only. ✅ `font-style/*` STRING primitive group + bound `fontStyle` on every text style; §15.11 item 3 closed. ⬜ `Intent / Light` deferred (waits on Harmoni — §13.5). ⬜ `Interaction` collection not authored; Button states wait on this. |
-| **2** The Button | ✅ Single Button component set in Figma with `variant × size × context` variant properties (6 × 5 × 4 = 120 cells). Every dimension bound: height, padding‑inline, gap, corner radii, icon width/height — all resolving through the active context's `framed-control/<size>/*`. Text style binds to `<Ctx> / Label / <size>`. Component properties expose the icon slots (toggle + swap) and the label text. Per‑variant colours wired to existing primitives (gold/red/grey) pending the intent layer; demo set on the **Button — Context Demo** page renders all 120 cells. ⬜ States (hover / active / focus / disabled) and focus‑ring geometry (§8) deferred until the Interaction collection lands. |
+| **1** Foundations | Partial. ✅ `Context / Comfortable` with the full §5 typography roles **and all four** §6 anatomy patterns (framed‑control, label‑control, nav‑item, container) — overshooting the original Phase 1 scope of framed‑control‑only. ✅ `font-style/*` STRING primitive group + bound `fontStyle` on every text style; §15.11 item 3 closed. ✅ `Interaction` collection authored via the new `Bootstrap interaction` plugin action — five FLOAT variables (`hover/opacity`, `active/opacity`, `disabled/opacity`, `focus/ring/width`, `focus/ring/offset`) aliased into the existing `opacity/*` and `border-width/*` primitives per §8. ⬜ `Intent / Light` deferred — see RFC 0002 for the Harmoni prototype path that unblocks this. |
+| **2** The Button | ✅ Single Button component set in Figma with `variant × size × context` variant properties (6 × 5 × 4 = 120 cells). Every dimension bound: height, padding‑inline, gap, corner radii, icon width/height — all resolving through the active context's `framed-control/<size>/*`. Text style binds to `<Ctx> / Label / <size>`. Component properties expose the icon slots (toggle + swap) and the label text. Per‑variant colours wired to existing primitives (gold/red/grey) pending the intent layer; demo set on the **Button — Context Demo** page renders all 120 cells. ⬜ States (hover / active / focus / disabled) and focus‑ring geometry (§8) deferred to the post‑Harmoni Button rebuild (RFC 0002 Phase C), so the rebuild can land states and intent‑backed colours in one cycle rather than two. |
 | **3** Repo sync | ✅ Complete. `Context / X` routing in `dtcg.ts` and tests; `semantic.context.{comfortable,compact,spacious,dense}.*` exported; short‑form alias synthesis (§10.3 step 3) emits `semantic.typography.*` and `semantic.anatomy.*` as DTCG aliases pointing at the default (`comfortable`) context; `Typography / X` route retired (§10.3 step 5) — `routeCollection` now throws on the legacy name, Figma‑side cleanup is the user's follow‑up; `space` vs `size` decision (§11 step 10) resolved as "keep both, divergent purpose". |
 | **4** Other three contexts | ✅ Compact, Spacious, Dense all populated via the `Bootstrap context` action; ✅ Button consumes all four through its `context` variant property. |
 | **5** Harmoni → intent | ⬜ Waiting on the Harmoni ramp prototype. |
 | **6, 7** | ⬜ Untouched. |
 
-**Next live cycle** — Phase 3 is complete. Remaining v1 authoring
-work, in order: author the `Interaction` collection (§11 Phase 1
-step 4) and then add states (hover / active / focus / disabled) to
-the Button (§9, §8) so it can finally consume the interaction
-overlays and focus geometry.
+**Next live cycle** — All token-architecture work that can land
+without the Harmoni engine is done. The forward path is now
+described in **RFC 0002 — Harmoni → Intent → Plugin**: a throwaway
+prototype port of the workbench `ColorEngine` into the harmoni
+plugin to produce live Figma variable ramps (Phase A), wiring those
+ramps into the `Intent / Light` collection to complete Phase 5
+above (Phase B), then a TDD-driven plugin rebuild (Phase C) which
+will also rebuild the Button with hover/active/focus/disabled
+states and intent-backed colours in one cycle.
 
 ---
 

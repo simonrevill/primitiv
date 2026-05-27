@@ -50,6 +50,32 @@ export type DtcgFiles = {
 /** Where a Figma collection lands in the DTCG output. */
 type Routing = { file: keyof DtcgFiles; prefix: string[] }
 
+/**
+ * The v1 default context whose values back the short-form alias layer
+ * (`semantic.typography.*`, `semantic.anatomy.*`). Changing this is the
+ * one-line switch for the default — components keep referencing the
+ * short-form names.
+ */
+const DEFAULT_CONTEXT = 'comfortable'
+
+/** Typography roles per RFC 0001 §5.1. Routed under `semantic.typography.*`. */
+const TYPOGRAPHY_ROLES = [
+  'label',
+  'body',
+  'heading',
+  'display',
+  'overline',
+  'mono',
+]
+
+/** Anatomy patterns per RFC 0001 §6.1. Routed under `semantic.anatomy.*`. */
+const ANATOMY_PATTERNS = [
+  'framed-control',
+  'label-control',
+  'nav-item',
+  'container',
+]
+
 /** Resolves a Figma variable id to the DTCG path segments of its token. */
 export type AliasResolver = (variableId: string) => string[]
 
@@ -89,10 +115,10 @@ export function collectionToDtcg(
  * Builds the three DTCG output groups from a whole Figma export.
  *
  * Each collection is routed to one of `primitives` / `semantic` /
- * `components` with an optional path prefix. The Typography variants
- * (`Typography / Compact` etc.) fold into `semantic.typography.<variant>`
- * so the output shape stays identical before and after the
- * Typography → Semantic migration.
+ * `components` with an optional path prefix. `Context / <name>` collections
+ * fold into `semantic.context.<name>`, and the short-form alias layer
+ * (`semantic.typography.*`, `semantic.anatomy.*`) is synthesised at the
+ * end of the transform from the default context.
  *
  * A master alias resolver knows the full DTCG path of every variable in
  * the payload (prefix + name), so cross-collection aliases produce the
@@ -132,17 +158,81 @@ export function figmaVarsToDtcg(
     mergeIntoPrefix(files[routing.file], routing.prefix, group)
   }
 
+  synthesiseShortFormAliases(files.semantic)
+
   return files
+}
+
+/**
+ * Emits `semantic.typography.*` and `semantic.anatomy.*` as DTCG aliases
+ * pointing at the default context's typography roles and anatomy patterns.
+ * Components consume the short forms so they stay context-agnostic;
+ * switching the default is changing {@link DEFAULT_CONTEXT}.
+ */
+function synthesiseShortFormAliases(semantic: DtcgGroup): void {
+  const contextRoot = semantic.context as DtcgGroup | undefined
+  if (!contextRoot) return
+  const defaultCtx = contextRoot[DEFAULT_CONTEXT] as DtcgGroup | undefined
+  if (!defaultCtx) return
+
+  for (const [key, value] of Object.entries(defaultCtx)) {
+    if (TYPOGRAPHY_ROLES.includes(key)) {
+      const typography = ensureGroup(semantic, 'typography')
+      typography[key] = aliasGroup(value as DtcgGroup, [
+        'context',
+        DEFAULT_CONTEXT,
+        key,
+      ])
+    } else if (ANATOMY_PATTERNS.includes(key)) {
+      const anatomy = ensureGroup(semantic, 'anatomy')
+      anatomy[key] = aliasGroup(value as DtcgGroup, [
+        'context',
+        DEFAULT_CONTEXT,
+        key,
+      ])
+    }
+  }
+}
+
+function ensureGroup(parent: DtcgGroup, key: string): DtcgGroup {
+  let existing = parent[key] as DtcgGroup | undefined
+  if (!existing) {
+    existing = {}
+    parent[key] = existing
+  }
+  return existing
+}
+
+function aliasGroup(source: DtcgGroup, sourcePath: string[]): DtcgGroup {
+  const result: DtcgGroup = {}
+  for (const [key, value] of Object.entries(source)) {
+    if (isDtcgToken(value)) {
+      result[key] = {
+        $type: value.$type,
+        $value: `{${[...sourcePath, key].join('.')}}`,
+      }
+    } else {
+      result[key] = aliasGroup(value as DtcgGroup, [...sourcePath, key])
+    }
+  }
+  return result
+}
+
+function isDtcgToken(value: unknown): value is DtcgToken {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    '$type' in value &&
+    '$value' in value
+  )
 }
 
 function routeCollection(name: string): Routing {
   if (name === 'Primitives') return { file: 'primitives', prefix: [] }
   if (name === 'Semantic') return { file: 'semantic', prefix: [] }
   if (name === 'Components') return { file: 'components', prefix: [] }
-  const typo = name.match(/^Typography\s*\/\s*(.+)$/)
-  if (typo) {
-    return { file: 'semantic', prefix: ['typography', typo[1].toLowerCase()] }
-  }
+  if (name === 'Interaction')
+    return { file: 'semantic', prefix: ['interaction'] }
   const ctx = name.match(/^Context\s*\/\s*(.+)$/)
   if (ctx) {
     return { file: 'semantic', prefix: ['context', ctx[1].toLowerCase()] }

@@ -185,12 +185,15 @@ enforced socially today; it should be enforced by the architecture).
 
 ### 3.2 Changes
 
-1. **Deduplicate `space` and `size`.** They are identical scales with
-   identical values. Pick one. Recommendation: keep `size` for raw
-   dimension values (control heights, icon sizes, max‑widths) and keep
-   `space` for layout gaps and paddings, **and let them diverge** as
-   needed — but they must not be silent mirrors of each other. If they
-   stay equal, fold one into the other now.
+1. **`space` and `size` — resolved: keep both, divergent purpose.**
+   The two scales currently share identical numeric values but carry
+   distinct semantic roles: `size.*` backs raw dimensions (control
+   heights, icon sizes, max-widths) and `space.*` backs layout
+   (padding-inline / padding-block / gap). The anatomy aliases in the
+   `Bootstrap context` plugin action already follow this split — every
+   `height` / `icon-size` aliases into `size/*`, every padding / gap
+   aliases into `space/*`. They are free to diverge in future without
+   any consumer change; the alias targets are already correct.
 
 2. **Remove the gold/red specific naming from intent‑adjacent consumers.**
    Primitives keep their palette identity (`color.gold.500`), but every
@@ -552,12 +555,18 @@ Centralised state modifiers and focus geometry. Lives once, applied
 everywhere.
 
 ```
-interaction.hover.opacity         0.92
-interaction.active.opacity        0.84
-interaction.disabled.opacity      0.40
-interaction.focus.ring.width      2
-interaction.focus.ring.offset     2
+interaction.hover.opacity         {opacity.90}        ← 0.90
+interaction.active.opacity        {opacity.80}        ← 0.80
+interaction.disabled.opacity      {opacity.40}        ← 0.40
+interaction.focus.ring.width      {border-width.2}    ← 2
+interaction.focus.ring.offset     {border-width.2}    ← 2
 ```
+
+Each interaction variable is a Figma alias into Primitives — the layer
+stays strict (no raw values outside primitives). The numeric values land
+on the regular `opacity.{10..100}` and `border-width.{0..8}` scales;
+extending those scales (e.g. `opacity.92` for a perceptually-tuned
+hover) is a primitive-side decision, not an interaction-layer one.
 
 **Implication for `components.json` today:** the per‑variant `disabled`
 colour entries that currently restate the default colour
@@ -875,10 +884,13 @@ reversible.
 9. **Re‑sync from Figma** end‑to‑end. The new `semantic.json` and
    `components.json` reflect Phase 1–2 authoring. Commit the
    regenerated JSON as the v2 backup baseline.
-10. **Decide `space` vs `size`** in `primitives.json`. Either delete
-    one or document the divergent purpose. This is the only Phase 3
-    edit made directly in JSON; it is a primitive cleanup and doesn't
-    affect Figma.
+10. **Decide `space` vs `size` — resolved: keep both, divergent
+    purpose.** See §3.2 item 1. The Figma collections and JSON
+    snapshot are already aligned: `size.*` and `space.*` carry equal
+    values for now but are aliased into distinct anatomy slots
+    (`height` / `icon-size` → `size`, padding / gap → `space`).
+    Future divergence in values is a single Figma edit, not a
+    structural change.
 
 ### Phase 4 — Figma authoring: the other three contexts
 
@@ -931,17 +943,22 @@ Reality vs the plan above. Updated as work lands.
 | Phase | State |
 | --- | --- |
 | **0** Paper validation | ✅ Done in‑chat. |
-| **1** Foundations | Partial. ✅ `Context / Comfortable` with the full §5 typography roles **and all four** §6 anatomy patterns (framed‑control, label‑control, nav‑item, container) — overshooting the original Phase 1 scope of framed‑control‑only. ✅ `font-style/*` STRING primitive group + bound `fontStyle` on every text style; §15.11 item 3 closed. ⬜ `Intent / Light` deferred (waits on Harmoni — §13.5). ⬜ `Interaction` collection not authored; Button states wait on this. |
-| **2** The Button | ✅ Single Button component set in Figma with `variant × size × context` variant properties (6 × 5 × 4 = 120 cells). Every dimension bound: height, padding‑inline, gap, corner radii, icon width/height — all resolving through the active context's `framed-control/<size>/*`. Text style binds to `<Ctx> / Label / <size>`. Component properties expose the icon slots (toggle + swap) and the label text. Per‑variant colours wired to existing primitives (gold/red/grey) pending the intent layer; demo set on the **Button — Context Demo** page renders all 120 cells. ⬜ States (hover / active / focus / disabled) and focus‑ring geometry (§8) deferred until the Interaction collection lands. |
-| **3** Repo sync | Partial. ✅ `Context / X` routing in `dtcg.ts` and tests; ✅ `semantic.context.{comfortable,compact,spacious,dense}.*` exported. ⬜ Short‑form alias synthesis (§10.3 step 3) — the next live step. ⬜ `Typography / X` route retirement (§10.3 step 5). ⬜ `space` vs `size` decision (§11 step 10). |
+| **1** Foundations | Partial. ✅ `Context / Comfortable` with the full §5 typography roles **and all four** §6 anatomy patterns (framed‑control, label‑control, nav‑item, container) — overshooting the original Phase 1 scope of framed‑control‑only. ✅ `font-style/*` STRING primitive group + bound `fontStyle` on every text style; §15.11 item 3 closed. ✅ `Interaction` collection authored via the new `Bootstrap interaction` plugin action — five FLOAT variables (`hover/opacity`, `active/opacity`, `disabled/opacity`, `focus/ring/width`, `focus/ring/offset`) aliased into the existing `opacity/*` and `border-width/*` primitives per §8. ⬜ `Intent / Light` deferred — see RFC 0002 for the Harmoni prototype path that unblocks this. |
+| **2** The Button | ✅ Single Button component set in Figma with `variant × size × context` variant properties (6 × 5 × 4 = 120 cells). Every dimension bound: height, padding‑inline, gap, corner radii, icon width/height — all resolving through the active context's `framed-control/<size>/*`. Text style binds to `<Ctx> / Label / <size>`. Component properties expose the icon slots (toggle + swap) and the label text. Per‑variant colours wired to existing primitives (gold/red/grey) pending the intent layer; demo set on the **Button — Context Demo** page renders all 120 cells. ⬜ States (hover / active / focus / disabled) and focus‑ring geometry (§8) deferred to the post‑Harmoni Button rebuild (RFC 0002 Phase C), so the rebuild can land states and intent‑backed colours in one cycle rather than two. |
+| **3** Repo sync | ✅ Complete. `Context / X` routing in `dtcg.ts` and tests; `semantic.context.{comfortable,compact,spacious,dense}.*` exported; short‑form alias synthesis (§10.3 step 3) emits `semantic.typography.*` and `semantic.anatomy.*` as DTCG aliases pointing at the default (`comfortable`) context; `Typography / X` route retired (§10.3 step 5) — `routeCollection` now throws on the legacy name, Figma‑side cleanup is the user's follow‑up; `space` vs `size` decision (§11 step 10) resolved as "keep both, divergent purpose". |
 | **4** Other three contexts | ✅ Compact, Spacious, Dense all populated via the `Bootstrap context` action; ✅ Button consumes all four through its `context` variant property. |
 | **5** Harmoni → intent | ⬜ Waiting on the Harmoni ramp prototype. |
 | **6, 7** | ⬜ Untouched. |
 
-**Next live cycle** — Phase 3 remaining work: synthesise the short‑form
-alias layer, retire the legacy Typography routes, decide `space` vs
-`size`, then author the Interaction collection so Button states can
-land.
+**Next live cycle** — All token-architecture work that can land
+without the Harmoni engine is done. The forward path is now
+described in **RFC 0002 — Harmoni → Intent → Plugin**: a throwaway
+prototype port of the workbench `ColorEngine` into the harmoni
+plugin to produce live Figma variable ramps (Phase A), wiring those
+ramps into the `Intent / Light` collection to complete Phase 5
+above (Phase B), then a TDD-driven plugin rebuild (Phase C) which
+will also rebuild the Button with hover/active/focus/disabled
+states and intent-backed colours in one cycle.
 
 ---
 

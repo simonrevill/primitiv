@@ -299,17 +299,11 @@ describe('figmaVarsToDtcg', () => {
     modes: [{ modeId: 'mp', name: 'Value' }],
     defaultModeId: 'mp',
   }
-  const COMPACT_COLL: FigmaCollection = {
-    id: 'cc',
-    name: 'Typography / Compact',
-    modes: [{ modeId: 'mc', name: 'Value' }],
-    defaultModeId: 'mc',
-  }
-  const COMFORTABLE_COLL: FigmaCollection = {
-    id: 'cf',
-    name: 'Typography / Comfortable',
-    modes: [{ modeId: 'mf', name: 'Value' }],
-    defaultModeId: 'mf',
+  const CONTEXT_COMPACT_COLL: FigmaCollection = {
+    id: 'cxc',
+    name: 'Context / Compact',
+    modes: [{ modeId: 'mxc', name: 'Value' }],
+    defaultModeId: 'mxc',
   }
   const COMPONENTS_COLL: FigmaCollection = {
     id: 'cmp',
@@ -353,55 +347,37 @@ describe('figmaVarsToDtcg', () => {
     expect(result.components).toEqual({})
   })
 
-  it('routes a Typography / Compact variable into semantic under typography.compact', () => {
-    const result = figmaVarsToDtcg(
-      [COMPACT_COLL],
-      [
-        {
-          id: 'v1',
-          name: 'display/xl/font-size',
-          resolvedType: 'FLOAT',
-          variableCollectionId: 'cc',
-          valuesByMode: { mc: 40 },
-        },
-      ],
-    )
+  it('merges multiple Context collections under the same context group', () => {
+    const CONTEXT_COMFORTABLE_COLL: FigmaCollection = {
+      id: 'cxf',
+      name: 'Context / Comfortable',
+      modes: [{ modeId: 'mxf', name: 'Value' }],
+      defaultModeId: 'mxf',
+    }
 
-    expect(result.semantic).toEqual({
-      typography: {
-        compact: {
-          display: {
-            xl: { 'font-size': { $type: 'number', $value: 40 } },
-          },
-        },
-      },
-    })
-  })
-
-  it('merges multiple Typography variants under the same typography group', () => {
     const result = figmaVarsToDtcg(
-      [COMPACT_COLL, COMFORTABLE_COLL],
+      [CONTEXT_COMPACT_COLL, CONTEXT_COMFORTABLE_COLL],
       [
         {
           id: 'vc',
-          name: 'display/xl/font-size',
+          name: 'label/md/font-size',
           resolvedType: 'FLOAT',
-          variableCollectionId: 'cc',
-          valuesByMode: { mc: 40 },
+          variableCollectionId: 'cxc',
+          valuesByMode: { mxc: 14 },
         },
         {
           id: 'vf',
-          name: 'display/xl/font-size',
+          name: 'label/md/font-size',
           resolvedType: 'FLOAT',
-          variableCollectionId: 'cf',
-          valuesByMode: { mf: 48 },
+          variableCollectionId: 'cxf',
+          valuesByMode: { mxf: 16 },
         },
       ],
     )
 
-    expect(result.semantic.typography).toEqual({
-      compact: { display: { xl: { 'font-size': { $type: 'number', $value: 40 } } } },
-      comfortable: { display: { xl: { 'font-size': { $type: 'number', $value: 48 } } } },
+    expect(result.semantic.context).toEqual({
+      compact: { label: { md: { 'font-size': { $type: 'number', $value: 14 } } } },
+      comfortable: { label: { md: { 'font-size': { $type: 'number', $value: 16 } } } },
     })
   })
 
@@ -433,17 +409,49 @@ describe('figmaVarsToDtcg', () => {
       ],
     )
 
-    expect(result.semantic).toEqual({
-      context: {
-        comfortable: {
-          label: {
-            md: { 'font-size': { $type: 'number', $value: 16 } },
-          },
-          'framed-control': {
-            md: { height: { $type: 'number', $value: 40 } },
-          },
+    expect(result.semantic.context).toEqual({
+      comfortable: {
+        label: {
+          md: { 'font-size': { $type: 'number', $value: 16 } },
+        },
+        'framed-control': {
+          md: { height: { $type: 'number', $value: 40 } },
         },
       },
+    })
+  })
+
+  it('routes an Interaction variable into semantic under interaction.*', () => {
+    const INTERACTION_COLL: FigmaCollection = {
+      id: 'ci',
+      name: 'Interaction',
+      modes: [{ modeId: 'mi', name: 'Value' }],
+      defaultModeId: 'mi',
+    }
+
+    const result = figmaVarsToDtcg(
+      [INTERACTION_COLL],
+      [
+        {
+          id: 'v1',
+          name: 'hover/opacity',
+          resolvedType: 'FLOAT',
+          variableCollectionId: 'ci',
+          valuesByMode: { mi: 0.9 },
+        },
+        {
+          id: 'v2',
+          name: 'focus/ring/width',
+          resolvedType: 'FLOAT',
+          variableCollectionId: 'ci',
+          valuesByMode: { mi: 2 },
+        },
+      ],
+    )
+
+    expect(result.semantic.interaction).toEqual({
+      hover: { opacity: { $type: 'number', $value: 0.9 } },
+      focus: { ring: { width: { $type: 'number', $value: 2 } } },
     })
   })
 
@@ -493,7 +501,7 @@ describe('figmaVarsToDtcg', () => {
 
   it('resolves a cross-collection alias to the target variable\'s full prefixed path', () => {
     const result = figmaVarsToDtcg(
-      [PRIMITIVES_COLL, COMPACT_COLL],
+      [PRIMITIVES_COLL, CONTEXT_COMPACT_COLL],
       [
         {
           id: 'pv1',
@@ -504,10 +512,10 @@ describe('figmaVarsToDtcg', () => {
         },
         {
           id: 'cv1',
-          name: 'display/xl/font-family',
+          name: 'label/md/font-family',
           resolvedType: 'STRING',
-          variableCollectionId: 'cc',
-          valuesByMode: { mc: { type: 'VARIABLE_ALIAS', id: 'pv1' } },
+          variableCollectionId: 'cxc',
+          valuesByMode: { mxc: { type: 'VARIABLE_ALIAS', id: 'pv1' } },
         },
       ],
     )
@@ -515,10 +523,10 @@ describe('figmaVarsToDtcg', () => {
     expect(result.primitives['font-family']).toEqual({
       sans: { $type: 'string', $value: 'Asta Sans' },
     })
-    expect(result.semantic.typography).toEqual({
+    expect(result.semantic.context).toEqual({
       compact: {
-        display: {
-          xl: {
+        label: {
+          md: {
             'font-family': {
               $type: 'string',
               $value: '{font-family.sans}',
@@ -529,16 +537,16 @@ describe('figmaVarsToDtcg', () => {
     })
   })
 
-  it('resolves an alias to a Typography variable using its semantic.* prefixed path', () => {
+  it('resolves an alias to a Context variable using its semantic.* prefixed path', () => {
     const result = figmaVarsToDtcg(
-      [COMPACT_COLL, COMPONENTS_COLL],
+      [CONTEXT_COMPACT_COLL, COMPONENTS_COLL],
       [
         {
           id: 'cv1',
-          name: 'display/xl/font-size',
+          name: 'label/md/font-size',
           resolvedType: 'FLOAT',
-          variableCollectionId: 'cc',
-          valuesByMode: { mc: 40 },
+          variableCollectionId: 'cxc',
+          valuesByMode: { mxc: 14 },
         },
         {
           id: 'cmpv1',
@@ -554,7 +562,7 @@ describe('figmaVarsToDtcg', () => {
       hero: {
         'font-size': {
           $type: 'number',
-          $value: '{typography.compact.display.xl.font-size}',
+          $value: '{context.compact.label.md.font-size}',
         },
       },
     })
@@ -610,5 +618,149 @@ describe('figmaVarsToDtcg', () => {
         [],
       ),
     ).toThrow(/Mystery/)
+  })
+
+  describe('short-form alias synthesis', () => {
+    const COMFORTABLE_CTX: FigmaCollection = {
+      id: 'cxf',
+      name: 'Context / Comfortable',
+      modes: [{ modeId: 'mxf', name: 'Mode 1' }],
+      defaultModeId: 'mxf',
+    }
+
+    it('emits semantic.typography.<role>.<tier>.<leaf> aliases pointing at the comfortable context', () => {
+      const result = figmaVarsToDtcg(
+        [COMFORTABLE_CTX],
+        [
+          {
+            id: 'v1',
+            name: 'label/md/font-size',
+            resolvedType: 'FLOAT',
+            variableCollectionId: 'cxf',
+            valuesByMode: { mxf: 16 },
+          },
+        ],
+      )
+
+      expect(result.semantic.typography).toEqual({
+        label: {
+          md: {
+            'font-size': {
+              $type: 'number',
+              $value: '{context.comfortable.label.md.font-size}',
+            },
+          },
+        },
+      })
+    })
+
+    it('groups multiple typography roles under a single typography alias parent', () => {
+      const result = figmaVarsToDtcg(
+        [COMFORTABLE_CTX],
+        [
+          {
+            id: 'v1',
+            name: 'label/md/font-size',
+            resolvedType: 'FLOAT',
+            variableCollectionId: 'cxf',
+            valuesByMode: { mxf: 16 },
+          },
+          {
+            id: 'v2',
+            name: 'body/md/font-size',
+            resolvedType: 'FLOAT',
+            variableCollectionId: 'cxf',
+            valuesByMode: { mxf: 14 },
+          },
+        ],
+      )
+
+      expect(result.semantic.typography).toEqual({
+        label: {
+          md: {
+            'font-size': {
+              $type: 'number',
+              $value: '{context.comfortable.label.md.font-size}',
+            },
+          },
+        },
+        body: {
+          md: {
+            'font-size': {
+              $type: 'number',
+              $value: '{context.comfortable.body.md.font-size}',
+            },
+          },
+        },
+      })
+    })
+
+    it('emits semantic.anatomy.<pattern>.<tier>.<leaf> aliases pointing at the comfortable context', () => {
+      const result = figmaVarsToDtcg(
+        [COMFORTABLE_CTX],
+        [
+          {
+            id: 'v1',
+            name: 'framed-control/md/height',
+            resolvedType: 'FLOAT',
+            variableCollectionId: 'cxf',
+            valuesByMode: { mxf: 40 },
+          },
+        ],
+      )
+
+      expect(result.semantic.anatomy).toEqual({
+        'framed-control': {
+          md: {
+            height: {
+              $type: 'number',
+              $value: '{context.comfortable.framed-control.md.height}',
+            },
+          },
+        },
+      })
+    })
+
+    it('ignores keys in the default context that are neither typography roles nor anatomy patterns', () => {
+      const result = figmaVarsToDtcg(
+        [COMFORTABLE_CTX],
+        [
+          {
+            id: 'v1',
+            name: 'mystery/md/foo',
+            resolvedType: 'STRING',
+            variableCollectionId: 'cxf',
+            valuesByMode: { mxf: 'bar' },
+          },
+        ],
+      )
+
+      expect(result.semantic.typography).toBeUndefined()
+      expect(result.semantic.anatomy).toBeUndefined()
+    })
+
+    it('synthesises nothing when the default context is absent', () => {
+      const compactOnly: FigmaCollection = {
+        ...COMFORTABLE_CTX,
+        id: 'cxc',
+        name: 'Context / Compact',
+      }
+
+      const result = figmaVarsToDtcg(
+        [compactOnly],
+        [
+          {
+            id: 'v1',
+            name: 'label/md/font-size',
+            resolvedType: 'FLOAT',
+            variableCollectionId: 'cxc',
+            valuesByMode: { mxf: 14 },
+          },
+        ],
+      )
+
+      expect(result.semantic.typography).toBeUndefined()
+      expect(result.semantic.anatomy).toBeUndefined()
+    })
   })
 })

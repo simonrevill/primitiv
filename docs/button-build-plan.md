@@ -33,11 +33,12 @@ The `color/danger/light/*` ramp does not yet exist in `Primitives / Palette`.
 Build it using the Harmoni plugin:
 
 1. Open the Harmoni plugin. Enter a red-spectrum brand colour (e.g. `#c0392b`
-   or your chosen danger hue) as the input.
-2. Generate the ramp and press **Apply**. This writes
-   `color/danger/light/50` through `color/danger/light/900` into
-   `Primitives / Palette`.
-3. Verify the variables appear in the Figma variables panel under
+   or your chosen danger hue) as the brand input.
+2. In the **Ramp name** field (in the actions area, above Apply), clear `brand`
+   and type `danger`.
+3. Press **Apply to Figma**. This writes `color/danger/light/50` through
+   `color/danger/light/900` into `Primitives / Palette`.
+4. Verify the variables appear in the Figma variables panel under
    `Primitives / Palette → color/danger/light/*`.
 
 ### 1.2 Wire Intent / Light danger tokens

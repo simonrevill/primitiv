@@ -584,12 +584,11 @@ that is an explicit override in the component layer (§8.5).
 
 ### 9.1 Variant inventory
 
-Six variants:
+Five variants (outline dropped — see decision record):
 
 ```
 primary       brand action, default CTA
 secondary     low‑emphasis, paired with primary
-outline       transparent with border
 ghost         transparent with no border, hover-only background
 danger        destructive actions
 link          text-only, inline-friendly
@@ -600,10 +599,18 @@ use it. Its anatomy still flows through `framed-control` (so a link
 button still has a hit area), but its background and border resolve to
 transparent in every state.
 
+**`outline` dropped.** A Figma proof-of-concept (RFC 0002 §4.6)
+revealed no meaningful visual distinction between `outline` and
+`secondary` across all context and size combinations. Decision: remove
+`outline` and treat `secondary` as the low-emphasis bordered variant.
+Any future need for a purely-bordered button is an escape-hatch
+override, not a new variant.
+
 ### 9.2 The Button token shape
 
-The Button has four axes: **variant × size × slot × state**. Density
-folds into context (§7), so it does not appear as a Button axis.
+The Button has four axes: **variant × size × context × state**. The
+context axis encodes density — selecting `dense`, `compact`, `comfortable`,
+or `spacious` picks both typography and anatomy dimensions in one choice.
 
 Per variant, the component tokens are pure references:
 
@@ -628,7 +635,7 @@ Per variant, the component tokens are pure references:
         "disabled": { "$value": "{color.action.primary.border.disabled}" }
       }
     },
-    /* secondary, outline, ghost, danger, link — same shape */
+    /* secondary, ghost, danger, link — same shape */
 
     "size": {
       "xs": {
@@ -944,7 +951,7 @@ Reality vs the plan above. Updated as work lands.
 | --- | --- |
 | **0** Paper validation | ✅ Done in‑chat. |
 | **1** Foundations | Partial. ✅ `Context / Comfortable` with the full §5 typography roles **and all four** §6 anatomy patterns (framed‑control, label‑control, nav‑item, container) — overshooting the original Phase 1 scope of framed‑control‑only. ✅ `font-style/*` STRING primitive group + bound `fontStyle` on every text style; §15.11 item 3 closed. ✅ `Interaction` collection authored via the new `Bootstrap interaction` plugin action — five FLOAT variables (`hover/opacity`, `active/opacity`, `disabled/opacity`, `focus/ring/width`, `focus/ring/offset`) aliased into the existing `opacity/*` and `border-width/*` primitives per §8. ⬜ `Intent / Light` deferred — see RFC 0002 for the Harmoni prototype path that unblocks this. |
-| **2** The Button | ✅ Single Button component set in Figma with `variant × size × context` variant properties (6 × 5 × 4 = 120 cells). Every dimension bound: height, padding‑inline, gap, corner radii, icon width/height — all resolving through the active context's `framed-control/<size>/*`. Text style binds to `<Ctx> / Label / <size>`. Component properties expose the icon slots (toggle + swap) and the label text. Per‑variant colours wired to existing primitives (gold/red/grey) pending the intent layer; demo set on the **Button — Context Demo** page renders all 120 cells. ⬜ States (hover / active / focus / disabled) and focus‑ring geometry (§8) deferred to the post‑Harmoni Button rebuild (RFC 0002 Phase C), so the rebuild can land states and intent‑backed colours in one cycle rather than two. |
+| **2** The Button | 🔶 Proof of concept complete (RFC 0002 §4.6). Single component set — `variant × size × context × state` (5 × 5 × 4 × 5 = 500 cells). All fills, strokes, and text colours bound to `Intent / Light` variables; dimensions resolved through `Context / *` anatomy tokens; focus ring implemented as layered DROP_SHADOW effects bound to `focus/ring` and `interaction.focus.ring.*` variables. Live cascade verified: changing the brand colour in `Primitives / Palette` propagates through `Intent / Light` → all primary-variant cells automatically. ⬜ **Real component** — rebuilding from the proof of concept with minor token tweaks and production-grade slot properties per the button-build-plan. Danger tokens still need a real ramp (`color/danger/light/*` in `Primitives / Palette`) before the danger variant resolves correctly. |
 | **3** Repo sync | ✅ Complete. `Context / X` routing in `dtcg.ts` and tests; `semantic.context.{comfortable,compact,spacious,dense}.*` exported; short‑form alias synthesis (§10.3 step 3) emits `semantic.typography.*` and `semantic.anatomy.*` as DTCG aliases pointing at the default (`comfortable`) context; `Typography / X` route retired (§10.3 step 5) — `routeCollection` now throws on the legacy name, Figma‑side cleanup is the user's follow‑up; `space` vs `size` decision (§11 step 10) resolved as "keep both, divergent purpose". |
 | **4** Other three contexts | ✅ Compact, Spacious, Dense all populated via the `Bootstrap context` action; ✅ Button consumes all four through its `context` variant property. |
 | **5** Harmoni → intent | 🔶 RFC 0002 Phase A complete (commit `05f9d17`): harmoni plugin produces `color/neutral/*`, `color/brand/light/*`, `color/brand/dark/*` variables in `Primitives / Palette`. Pending: Figma smoke-test (Apply + alias verification), then RFC 0002 Phase B wires the `Intent / Light` collection. |
@@ -1040,9 +1047,9 @@ To resolve in follow‑up RFCs or before Phase 2:
    targets. Lives in the Harmoni README, not here.
 6. **`mono` typography role.** Listed but unscaffolded. Add when first
    consumed (likely Code, Kbd, TabularNumber components).
-7. **Per‑variant border policy for `outline` and `ghost`.** Whether
-   `outline.border.hover` actually changes colour or just borrows a
-   background hover. Visual design call.
+7. **Per‑variant border policy for `outline` and `ghost` — resolved.**
+   `outline` variant dropped (see §9.1). `ghost` carries no border in
+   any state. No open question remains here.
 
 8. **A composition layer above components.** Components are
    context‑agnostic by design (§7.3, Shape B). Consumers (a dashboard
@@ -1063,14 +1070,12 @@ To resolve in follow‑up RFCs or before Phase 2:
    already true of the current files.
 
 10. **Figma Button authoring: one master with `context` variants, or
-    four masters? — Resolved: one master.** Shipped as a single
-    component set with `variant × size × context` variant properties
-    (6 × 5 × 4 = 120 cells). Component properties expose the leading
-    and trailing icon slots (instance‑swappable, individually
+    four masters? — Resolved: one master.** Proof-of-concept confirms
+    500 cells (5 variants × 5 sizes × 4 contexts × 5 states) is
+    tractable in Figma's variant panel. Component properties expose the
+    leading and trailing icon slots (instance‑swappable, individually
     toggleable) plus the label text as per‑instance overrides. The
-    cell count is tractable in Figma's variant panel today; revisit
-    the four‑masters split only if adding states pushes it past a
-    workable ceiling (states alone would take it to ~480 cells).
+    four‑masters split is not needed.
 
 ---
 

@@ -1,6 +1,6 @@
 # RFC 0002 — Harmoni → Intent → Plugin
 
-> **Status:** Phase B complete — Phase C next
+> **Status:** Phase B complete — Phase C in progress (proof of concept done, real component build next)
 > **Author:** simonrevill, with architectural review
 > **Date:** 2026-05-27
 > **Relates to:** RFC 0001 (Token Architecture), specifically §11 Phase 5
@@ -411,6 +411,61 @@ only file that survives unchanged.
 
 ---
 
+### 4.6 Phase C — Button proof of concept delivered 2026-05-27
+
+Before rebuilding the plugin, a Figma proof-of-concept Button was built
+to validate the end-to-end token chain and settle outstanding design
+decisions.
+
+**What was built:**
+
+- Button component set on the `Button — Context Demo` page (nodeId `341:4276`)
+  with **500 variants**: 5 variants × 5 sizes × 4 contexts × 5 interaction
+  states (default / hover / active / focus / disabled).
+- All fills and strokes bound to `Intent / Light` variables via
+  `figma.variables.setBoundVariableForPaint()`.
+- Focus ring implemented as **layered DROP_SHADOW effects** (not a child
+  rectangle, which interferes with auto-layout sizing):
+  - Shadow at index 0 (rendered behind): colour bound to `focus/ring` variable,
+    `spread = focus/ring/offset + focus/ring/width`, `radius = 0`.
+  - Shadow at index 1 (rendered on top): white (`r:1, g:1, b:1`),
+    `spread = focus/ring/offset`, `radius = 0`. Carves the visible gap.
+  - Figma's effect render order is the **inverse** of CSS box-shadow: higher
+    array index = on top.
+- All parent frames set `clipsContent = false` so shadows render outside bounds.
+- Ghost and link variants require an `opacity: 0.001` fill on the button frame
+  to activate Figma's drop-shadow rendering (Figma suppresses shadows on frames
+  with no fill and no stroke).
+- "Button — Interaction State Review" frame preserved on canvas for reference.
+
+**Decisions made:**
+
+- **`outline` variant dropped.** Visually indistinguishable from `secondary`
+  across all contexts and sizes. RFC 0001 §9.1 updated accordingly.
+- **500 cells is tractable** in Figma's variant panel. Four-masters split
+  (RFC 0001 §13 Q10) is confirmed unnecessary.
+
+**Live cascade verified:**
+
+The Harmoni plugin generated a new teal brand palette and applied it to
+`Primitives / Palette`. All primary-variant cells, link text, and focus rings
+updated automatically. Secondary, ghost, and danger held their own values.
+The three-tier alias chain — Component fill → Intent / Light → Primitives /
+Palette — is confirmed working end-to-end.
+
+**Remaining token gap before real Button build:**
+
+The danger variant currently uses placeholder tokens in the Components
+collection because `color/danger/light/*` does not yet exist in
+`Primitives / Palette`. Real Button build requires: (1) build the danger ramp
+in the Harmoni plugin, (2) wire `action/danger/*` in `Intent / Light` to the
+new ramp, (3) then rebuild the component with proper bindings.
+
+**Next step:** See `docs/button-build-plan.md` for the step-by-step authoring
+guide.
+
+---
+
 ## 5. Order of operations and dependencies
 
 ```
@@ -500,6 +555,10 @@ The non-negotiables this RFC commits to:
    boundary documented in the `figma-token-sync` skill moves
    accordingly.
 6. **The Button rebuild lives in Phase C.** RFC 0001 §8 / §9
-   states are not addressed before then.
+   states are not addressed before then. *Update (2026-05-27):* a
+   Figma proof-of-concept (§4.6) was built ahead of the plugin rebuild
+   to validate the token chain and settle design decisions. The real
+   component build follows the guide in `docs/button-build-plan.md`;
+   the plugin rebuild proceeds in parallel.
 
 End.

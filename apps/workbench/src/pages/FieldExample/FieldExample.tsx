@@ -49,7 +49,11 @@ export function FieldExample() {
           automatically picks up <code>aria-invalid="true"</code> and adds the
           error id to its <code>aria-describedby</code>.
         </p>
-        <form className="fl-example__form" onSubmit={handleSubmit}>
+        <form
+          className="fl-example__form"
+          onSubmit={handleSubmit}
+          noValidate
+        >
           <Field.Root className="fl-example__field" invalid={!!error}>
             <Field.Label className="fl-example__label">Email</Field.Label>
             <Input

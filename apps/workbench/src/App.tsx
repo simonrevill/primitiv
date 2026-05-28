@@ -20,6 +20,7 @@ import {
   EmptyStateExample,
   FieldsetExample,
   InputExample,
+  InputGroupExample,
   MillerColumnsExample,
   ModalExample,
   PortalExample,
@@ -55,6 +56,7 @@ const navGroups: { title: string; links: NavLink[] }[] = [
       { to: "/checkbox-card", label: "Checkbox Card" },
       { to: "/fieldset", label: "Fieldset" },
       { to: "/input", label: "Input" },
+      { to: "/input-group", label: "Input Group" },
       { to: "/radio-group", label: "Radio Group" },
       { to: "/radio-card", label: "Radio Card" },
       { to: "/select", label: "Select" },
@@ -187,6 +189,7 @@ function App() {
           <Route path="/empty-state" element={<EmptyStateExample />} />
           <Route path="/fieldset" element={<FieldsetExample />} />
           <Route path="/input" element={<InputExample />} />
+          <Route path="/input-group" element={<InputGroupExample />} />
           <Route path="/miller-columns" element={<MillerColumnsExample />} />
           <Route path="/modal" element={<ModalExample />} />
           <Route path="/portal" element={<PortalExample />} />

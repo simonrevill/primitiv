@@ -16,6 +16,7 @@ export * from "./DropdownExample";
 export * from "./EmptyStateExample";
 export * from "./FieldsetExample";
 export * from "./InputExample";
+export * from "./InputGroupExample";
 export * from "./MillerColumnsExample";
 export * from "./ModalExample";
 export * from "./PortalExample";

@@ -1,5 +1,6 @@
 import { ChangeEvent, Children, isValidElement, ReactNode } from "react";
 
+import { useFieldProps } from "../Field/hooks";
 import { Slot } from "../Slot";
 
 import {
@@ -42,6 +43,13 @@ function hasPlaceholderChild(children: ReactNode): boolean {
  * among the direct children and neither `value` nor `defaultValue` is
  * set, Root infers `defaultValue=""` so the placeholder — not the first
  * selectable option — is the initial selection.
+ *
+ * **Field integration.** When rendered inside a `<Field.Root>`, Select
+ * opts into `FieldContext` and inherits `id`, `aria-describedby`,
+ * `aria-invalid`, `disabled`, and `required` from the field. Any prop
+ * the consumer passes wins; `aria-describedby` is composed (consumer
+ * ids first, then field-supplied description / error ids). Outside a
+ * `<Field.Root>`, behaviour is unchanged.
  */
 function SelectRoot({
   children,
@@ -50,8 +58,10 @@ function SelectRoot({
   onValueChange,
   value,
   defaultValue,
-  ...rest
+  ...consumer
 }: SelectRootProps) {
+  const merged = useFieldProps(consumer);
+
   const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {
     onChange?.(event);
     onValueChange?.(event.target.value);
@@ -73,9 +83,9 @@ function SelectRoot({
         : {};
 
   const rootProps = {
-    ...rest,
+    ...merged,
     ...controlProps,
-    "data-disabled": rest.disabled ? "" : undefined,
+    "data-disabled": merged.disabled ? "" : undefined,
     onChange: handleChange,
   };
 

@@ -1,42 +1,68 @@
+import { Slot } from "../Slot";
 import {
   InputGroupAdornmentProps,
   InputGroupRootProps,
 } from "./types";
 
-function InputGroupRoot({ children, ref, ...rest }: InputGroupRootProps) {
-  return (
-    <div {...rest} ref={ref} data-input-group="">
-      {children}
-    </div>
-  );
+function InputGroupRoot({
+  asChild = false,
+  children,
+  ref,
+  ...rest
+}: InputGroupRootProps) {
+  const rootProps = {
+    ...rest,
+    ref,
+    "data-input-group": "",
+  };
+
+  if (asChild) {
+    return <Slot {...rootProps}>{children}</Slot>;
+  }
+
+  return <div {...rootProps}>{children}</div>;
 }
 
 InputGroupRoot.displayName = "InputGroupRoot";
 
 function InputGroupLeadingAdornment({
+  asChild = false,
   children,
   ref,
   ...rest
 }: InputGroupAdornmentProps) {
-  return (
-    <span {...rest} ref={ref} data-input-group-adornment="leading">
-      {children}
-    </span>
-  );
+  const adornmentProps = {
+    ...rest,
+    ref,
+    "data-input-group-adornment": "leading" as const,
+  };
+
+  if (asChild) {
+    return <Slot {...adornmentProps}>{children}</Slot>;
+  }
+
+  return <span {...adornmentProps}>{children}</span>;
 }
 
 InputGroupLeadingAdornment.displayName = "InputGroupLeadingAdornment";
 
 function InputGroupTrailingAdornment({
+  asChild = false,
   children,
   ref,
   ...rest
 }: InputGroupAdornmentProps) {
-  return (
-    <span {...rest} ref={ref} data-input-group-adornment="trailing">
-      {children}
-    </span>
-  );
+  const adornmentProps = {
+    ...rest,
+    ref,
+    "data-input-group-adornment": "trailing" as const,
+  };
+
+  if (asChild) {
+    return <Slot {...adornmentProps}>{children}</Slot>;
+  }
+
+  return <span {...adornmentProps}>{children}</span>;
 }
 
 InputGroupTrailingAdornment.displayName = "InputGroupTrailingAdornment";

@@ -1,6 +1,4 @@
-import { useContext } from "react";
-
-import { FieldContext } from "../Field/FieldContext";
+import { useFieldProps } from "../Field/hooks";
 import { Slot } from "../Slot";
 import { InputProps } from "./types";
 
@@ -100,39 +98,16 @@ import { InputProps } from "./types";
 export function Input({
   asChild = false,
   type = "text",
-  id: idProp,
-  "aria-describedby": ariaDescribedByProp,
-  "aria-invalid": ariaInvalidProp,
-  disabled: disabledProp,
-  required: requiredProp,
   children,
   ref,
-  ...rest
+  ...consumer
 }: InputProps) {
-  const field = useContext(FieldContext);
-
-  const id = idProp ?? field?.id;
-  const disabled = disabledProp ?? field?.disabled;
-  const required = requiredProp ?? field?.required;
-  const ariaInvalid = ariaInvalidProp ?? (field?.invalid || undefined);
-  const composedDescribedBy =
-    [
-      ariaDescribedByProp,
-      field?.descriptionId,
-      field?.invalid ? field?.errorId : null,
-    ]
-      .filter(Boolean)
-      .join(" ") || undefined;
+  const merged = useFieldProps(consumer);
 
   const rootProps = {
-    ...rest,
-    id,
+    ...merged,
     ref,
-    disabled,
-    required,
-    "aria-invalid": ariaInvalid,
-    "aria-describedby": composedDescribedBy,
-    "data-disabled": disabled ? "" : undefined,
+    "data-disabled": merged.disabled ? "" : undefined,
   };
 
   if (asChild) {

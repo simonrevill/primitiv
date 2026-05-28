@@ -1,3 +1,5 @@
+import { ChangeEvent } from "react";
+
 import { SelectOptionProps, SelectRootProps } from "./types";
 
 /**
@@ -5,11 +7,36 @@ import { SelectOptionProps, SelectRootProps } from "./types";
  * all `SelectHTMLAttributes` through to the DOM.
  *
  * Browser-native behaviour is preserved: keyboard navigation (arrow keys,
- * Home/End, typeahead), the platform popup, mobile UX, and form submission
- * all work without additional JS.
+ * Home/End, typeahead), the platform popup, mobile UX, and form
+ * submission all work without additional JS.
+ *
+ * Supports two state modes, statically discriminated at the type level:
+ *
+ * - **Uncontrolled** — pass `defaultValue` (or omit it). The browser owns
+ *   the selection. `onValueChange` is optional.
+ * - **Controlled** — pass `value` and `onValueChange` together. Every
+ *   transition defers back through `onValueChange`.
+ *
+ * `onValueChange` receives the new selection as a plain string. The
+ * consumer's own `onChange` (the raw `ChangeEvent`) still fires alongside
+ * it.
  */
-function SelectRoot({ children, ...rest }: SelectRootProps) {
-  return <select {...rest}>{children}</select>;
+function SelectRoot({
+  children,
+  onChange,
+  onValueChange,
+  ...rest
+}: SelectRootProps) {
+  const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    onChange?.(event);
+    onValueChange?.(event.target.value);
+  };
+
+  return (
+    <select {...rest} onChange={handleChange}>
+      {children}
+    </select>
+  );
 }
 
 SelectRoot.displayName = "SelectRoot";

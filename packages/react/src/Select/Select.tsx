@@ -1,6 +1,10 @@
 import { ChangeEvent } from "react";
 
-import { SelectOptionProps, SelectRootProps } from "./types";
+import {
+  SelectGroupProps,
+  SelectOptionProps,
+  SelectRootProps,
+} from "./types";
 
 /**
  * The root of a Select — renders a native `<select>` element and passes
@@ -54,14 +58,27 @@ function SelectOption({ children, ...rest }: SelectOptionProps) {
 
 SelectOption.displayName = "SelectOption";
 
+/**
+ * Visually groups related options inside the Select popup — renders a
+ * native `<optgroup>` element. The `label` is shown by the browser as a
+ * non-selectable heading and is announced as the group's accessible name.
+ */
+function SelectGroup({ children, ...rest }: SelectGroupProps) {
+  return <optgroup {...rest}>{children}</optgroup>;
+}
+
+SelectGroup.displayName = "SelectGroup";
+
 type TSelectCompound = typeof SelectRoot & {
   Root: typeof SelectRoot;
   Option: typeof SelectOption;
+  Group: typeof SelectGroup;
 };
 
 const SelectCompound: TSelectCompound = Object.assign(SelectRoot, {
   Root: SelectRoot,
   Option: SelectOption,
+  Group: SelectGroup,
 });
 
 SelectCompound.displayName = "Select";

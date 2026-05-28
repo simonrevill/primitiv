@@ -52,3 +52,15 @@ export type SelectOptionProps = ComponentProps<"option"> & {
   children?: ReactNode;
   ref?: Ref<HTMLOptionElement>;
 };
+
+/**
+ * Props for {@link Select.Group} — all `OptgroupHTMLAttributes` on the
+ * underlying `<optgroup>` element, plus a typed `ref`. `label` is
+ * required by the native element and is what assistive technology
+ * announces for the group.
+ */
+export type SelectGroupProps = ComponentProps<"optgroup"> & {
+  label: string;
+  children?: ReactNode;
+  ref?: Ref<HTMLOptGroupElement>;
+};

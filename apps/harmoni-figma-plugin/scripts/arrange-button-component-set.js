@@ -62,6 +62,9 @@
   const GAP_VARIANT = 32;   // between variant column groups
   const GAP_SIZE    = 12;   // between size rows within a density section
   const GAP_DENSITY = 64;   // between density sections
+  // Focus ring frames extend 4 px beyond each component edge. EDGE_PAD ensures
+  // the first row/column never reaches the component-set frame boundary.
+  const EDGE_PAD    =  8;
 
   // ─── Find the component set ───────────────────────────────────────────────
   const componentSet = figma.currentPage.selection
@@ -139,12 +142,13 @@
     }
   }
 
+  // ─── Shift all positions inward by EDGE_PAD ──────────────────────────────
+  // Keeps focus ring overflow (4 px per side) away from the component-set boundary.
+  for (const k of Object.keys(colX)) colX[k] += EDGE_PAD;
+  for (const k of Object.keys(rowY)) rowY[k] += EDGE_PAD;
+
   // ─── Resize the component set frame first ────────────────────────────────
-  // x = right edge of the last column (total width needed).
-  // y = bottom edge of the last row   (total height needed).
-  // Expanding the frame before repositioning ensures no component is ever moved
-  // to a coordinate outside the container bounds mid-operation.
-  componentSet.resize(x, y);
+  componentSet.resize(x + EDGE_PAD * 2, y + EDGE_PAD * 2);
 
   // ─── Position every component ─────────────────────────────────────────────
   // colMaxWidth guarantees every column is wide enough for the widest component

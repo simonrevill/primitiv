@@ -140,11 +140,18 @@ keyword or by topic; do not paraphrase their content here.
   building or extending a framed-control component set in Figma
   (Button, Switch, Checkbox, …): pre-flight (real-set vs POC), learn
   the anatomy, clone-and-rebind to add a context/variant/fill gaps,
-  the incremental instance-preview audit loop, the arrange script +
-  default-instance trick, and verification. Pairs with
-  `figma-variable-architecture` (the token-value reference it links to).
+  component-specific `{component}/` tokens in Context collections,
+  auto-layout for token-driven dimensions, the incremental audit loop,
+  arrange + default-instance, verification, and all build-time gotchas
+  (x=0 clamp, ABSOLUTE layout, variantProperties errors, non-token sweeps).
   TRIGGER when building/extending/laying-out/auditing a framed-control
   component set in Figma.
+- **`figma-arrange-component-set`** — canonical recipe for the arrange +
+  label step: grid convention (density rows × variant/state cols, md first,
+  dense last), EDGE_PAD=8 focus-ring fix, re-run safety, name-based parsing,
+  and how to adapt the script template for any new component. TRIGGER when
+  writing or running an arrange script, laying out a component set grid, or
+  adding labels to a component set.
 - **`model-routing`** — Opus/Sonnet/Haiku decision tree.
 
 ## Slash commands

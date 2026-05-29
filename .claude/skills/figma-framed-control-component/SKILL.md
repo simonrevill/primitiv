@@ -94,6 +94,79 @@ await rebind(clone); // walk boundVariables; skip fills/strokes; text fields are
 - **Pitfall**: a clone faithfully copies *source* slip-bugs (e.g. a
   ring-frame radius bound to the wrong size slot). Sweep-fix afterwards — see
   the focus-ring slip gotcha in `figma-variable-architecture`.
+- **After rebind, always re-set ring frame x/y** — clones inherit the
+  source's ring positions, but if the source was built via in-place
+  auto-layout addition, those positions may have been clamped to 0 (see
+  x=0 clamp gotcha below). Safest: unconditionally set
+  `gapFr.x = -2; gapFr.y = -2` and `ringFr.x = -4; ringFr.y = -4` in the
+  rebind sweep, and resize ring frames to `(clone.width+4)×(clone.height+4)`
+  and `(clone.width+8)×(clone.height+8)`.
+- **Non-token properties don't rebind** — only variables in Context
+  collections are updated. Anything set as a static value at build time
+  (icon size/position, tick centering, explicit pixel offsets) stays at
+  the source value. After clone-and-rebind, sweep these separately using
+  the resolved `node.width`/`node.height` values.
+
+## 2a. Component-specific sizing tokens
+
+When a component has geometry that does not map to shared `framed-control/*`
+tokens (e.g. Switch track dimensions, Checkbox box size), create a
+**`{component}/` namespace in each Context collection** alongside
+`framed-control/*`:
+
+```
+Context / Compact
+  framed-control/md/height        ← shared
+  switch/md/track-height          ← Switch-specific
+  switch/md/track-width
+  switch/md/thumb-size
+  switch/md/thumb-margin
+```
+
+Same clone-and-rebind walk picks these up automatically because the rebind
+checks `variableCollectionId` — any variable whose collection is one of the
+four Context collections gets rebound. Adding the `{component}/` namespace
+keeps `framed-control/*` clean (shared anatomy only) and gives each
+component a tidy, discoverable home.
+
+## 2b. Using auto-layout to make dimensions token-drivable
+
+`node.width` and `node.height` can only be bound to FLOAT variables when the
+node has `layoutSizingHorizontal/Vertical = "FIXED"`, which in turn requires
+`layoutMode ≠ NONE`. Without auto-layout you cannot bind dimensions to tokens
+at all — component geometry stays hardcoded and clone-and-rebind won't resize
+across densities.
+
+For a pill/track component (e.g. Switch) where layout drives thumb position:
+
+```js
+comp.layoutMode = "HORIZONTAL";
+comp.layoutSizingHorizontal = "FIXED";
+comp.layoutSizingVertical   = "FIXED";
+comp.counterAxisAlignItems  = "CENTER";      // centres thumb vertically
+// Unchecked: thumb at left
+comp.primaryAxisAlignItems  = "MIN";
+comp.setBoundVariable('paddingLeft',  thumbMarginVar);
+// Checked: thumb at right  
+comp.primaryAxisAlignItems  = "MAX";
+comp.setBoundVariable('paddingRight', thumbMarginVar);
+// Bind dimensions
+comp.setBoundVariable('width',  trackWidthVar);
+comp.setBoundVariable('height', trackHeightVar);
+// Ring frames must be ABSOLUTE so layout doesn't reposition them
+ringGapFr.layoutPositioning  = "ABSOLUTE";
+ringFr.layoutPositioning     = "ABSOLUTE";
+// Thumb stays in flow with FIXED sizing
+thumb.layoutSizingHorizontal = "FIXED";
+thumb.layoutSizingVertical   = "FIXED";
+thumb.setBoundVariable('width',  thumbSizeVar);
+thumb.setBoundVariable('height', thumbSizeVar);
+```
+
+`paddingLeft` / `paddingRight` bound to the margin token drives thumb
+position automatically across densities. The auto-layout centering
+(`counterAxisAlignItems = CENTER`) is equivalent to `y = thumbMargin` because
+`thumbSize = trackHeight − 2 × thumbMargin` by construction.
 
 ## 3. Focus ring
 
@@ -122,23 +195,21 @@ before they propagate:
 
 ## 5. Lay the set out + set the default instance
 
-`apps/harmoni-figma-plugin/scripts/arrange-button-component-set.js` arranges
-the set into the documented grid (`button-component-set-layout.md`):
+See the **`figma-arrange-component-set`** skill for the full layout recipe,
+EDGE_PAD explanation, re-run safety pattern, and how to adapt for a new
+component. Quick summary:
 
-- Props `Context/Variant/Size/State` (lowercase). Context order
-  **compact → comfortable → spacious → dense** (dense last, least-used),
-  md-first rows.
-- Figma's **default instance is the set's first child** — the script
-  `insertChild(0, …)`s the top-left cell (`compact/md/primary/default`), not
-  just relying on position.
-- State labels are left-aligned to each column's button left edge (buttons
-  are left-aligned within a column, which is wider than the smallest button).
-- To run via `figma_execute`: set `figma.currentPage.selection = [set]` first
-  (the script reads the selection), and remove the prior "… Grid Labels"
-  group so re-runs don't duplicate it.
-
-For a new component, adapt this script's property names/orders or write a
-sibling under `apps/harmoni-figma-plugin/scripts/`.
+- Grid: density rows (compact → comfortable → spacious → dense, md first)
+  × variant/state columns (sub-grouped by interaction/state).
+- Script lives in `apps/harmoni-figma-plugin/scripts/arrange-<component>-component-set.js`.
+- **EDGE_PAD = 8**: all component positions are shifted 8 px inward so focus
+  ring overflow (−4 px) never reaches the component-set frame boundary and
+  gets clipped.
+- Default instance: `componentSet.insertChild(0, topLeftComponent)`.
+- Re-run safe: delete the existing `"<Name> Grid Labels"` group before
+  regenerating labels.
+- Run via `figma_execute` by replacing the `selection.find(…)` lookup with a
+  direct `getNodeByIdAsync` call.
 
 ## 6. Verify
 
@@ -156,10 +227,29 @@ sibling under `apps/harmoni-figma-plugin/scripts/`.
 
 - Decoy POC sets (modes, "… Demo" page) vs the real default-mode set.
 - `getNodeByIdAsync` etc. required (dynamic-page document access).
+- `figma.currentPage = page` **throws** — use `await figma.setCurrentPageAsync(page)`.
 - `boundVariables`: `fills`/`strokes` are colour paints (skip when rebinding
   context geometry); text typography fields come back as **arrays**.
 - `figma_capture_screenshot` (live) over `figma_take_screenshot` (cloud).
 - Ring-frame radius slips survive cloning — always sweep-fix.
+- **x=0 clamp gotcha**: Adding `layoutMode = "HORIZONTAL"` to an existing
+  frame in-place clamps any child at a negative x/y to 0 during the layout
+  transition. Ring frames at x=−2/−4 silently move to x=0, making the ring
+  appear asymmetric (flush-left, overflowing right). Fix: always explicitly
+  set `gapFr.x = -2; ringFr.x = -4` *after* `layoutMode` is set, and again
+  after every clone-and-rebind sweep.
+- **`layoutPositioning = "ABSOLUTE"` requires a layout parent**: setting it
+  on a child of a `layoutMode = NONE` frame throws. Add `layoutMode` to the
+  parent first, *then* set children to ABSOLUTE.
+- **`variantProperties` unreliable during build**: while old and new variants
+  coexist in a set (mixed schemas), `c.variantProperties` throws
+  "Component set for node has existing errors". Use name-based parsing
+  (`name.match(/Context=(\w+)/)`) instead — always reliable.
 - Free tier = 1 mode per collection → densities are separate collections;
   the eventual Professional-tier modes consolidation reuses the same
   clone-and-rebind walk (see the density-consolidation memory).
+- **Non-token properties must be swept manually after rebind**: only variables
+  whose `variableCollectionId` is a Context collection are updated by the
+  rebind walk. Static pixel values (icon size, icon position, explicit x/y)
+  stay at source values. After clone-and-rebind, sweep these separately using
+  the resolved `node.width`/`node.height`.

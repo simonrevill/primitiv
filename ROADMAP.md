@@ -14,7 +14,7 @@ Composite components (PaletteRamp, Swatch, etc.) are out of scope here.
 
 | Component | `@primitiv/react` | Figma design | Notes |
 |---|---|---|---|
-| Button | ✓ built | in progress | Primary, secondary, ghost/link, and icon-only variants all appear |
+| Button | ✓ built | ✓ | Primary, secondary, ghost/link, and icon-only variants all appear |
 | Slider | ✓ built | needed | Horizontal (Padding control) and vertical (curve editors) |
 | Switch | ✓ built | needed | Step labels and A11y badges on/off toggles |
 | Toggle Group | ✓ built | needed | Layout, Shape, Naming, and Modes pill selectors |

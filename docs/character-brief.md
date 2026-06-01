@@ -62,7 +62,7 @@ yet) · ⬜ gap (not started).
 | --- | --- | --- |
 | Type contrast | Condensed display vs humanist body — the *contrast* is the commitment, faces are swappable | ✅ decided |
 | Density / proportion | Four-mode Context (Dense→Spacious); proportion as a through-line, cross-environment | ✅ decided |
-| Radius / shape | Small roundness — never sharp, never pill; intrinsically-round components excepted | ✅ decided |
+| Radius / shape | Derived `r = k·height` (k≈0.1875, provisional); small, never sharp/pill; intrinsic-round excepted | ✅ model decided |
 | Elevation / shadow | Borders-first; multi-layer neutral shadows only where hierarchy demands | ✅ position (build TBD) |
 | Expressive typography | Tracking + casing as tokens; Khand for display / heading / label / overline only | ✅ decided |
 | Chroma / primary | In active exploration via Harmoni — synced but volatile | 🔬 exploring |
@@ -102,19 +102,53 @@ ethos note on proportion.
 
 ### Radius / shape
 
-**Small roundness.** Never sharp corners anywhere; equally, never
-pill-shaped components and never fully-round icon buttons. A precise,
-engineered feel that rhymes with Khand's condensed geometry and the
-"Primitiv" name.
+**Small roundness, and *derived* — never hand-assigned.** Radius is a
+constant fraction of a control's height, which is what makes it
+proportional (per the ethos) and makes density fall out for free:
+smaller heights yield smaller radii with no separate table.
 
-**The one exception:** components that are *intrinsically* circular —
-e.g. an Avatar — are round by their nature, not by the shape language.
-We should name a small "intrinsic-round" carve-out concept so these
-don't become ad-hoc special cases.
+**The rule (framed controls):**
 
-Token implication: keep `framed-control/{size}/radius` on the small
-end of the `radii/*` scale, and pin the radius-to-height relationship
-so a control reads equally Primitiv at every size and density.
+```
+radius = clamp( snap_to_scale(height × k), floor≈2, —)
+k = 0.1875  (3/16) — provisional, pending visual validation
+```
+
+A floor of ~2 guarantees "never sharp"; any `k` well under 0.5
+guarantees "never pill" by construction. `k` is the single roundness
+knob for the whole framed-control family — *Primitiv's roundness
+coefficient*. (Today's radii float between r/h 0.125 and 0.214 with no
+pattern — they were snapped to `radii/*` by hand. Adopting one `k`
+regularises that.)
+
+**Three tiers — not everything is a framed control:**
+
+1. **Framed controls** (Button, Input, Switch, Checkbox, Tabs…) →
+   `radius = k × height`.
+2. **Surfaces** (Dropdown / Context-Menu panel, Modal, Card) — no
+   meaningful height to derive from, so `k × height` would blow up.
+   The **outer** radius **pins to the md control radius** (cohesive,
+   density-flexing); everything **inside** derives concentrically
+   (next rule).
+3. **Intrinsically round** (Avatar, status dot, spinner) →
+   `radii/full`. Exempt by nature, not by exception — the named
+   carve-out so these never become ad-hoc special cases.
+
+**Two threading rules keep radius derived even in composition:**
+
+- **Concentric focus ring** (already in the system): `gap = R+2`,
+  `ring = R+4`. Geometric necessity; stays keyed to the control's R.
+- **Concentric nesting**: `inner = outer − inset`. A panel's items, a
+  highlight inside a button — the inner corner is the outer corner
+  minus the padding, so nested shapes stay concentric. Squares off to
+  0 when inset ≥ outer radius, which is correct.
+
+**Materialization (Figma vs code).** Figma variables can't compute, so
+the rule *generates* the per-slot `framed-control/{size}/radius`
+values that alias `radii/*` (as today, but produced by the rule, not
+by hand). In `@primitiv/react` / `@primitiv/tokens` the radius can be
+**computed** directly from the height token. Either way the *rule* is
+the source of truth; the tokens are its output.
 
 ### Expressive typography
 

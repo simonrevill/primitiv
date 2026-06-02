@@ -1,0 +1,85 @@
+@use "./carouselShared" as cx;
+
+// Keyframes are at file root — safe because the animation-name is unique
+// enough not to collide, and the property is only applied inside the
+// .cover-flow__slide selector below (which IS scoped via the BEM prefix).
+@keyframes cover-flow-coverflow-card {
+  // Slide entering from the right: tilted right, slightly smaller.
+  0% {
+    opacity: 0.5;
+    transform: perspective(900px) rotateY(38deg) scale(0.88);
+  }
+  // Fully centred (active): flat and full-size.
+  35%,
+  65% {
+    opacity: 1;
+    transform: perspective(900px) rotateY(0deg) scale(1);
+  }
+  // Slide exiting to the left: tilted left, slightly smaller.
+  100% {
+    opacity: 0.5;
+    transform: perspective(900px) rotateY(-38deg) scale(0.88);
+  }
+}
+
+.cover-flow {
+  @include cx.frame;
+
+  &__viewport {
+    @include cx.viewport-track;
+    display: flex;
+    align-items: center;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    // Generous peek so partially-visible tilted slides are visible on
+    // both sides of the centred active slide.
+    padding-inline: 18%;
+    scroll-padding-inline: 18%;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  &__slide {
+    flex: 0 0 64%;
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
+    @include cx.slide-surface;
+
+    // Scroll-driven 3D rotation. `view(inline)` tracks each slide's
+    // position in the inline-scrolling viewport; the animation drives
+    // the 3D tilt purely from scroll progress — no JS required.
+    // `perspective()` in the transform function (not the CSS property)
+    // avoids the stacking-context clipping that the property causes
+    // inside an overflow:auto container.
+    @supports (animation-timeline: view()) {
+      animation: cover-flow-coverflow-card linear both;
+      animation-timeline: view(inline);
+      animation-range: entry 0% exit 100%;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+
+  &__image {
+    @include cx.image;
+  }
+
+  &__controls {
+    @include cx.controls;
+  }
+
+  &__trigger {
+    @include cx.trigger;
+  }
+
+  &__indicator-group {
+    @include cx.indicators;
+  }
+}

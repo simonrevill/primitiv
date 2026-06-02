@@ -1,0 +1,77 @@
+@use "./carouselShared" as cx;
+
+.autoplay {
+  @include cx.frame;
+
+  &__viewport {
+    @include cx.viewport-track;
+    display: flex;
+    align-items: flex-start;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    padding-inline: 10%;
+    scroll-padding-inline: 10%;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  &__slide {
+    flex: 0 0 80%;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    @include cx.slide-surface;
+  }
+
+  &__image {
+    @include cx.image;
+  }
+
+  &__controls {
+    @include cx.controls;
+    gap: 0.75rem;
+  }
+
+  &__trigger {
+    @include cx.trigger;
+  }
+
+  // Play/Pause sits inline with the other controls. Styled as a small pill
+  // button to distinguish it from the circular prev/next triggers.
+  &__playpause {
+    appearance: none;
+    padding: 0.25rem 0.875rem;
+    border: 1px solid cx.$border;
+    border-radius: 999px;
+    background: cx.$surface-slide;
+    color: cx.$ink;
+    font: inherit;
+    font-size: 0.8125rem;
+    cursor: pointer;
+    transition:
+      background 120ms ease,
+      border-color 120ms ease;
+
+    &[data-state="playing"] {
+      border-color: cx.$accent;
+      color: cx.$accent;
+    }
+
+    &:hover:not(:disabled) {
+      background: cx.$viewport-track;
+    }
+
+    &:focus-visible {
+      outline: 2px solid cx.$accent;
+      outline-offset: 2px;
+    }
+  }
+
+  &__indicator-group {
+    @include cx.indicators;
+  }
+}

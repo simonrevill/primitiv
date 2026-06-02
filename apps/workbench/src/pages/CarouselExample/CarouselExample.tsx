@@ -3,6 +3,8 @@ import type { ReactNode } from "react";
 import { Tabs } from "@primitiv/react";
 
 import {
+  AutoPlay,
+  CoverFlow,
   MultiSlideCrossfade,
   MultiSlideScroll,
   MultiStepSlideCrossfade,
@@ -11,6 +13,7 @@ import {
   Programmatic,
   SingleSlideCrossfade,
   SingleSlideScroll,
+  Thumbnails,
   VariableSizes,
 } from "./examples";
 import "./CarouselExample.scss";
@@ -66,6 +69,21 @@ const TABS: ExampleTab[] = [
     value: "programmatic",
     label: "Programmatic",
     render: () => <Programmatic />,
+  },
+  {
+    value: "cover-flow",
+    label: "Cover Flow",
+    render: () => <CoverFlow />,
+  },
+  {
+    value: "autoplay",
+    label: "Autoplay",
+    render: () => <AutoPlay />,
+  },
+  {
+    value: "thumbnails",
+    label: "Thumbnails",
+    render: () => <Thumbnails />,
   },
 ];
 

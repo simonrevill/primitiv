@@ -3,17 +3,19 @@
 .single-slide-crossfade {
   @include cx.frame;
 
-  // The viewport is the card here: the slides stack absolutely inside it
-  // and only opacity changes, so the rounded surface + shadow live on the
-  // container (a shadow on each stacked slide would be clipped).
+  // The viewport is the visible card: slides stack absolutely inside it,
+  // only opacity changes. The rounded grey surface and shadow live here
+  // (not on each slide, which would be clipped by overflow:hidden).
+  // Matches the single-slide-scroll visible width (80% of 38rem).
   &__viewport {
     position: relative;
     aspect-ratio: cx.$ratio;
-    inline-size: 100%;
+    inline-size: 80%;
+    margin-inline: auto;
     overflow: hidden;
-    border-radius: cx.$radius;
-    background: cx.$surface;
-    box-shadow: cx.$shadow;
+    border-radius: cx.$radius-card;
+    background: cx.$viewport-track;
+    box-shadow: cx.$shadow-card;
   }
 
   &__slide {

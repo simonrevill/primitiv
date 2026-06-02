@@ -1,14 +1,16 @@
 @use "./carouselShared" as cx;
 
 .multi-slide-crossfade {
-  --gap: 1rem;
+  --gap: 0.75rem;
 
   @include cx.frame;
 
   &__viewport {
+    @include cx.viewport-track;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: var(--gap);
+    padding: 0.75rem;
   }
 
   &__slide {
@@ -16,9 +18,8 @@
     opacity: 0;
     transition: opacity 400ms ease;
     pointer-events: none;
-    // slide-surface gives every cell the image ratio, so the grid row
-    // keeps a stable height across the opacity stack and the partial last
-    // page (one image, columns 2 & 3 empty).
+    // slide-surface provides the card ratio so the grid row has a stable
+    // height even when all slides in a column are opacity:0 (partial page).
     @include cx.slide-surface;
 
     &:nth-child(3n + 1) {

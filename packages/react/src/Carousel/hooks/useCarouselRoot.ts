@@ -126,7 +126,7 @@ export function useCarouselRoot(
   const [slideKeys, setSlideKeys] = useState<string[]>([]);
   const [internalPage, setInternalPage] = useState(defaultPage);
   const isControlled = page !== undefined;
-  const currentPage = isControlled ? page : internalPage;
+  const rawPage = isControlled ? (page as number) : internalPage;
   const total = slideKeys.length;
   const effectiveSlidesPerMove =
     slidesPerMove === "auto" ? slidesPerPage : slidesPerMove;
@@ -144,14 +144,22 @@ export function useCarouselRoot(
           ? Math.ceil(total / slidesPerPage)
           : Math.floor((total - slidesPerPage) / effectiveSlidesPerMove) + 1;
 
-  // Once slides have registered, an out-of-range page is a consumer
-  // mistake that would otherwise ship silently as a no-op carousel —
-  // throw with the live values to surface it during development.
-  if (totalPages > 0 && (currentPage < 0 || currentPage >= totalPages)) {
+  // In controlled mode an out-of-range page prop is a consumer error —
+  // throw loudly so it surfaces during development rather than shipping
+  // as a silent no-op carousel.
+  if (isControlled && totalPages > 0 && (rawPage < 0 || rawPage >= totalPages)) {
     throw new Error(
-      `Carousel: page index ${currentPage} is out of range (totalPages: ${totalPages})`,
+      `Carousel: page index ${rawPage} is out of range (totalPages: ${totalPages})`,
     );
   }
+  // In uncontrolled mode, clamp silently: the page can temporarily
+  // outlive totalPages during slide re-registration (HMR, tab switch)
+  // where slides unmount and re-register one by one, briefly lowering
+  // totalPages below the previously-valid current page.
+  const currentPage =
+    !isControlled && totalPages > 0
+      ? Math.max(0, Math.min(rawPage, totalPages - 1))
+      : rawPage;
 
   const [internalPlaying, setInternalPlaying] = useState(defaultPlaying);
   const isPlayingControlled = playing !== undefined;

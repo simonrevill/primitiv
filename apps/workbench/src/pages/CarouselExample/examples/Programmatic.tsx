@@ -14,7 +14,7 @@ import "./_programmatic.scss";
  *
  * JS owns: imperative `goTo(index)` for the quick-jump toolbar,
  *   `onPageChange` callback to mirror page state in React for
- *   the progress bar, `loop`.
+ *   the progress bar.
  * CSS owns: same single-slide-scroll layout as the canonical
  *   Single · Slide example, plus a `width: calc(var(--progress)
  *   * 100%)` rule on a `::after` pseudo-element for the bar.

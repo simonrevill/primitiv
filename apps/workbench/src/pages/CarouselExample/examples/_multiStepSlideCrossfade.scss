@@ -9,12 +9,15 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: var(--gap);
-    // aspect-ratio: 1120 / 959;
     overflow: hidden;
   }
 
   &__slide {
     grid-row: 1;
+    // Give every cell the image's intrinsic ratio so the grid row keeps
+    // a stable height — without it the opacity:0 stack and the partial
+    // last page collapse the track and the page transition jumps.
+    aspect-ratio: 1120 / 959;
     display: flex;
     justify-content: center;
     align-items: center;

@@ -17,8 +17,8 @@ const slideWidths = [
 
 /**
  * Slides of mixed widths in a single carousel. Already supported by
- * the JS — the viewport's scroll target is derived from each slide's
- * `getBoundingClientRect`, so no fixed width is assumed.
+ * the JS — the viewport delegates the scroll to the target slide's
+ * `scrollIntoView`, so no fixed width is assumed.
  *
  * JS owns: `snapAlign="center"` so programmatic navigation lands
  *   each slide centred regardless of its individual width. Without
@@ -26,7 +26,7 @@ const slideWidths = [
  *   to the browser's snap engine.
  * CSS owns: per-slide `flex: 0 0 var(--w)` driven by an inline
  *   custom property the example sets per slide;
- *   `scroll-snap-align: center` to match the JS scroll target.
+ *   `scroll-snap-align: center` to match the native scroll target.
  */
 export function VariableSizes() {
   return (

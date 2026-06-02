@@ -6,15 +6,14 @@ import "./_peek.scss";
 /**
  * Single image centred in the viewport with a sliver of the
  * previous and next slides visible to either side, scroll-driven
- * slide transition, seamless loop. The Ark UI "spacing" recipe —
- * achieved with `padding-inline` on the viewport, `flex-basis`
- * less than 100% on the slide, and `scroll-snap-align: center`.
+ * slide transition. The Ark UI "spacing" recipe — achieved with
+ * `padding-inline` on the viewport, `flex-basis` less than 100% on
+ * the slide, and `scroll-snap-align: center`.
  *
- * JS owns: `snapAlign="center"` so programmatic navigation lands
- *   on the centred offset (`(viewportWidth - slideWidth) / 2`)
- *   instead of the start edge — this matches where the browser's
- *   snap engine settles, so there's no double-correction after a
- *   `goTo`.
+ * JS owns: `snapAlign="center"` so programmatic navigation passes
+ *   `inline: "center"` to `scrollIntoView` — the browser's
+ *   `scroll-snap-align: center` then makes the final correction, so
+ *   there's no double-correction after a `goTo`.
  * CSS owns: viewport `padding-inline` (the symmetric peek
  *   distance), viewport `scroll-padding-inline` (so the snap
  *   target accounts for the padding), slide

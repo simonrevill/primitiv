@@ -5,11 +5,10 @@ import "./_multiSlideScroll.scss";
 
 /**
  * Three slides visible per page, scroll-driven slide transition,
- * full-page step (default `slidesPerMove="auto"`), seamless loop.
+ * full-page step (default `slidesPerMove="auto"`).
  *
  * JS owns: `slidesPerPage={3}` (drives the page math —
- *   `ceil(7 / 3) = 3` total pages, last page partial), `loop`
- *   (clones leading/trailing windows for seamless wrap), default
+ *   `ceil(7 / 3) = 3` total pages, last page partial), default
  *   `transition="slide"`.
  * CSS owns: viewport `gap` for inter-slide spacing, slide
  *   `flex: 0 0 calc((100% - 2 * var(--gap)) / 3)` so the three

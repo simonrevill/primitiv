@@ -5,12 +5,12 @@ import "./_multiStepSlideCrossfade.scss";
 
 /**
  * Three slides visible per page, single-slide step, CSS-only
- * crossfade between pages, seamless loop.
+ * crossfade between pages.
  *
  * JS owns: `slidesPerPage={3}`, `slidesPerMove={1}` (5 total
- *   pages — `floor((7 - 3) / 1) + 1`), `transition="none"`,
- *   `loop`. The page diff between adjacent pages is exactly one
- *   slide, so each step swaps one column visually.
+ *   pages — `floor((7 - 3) / 1) + 1`), `transition="none"`. The
+ *   page diff between adjacent pages is exactly one slide, so each
+ *   step swaps one column visually.
  * CSS owns: same three-column grid as `MultiSlideCrossfade`.
  *   Slide `i` lives permanently in column `(i mod 3) + 1`, so the
  *   slide that leaves and the slide that enters always share a

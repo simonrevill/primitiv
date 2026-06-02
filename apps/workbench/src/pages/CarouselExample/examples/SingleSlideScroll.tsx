@@ -4,12 +4,11 @@ import { carouselImages } from "../fixtures";
 import "./_singleSlideScroll.scss";
 
 /**
- * Single image visible at a time, scroll-driven slide transition,
- * seamless loop.
+ * Single image visible at a time, scroll-driven slide transition.
  *
- * JS owns: `loop`, default `transition="slide"` (browser-native
- *   scroll-snap drives the visual; clones inject at edges so the
- *   wrap is seamless).
+ * JS owns: default `transition="slide"` (browser-native scroll-snap
+ *   drives the visual; programmatic navigation delegates to
+ *   `scrollIntoView`).
  * CSS owns: viewport flex + `scroll-snap-type: x mandatory`,
  *   slide `flex: 0 0 100%` + `scroll-snap-align: start`.
  */

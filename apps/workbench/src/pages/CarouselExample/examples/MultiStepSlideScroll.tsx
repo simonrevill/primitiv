@@ -5,13 +5,12 @@ import "./_multiStepSlideScroll.scss";
 
 /**
  * Three slides visible per page, single-slide step, scroll-driven
- * slide transition, seamless loop.
+ * slide transition.
  *
  * JS owns: `slidesPerPage={3}`, `slidesPerMove={1}` (window
  *   advances one slide at a time — `floor((7 - 3) / 1) + 1 = 5`
- *   total pages, full window in every page), `loop`, default
- *   `transition="slide"`. Loop wrap clones leading/trailing
- *   `slidesPerPage` slides on each side.
+ *   total pages, full window in every page), default
+ *   `transition="slide"`.
  * CSS owns: same as the full-page-step variant — viewport `gap`
  *   and slide `flex: 0 0 calc((100% - 2 * var(--gap)) / 3)`.
  */

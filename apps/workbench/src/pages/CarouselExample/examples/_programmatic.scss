@@ -78,10 +78,6 @@
     scroll-snap-align: start;
     scroll-snap-stop: always;
     -webkit-user-drag: none;
-
-    &[data-carousel-slide-clone] {
-      scroll-snap-stop: normal;
-    }
   }
 
   &__image {

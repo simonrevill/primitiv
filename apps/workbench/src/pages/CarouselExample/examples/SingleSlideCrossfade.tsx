@@ -4,13 +4,10 @@ import { carouselImages } from "../fixtures";
 import "./_singleSlideCrossfade.scss";
 
 /**
- * Single image visible at a time, CSS-only crossfade between slides,
- * seamless loop.
+ * Single image visible at a time, CSS-only crossfade between slides.
  *
- * JS owns: `transition="none"` (skips all scroll wiring; no clones
- *   are injected at the loop boundary because there's no scroll axis
- *   to wrap on), `loop` (just flips `data-state` on the active slide
- *   when wrapping page 6 → page 0).
+ * JS owns: `transition="none"` (skips all scroll wiring; the visual is
+ *   purely a `data-state` flip on the active slide).
  * CSS owns: viewport `position: relative` + fixed aspect ratio so
  *   absolutely-positioned slides stack; per-slide `opacity` keyed on
  *   `[data-state="active"]` with a `transition: opacity` honouring

@@ -532,16 +532,17 @@ Type: non-framed composition
 
 Axes: Size xs|sm|md|lg|xl
 
-Tokens: fill    none (transparent)
+Tokens: fill    surface/default
         stroke  action/secondary/border/default (INSIDE, all 4 edges = 1px — matches trigger stroke family)
         padding panel/padding/block (top/bottom) · panel/padding/inline (left/right)
         radius  TL/TR = 0; BL/BR = framed-control/{size}/radius
+        text    body/{size}/* (Asta Sans Regular) · content/primary
 
 Properties: Content (TEXT "Panel content")
 
 Density: Context mode override on parent frame (panel/* tokens scale across all 4 modes)
 Pairs with: Tabs/Trigger (placed immediately below a trigger strip)
-Notes: TL/TR always 0 — connects flush to the trigger strip above. BL/BR rounded using the same size slot as the triggers above. Stroke family matches Tabs/Trigger to prevent a visible seam at the junction. All 4 edges = 1px stroke (panel is always terminal). panel/padding/* tokens shared with Accordion/Panel.
+Notes: TL/TR always 0 — connects flush to the trigger strip above. BL/BR rounded using the same size slot as the triggers above. Stroke family matches Tabs/Trigger to prevent a visible seam at the junction. All 4 edges = 1px stroke (panel is always terminal). minHeight=80px gives substance when empty; no preferred nested instance — content slot is open. panel/padding/* tokens shared with Accordion/Panel.
 ```
 
 ---

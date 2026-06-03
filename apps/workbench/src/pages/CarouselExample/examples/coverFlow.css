@@ -1,11 +1,8 @@
 /* ─── Blossom-derived cover flow ──────────────────────────────────────────────
  *
- * Modern-CSS proof-of-concept: this example was the first to drop SCSS. It uses
- * CSS custom properties (no `$variables`), native nesting (no `&__bem`
- * concatenation — flat BEM selectors, `&` only for states/pseudos/at-rules),
- * and inlined rules in place of the shared SCSS mixins. The shared cosmetic
- * tokens live as `--cx-*` custom properties on the example root below; when the
- * other examples migrate, those move to a shared stylesheet.
+ * Shared cosmetic tokens come from carouselShared.css via .carousel-example.
+ * Shared skin classes (cx-controls, cx-trigger, cx-indicators, cx-image) are
+ * added directly in JSX — no expansions of those mixins here.
  *
  * Structure (mirrors Blossom's li › .slide › .card):
  *
@@ -64,19 +61,9 @@
   to   { z-index: 1; }
 }
 
-/* Example root. Holds the shared cosmetic tokens (inherited by .cover-flow,
- * which is nested inside) and lays out the control panel above the carousel. */
+/* Example root. Lays out the control panel above the carousel.
+ * --cx-* tokens are inherited from .carousel-example via carouselShared.css. */
 .cf-playground {
-  /* Shared cosmetic tokens (formerly carouselShared.scss $variables). */
-  --cx-accent: #6366f1;
-  --cx-ink: #111827;
-  --cx-muted: #9ca3af;
-  --cx-border: #d1d5db;
-  --cx-surface: #f3f4f6; /* slide placeholder + trigger background */
-  --cx-track: #e5e7eb; /* viewport track + segmented-control background */
-  --cx-radius-card: 10px;
-  --cx-shadow-card: 0 1px 2px rgb(17 24 39 / 0.06), 0 4px 10px rgb(17 24 39 / 0.08);
-
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -109,7 +96,7 @@
   --cf-center-pad: calc(50% - var(--cf-snap) / 2); /* centres first/last card */
   --cf-band: calc(var(--cf-snap) * var(--cf-spread)); /* half-width of tilt band */
 
-  /* Frame (formerly @include frame), width overridden by the knob. */
+  /* Frame layout, width overridden by the viewport-w knob. */
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -118,7 +105,7 @@
 }
 
 .cover-flow__viewport {
-  /* Track surface (formerly @include viewport-track). */
+  /* Track surface colours (same tokens as cx-viewport-track). */
   background: var(--cx-track);
   border-radius: var(--cx-radius-card);
 
@@ -217,101 +204,6 @@
 
   @media (prefers-reduced-motion: reduce) {
     animation: none;
-  }
-}
-
-/* Image (formerly @include image). */
-.cover-flow__image {
-  display: block;
-  inline-size: 100%;
-  block-size: 100%;
-  object-fit: cover;
-  -webkit-user-drag: none;
-}
-
-/* Controls row (formerly @include controls). */
-.cover-flow__controls {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-}
-
-/* Circular prev/next button (formerly @include trigger). */
-.cover-flow__trigger {
-  appearance: none;
-  display: grid;
-  place-items: center;
-  inline-size: 2rem;
-  block-size: 2rem;
-  padding: 0;
-  border: 1px solid var(--cx-border);
-  border-radius: 999px;
-  background: var(--cx-surface);
-  color: var(--cx-ink);
-  font: inherit;
-  font-size: 0.875rem;
-  line-height: 1;
-  cursor: pointer;
-  transition:
-    background 120ms ease,
-    border-color 120ms ease,
-    transform 120ms ease;
-
-  &:hover:not(:disabled) {
-    background: var(--cx-track);
-    border-color: var(--cx-muted);
-  }
-
-  &:active:not(:disabled) {
-    transform: scale(0.92);
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--cx-accent);
-    outline-offset: 2px;
-  }
-
-  &:disabled {
-    opacity: 0.35;
-    cursor: not-allowed;
-  }
-}
-
-/* Dot indicators that expand into a pill on the active page (formerly
- * @include indicators). */
-.cover-flow__indicator-group {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.375rem;
-
-  & [data-carousel-indicator] {
-    appearance: none;
-    display: inline-grid;
-    place-items: center;
-    min-inline-size: 1.5rem;
-    min-block-size: 1.5rem;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    cursor: pointer;
-
-    &::before {
-      content: "";
-      inline-size: 0.375rem;
-      block-size: 0.375rem;
-      border-radius: 999px;
-      background: var(--cx-border);
-      transition:
-        inline-size 160ms ease,
-        background 160ms ease;
-    }
-
-    &[data-state="active"]::before {
-      inline-size: 1rem;
-      background: var(--cx-accent);
-    }
   }
 }
 

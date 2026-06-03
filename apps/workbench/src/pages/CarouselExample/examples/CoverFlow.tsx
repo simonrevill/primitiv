@@ -164,7 +164,7 @@ export function CoverFlow() {
               <div className="cover-flow__visual">
                 <div className="cover-flow__card">
                   <img
-                    className="cover-flow__image"
+                    className="cover-flow__image cx-image"
                     src={src}
                     alt={description}
                   />
@@ -173,19 +173,19 @@ export function CoverFlow() {
             </Carousel.Slide>
           ))}
         </Carousel.Viewport>
-        <div className="cover-flow__controls">
+        <div className="cover-flow__controls cx-controls">
           <Carousel.PreviousTrigger
-            className="cover-flow__trigger"
+            className="cover-flow__trigger cx-trigger"
             aria-label="Previous"
           >
             {"<"}
           </Carousel.PreviousTrigger>
           <Carousel.Indicators
-            className="cover-flow__indicator-group"
+            className="cover-flow__indicator-group cx-indicators"
             label="Choose slide"
           />
           <Carousel.NextTrigger
-            className="cover-flow__trigger"
+            className="cover-flow__trigger cx-trigger"
             aria-label="Next"
           >
             {">"}

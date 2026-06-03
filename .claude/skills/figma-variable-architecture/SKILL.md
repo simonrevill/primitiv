@@ -142,11 +142,13 @@ For a focus variant of size `S` in context collection `C`, add two frames as the
 
 1. **`focus-ring-gap`** (index 0 or 1, drawn under the ring):
    - size = control **+2 px per side** (w+4, h+4); position x=y=**−2** rel. control.
+   - **constraints = `{ horizontal: "STRETCH", vertical: "STRETCH" }`** — anchors all four edges to the parent so the ring follows when label text (and thus control width) changes.
    - 4 corner radii → `C` `framed-control/${S}/focus-ring-gap-radius`.
    - stroke INSIDE, 4 weights → `focus/ring/width`; stroke colour → `color/neutral/transparent`.
    - no fill.
 2. **`focus-ring`** (outermost):
    - size = control **+4 px per side** (w+8, h+8); position x=y=**−4** rel. control.
+   - **constraints = `{ horizontal: "STRETCH", vertical: "STRETCH" }`** — same requirement as the gap frame.
    - 4 corner radii → `C` `framed-control/${S}/focus-ring-radius`.
    - stroke INSIDE, 4 weights → `focus/ring/width`; stroke colour → `focus/ring`.
    - no fill.
@@ -173,6 +175,17 @@ Button set, 16 of 160 ring frames had slipped this way. Fix deterministically:
 sweep every `State=focus` component and `setBoundVariable` all four radius corners
 of each ring frame to the correct context+size token. Frame *offsets* are a fixed
 +4 px/side (ring) and +2 px/side (gap) regardless of size, so only the radii slip.
+
+**Gotcha — ring-frame constraints must be STRETCH, not MIN.** Both ring frames
+require `constraints: { horizontal: "STRETCH", vertical: "STRETCH" }` (the "Left &
+Right / Top & Bottom" setting in Figma's UI). With `MIN` (the default when a frame
+is created), the ring anchors only to the top-left corner and stays at a fixed pixel
+size — so when a designer changes label text and the control widens/narrows, the ring
+doesn't follow and becomes asymmetric. With `STRETCH`, Figma maintains the exact
+−2/−4 px margin on *all four sides* dynamically. Found on Tabs/Trigger and
+Accordion/Item (2026-06-03) after both were built correctly except for this one
+property. After any ring-frame build or clone sweep, verify:
+`ringFr.constraints.horizontal === "STRETCH" && ringFr.constraints.vertical === "STRETCH"`.
 
 ## Primitives referenced by framed-control
 

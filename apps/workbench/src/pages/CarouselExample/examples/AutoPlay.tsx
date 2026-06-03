@@ -1,7 +1,7 @@
 import { Carousel } from "@primitiv/react";
 
 import { carouselImages } from "../fixtures";
-import "./_autoPlay.scss";
+import "./autoPlay.css";
 
 /**
  * Autoplay — slides advance automatically every 3 seconds, pausing
@@ -17,16 +17,16 @@ import "./_autoPlay.scss";
 export function AutoPlay() {
   return (
     <Carousel.Root
-      className="autoplay"
+      className="autoplay cx-frame"
       ariaLabel="Metal primitives — autoplay"
       autoplay={{ delay: 3000 }}
       defaultPlaying
     >
-      <Carousel.Viewport className="autoplay__viewport">
+      <Carousel.Viewport className="autoplay__viewport cx-viewport-track">
         {carouselImages.map(({ src, description }) => (
-          <Carousel.Slide key={src} className="autoplay__slide">
+          <Carousel.Slide key={src} className="autoplay__slide cx-slide-surface">
             <img
-              className="autoplay__image"
+              className="autoplay__image cx-image"
               src={src}
               alt={description}
             />
@@ -35,7 +35,7 @@ export function AutoPlay() {
       </Carousel.Viewport>
       <div className="autoplay__controls">
         <Carousel.PreviousTrigger
-          className="autoplay__trigger"
+          className="autoplay__trigger cx-trigger"
           aria-label="Previous"
         >
           {"<"}
@@ -44,11 +44,11 @@ export function AutoPlay() {
           {({ playing }) => (playing ? "Pause" : "Play")}
         </Carousel.PlayPauseTrigger>
         <Carousel.Indicators
-          className="autoplay__indicator-group"
+          className="autoplay__indicator-group cx-indicators"
           label="Choose slide"
         />
         <Carousel.NextTrigger
-          className="autoplay__trigger"
+          className="autoplay__trigger cx-trigger"
           aria-label="Next"
         >
           {">"}

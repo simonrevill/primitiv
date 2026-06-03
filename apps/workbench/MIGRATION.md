@@ -95,10 +95,10 @@ Flow sliders still render after converting SliderExample.)
 
 ## Phase 3 — App shell + teardown
 
-- [ ] Convert `App.scss` → `App.css`.
-- [ ] Confirm zero `.scss` remain: `find apps/workbench/src -name '*.scss'`.
-- [ ] Remove `"sass"` from `apps/workbench/package.json`; `pnpm install`.
-- [ ] Final `vite build`.
+- [x] Convert `App.scss` → `App.css`.
+- [x] Confirm zero `.scss` remain: `find apps/workbench/src -name '*.scss'`.
+- [x] Remove `"sass"` from `apps/workbench/package.json`; `pnpm install`.
+- [x] Final `vite build`.
 
 ## Conventions / gotchas
 

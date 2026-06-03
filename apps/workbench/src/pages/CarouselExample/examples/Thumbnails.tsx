@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Carousel } from "@primitiv/react";
 
 import { carouselImages } from "../fixtures";
-import "./_thumbnails.scss";
+import "./thumbnails.css";
 
 /**
  * Thumbnails — a main carousel synced with a thumbnail strip below it.
@@ -21,33 +21,33 @@ export function Thumbnails() {
   const [page, setPage] = useState(0);
 
   return (
-    <div className="thumbnails">
+    <div className="thumbnails cx-frame">
       <Carousel.Root
         className="thumbnails__carousel"
         ariaLabel="Metal primitives — thumbnails"
         page={page}
         onPageChange={setPage}
       >
-        <Carousel.Viewport className="thumbnails__viewport">
+        <Carousel.Viewport className="thumbnails__viewport cx-viewport-track">
           {carouselImages.map(({ src, description }) => (
-            <Carousel.Slide key={src} className="thumbnails__slide">
+            <Carousel.Slide key={src} className="thumbnails__slide cx-slide-surface">
               <img
-                className="thumbnails__image"
+                className="thumbnails__image cx-image"
                 src={src}
                 alt={description}
               />
             </Carousel.Slide>
           ))}
         </Carousel.Viewport>
-        <div className="thumbnails__controls">
+        <div className="thumbnails__controls cx-controls">
           <Carousel.PreviousTrigger
-            className="thumbnails__trigger"
+            className="thumbnails__trigger cx-trigger"
             aria-label="Previous"
           >
             {"<"}
           </Carousel.PreviousTrigger>
           <Carousel.NextTrigger
-            className="thumbnails__trigger"
+            className="thumbnails__trigger cx-trigger"
             aria-label="Next"
           >
             {">"}
@@ -69,7 +69,7 @@ export function Thumbnails() {
             aria-pressed={index === page}
             onClick={() => setPage(index)}
           >
-            <img src={src} alt="" className="thumbnails__thumb-image" />
+            <img src={src} alt="" className="thumbnails__thumb-image cx-image" />
           </button>
         ))}
       </div>

@@ -458,3 +458,5 @@ Practical behaviour:
 - `body/{xs–xl}/…`, `heading/{h1–h6}/…`, `display/{lg,xl}/…`, `overline/…`
 
 **Component label text nodes** (e.g. Button's "Button text") bind directly to Context collection variables inline — no text style applied. They respond correctly to frame mode overrides without any text style involvement.
+
+> **Gotcha — text styles silently break density.** Applying a text style to a component text node looks correct in the Figma panel but is a density bug: `TextStyle` has no `setExplicitVariableModeForCollection` and always resolves at the collection's default mode (Compact, `369:9`), regardless of any frame mode override. The text will render at Compact values even inside a Dense or Spacious frame. **Always bind `fontSize`, `fontStyle`, `fontFamily`, and `lineHeight` inline via `node.setBoundVariable`.** This applies to every TEXT node in every component — framed-controls, surface components, non-framed compositions. If any of the four fields is missing from `node.boundVariables`, it is unbound and will not respond to density. Found on Modal/Header title (2026-06-04).

@@ -12,6 +12,14 @@ canvas analysis, which is slow and error-prone.
 
 **Rule:** no component design is *done* until its description is written.
 
+**Pre-description check — text typography bindings.** Before writing the
+description, verify that every TEXT node in the component set has its typography
+bound inline to Context collection variables (`fontSize`, `fontStyle`,
+`fontFamily`, `lineHeight` — all four fields in `node.boundVariables`). A text
+style applied instead looks correct in the panel but silently ignores density
+mode overrides. If any text node is missing bindings, fix it first — then write
+the description.
+
 ---
 
 ## Schema
@@ -566,6 +574,103 @@ Pairs with: Button (when a label is needed), Modal.Close, Toolbar, ActionBar
 Notes: width = height = framed-control/{size}/height — always square, no padding-inline binding needed.
   link variant: no fill or stroke; disabled link uses 50% root opacity.
   Focus ring: two-frame anatomy (focus-ring-gap + focus-ring); ring dimensions = comp.width+4/+8, re-swept after arrange to fix constraint offset computed against initial resize(32,32). STRETCH constraints maintain correct offsets across density modes after the sweep.
+```
+
+### Modal — `435:10250`
+
+```
+Floating dialog overlay — fixed-width surface with header, body, and optional footer.
+
+Type: surface component (overlay)
+
+Axes: Size sm|md|lg|xl
+
+Tokens: fill → surface/default (Intent Light mode set on Modal page)
+        header divider → border/subtle (border-bottom 1px); footer divider → border/subtle (border-top 1px)
+        title → label/md/* Khand SemiBold; color → content/primary
+        description → body/sm/* Asta Sans Regular; color → content/secondary
+        sizing → modal/{size}/radius|padding-inline|padding-block|gap (Context collection)
+        shadow → hardcoded y=8 blur=24 rgba(0,0,0,0.16) — pending elevation/* tokens
+
+Fixed widths: sm=360px · md=520px · lg=640px · xl=800px (hardcoded, not token-driven)
+
+Properties: Title (TEXT "Dialog title") · Description (TEXT "Supporting description text") · Show description (BOOL true) · Show footer (BOOL true) · Show close (BOOL true)
+
+Density: Context mode override on parent frame (modal/* tokens scale across Dense/Compact/Comfortable/Spacious)
+Pairs with: Modal/Header · Modal/Body · Modal/Footer (parallel sub-component documentation sets)
+            Icon Button xs/secondary (close), Button md/primary + md/secondary (footer)
+Notes: no intent axis; no focus ring — display surface; open/close is Portal/Overlay concern in React.
+  Footer buttons right-aligned; labels "Cancel"/"Confirm" with icons off.
+  Close button is Icon Button Size=xs, Variant=secondary.
+  Direct-frame-children (not nested instances) — API blocks componentPropertyReferences on instance sublayers.
+  Shadow hardcoded until elevation/* tokens exist. Light mode set explicitly on Modal page for surface/default.
+```
+
+### Modal/Header — `435:9450`
+
+```
+Header bar for a Modal dialog — title text with optional close button.
+
+Type: surface component (sub-component of Modal)
+
+Axes: Size sm|md|lg|xl
+
+Tokens: title text → label/md/* Khand SemiBold; color → content/primary
+        close button → action/secondary/* (Icon Button, Variant=secondary, Size=xs)
+        divider → border/subtle (border-bottom, 1px INSIDE)
+        sizing → modal/{size}/padding-inline|padding-block|gap (Context collection)
+
+Properties: Title (TEXT "Dialog title") · Show close (BOOL true)
+
+Density: Context mode override on parent frame
+Pairs with: Modal, Modal/Body, Modal/Footer
+Notes: Close button is Icon Button Size=xs (not md) — fits better across all Modal sizes.
+  Use Size matching the parent Modal's Size for correct token resolution and typography.
+```
+
+### Modal/Body — `435:10108`
+
+```
+Content area for a Modal dialog — padded slot for arbitrary content.
+
+Type: surface component (sub-component of Modal)
+
+Axes: Size sm|md|lg|xl
+
+Tokens: sizing → modal/{size}/padding-inline|padding-block|gap (Context collection)
+
+Fixed widths: sm=360px · md=520px · lg=640px · xl=800px
+
+Properties: (none — content slot is open; drag content into the slot frame)
+
+Density: Context mode override on parent frame
+Pairs with: Modal, Modal/Header, Modal/Footer
+Notes: Inner "slot" frame is FILL width, 80px FIXED height — provides substance when empty.
+  Replace with actual content (Field, form layout, etc.) for usage.
+  Use Size matching the parent Modal's Size for correct padding token resolution.
+```
+
+### Modal/Footer — `435:10161`
+
+```
+Footer action bar for a Modal dialog — Cancel and Confirm buttons, right-aligned.
+
+Type: surface component (sub-component of Modal)
+
+Axes: Size sm|md|lg|xl
+
+Tokens: divider → border/subtle (border-top, 1px INSIDE)
+        sizing → modal/{size}/padding-inline|padding-block|gap (Context collection)
+        buttons → action/secondary/* (Cancel) · action/primary/* (Confirm); both Button Size=md, icons off
+
+Fixed widths: sm=360px · md=520px · lg=640px · xl=800px
+
+Properties: (none — Cancel/Confirm labels and sizes are static)
+
+Density: Context mode override on parent frame (modal/* padding/gap tokens scale; button height follows framed-control/md/* within density context)
+Pairs with: Modal, Modal/Header, Modal/Body
+Notes: primaryAxisAlignItems=MAX (right-aligned). Use Size matching the parent Modal's Size.
+  Button labels are static — replace instances for different action labels.
 ```
 
 ---

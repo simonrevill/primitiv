@@ -294,6 +294,11 @@ re-reading Figma.
   column's button left edge (delta should be 0).
 - **Default instance**: `set.children.find(n=>n.type==="COMPONENT")` returns
   the intended top-left variant.
+- **Text typography bindings**: every TEXT node in the set must have `fontSize`,
+  `fontStyle`, `fontFamily`, and `lineHeight` bound inline to Context collection
+  variables — never via a text style. Verify with `node.boundVariables`: all four
+  fields must be present. Any unbound field is a density bug — the text will silently
+  ignore frame mode overrides and always render at Compact values.
 
 ## Gotchas (quick list)
 
@@ -305,6 +310,7 @@ re-reading Figma.
 - `figma_capture_screenshot` (live) over `figma_take_screenshot` (cloud).
 - Ring-frame radius slips survive cloning — always sweep-fix.
 - **Ring-frame constraints must be `STRETCH`, not `MIN`**: both `focus-ring` and `focus-ring-gap` need `constraints: { horizontal: "STRETCH", vertical: "STRETCH" }` so the ring follows the control when label text changes. The default on a new frame is `MIN` (anchored top-left only) — always set this explicitly. See `figma-variable-architecture` → "Gotcha — ring-frame constraints must be STRETCH".
+- **Text typography must be bound inline — never via text styles.** Every TEXT node's `fontSize`, `fontStyle`, `fontFamily`, and `lineHeight` must be bound to Context variables (`label/{size}/*`, `body/{size}/*`, `content/*` etc.) via `node.setBoundVariable`. A text style looks correct in the panel but silently ignores frame mode overrides — it always resolves at the default mode (Compact) regardless of which density the containing frame is set to. Found on Modal/Header title (2026-06-04). Applies to every text node in every component, including surface and non-framed-control components.
 - **Border widths must go through the Context layer — never bind directly to Primitives.** Every framed-control stroke side weight (`strokeTopWeight` etc.) must be bound to `framed-control/border-width` (Context collection, `VariableID:428:6601`), which aliases `border-width/1` in Primitives. Binding directly to `border-width/1` (Primitive) violates the token layering rule. Hardcoded numeric weights (including 1.5px on Checkbox/Radio — now corrected to 1px) are also forbidden. After any clone-and-rebind sweep, verify with `node.boundVariables.strokeTopWeight?.id === 'VariableID:428:6601'`.
 - **x=0 clamp gotcha**: Adding `layoutMode = "HORIZONTAL"` to an existing
   frame in-place clamps any child at a negative x/y to 0 during the layout

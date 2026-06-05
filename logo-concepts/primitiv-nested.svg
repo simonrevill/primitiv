@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Outer equilateral triangle minus a concentric triangle scaled
+       0.5 about the centroid (50,55): a clean triangular ring.
+       The primitive form as a container. -->
+  <path fill="#000" fill-rule="evenodd"
+        d="M50 10 L11 77.5 L89 77.5 Z
+           M50 32.5 L30.5 66.25 L69.5 66.25 Z"/>
+</svg>

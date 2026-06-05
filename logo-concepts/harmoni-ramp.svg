@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Same equilateral triangle, divided into 3 bands parallel to the
+       base (trisection heights), separated by negative-space gaps.
+       A tonal ramp / proportional scale = palette harmony. -->
+  <path fill="#000"
+        d="M50 10 L62.28 31.25 L37.72 31.25 Z
+           M36.28 33.75 L63.72 33.75 L75.28 53.75 L24.72 53.75 Z
+           M23.28 56.25 L76.72 56.25 L89 77.5 L11 77.5 Z"/>
+</svg>

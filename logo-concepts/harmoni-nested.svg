@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Concentric equilateral triangles scaled 1.0 / 0.74 / 0.52 / 0.30 / 0.10
+       about the centroid (50,55). Even-odd fill yields outer ring +
+       inner ring + core: a series of proportional steps = harmony. -->
+  <path fill="#000" fill-rule="evenodd"
+        d="M50 10 L11 77.5 L89 77.5 Z
+           M50 21.7 L21.14 71.65 L78.86 71.65 Z
+           M50 31.6 L29.72 66.7 L70.28 66.7 Z
+           M50 41.5 L38.3 61.75 L61.7 61.75 Z
+           M50 50.5 L46.1 57.25 L53.9 57.25 Z"/>
+</svg>

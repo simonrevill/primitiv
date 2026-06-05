@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Equilateral triangle A(50,10) B(11,77.5) C(89,77.5)
+       with the medial (midpoint) triangle removed as negative space.
+       The primitive form + its first recursive subdivision. -->
+  <path fill="#000" fill-rule="evenodd"
+        d="M50 10 L11 77.5 L89 77.5 Z
+           M30.5 43.75 L69.5 43.75 L50 77.5 Z"/>
+</svg>

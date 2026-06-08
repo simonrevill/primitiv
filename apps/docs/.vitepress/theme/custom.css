@@ -1,0 +1,56 @@
+/*
+ * Primitiv branding for the docs site.
+ *
+ * Matches the workbench type system (apps/workbench/src/index.css):
+ *   - Asta Sans for body / UI text
+ *   - Khand for headings and brand labels
+ *   - VitePress default mono for code (left untouched)
+ *
+ * Fonts are loaded from Google Fonts in .vitepress/config.ts (head links).
+ */
+
+:root {
+  --vp-font-family-base: "Asta Sans", system-ui, -apple-system, sans-serif;
+}
+
+/* Khand for headings, site title, and sidebar group labels. */
+.VPDoc h1,
+.VPDoc h2,
+.VPDoc h3,
+.VPDoc h4,
+.VPHero .name,
+.VPHero .text,
+.VPNavBarTitle .title,
+.VPSidebarItem.level-0 > .item > .text,
+.vp-doc h1,
+.vp-doc h2,
+.vp-doc h3,
+.vp-doc h4 {
+  font-family: "Khand", system-ui, sans-serif;
+  letter-spacing: 0.01em;
+}
+
+/*
+ * The repo logo lockups are hard-coded fill="#000", so they vanish on the
+ * dark theme. Invert them (and the nav mark) in dark mode. v1 stopgap until a
+ * currentColor / two-tone export exists.
+ */
+.dark .VPImage.logo,
+.dark img.primitiv-logo,
+.dark img.harmoni-logo {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+/* Brand lockups used on the home page. */
+.brand-lockups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2.5rem;
+  align-items: center;
+  margin: 2rem 0 1rem;
+}
+
+.brand-lockups img {
+  height: 56px;
+  width: auto;
+}

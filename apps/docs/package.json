@@ -1,0 +1,14 @@
+{
+  "name": "@primitiv/docs",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "docs:dev": "node scripts/gen-react-pages.mjs && vitepress dev",
+    "docs:build": "node scripts/gen-react-pages.mjs && vitepress build",
+    "docs:preview": "vitepress preview",
+    "gen:react": "node scripts/gen-react-pages.mjs"
+  },
+  "devDependencies": {
+    "vitepress": "^1.6.3"
+  }
+}

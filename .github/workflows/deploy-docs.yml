@@ -1,0 +1,85 @@
+name: Deploy docs
+
+# Manual only — never publishes on push. Trigger it from the GitHub mobile
+# web UI (Actions → "Deploy docs" → Run workflow) or by asking Claude to run it.
+on:
+  workflow_dispatch:
+
+# Allow one concurrent deployment; let an in-progress run finish.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install wasm-pack
+        uses: jetli/wasm-pack-action@v0.4.0
+
+      # Build the wasm package first: it generates crates/harmoni-wasm/pkg,
+      # the workspace member the workbench depends on. Without it, pnpm install
+      # fails to resolve the "harmoni-wasm" workspace package.
+      - name: Build harmoni-wasm
+        run: wasm-pack build crates/harmoni-wasm --target web
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      # Sub-path base + hash router so the SPA works under /primitiv/workbench/
+      # and deep links survive a hard refresh on GitHub Pages.
+      - name: Build workbench
+        env:
+          WORKBENCH_BASE: /primitiv/workbench/
+          VITE_HASH_ROUTER: "true"
+        run: pnpm --filter workbench build
+
+      - name: Build docs
+        run: pnpm --filter @primitiv/docs docs:build
+
+      # Combine: the workbench is served from /workbench/ within the docs site.
+      - name: Assemble site
+        run: |
+          cp -r apps/workbench/dist apps/docs/.vitepress/dist/workbench
+          touch apps/docs/.vitepress/dist/.nojekyll
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: apps/docs/.vitepress/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,5 @@
+node_modules
+# Monorepo uses a single root lockfile; this only appears from an isolated install.
+pnpm-lock.yaml
+.vitepress/dist
+.vitepress/cache

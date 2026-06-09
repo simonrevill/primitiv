@@ -12,6 +12,10 @@ in [`../RELEASING.md`](../RELEASING.md); the full decision log (D1–D25) lives 
 - npm names **reserved** (placeholder packages, v0.0.1, owner: `simonrevill`):
   - `primitiv-ui` — the CLI package (command: `primitiv`)
   - `create-primitiv-ui` — the `npm create primitiv-ui` scaffold
+- npm **scope `@primitiv-ui` secured** — the `primitiv-ui` npm **org** is owned
+  (org names carry no `@`; owning the org reserves every `@primitiv-ui/*` name).
+  So `@primitiv-ui/react`, `/icons`, `/tokens`, `/cli-*` need **no** per-package
+  registration — each is created on first publish.
 - Placeholders live under `reserved/` (outside the pnpm workspace).
 
 ## 🔐 Security cleanup — done (2026-06-09)

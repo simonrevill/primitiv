@@ -51,10 +51,23 @@ adapters, hand-authored golden files, 100% coverage):
 - [ ] **The CLI** (RFC 0005) — `init` / `add` / `tokens` / `theme` / `list`, `primitiv.json`, the static registry, refresh + wiring behaviour.
 - [ ] **Distribution** (RFC 0005 §7) — Rust binary via `optionalDependencies` (`@primitiv-ui/cli-*`), `cargo-dist`/napi-rs matrix; supersede the published v0.0.1 name-reservation placeholders with the real `primitiv-ui` / `create-primitiv-ui` at a higher version.
 
-## ❓ Small open questions to settle during the build
+## ❓ Open questions
 
-- Dark-mode switch selector — `[data-theme="dark"]` vs `.dark` (RFC 0006 §10).
-- TS token object shape; Tailwind v4-only vs also v3 (RFC 0006 §10).
-- `primitiv theme` output — separate overrides file vs merge (RFC 0006 §10).
-- Written-file manifest location; registry hosting URL; package-manager coverage (RFC 0005 §9).
-- (Already settled: BEM compound-part naming, hybrid `contract.json` generation, all-four token formats, light-theme + dark-tokens; **CSS cascade layers + two-tier token scoping — RFC 0008**; **mode scoping via `data-theme`/`data-density` attributes — RFC 0009**, which also resolves the old dark-switch-selector open question.)
+**Cleared before the build (2026-06-10, D45–D49)** — the pre-build open questions
+are now settled: root-class emission (component-emitted identity classes, D45),
+Tailwind v4-only (D46), nested+typed TS tokens (D47), paired light+dark from
+`primitiv theme` with a stable structural contract (D48), and the operational
+cluster — `cargo-llvm-cov`, in-memory FS for command tests, separate
+`primitiv.theme` file, reserved-empty reset layer, GitHub-raw registry, separate
+`primitiv.lock` manifest, Deno out of scope (D49). Plus the earlier settles: BEM
+part naming, hybrid `contract.json`, all-four formats, cascade layers + two-tier
+token scoping (RFC 0008), and `data-theme`/`data-density` mode scoping (RFC 0009).
+
+**Deliberately deferred (answer emerges during the build):**
+
+- Config-parser fuzzing (RFC 0007 §11.3) — once the parsers exist.
+- A `rust-cli-test-conventions` skill (RFC 0007 §11.4) — after the first command.
+- Workbench styled-preview shape (RFC 0006 §10.5) — while authoring the theme.
+- A first-class CSS Modules emit (RFC 0006 §10.6) — post-v1; no longer blocked.
+- `DensityProvider` ergonomics + responsive-density emit shape (RFC 0009 §8.1–8.2)
+  — post-v1.

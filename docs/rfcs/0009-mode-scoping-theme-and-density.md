@@ -280,14 +280,16 @@ post-v1.)
 1. **A `DensityProvider` convenience?** Whether `@primitiv-ui/react` ships an
    optional component/hook that sets `data-density` (and reads the active value)
    for ergonomic React use, or the bare attribute is left to the consumer. Bare
-   attribute is the v1 floor either way (§3.2).
+   attribute is the v1 floor either way (§3.2). *(Deferred — post-v1 ergonomics.)*
 2. **Responsive-density emit shape.** When §5 is built, exactly how the emitter
    exposes each density block for container queries (a utility class per density,
-   a documented mixin, a generated `@container` ruleset) — deferred with the
-   feature.
-3. **`add`-time Tailwind `dark:` remap.** Whether the wiring step (RFC 0005 §4.3)
-   *offers to write* the `@custom-variant dark …` line or only documents it (ties
-   to RFC 0008 §7.3, the analogous Tailwind layer-order wiring question).
+   a documented mixin, a generated `@container` ruleset) — *deferred with the
+   feature.*
+3. ~~**`add`-time Tailwind `dark:` remap.**~~ **Resolved (D49):** the wiring step
+   **reuses the detect-and-offer-to-patch mechanism** (RFC 0005 §4.3, D19) —
+   documents the `@custom-variant dark …` line and offers to write it (applied
+   under `--yes`, skipped under `--no-wiring`). Same mechanism as the layer-order
+   statement (RFC 0008 §7.3).
 
 ---
 

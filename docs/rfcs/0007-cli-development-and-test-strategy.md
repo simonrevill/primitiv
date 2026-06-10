@@ -261,16 +261,18 @@ fast and precise; the e2e layer proves the seams are wired.
 
 ## 11. Open questions
 
-1. **In-memory `FileSystem` vs always `assert_fs`.** Whether command-layer tests
-   use a pure in-memory FS fake (fastest) or a temp dir uniformly (simpler, one
-   mechanism). Likely in-memory for command tests, `assert_fs` for e2e.
-2. **`cargo-llvm-cov` vs `tarpaulin`** for the coverage gate, and the exact CI
-   trigger path filter.
+1. ~~**In-memory `FileSystem` vs always `assert_fs`.**~~ **Resolved (D49):**
+   in-memory FS fake for command-layer tests (fastest), `assert_fs` temp dirs for
+   the e2e layer (real adapter wiring).
+2. ~~**`cargo-llvm-cov` vs `tarpaulin`.**~~ **Resolved (D49):** `cargo-llvm-cov`
+   (more accurate, already the assumed tool in §7/§9). Exact CI trigger path
+   filter settled when the workflow is written.
 3. **Config-format parsers as a fuzz target.** Whether `primitiv.json` and DTCG
-   parsing warrant `proptest`/fuzzing beyond example-based tests.
+   parsing warrant `proptest`/fuzzing beyond example-based tests. *(Deferred —
+   decide once the parsers exist; example-based tests first.)*
 4. **A `rust-cli-test-conventions` skill.** Promote §3–§6 into an on-demand skill
    (mirroring `react-test-conventions`) once the first command is built and the
-   patterns are proven.
+   patterns are proven. *(Deliberately deferred until the patterns are real.)*
 
 ---
 

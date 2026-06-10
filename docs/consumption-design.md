@@ -486,6 +486,17 @@ dark-mode scope into two orthogonal mode axes set as inheritable DOM attributes:
 | D43 | Model works across **all four formats** with no per-format reinvention; Tailwind wiring documented — remap the `dark:` variant to `[data-theme="dark"]`, optional `data-[density]` variants; v4 utilities inherit the active mode automatically (CSS-variable-native) |
 | D44 | **v1 ships attribute-based density**; **responsive (container-query) density is designed-in but deferred** — additive on the same value-sets (each density also exposed as a container-applicable block + a `container-type` helper); CSS style-queries the eventual purest path |
 
+**Open-question clear-out (2026-06-10) — before building.** Settling the live RFC
+open questions ahead of implementation:
+
+| # | Decision |
+|---|---|
+| D45 | The **headless component emits its root/part identity classes** (`.primitiv-button`, `.primitiv-tabs__trigger`), merged with any consumer `className` — so a "component + styles" install needs no hand-wired identity class. **Only** root/part classes are emitted (modifiers stay consumer/recipe-applied) and **only** semantic classes (never utilities — the package stays styling-agnostic for Dev 1). Resolves RFC 0004 §7.5; unblocks the CSS-Modules story (RFC 0006 §10.6) — module projects consume the global contract stylesheet |
+| D46 | Tailwind output target = **v4 only** for v1 (CSS-variable-native); v3 best-effort via `data-[…]:` variants, not a promise. Resolves RFC 0006 §10.3 |
+| D47 | Emitted TS/JS token object = **nested + typed** (`tokens.color.primary`), **CLI-emitted** like the other formats (per D23), not hand-maintained. Resolves RFC 0006 §10.2 |
+| D48 | `primitiv theme --brand` emits a **paired light + dark** palette in v1; the emitted **structure (names, file shape, `[data-theme]` scope) is the stable contract**, while dark *values* track `harmoni-core`'s dark ramp and evolve **non-breakingly** (Principle 2). Resolves RFC 0005 §9.1 |
+| D49 | **Operational ratifications:** theme overrides = separate file in `primitiv.theme` (RFC 0006 §10.4); coverage = `cargo-llvm-cov`, command tests = in-memory FS + e2e = `assert_fs` (RFC 0007 §11); `primitiv.reset` reserved-empty + per-component stylesheets re-open named layers + Tailwind layer/`dark:` wiring reuses the D19 detect-and-offer mechanism (RFC 0008 §7, RFC 0009 §8.3); written-file manifest = separate `primitiv.lock`-style sibling, registry = GitHub raw at the pinned tag (CDN fast-follow), package managers = pnpm/npm/yarn/bun with **Deno out of scope v1** (RFC 0005 §9) |
+
 ---
 
 ## 11. Open questions

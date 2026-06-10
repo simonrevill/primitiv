@@ -137,8 +137,8 @@ a thin front-end over it.
 |---|---|---|
 | **CSS** | `--primitiv-*` custom properties | **Canonical.** Everything else is an adapter over these. |
 | **SCSS** | SCSS variables / maps + the same selectors | Resolves to the CSS custom properties; gives SCSS-pipeline users `$`-vars and maps. |
-| **TS/JS** | a typed token object | For tokens-in-code (JS styling, theming the React layer, tooling). |
-| **Tailwind** | a preset/config + per-component recipes | Tailwind **v4 is CSS-variable-native**, so the preset largely *is* the custom properties plus a `@theme` mapping — a thin, natural adapter. |
+| **TS/JS** | a **nested, typed** token object (`tokens.color.primary`), CLI-emitted | For tokens-in-code (JS styling, theming the React layer, tooling). Nested for autocomplete (D47). |
+| **Tailwind** | a **v4** preset/config + per-component recipes | Tailwind **v4 is CSS-variable-native**, so the preset largely *is* the custom properties plus a `@theme` mapping — a thin, natural adapter. **v4-only for v1** (D46); v3 best-effort, not promised. |
 
 One emitter, four serialisers; identical values across all (design doc §5.4).
 
@@ -172,6 +172,16 @@ styles resolve those properties, a generated palette re-skins every component
 without touching component CSS — the canonical re-skin path of design doc §5.3
 (D11). The default value of the primary token is Primitiv's own primary; the
 brand flag overrides it.
+
+**The brand emit is paired light + dark from day one (D48).** `primitiv theme
+--brand` derives *both* a light and a dark palette from the brand and emits both
+scopes (`:root`/`[data-theme="light"]` and `[data-theme="dark"]`) — not light
+only. The **structural output is the stable contract**: the token names, the file
+shape, and the `[data-theme]` scope do not change. Only the dark *values* depend
+on `harmoni-core`'s current dark-ramp generation, and those may improve later
+(`dark-mode-palettes`) as **non-breaking value updates** — by Principle 2, a
+change to how the dark ramp is computed never changes what the CLI emits
+*structurally*.
 
 ### 5.2 Light + dark (D24)
 
@@ -282,27 +292,26 @@ Specified in RFC 0005; listed here for the pipeline's entry points:
    `data-*`-attribute scope is canonical for both mode axes (`[data-theme]`,
    `[data-density]`), over a `.class`. The `prefers-color-scheme` variant stays
    **opt-in**, not default (RFC 0009 §6).
-2. **TS token object shape.** Flat (`tokens['color.primary']`) vs nested
-   (`tokens.color.primary`), and whether it ships as part of `@primitiv-ui/tokens`
-   or is emitted by the CLI like the other formats.
-3. **Tailwind version target.** v4-first (CSS-variable-native, simplest) vs
-   also supporting v3 (`theme.extend` JS config) for the Tailwind output.
-4. **Theme output location.** Does `primitiv theme` write a separate overrides
-   file or merge into the emitted token file? **RFC 0008 §5 recommends** a
-   separate file in the `primitiv.theme` sublayer, which beats the base tokens by
-   *layer order* rather than load order — to ratify here.
+2. ~~**TS token object shape.**~~ **Resolved (D47):** a **nested, typed** object
+   (`tokens.color.primary`) for autocomplete, **CLI-emitted** like the other
+   formats (consistent with D23), not hand-maintained in `@primitiv-ui/tokens`.
+3. ~~**Tailwind version target.**~~ **Resolved (D46):** **v4-only** for v1
+   (CSS-variable-native, aligns with the whole token model); v3 is best-effort via
+   `data-[…]:` variants, not a v1 promise.
+4. ~~**Theme output location.**~~ **Resolved (D49):** a **separate** overrides
+   file in the `primitiv.theme` sublayer (RFC 0008 §5) — it beats the base tokens
+   by *layer order*, not load order, so it is robust regardless of import order.
 5. **Workbench styled-preview shape.** One combined themed gallery vs a styled
-   variant of each existing per-component example page.
-6. **CSS Modules output — parked.** Not a v1 format (the four of D23 stand). CSS
-   Modules only localises *class names*; the contract's `data-*` and `--primitiv-*`
-   layers are global and module-safe, so the only friction is the root/modifier
-   **class** layer. Whether a clean `.module.css` emit is even possible hinges on
-   an RFC 0004 decision — *does the headless component hard-emit a fixed root
-   class (→ needs `:global()`, awkward) or rely on a consumer-applied
-   `className` (→ modules work naturally)?* Until that's settled, module projects
-   are served by importing the global `.css`/`.scss` contract stylesheet once at
-   the root while keeping modules for their own components. Revisit once the
-   contract's class-emission is pinned down.
+   variant of each existing per-component example page. *(Deferred — emerges while
+   authoring the default theme; not blocking the emitter.)*
+6. **CSS Modules output — parked (post-v1).** Not a v1 format (the four of D23
+   stand). The blocking dependency — *does the component hard-emit the root class?*
+   — is now **resolved (D45): it does** (an emitted **global** identity class). So
+   module projects consume the global `.css`/`.scss` contract stylesheet once at
+   the root (keeping modules for their *own* components); `:global()` is only
+   needed if a module redefines the class, which is not the path. A first-class
+   `.module.css` emit can be revisited post-v1, but the integration story no longer
+   blocks on an open question.
 
 ---
 
@@ -318,3 +327,7 @@ Specified in RFC 0005; listed here for the pipeline's entry points:
 | 6 | One visual design, emitted per format; all formats identical | D6 |
 | 7 | `primitiv theme` (Harmoni) emits theme-token overrides re-skinning via custom properties | D11 |
 | 8 | Default theme authored by **extending `apps/workbench`** with a styled preview (conscious CLAUDE.md exception) | D25 |
+| 9 | Tailwind output = **v4 only** for v1; v3 best-effort, not promised | D46 |
+| 10 | TS/JS token object = **nested + typed** (`tokens.color.primary`), CLI-emitted | D47 |
+| 11 | `primitiv theme --brand` emits **paired light + dark** in v1; emitted **structure is the stable contract**, dark values from `harmoni-core` evolve non-breakingly | D48 |
+| 12 | `primitiv theme` writes a **separate** overrides file in the `primitiv.theme` sublayer (robust by layer order, not load order) | D49 |

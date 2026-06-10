@@ -165,12 +165,12 @@ defeating Principle 1. Therefore **Primitiv-emitted CSS contains no
 ### 2.6 Orthogonal to root-class emission (RFC 0004 §7.5)
 
 A cascade layer wraps *rule blocks* (`.primitiv-button { … }`), not the act of
-applying a class. So the layer model holds **identically** whether the headless
-component hard-emits `.primitiv-button` or the consumer applies it via
-`className`. RFC 0004 §7.5 therefore stays open on its own merits; this RFC does
-not depend on it and does not settle it. (The genuinely class-emission-sensitive
-question is the **CSS Modules** output, RFC 0006 §10.6 — unaffected here because
-v1 ships no module format.)
+applying a class. So the layer model holds **identically** regardless of who puts
+the class on the element. RFC 0004 §7.5 has since been **resolved (D45): the
+component emits its root/part identity classes** — but that decision and this one
+are independent, exactly because a layer wraps the rule, not the application.
+(The class-emission decision matters for the **CSS Modules** output, RFC 0006
+§10.6 — unaffected here because v1 ships no module format.)
 
 ---
 
@@ -319,19 +319,20 @@ that one design, not a per-format reinvention.
 
 ## 7. Open questions
 
-1. **Reset layer.** Whether v1 ships any opt-in `primitiv.reset` content (e.g. a
-   `box-sizing` normaliser scoped to contract classes) or leaves the sublayer
-   reserved-and-empty. Leaning empty — the components are headless and a reset is
-   the consumer's concern.
-2. **Anonymous vs named nested layers.** The sublayer statement is written once
-   in the shared token file (§2.1); confirm every per-component stylesheet
-   re-states `@layer primitiv.base { … }` (re-opening a named layer is safe and
-   order-stable) rather than relying on a single concatenated bundle, since
-   copy-in files are imported independently.
-3. **Tailwind layer-order enforcement.** Whether the `add` wiring step (RFC 0005
-   §4.3) *offers to write* the recommended `@layer … primitiv … utilities`
-   statement into the consumer's entry CSS, or only documents it. Ties to the
-   Tailwind-version open question (RFC 0006 §10.3).
+1. ~~**Reset layer.**~~ **Resolved (D49):** `primitiv.reset` is **reserved but
+   empty** in v1 — the components are headless and a reset is the consumer's
+   concern. The sublayer name is declared so the order stays stable if one is
+   ever added.
+2. ~~**Anonymous vs named nested layers.**~~ **Resolved (D49):** every
+   per-component stylesheet **re-opens the named layer** (`@layer primitiv.base
+   { … }`) — re-opening is safe and order-stable, and copy-in files are imported
+   independently, so a single concatenated bundle cannot be assumed.
+3. ~~**Tailwind layer-order enforcement.**~~ **Resolved (D49):** the `add` wiring
+   step **reuses the existing detect-and-offer-to-patch mechanism** (RFC 0005
+   §4.3, D19) — it documents the recommended `@layer … primitiv … utilities`
+   statement and offers to write it (applied under `--yes`, skipped under
+   `--no-wiring`). Same mechanism as the Tailwind `dark:`-variant remap (RFC 0009
+   §8.3).
 
 ---
 

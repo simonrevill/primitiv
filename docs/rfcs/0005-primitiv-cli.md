@@ -183,7 +183,9 @@ from `primitiv.json`; both are overridable by flag.
 Links `harmoni-core` natively to derive a contrast-checked palette from a brand
 colour and emit it as **theme token overrides** (the `--primitiv-<token-path>`
 layer, RFC 0004 §3.3) in the chosen format. `--brand <hex>` required;
-`--out <path>` optional. (Dark-palette generation is an open question, §9.)
+`--out <path>` optional. **Emits paired light + dark** from the brand (D48): the
+emitted *structure* is the stable contract; dark *values* track `harmoni-core`
+and evolve non-breakingly (RFC 0006 §5.1/§5.3).
 
 ### 2.5 `list`
 
@@ -541,17 +543,19 @@ the libraries still publish to both. (Detail tracked in `RELEASING.md`.)
 
 ## 9. Open questions
 
-1. **Dark theme generation (§2.4).** Whether `primitiv theme` emits a dark
-   palette in v1, and how it surfaces (a `--dark` flag, a paired light/dark
-   emit). Ties to the deferred dark-mode work (`dark-mode-palettes` skill).
-2. **Written-file manifest location (§4.2).** Where the hash manifest lives — a
-   field in `primitiv.json`, a sibling `.primitiv/` dir, or a lockfile-style
-   `primitiv.lock`.
-3. **Registry hosting concretely (§6.4).** GitHub raw at a tag vs a CDN mirror
-   as the canonical fetch URL for v1.
-4. **Package-manager coverage (§2.1).** pnpm / npm / yarn / bun are detected
-   from the lockfile; confirm Deno (and bun's workspace quirks) are out of scope
-   for v1.
+1. ~~**Dark theme generation (§2.4).**~~ **Resolved (D48):** `primitiv theme`
+   emits a **paired light + dark** palette from the brand in v1; the emitted
+   *structure* is stable, the dark *values* evolve with `harmoni-core`
+   non-breakingly. (No separate `--dark` flag needed; dark is always paired.)
+2. ~~**Written-file manifest location (§4.2).**~~ **Resolved (D49):** a separate
+   generated **`primitiv.lock`-style sibling** file, kept *out* of the
+   hand-editable `primitiv.json` (a generated lockfile is not something a human
+   edits).
+3. ~~**Registry hosting concretely (§6.4).**~~ **Resolved (D49):** **GitHub raw at
+   the pinned tag** is the canonical fetch URL for v1; a CDN mirror is a
+   fast-follow (the content-addressable pin makes swapping the host transparent).
+4. ~~**Package-manager coverage (§2.1).**~~ **Resolved (D49):** pnpm / npm / yarn /
+   bun only (detected from the lockfile); **Deno is out of scope for v1.**
 5. ~~`add` for non-React frameworks.~~ **Resolved (D26, §1.5.2):** React-only
    component logic; the `primitiv.json` `framework` field is forward-looking, not
    load-bearing.
@@ -574,3 +578,5 @@ the libraries still publish to both. (Detail tracked in `RELEASING.md`.)
 | 10 | v1 auto-wiring adapters = **Vite + React** and **Next.js**; Remix/Astro/unknown → manual fallback | D27 |
 | 11 | Greenfield generator **deferred**; v1 `create-primitiv-ui` runs `init` in an existing app | D28 |
 | 12 | `aliases` **detected** from tsconfig/jsconfig `paths` at `init`, overridable by prompt or `--alias-*` flag, persisted; relative-import fallback when absent; minimal set (only emitted targets) given the hybrid model | D32 |
+| 13 | `primitiv theme` emits **paired light + dark** from the brand; structure stable, dark values evolve non-breakingly | D48 |
+| 14 | Written-file manifest = separate **`primitiv.lock`-style** sibling (not in `primitiv.json`); registry = **GitHub raw at the pinned tag** for v1 (CDN fast-follow); package managers = pnpm/npm/yarn/bun, **Deno out of scope v1** | D49 |

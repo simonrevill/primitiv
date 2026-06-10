@@ -150,8 +150,9 @@ surface, and it is part of each component's public API.
    `.primitiv-tabs`. A compound component names its parts **BEM-style** off the
    root — `.primitiv-tabs__trigger`, `.primitiv-tabs__panel` (decided, D14).
    Each part is directly selectable, with no descendant selector and no extra
-   emitted attribute needed to target it. (*Whether the headless component
-   emits this class or the consumer applies it is an open question — §7.5.*)
+   emitted attribute needed to target it. (*The headless component **emits**
+   these root/part identity classes — decided, §7.5 / D45 — merging them with any
+   consumer `className`.*)
 2. **Modifier classes** — *purely visual variants the headless layer does not
    model*: tone/intent, size, emphasis. `.primitiv-button--primary`,
    `.primitiv-button--lg`, `.primitiv-tabs--underline`. Applied by the consumer
@@ -257,9 +258,10 @@ Aligning with RFC 0001 §9: the Button's intents are `primary`, `secondary`,
   { Button }`. No Primitiv CSS; they style `.primitiv-button` or their own
   classes however they like.
 - **Dev 2 (complete solution).** `primitiv add button` → ensures the package,
-  asks styles? yes → format → copies `button.<fmt>` in. `<Button
-  className="primitiv-button primitiv-button--primary primitiv-button--md" />`;
-  state (`[data-loading]`) styles itself.
+  asks styles? yes → format → copies `button.<fmt>` in. The root
+  `.primitiv-button` is **emitted by the component** (§7.5); the consumer adds
+  only the visual modifiers: `<Button className="primitiv-button--primary
+  primitiv-button--md" />`; state (`[data-loading]`) styles itself.
 - **Dev 3 (styles only, has Radix).** `primitiv add button --styles-only`. The
   CSS targets the contract; it applies to a Radix button to the degree that
   button emits the same root class + `data-*` (§5).
@@ -318,18 +320,29 @@ decision record):
 4. ~~Dev 3 reach investment (§5)~~ — **resolved (D17):** document the boundary;
    no Radix testing or shimming for v1.
 
-One question surfaced later, during the token-pipeline discussion:
+One question surfaced later, during the token-pipeline discussion, and is now
+also resolved:
 
-5. **Who emits the root class (§3.1.1)?** The contract names `.primitiv-button`
-   as the root but doesn't pin down whether the **headless component emits it**
-   or the **consumer applies it** via `className`. This is load-bearing for two
-   dependents: the contract's own portability story, and any future **CSS
-   Modules** output (parked, RFC 0006 §10.6) — a module can own a
-   consumer-applied class cleanly, whereas a component-emitted *global* class
-   would need `:global()`. To settle on the next RFC 0004 pass. *(Note: the
-   cascade-layer model of RFC 0008 is **orthogonal** to this question — a layer
-   wraps the rule block, not the class application — so it neither depends on nor
-   blocks this decision; RFC 0008 §2.6.)*
+5. ~~**Who emits the root class?**~~ **Resolved (D45):** the **headless component
+   emits its root/part identity classes** (`.primitiv-button`,
+   `.primitiv-tabs__trigger`), merged with any consumer `className`, so a Dev 2
+   "component + styles" install works without hand-wiring the identity class.
+   Two boundaries make this safe:
+   - **Only root/part classes are emitted — never modifier classes.** Modifiers
+     (`--primary`, `--md`) are visual *choices* and stay consumer/recipe-applied
+     (§3.1.2), so the headless layer never decides appearance.
+   - **Only the *semantic* class is emitted — never utility classes.** The
+     versioned headless package stays styling-agnostic (Principle 4; Dev 1 may
+     have no Tailwind). A Tailwind consumer gets `.primitiv-button` and the
+     copied-in recipe maps it to theme-referencing utilities (`@apply` / `@theme`,
+     v4) — the component markup is identical across all formats.
+
+   *Consequence for CSS Modules (RFC 0006 §10.6):* the emitted class is a
+   **global** identity class, so module projects consume the global contract
+   stylesheet once at the root (the already-documented path); `:global()` is only
+   needed if a module tries to *redefine* it, which is not the intended flow. The
+   cascade-layer model is orthogonal either way — a layer wraps the rule block,
+   not the class application (RFC 0008 §2.6).
 
 CLI- and pipeline-level details live in RFC 0005 / 0006.
 
@@ -349,3 +362,4 @@ CLI- and pipeline-level details live in RFC 0005 / 0006.
 | 8 | Dev 3 reach is honest best-effort; document the boundary, no Radix shimming for v1 | D17 |
 | 9 | Compound components name parts BEM-style off the root (`.primitiv-tabs__trigger`) | D14 |
 | 10 | `contract.json` is hybrid: `data-*` auto-verified against the render, modifiers + custom properties authored with the stylesheet | D15 |
+| 11 | The headless component **emits its root/part identity classes** (merged with consumer `className`); modifier classes stay consumer/recipe-applied; the package emits **only semantic classes, never utilities** (stays styling-agnostic for Dev 1) | D45 |

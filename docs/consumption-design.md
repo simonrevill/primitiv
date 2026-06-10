@@ -458,7 +458,7 @@ The Agent profile is first-class, not bolted on:
 | D28 | A from-scratch project generator is **deferred past v1**; `create-primitiv-ui` is name-reserved but in v1 just runs `init` in an already-created app (errors helpfully on an empty dir) |
 | D29 | CLI test architecture = **ports & adapters**: pure core + effect traits (`FileSystem`, `PackageManager`, `Registry`, `Prompter`) faked in tests, real at the edge; `primitiv-cli` is lib + thin bin; the emitter is its own `primitiv-emit` crate; the agent flags (`--json`/`--yes`/`--dry-run`/`--registry path`) double as test seams |
 | D30 | **100% coverage** across the CLI workspace; **Rust enters CI** (`cargo test` + `cargo llvm-cov` gate) — it runs in no workflow today |
-| D31 | Generated outputs asserted via **hand-authored golden files** + exact compare (pure red-green); no auto-accepted snapshots (`insta` only as diff-review) |
+| D31 | Generated outputs asserted via **hand-authored golden files** + exact compare (pure red-green); **snapshot testing (`insta`) ruled out entirely** — not a dependency; diff ergonomics come from `pretty_assertions` (updated 2026-06-10) |
 | D32 | `aliases` are **detected** from tsconfig/jsconfig `compilerOptions.paths` at `init`, overridable by prompt or `--alias-*` flag, persisted in `primitiv.json`; relative-import fallback when absent; minimal set (only emitted targets) given the hybrid model |
 | — | **Parked:** CSS Modules as a styling-output format — kept to the four formats (D23) for v1; revisit once RFC 0004 settles whether the headless component hard-emits a root class (RFC 0006 §10.6) |
 

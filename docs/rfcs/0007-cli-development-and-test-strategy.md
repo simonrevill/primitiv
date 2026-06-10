@@ -30,8 +30,9 @@ The moves:
 3. **A test pyramid** — many pure unit tests, golden tests for the emitter,
    fake-injected command tests, a few real-binary end-to-end tests (§3).
 4. **Hand-authored golden files** — expected outputs are written by hand
-   (encoding design intent), asserted by exact compare; no auto-accepted
-   snapshots, which would pass on first run (D31, §6).
+   (encoding design intent), asserted by exact compare; **snapshot testing
+   (`insta`) is ruled out entirely** — a snapshot passes the moment you accept
+   whatever the code emitted, which is a characterisation test (D31, §6).
 5. **100% everywhere + Rust in CI** — the whole CLI workspace holds 100%
    coverage, enforced by a new `cargo test` + `cargo llvm-cov` CI job (Rust
    currently runs in no workflow) (D30, §7).
@@ -182,7 +183,9 @@ Pure data, shared across tests, mirroring the React fixture convention:
 Snapshot tools (`insta`) auto-generate a snapshot and you `cargo insta accept`
 it — so the test **passes the moment you accept whatever the code emitted**.
 That is a characterisation test, and it violates the repo rule: *no tests that
-pass on first run; if one does, delete it.*
+pass on first run; if one does, delete it.* **Snapshot testing is therefore
+ruled out for this workspace** — `insta` is not a dependency, and
+`cargo insta accept` is never how behaviour is specified.
 
 So for generated outputs we **author the expected file by hand first**:
 
@@ -193,9 +196,10 @@ So for generated outputs we **author the expected file by hand first**:
 2. **GREEN** — implement `emit_css` until the bytes match the authored intent.
 3. **REFACTOR** — clean up; the golden file stays the spec.
 
-The golden file encodes *design intent*, not "whatever the code produced."
-`insta` is permitted only as diff-review *ergonomics* on already-authored
-snapshots; `cargo insta accept` is never how new behaviour is specified.
+The golden file encodes *design intent*, not "whatever the code produced." The
+readable-diff ergonomics a snapshot tool would have offered come instead from
+**`pretty_assertions`** (a drop-in `assert_eq!` with a coloured line diff) — no
+snapshot semantics, no accept step, nothing that can pass on first run.
 
 ---
 
@@ -237,7 +241,10 @@ fast and precise; the e2e layer proves the seams are wired.
 - `predicates` — composable assertions for files/strings.
 - `serde_json` (dev) — parse and assert `--json` output.
 - `cargo-llvm-cov` — coverage measurement + the CI gate.
-- `insta` — **optional**, diff-review only (§6); not load-bearing.
+- `pretty_assertions` (dev) — readable coloured diffs on golden-file mismatch
+  (the diff ergonomics that ruled-out `insta` would have provided, §6).
+- **No `insta` / snapshot tooling** — ruled out (§6); behaviour is authored, not
+  captured.
 
 (Confirm exact versions at build time; pin in each crate's `[dev-dependencies]`.)
 
@@ -273,4 +280,4 @@ fast and precise; the e2e layer proves the seams are wired.
 |---|---|---|
 | 1 | Pure core + ports/adapters (`FileSystem`, `PackageManager`, `Registry`, `Prompter`); `primitiv-cli` is lib + thin bin; emitter is its own `primitiv-emit` crate; the agent flags double as test seams | D29 |
 | 2 | **100% coverage** across the CLI workspace; **Rust enters CI** (`cargo test` + `cargo llvm-cov` gate), since it runs in no workflow today | D30 |
-| 3 | Generated outputs asserted via **hand-authored golden files** + exact compare (pure red-green); no auto-accepted snapshots; `insta` is diff-review ergonomics only | D31 |
+| 3 | Generated outputs asserted via **hand-authored golden files** + exact compare (pure red-green); **snapshot testing (`insta`) ruled out entirely** (not a dependency); diff ergonomics via `pretty_assertions` | D31 |

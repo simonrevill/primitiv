@@ -129,6 +129,26 @@ fn overwrites_an_existing_config_when_forced() {
 }
 
 #[test]
+fn surfaces_a_failure_to_read_the_working_directory() {
+    let fs = InMemoryFs::new();
+    fs.fail_current_dir();
+
+    let err = init(&fs, &default_options()).unwrap_err();
+
+    assert!(matches!(err, CliError::Io(_)));
+}
+
+#[test]
+fn surfaces_a_write_failure() {
+    let fs = InMemoryFs::new();
+    fs.fail_writes_to(Path::new("primitiv.json"));
+
+    let err = init(&fs, &default_options()).unwrap_err();
+
+    assert!(matches!(err, CliError::Io(_)));
+}
+
+#[test]
 fn keeps_the_css_extension_for_the_tailwind_token_layer() {
     let fs = InMemoryFs::new();
 

@@ -83,9 +83,18 @@ adapters, hand-authored golden files, 100% coverage):
     read error is a hard I/O failure, an exhausted search errors with the search
     root. A new `CliError::Config` variant (exit code `5`) covers missing /
     malformed config. This unblocks `tokens` / `init` / `add`, which read it for
-    their format and path defaults. **Remaining:** the `tokens`, `init`, `add`,
-    `list` commands; the static registry (+ the `Registry` port); refresh +
-    wiring behaviour; the Tailwind `dark:`-variant remap (RFC 0009 §4.2).
+    their format and path defaults. The **`tokens` command is now landed
+    (CSS)** (`commands/tokens.rs`): it embeds the design-system DTCG documents
+    (`packages/tokens/src/*.json`) via `include_str!`, routes them into the
+    emitter per the figma-token-sync collection table (`primitives` +
+    `interaction` → base; `palette` + `intent` → theme axis; `context` →
+    density axis), and writes the canonical token layer to `--out` through the
+    `FileSystem` port (RFC 0005 §2.3). It mirrors how `theme` first landed
+    (CSS-only, config-less); `--format scss|tailwind` and `primitiv.json`
+    path / format defaults are the next increments. **Remaining:** `tokens`
+    `--format` + config defaults; the `init`, `add`, `list` commands; the
+    static registry (+ the `Registry` port); refresh + wiring behaviour; the
+    Tailwind `dark:`-variant remap (RFC 0009 §4.2).
 - [ ] **Distribution** (RFC 0005 §7) — Rust binary via `optionalDependencies` (`@primitiv-ui/cli-*`), `cargo-dist`/napi-rs matrix; supersede the published v0.0.1 name-reservation placeholders with the real `primitiv-ui` / `create-primitiv-ui` at a higher version.
 
 ## ❓ Open questions

@@ -8,6 +8,9 @@ use harmoni_core::ColorInputError;
 /// the bin can map a single type to an exit code (RFC 0005 §5).
 #[derive(Debug)]
 pub enum CliError {
+    /// A malformed invocation — an unknown command, a missing required flag, or
+    /// a flag without its value. Carries a human-readable explanation.
+    Usage(String),
     /// A brand or colour argument the emitter could not parse.
     InvalidColor(ColorInputError),
     /// A filesystem read/write failure.

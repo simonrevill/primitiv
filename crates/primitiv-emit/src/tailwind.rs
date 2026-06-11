@@ -1,6 +1,8 @@
 //! Tailwind v4 serialiser — a `@theme` preset over the custom properties
 //! (RFC 0006 §4.2, D46).
 
+use std::collections::HashSet;
+
 use crate::token::Token;
 
 /// Emit the theme-token surface as a Tailwind v4 `@theme` preset (RFC 0006 §4.2,
@@ -9,14 +11,21 @@ use crate::token::Token;
 /// preset *is* the custom properties plus this mapping — utilities resolve the
 /// vars, and a `[data-theme]`/`[data-density]` ancestor re-skins them with no
 /// extra config (RFC 0009 §4.2).
+///
+/// A name repeated across mode scopes (the same token in a light / dark or
+/// density pair) maps to one theme variable, in first-occurrence order — the
+/// `var()` reference is mode-independent, so one entry serves every mode.
 pub fn emit_tailwind(tokens: &[Token]) -> String {
     let mut out = String::from("@theme {\n");
+    let mut seen = HashSet::new();
     for token in tokens {
         let name = token.path.join("-");
-        out.push_str(&format!(
-            "  --{}: var(--primitiv-{name});\n",
-            theme_name(&token.path)
-        ));
+        if seen.insert(name.clone()) {
+            out.push_str(&format!(
+                "  --{}: var(--primitiv-{name});\n",
+                theme_name(&token.path)
+            ));
+        }
     }
     out.push_str("}\n");
     out

@@ -761,6 +761,34 @@ fn the_format_flag_overrides_the_config_stylesheet_format() {
 }
 
 #[test]
+fn the_path_flag_overrides_the_config_styles_destination() {
+    let fs = InMemoryFs::new();
+    // The config writes under src/styles/primitiv, but --path redirects this run.
+    fs.write(Path::new("primitiv.json"), CONFIG).unwrap();
+    let registry =
+        InMemoryRegistry::new(WITH_STYLES).with_file("button", "styles.css", b".primitiv-button{}");
+    let output = InMemoryOutput::new();
+    let runner = InMemoryProcessRunner::new();
+
+    add(
+        &fs,
+        &registry,
+        &output,
+        &runner,
+        &AddOptions {
+            components: names(&["button"]),
+            path: Some("lib/styles".to_string()),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+
+    // The stylesheet lands under the overridden path, not the config's.
+    assert!(fs.exists(Path::new("lib/styles/button/styles.css")));
+    assert!(!fs.exists(Path::new("src/styles/primitiv/button/styles.css")));
+}
+
+#[test]
 fn errors_when_the_registry_cannot_serve_a_react_file() {
     let fs = InMemoryFs::new();
     fs.write(Path::new("primitiv.json"), CONFIG).unwrap();

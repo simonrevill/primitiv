@@ -31,6 +31,9 @@ pub struct AddOptions {
     /// `None` the project config's `styles.format` is used; an explicit
     /// `--format` wins, mirroring `tokens` / `theme` (no persistence).
     pub format: Option<Format>,
+    /// Override the styles destination for this copy (§5). When `None` the
+    /// config's `styles.path` is used; an explicit `--path` wins (no persistence).
+    pub path: Option<String>,
 }
 
 /// The `primitiv add <component...>` command (RFC 0005 §2.2 / §4).
@@ -60,6 +63,7 @@ pub fn add(
         styles_only,
         no_styles,
         format,
+        path,
     } = options;
     let index = registry
         .index()
@@ -78,7 +82,7 @@ pub fn add(
             ensure_packages(fs, runner, &index, &resolved, &dir)?;
         }
         if !*no_styles {
-            copy_styled_surface(fs, registry, &index, &resolved, &dir, *format)?;
+            copy_styled_surface(fs, registry, &index, &resolved, &dir, *format, path.as_deref())?;
         }
     }
     Ok(())
@@ -94,9 +98,10 @@ const DEFAULT_COMPONENTS_DIR: &str = "components";
 /// headless-only install) or `styles.enabled = false`, nothing is copied.
 /// Otherwise each component's per-format stylesheet lands in the styles path and
 /// its format-independent React surface (recipe + wrapper) in the components
-/// directory. An explicit `format` overrides the config's `styles.format` for
-/// the stylesheet (RFC 0005 §4.1 step 3 / §5); the React surface is
-/// format-independent, so it is unaffected.
+/// directory. An explicit `format` / `path` overrides the config's
+/// `styles.format` / `styles.path` for the stylesheet (RFC 0005 §4.1 step 3 /
+/// §5); the React surface is format-independent and alias-placed, so neither
+/// affects it.
 fn copy_styled_surface(
     fs: &impl FileSystem,
     registry: &impl Registry,
@@ -104,6 +109,7 @@ fn copy_styled_surface(
     resolved: &[String],
     dir: &Path,
     format: Option<Format>,
+    path: Option<&str>,
 ) -> Result<(), CliError> {
     let Some(config) = config::try_resolve(fs, dir)? else {
         return Ok(());
@@ -112,22 +118,23 @@ fn copy_styled_surface(
         return Ok(());
     }
     let format = format.unwrap_or(config.styles.format);
-    copy_stylesheets(fs, registry, index, resolved, &config, format)?;
+    let styles_path = path.unwrap_or(&config.styles.path);
+    copy_stylesheets(fs, registry, index, resolved, styles_path, format)?;
     copy_react_surface(fs, registry, index, resolved, dir)
 }
 
 /// Copy each component's stylesheet for the resolved `format` into
-/// `<styles.path>/<component>/` (RFC 0005 §4.1 step 4).
+/// `<styles_path>/<component>/` (RFC 0005 §4.1 step 4).
 fn copy_stylesheets(
     fs: &impl FileSystem,
     registry: &impl Registry,
     index: &RegistryIndex,
     resolved: &[String],
-    config: &config::Config,
+    styles_path: &str,
     format: Format,
 ) -> Result<(), CliError> {
     for name in resolved {
-        let component_dir = Path::new(&config.styles.path).join(name);
+        let component_dir = Path::new(styles_path).join(name);
         for file in index.components[name].styles.formats.files(format) {
             copy_file(fs, registry, name, file, &component_dir)?;
         }

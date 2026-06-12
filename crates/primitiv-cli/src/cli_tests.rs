@@ -181,6 +181,29 @@ fn rejects_an_unknown_add_format() {
 }
 
 #[test]
+fn parses_add_with_a_path_override() {
+    // `--path` overrides where copied stylesheets land for this run.
+    let command = parse(&args(&["add", "button", "--path", "lib/styles"])).unwrap();
+
+    assert_eq!(
+        command,
+        Command::Add(AddOptions {
+            components: vec!["button".to_string()],
+            path: Some("lib/styles".to_string()),
+            ..Default::default()
+        })
+    );
+}
+
+#[test]
+fn rejects_add_path_with_no_value() {
+    assert!(matches!(
+        parse(&args(&["add", "button", "--path"])).unwrap_err(),
+        CliError::Usage(_)
+    ));
+}
+
+#[test]
 fn parses_add_with_the_styles_only_flag() {
     let command = parse(&args(&["add", "button", "--styles-only"])).unwrap();
 
